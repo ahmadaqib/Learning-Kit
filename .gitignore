@@ -1,0 +1,18 @@
+# Privacy & private source materials (never publish to public repo)
+pdf-material/
+pdf-material
+prd.md
+*.pdf
+
+# Dependencies & build outputs
+node_modules/
+dist/
+.vercel/
+
+# Logs, caches & local env
+*.log
+*.local
+.env
+.env.*
+.DS_Store
+Thumbs.db

@@ -1,0 +1,155 @@
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jakarta-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/jakarta-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/jakarta-800.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/jetbrains-700.woff2') format('woff2');
+}
+
+:root {
+  color-scheme: light dark;
+
+  --ink: #1f2340;
+  --ink-2: #4a4f72;
+  --ink-3: #8a8ea8;
+  --paper: #ffffff;
+  --cream: #f6f3ee;
+  --line: #e4e1da;
+
+  --ok-500: #23913f;
+  --ok-600: #1c7432;
+  --ok-50: #eaf7ec;
+  --warn-500: #c97a00;
+  --warn-700: #8f5600;
+  --warn-50: #fff4e0;
+  --err-500: #d23b2a;
+  --err-600: #b52d1e;
+  --err-50: #fdecea;
+  --star: #f5b400;
+
+  /* Default world accent (A1) */
+  --world: #e4572e;
+  --world-50: color-mix(in srgb, var(--world), #fff 90%);
+  --world-100: color-mix(in srgb, var(--world), #fff 78%);
+  --world-600: color-mix(in srgb, var(--world), #000 22%);
+  --world-700: color-mix(in srgb, var(--world), #000 36%);
+  --world-btn-text: #ffffff;
+
+  /* Font families */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Scale multiplier controlled by Settings (100% / 115% / 130%) */
+  --text-scale: 1;
+
+  /* Responsive typography (Pro default, Junior overrides via [data-mode="junior"]) */
+  --fs-display: clamp(1.875rem, 1.5rem + 1vw, 2.25rem);
+  --fs-h1: clamp(1.5rem, 1.3rem + 0.6vw, 1.75rem);
+  --fs-h2: clamp(1.25rem, 1.15rem + 0.35vw, 1.4rem);
+  --fs-h3: clamp(1.125rem, 1.05rem + 0.25vw, 1.25rem);
+  --fs-body-l: clamp(1.125rem, 1.05rem + 0.25vw, 1.25rem);
+  --fs-body: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --fs-small: clamp(0.875rem, 0.84rem + 0.12vw, 0.95rem);
+  --fs-kicker: 0.75rem;
+
+  /* Touch & padding tokens */
+  --touch-min: 48px;
+  --screen-pad: 16px;
+
+  /* Radius & shadow */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-card: 0 1px 0 var(--line), 0 6px 16px rgba(31, 35, 64, 0.06);
+  --shadow-btn: 0 3px 0 var(--world-700);
+}
+
+:root:has(> head > meta[name='color-scheme'][content='dark']),
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --cream: #14162a;
+  --paper: #1e2140;
+  --ink: #e8eaf6;
+  --ink-2: #b8bce0;
+  --ink-3: #8c91ba;
+  --line: #2e3258;
+  --ok-50: #132a1d;
+  --ok-600: #6fe08b;
+  --warn-50: #2c200d;
+  --warn-700: #ffc857;
+  --err-50: #331618;
+  --err-600: #ff8577;
+  --world-50: color-mix(in srgb, var(--world), #14162a 78%);
+  --world-100: color-mix(in srgb, var(--world), #14162a 62%);
+  --world-700: color-mix(in srgb, var(--world), #ffffff 42%);
+  --shadow-card: 0 1px 0 var(--line), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+:root:has(> head > meta[name='color-scheme'][content='light']),
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-mode='junior'] {
+  --fs-display: clamp(2.125rem, 1.75rem + 1vw, 2.5rem);
+  --fs-h1: clamp(1.75rem, 1.5rem + 0.65vw, 2rem);
+  --fs-h2: clamp(1.375rem, 1.25rem + 0.4vw, 1.625rem);
+  --fs-h3: clamp(1.25rem, 1.15rem + 0.3vw, 1.4rem);
+  --fs-body-l: clamp(1.25rem, 1.15rem + 0.35vw, 1.4rem);
+  --fs-body: clamp(1.125rem, 1rem + 0.35vw, 1.3125rem);
+  --fs-small: clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem);
+  --touch-min: 56px;
+  --screen-pad: 20px;
+}
+
+/* Kuning (#D99A00) memakai teks gelap --ink untuk kontras >= 4.5:1 */
+[data-world-yellow='true'] {
+  --world-600: color-mix(in srgb, var(--world), #fff 10%);
+  --world-700: #785300;
+  --world-btn-text: #1f2340;
+}
+
+:root[data-theme='dark'] [data-world-yellow='true'] {
+  --world-600: #d99a00;
+  --world-700: #ffd466;
+  --world-btn-text: #14162a;
+}
+
+/* B10 navy gelap pada mode gelap memakai emas agar kontras >= 4.5:1 */
+:root[data-theme='dark'] [data-world-id='b10'] {
+  --world-600: #f5b400;
+  --world-700: #ffd466;
+  --world-btn-text: #14162a;
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      try {
+        var raw = localStorage.getItem('petualang-web');
+        var theme = 'light';
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          var state = parsed && parsed.state ? parsed.state : parsed;
+          var active = state && state.profiles && state.activeProfileId ? state.profiles[state.activeProfileId] : null;
+          if (active && active.settings && active.settings.theme) {
+            theme = active.settings.theme;
+          }
+        }
+        var meta = document.querySelector('meta[name="color-scheme"]');
+        if (theme === 'dark') {
+          if (meta) meta.setAttribute('content', 'dark');
+          document.documentElement.dataset.theme = 'dark';
+        } else if (theme === 'light') {
+          if (meta) meta.setAttribute('content', 'light');
+          document.documentElement.dataset.theme = 'light';
+        } else {
+          if (meta) meta.setAttribute('content', 'light dark');
+          var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.dataset.theme = sysDark ? 'dark' : 'light';
+        }
+      } catch (e) {}
+    </script>
+    <meta name="theme-color" content="#1F2340" />
+    <meta
+      name="description"
+      content="Petualang Web — Belajar membuat website dan memahami API lewat cerita restoran, kurir, dan radio, sedikit demi sedikit."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <title>Petualang Web — Belajar Website &amp; API</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,634 @@
+@import 'tailwindcss';
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    font-size: calc(16px * var(--text-scale));
+    background-color: var(--cream);
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--cream);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  button,
+  a,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1rem);
+  }
+
+  :where(a:any-link, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid var(--world-700);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .pw-prose {
+    max-width: 60ch;
+  }
+
+  .pw-display {
+    font-size: var(--fs-display);
+    line-height: 1.1;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .pw-h1 {
+    font-size: var(--fs-h1);
+    line-height: 1.2;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .pw-h2 {
+    font-size: var(--fs-h2);
+    line-height: 1.25;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .pw-h3 {
+    font-size: var(--fs-h3);
+    line-height: 1.3;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .pw-body-l {
+    font-size: var(--fs-body-l);
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  .pw-body {
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .pw-small {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+  }
+
+  .pw-kicker {
+    font-size: var(--fs-kicker);
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--world-700);
+  }
+
+  .pw-code {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .pw-card {
+    background-color: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Efek stretch & squish taktil untuk tombol, kartu, dan menu */
+  .pw-pressable {
+    transition:
+      transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 180ms ease,
+      border-color 150ms ease,
+      background-color 150ms ease,
+      filter 150ms ease;
+    transform-origin: center center;
+  }
+
+  @media (hover: hover) {
+    .pw-pressable:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.018, 0.985);
+    }
+  }
+
+  .pw-pressable:active:not(:disabled) {
+    transform: translateY(2px) scale(1.045, 0.925);
+  }
+
+  .pw-btn-primary {
+    min-block-size: var(--touch-min);
+    min-inline-size: var(--touch-min);
+    background-color: var(--world-600);
+    color: var(--world-btn-text);
+    border: 0;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 0 var(--world-700);
+    font-weight: 800;
+    font-size: var(--fs-body);
+    line-height: 1.25;
+    text-align: center;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition:
+      transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 160ms ease,
+      filter 140ms ease;
+    transform-origin: center center;
+  }
+
+  @media (hover: hover) {
+    .pw-btn-primary:hover:not(:disabled) {
+      filter: brightness(1.06);
+      transform: translateY(-2px) scale(1.02, 0.985);
+      box-shadow: 0 6px 0 var(--world-700);
+    }
+  }
+
+  .pw-btn-primary:active:not(:disabled) {
+    transform: translateY(3px) scale(1.045, 0.91);
+    box-shadow: 0 1px 0 var(--world-700);
+  }
+
+  .pw-btn-primary:disabled {
+    background-color: var(--line);
+    color: var(--ink-3);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .pw-btn-secondary {
+    min-block-size: var(--touch-min);
+    min-inline-size: var(--touch-min);
+    background-color: var(--paper);
+    color: var(--ink);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: 0 3px 0 var(--line);
+    font-weight: 700;
+    font-size: var(--fs-body);
+    line-height: 1.25;
+    text-align: center;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition:
+      transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 160ms ease,
+      background-color 140ms ease,
+      border-color 140ms ease;
+    transform-origin: center center;
+  }
+
+  @media (hover: hover) {
+    .pw-btn-secondary:hover:not(:disabled) {
+      border-color: var(--world-600);
+      background-color: var(--world-50);
+      transform: translateY(-2px) scale(1.02, 0.985);
+      box-shadow: 0 4px 0 color-mix(in srgb, var(--world-600), transparent 55%);
+    }
+  }
+
+  .pw-btn-secondary:active:not(:disabled) {
+    transform: translateY(2px) scale(1.045, 0.92);
+    box-shadow: 0 1px 0 var(--line);
+  }
+
+  .pw-btn-secondary:disabled {
+    opacity: 0.55;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .pw-btn-ghost {
+    min-block-size: var(--touch-min);
+    min-inline-size: var(--touch-min);
+    background: transparent;
+    color: var(--ink-2);
+    border: 0;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: var(--fs-small);
+    line-height: 1.25;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition:
+      transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      background-color 140ms ease,
+      color 140ms ease;
+  }
+
+  @media (hover: hover) {
+    .pw-btn-ghost:hover:not(:disabled) {
+      background-color: var(--cream);
+      color: var(--ink);
+      transform: scale(1.02, 0.985);
+    }
+  }
+
+  .pw-btn-ghost:active:not(:disabled) {
+    transform: scale(1.04, 0.92);
+  }
+
+  /* Native <dialog> modal rules per modern-web-guidance */
+  dialog.pw-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    background-color: var(--paper);
+    color: var(--ink);
+    padding: 0;
+    max-width: min(560px, calc(100vw - 24px));
+    width: 100%;
+    max-height: 85dvh;
+    box-shadow: 0 24px 60px rgba(15, 18, 36, 0.3);
+  }
+
+  dialog.pw-dialog[open] {
+    animation: pw-pop-elastic 280ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  dialog.pw-dialog:modal {
+    overscroll-behavior: contain;
+  }
+
+  dialog.pw-dialog::backdrop {
+    background-color: rgba(20, 22, 42, 0.55);
+    backdrop-filter: blur(3px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  dialog.pw-sheet {
+    position: fixed;
+    inset: auto 0 0 0;
+    margin-inline: auto;
+    margin-block: auto 0;
+    border: 1.5px solid var(--line);
+    border-bottom: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background-color: var(--paper);
+    color: var(--ink);
+    padding: 0;
+    max-width: min(640px, 100vw);
+    width: 100%;
+    max-height: 72dvh;
+    box-shadow: 0 -12px 44px rgba(15, 18, 36, 0.25);
+  }
+
+  dialog.pw-sheet[open] {
+    animation: pw-sheet-spring 310ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  dialog.pw-sheet:modal {
+    overscroll-behavior: contain;
+  }
+
+  dialog.pw-sheet::backdrop {
+    background-color: rgba(20, 22, 42, 0.45);
+    backdrop-filter: blur(2px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Container queries untuk ChoiceCard dan kartu adaptif (§10.10) */
+.pw-choice-container {
+  container-type: inline-size;
+}
+
+.pw-choices-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@container (min-width: 560px) {
+  .pw-choices-grid[data-compact-labels='true'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.pw-drag-item {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Safe area padding helpers */
+.pw-safe-bottom {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.pw-safe-top {
+  padding-top: max(8px, env(safe-area-inset-top));
+}
+
+/* Animations */
+@keyframes pw-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pw-jelly-press {
+  0% {
+    transform: scale(1, 1);
+  }
+  30% {
+    transform: scale(1.06, 0.92) translateY(2px);
+  }
+  60% {
+    transform: scale(0.96, 1.04) translateY(-2px);
+  }
+  82% {
+    transform: scale(1.02, 0.99);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+@keyframes pw-pop-elastic {
+  0% {
+    opacity: 0;
+    transform: scale(0.88, 0.84) translateY(14px);
+  }
+  62% {
+    opacity: 1;
+    transform: scale(1.03, 0.97) translateY(-2px);
+  }
+  84% {
+    transform: scale(0.99, 1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+@keyframes pw-sheet-spring {
+  0% {
+    opacity: 0;
+    transform: translateY(100%) scaleY(0.94);
+  }
+  68% {
+    opacity: 1;
+    transform: translateY(-4px) scaleY(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes pw-float-gentle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pw-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes pw-pulse-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--world), transparent 55%);
+  }
+  50% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--world), transparent 100%);
+  }
+}
+
+@keyframes pw-star-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.pw-anim-slide-up {
+  animation: pw-slide-up 240ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.pw-squish-pop {
+  animation: pw-jelly-press 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pw-anim-pop {
+  animation: pw-pop-elastic 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.pw-float {
+  animation: pw-float-gentle 3.4s ease-in-out infinite;
+}
+
+.pw-anim-shake {
+  animation: pw-shake 200ms ease-in-out;
+}
+
+.pw-anim-pulse {
+  animation: pw-pulse-ring 2.2s ease-in-out infinite;
+}
+
+.pw-anim-star {
+  animation: pw-star-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Reduced motion support (§10.8) */
+@media (prefers-reduced-motion: reduce) {
+  .pw-anim-slide-up,
+  .pw-anim-star,
+  .pw-squish-pop,
+  .pw-anim-pop,
+  dialog.pw-dialog[open],
+  dialog.pw-sheet[open] {
+    animation: none;
+    transition: opacity 120ms linear;
+  }
+  .pw-anim-shake,
+  .pw-anim-pulse,
+  .pw-float {
+    animation: none;
+  }
+  .pw-pressable,
+  .pw-btn-primary,
+  .pw-btn-secondary,
+  .pw-btn-ghost {
+    transition: background-color 120ms linear, border-color 120ms linear;
+  }
+  .pw-pressable:hover:not(:disabled),
+  .pw-pressable:active:not(:disabled),
+  .pw-btn-primary:hover:not(:disabled),
+  .pw-btn-primary:active:not(:disabled),
+  .pw-btn-secondary:hover:not(:disabled),
+  .pw-btn-secondary:active:not(:disabled),
+  .pw-btn-ghost:hover:not(:disabled),
+  .pw-btn-ghost:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+:root[data-reduced-motion='always'] .pw-anim-slide-up,
+:root[data-reduced-motion='always'] .pw-anim-star,
+:root[data-reduced-motion='always'] .pw-squish-pop,
+:root[data-reduced-motion='always'] .pw-anim-pop,
+:root[data-reduced-motion='always'] dialog.pw-dialog[open],
+:root[data-reduced-motion='always'] dialog.pw-sheet[open] {
+  animation: none;
+  transition: opacity 120ms linear;
+}
+
+:root[data-reduced-motion='always'] .pw-anim-shake,
+:root[data-reduced-motion='always'] .pw-anim-pulse,
+:root[data-reduced-motion='always'] .pw-float {
+  animation: none;
+}
+
+:root[data-reduced-motion='always'] .pw-pressable,
+:root[data-reduced-motion='always'] .pw-btn-primary,
+:root[data-reduced-motion='always'] .pw-btn-secondary,
+:root[data-reduced-motion='always'] .pw-btn-ghost {
+  transition: background-color 120ms linear, border-color 120ms linear;
+}
+
+:root[data-reduced-motion='always'] .pw-pressable:hover:not(:disabled),
+:root[data-reduced-motion='always'] .pw-pressable:active:not(:disabled),
+:root[data-reduced-motion='always'] .pw-btn-primary:hover:not(:disabled),
+:root[data-reduced-motion='always'] .pw-btn-primary:active:not(:disabled),
+:root[data-reduced-motion='always'] .pw-btn-secondary:hover:not(:disabled),
+:root[data-reduced-motion='always'] .pw-btn-secondary:active:not(:disabled),
+:root[data-reduced-motion='always'] .pw-btn-ghost:hover:not(:disabled),
+:root[data-reduced-motion='always'] .pw-btn-ghost:active:not(:disabled) {
+  transform: none;
+}
+
+/* App shell layout classes (Compact / Medium / Expanded / Pendek) (§10.10) */
+.pw-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pw-side-rail {
+  display: none;
+}
+
+.pw-bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background-color: var(--paper);
+  border-top: 1.5px solid var(--line);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 6px 8px max(6px, env(safe-area-inset-bottom));
+}
+
+.pw-main-with-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 1024px), (max-height: 499px) and (min-width: 600px) {
+  .pw-shell {
+    flex-direction: row;
+  }
+  .pw-bottom-nav {
+    display: none;
+  }
+  .pw-side-rail {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    width: 96px;
+    flex-shrink: 0;
+    background-color: var(--paper);
+    border-right: 1.5px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 8px;
+    gap: 10px;
+    z-index: 30;
+  }
+  .pw-main-with-nav {
+    padding-bottom: 32px;
+  }
+}
+
+@media (max-height: 499px) and (min-width: 600px) {
+  .pw-side-rail {
+    width: 72px;
+    padding: 8px 4px;
+  }
+}
+
+/* Visually hidden utility (accessibility guide) */
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff;
+    color: #1f2340;
+  }
+}
