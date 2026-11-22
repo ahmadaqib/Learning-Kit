@@ -45,7 +45,7 @@ export const OnboardingPage: React.FC = () => {
         {[1, 2, 3].map((idx) => (
           <span
             key={idx}
-            className={`h-2.5 rounded-full transition-all duration-300 ${
+            className={`h-2.5 rounded-full transition-[width,background-color] duration-200 ${
               idx === step ? 'w-10 bg-[var(--world-600)]' : 'w-2.5 bg-[var(--line)]'
             }`}
           />

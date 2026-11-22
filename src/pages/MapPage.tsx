@@ -87,19 +87,23 @@ export const MapPage: React.FC = () => {
             {track === 'A' ? 'Jalur A: Membangun Tampilan' : 'Jalur B: Aplikasi Saling Bicara'}
           </h1>
         </div>
-        <div className="inline-flex rounded-full border-2 border-[var(--line)] bg-[var(--paper)] p-1">
+        <div className="inline-flex rounded-full border-2 border-[var(--line)] bg-[var(--paper)] p-1 gap-1">
           <Link
             to="/peta/A"
-            className={`min-h-[42px] inline-flex items-center rounded-full px-4 text-sm font-extrabold ${
-              track === 'A' ? 'bg-[var(--ink)] text-white' : 'text-[var(--ink-2)]'
+            className={`pw-pressable min-h-[42px] inline-flex items-center rounded-full px-5 text-sm font-extrabold ${
+              track === 'A'
+                ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
             }`}
           >
             Jalur A
           </Link>
           <Link
             to="/peta/B"
-            className={`min-h-[42px] inline-flex items-center rounded-full px-4 text-sm font-extrabold ${
-              track === 'B' ? 'bg-[var(--ink)] text-white' : 'text-[var(--ink-2)]'
+            className={`pw-pressable min-h-[42px] inline-flex items-center rounded-full px-5 text-sm font-extrabold ${
+              track === 'B'
+                ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
             }`}
           >
             Jalur B

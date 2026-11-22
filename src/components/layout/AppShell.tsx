@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BookOpen, Home, Layers, Map as MapIcon, User } from 'lucide-react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
+import { BrandLogo } from '@/components/mascot/BrandLogo';
 import { countAllDueCards } from '@/engine/leitner';
 import { formatLocalDate } from '@/engine/date';
 import { useAppStore } from '@/store/useAppStore';
@@ -72,11 +73,11 @@ export const AppShell: React.FC<AppShellProps> = ({ children, hideNav = false })
   if (hideNav || !profile) {
     return (
       <div className="min-h-[100dvh] flex flex-col">
-        <a href="#main-content" className="skip-link visually-hidden rounded bg-[var(--ink)] px-4 py-2 text-white">
+        <a href="#main-content" className="skip-link visually-hidden rounded bg-[var(--ink)] px-4 py-2 text-[var(--paper)]">
           Langsung ke isi utama
         </a>
-        <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col">
-          <div className="flex-1 flex flex-col">{children}</div>
+        <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col w-full">
+          <div className="flex-1 flex flex-col w-full">{children}</div>
           {creatorWatermark}
         </main>
       </div>
@@ -85,15 +86,22 @@ export const AppShell: React.FC<AppShellProps> = ({ children, hideNav = false })
 
   return (
     <div className="pw-shell">
-      <a href="#main-content" className="skip-link visually-hidden rounded bg-[var(--ink)] px-4 py-2 text-white">
+      <a href="#main-content" className="skip-link visually-hidden rounded bg-[var(--ink)] px-4 py-2 text-[var(--paper)]">
         Langsung ke isi utama
       </a>
 
       {/* Rel Samping Kiri untuk iPad mendatar & Desktop (>= 1024px / pendek landscape) */}
       <aside className="pw-side-rail no-print">
-        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#1F2340] text-sm font-extrabold text-[#F5B400]">
-          PW
-        </div>
+        <Link
+          to="/beranda"
+          aria-label="Beranda Petualang Web"
+          className="pw-pressable group mb-2 flex flex-col items-center gap-1 rounded-2xl px-1.5 py-1"
+        >
+          <BrandLogo size={48} />
+          <span className="text-[10px] font-extrabold tracking-tight text-[var(--ink-2)] group-hover:text-[var(--ink)]">
+            Petualang
+          </span>
+        </Link>
         <nav aria-label="Navigasi utama samping" className="flex flex-col gap-2 w-full">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -123,7 +131,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, hideNav = false })
       </aside>
 
       <main id="main-content" tabIndex={-1} className="pw-main-with-nav">
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 w-full">{children}</div>
         {creatorWatermark}
       </main>
 
