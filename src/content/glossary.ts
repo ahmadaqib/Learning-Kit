@@ -4,7 +4,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   // A1 Kota Web
   {
     id: 'frontend',
-    term: 'Frontend',
+    term: 'Frontend (FE)',
     pronunciation: 'fron-end',
     shortDef: {
       junior: 'Bagian website yang terlihat dan bisa disentuh oleh pengunjung, seperti ruang makan restoran.',
@@ -15,7 +15,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     id: 'backend',
-    term: 'Backend',
+    term: 'Backend (BE)',
     pronunciation: 'bek-end',
     shortDef: {
       junior: 'Bagian di balik layar yang mengolah dan menyimpan data, seperti dapur restoran.',

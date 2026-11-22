@@ -65,8 +65,10 @@ export const LessonPlayerPage: React.FC = () => {
     let active = true;
     setLoadError(false);
     setLesson(null);
+    setWarmupQuestion(null);
     setResultSummary(null);
     setInQuizPhase(false);
+    setQuizSession(null);
     setSubmitted(null);
     setAnswerVal(undefined);
 
@@ -95,7 +97,8 @@ export const LessonPlayerPage: React.FC = () => {
           }
         }
 
-        const savedIdx = profile?.lessons[found.id]?.stepIndex ?? 0;
+        const savedRec = profile?.lessons[found.id];
+        const savedIdx = savedRec?.completedAt ? 0 : (savedRec?.stepIndex ?? 0);
         setIntroIndex(savedIdx);
       })
       .catch(() => {
@@ -145,6 +148,15 @@ export const LessonPlayerPage: React.FC = () => {
   const currentQuizItem = inQuizPhase ? quizSession?.queue[0] : undefined;
   const activeQuestion: Question | undefined =
     currentIntro?.kind === 'warmup' ? currentIntro.q : currentQuizItem?.question;
+
+  // Pastikan transisi mulus ke fase kuis jika stepIndex sudah melewati kartu pengantar (mis. reload di tengah kuis)
+  useEffect(() => {
+    if (!lesson || inQuizPhase || resultSummary) return;
+    if (introSteps.length === 0 || introIndex >= introSteps.length) {
+      setInQuizPhase(true);
+      setQuizSession(createQuizSession(lessonQuestions));
+    }
+  }, [lesson, introSteps.length, introIndex, inQuizPhase, resultSummary, lessonQuestions]);
 
   // Panduan pertama kali per tipe soal (V13 / F18)
   useEffect(() => {
@@ -430,9 +442,9 @@ export const LessonPlayerPage: React.FC = () => {
       </header>
 
       {/* Konten Utama: 1 kolom di HP/iPad tegak, 2 kolom di iPad mendatar/Desktop (§10.10) */}
-      <div className="flex-1 flex flex-col justify-between pb-6">
+      <div className="flex-1 w-full flex flex-col justify-between pb-6">
         {currentIntro && currentIntro.kind !== 'warmup' && (
-          <div className="grid flex-1 gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+          <div key={`intro-${introIndex}`} className="pw-anim-pop grid flex-1 w-full gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
             {/* Area Visual */}
             <div className="pw-card flex min-h-[200px] items-center justify-center bg-[var(--world-50)] p-5">
               {currentIntro.kind === 'story' && (
@@ -533,7 +545,7 @@ export const LessonPlayerPage: React.FC = () => {
 
         {/* Kartu Soal (Pemanasan atau Kuis Utama) */}
         {activeQuestion && (
-          <div className="mx-auto flex w-full max-w-[720px] flex-1 flex-col justify-between gap-6">
+          <div key={`q-${activeQuestion.id}`} className="pw-anim-pop mx-auto flex w-full max-w-[720px] flex-1 flex-col justify-between gap-6">
             <div className="space-y-5">
               <div>
                 <span className="pw-kicker">

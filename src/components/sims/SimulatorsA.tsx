@@ -108,7 +108,7 @@ export const RestoranWebSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
     >
       <div className="grid gap-3 sm:grid-cols-3 text-center">
         <div
-          className={`rounded-xl border-2 p-3 transition-all duration-300 ${
+          className={`rounded-xl border-2 p-3 transition-[transform,border-color,background-color] duration-200 ${
             stage === 'response'
               ? 'pw-squish-pop border-[var(--ok-500)] bg-[var(--ok-50)] shadow-md'
               : 'border-[var(--line)] bg-[var(--cream)]'
@@ -121,7 +121,7 @@ export const RestoranWebSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
           </div>
         </div>
         <div
-          className={`rounded-xl border-2 p-3 transition-all duration-300 ${
+          className={`rounded-xl border-2 p-3 transition-[transform,border-color,background-color,opacity] duration-200 ${
             stage === 'request' || stage === 'response'
               ? 'pw-squish-pop border-[var(--world-600)] bg-[var(--world-50)] scale-[1.02] shadow-md'
               : 'border-[var(--world-600)] bg-[var(--world-50)] opacity-85'
@@ -136,7 +136,7 @@ export const RestoranWebSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
           </div>
         </div>
         <div
-          className={`rounded-xl border-2 p-3 text-white transition-all duration-300 ${
+          className={`rounded-xl border-2 p-3 text-white transition-[transform,border-color] duration-200 ${
             stage === 'kitchen'
               ? 'pw-squish-pop border-[#F5B400] bg-[#1F2340] scale-[1.03] shadow-lg'
               : 'border-[#1F2340] bg-[#1F2340]'

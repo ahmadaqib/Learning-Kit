@@ -21,7 +21,7 @@ export const WorldThemeWrapper: React.FC<WorldThemeWrapperProps> = ({
       data-world-id={worldId}
       data-world-yellow={isYellow ? 'true' : undefined}
       style={{ '--world': color } as React.CSSProperties}
-      className={className}
+      className={`w-full ${className}`.trim()}
     >
       {children}
     </div>
