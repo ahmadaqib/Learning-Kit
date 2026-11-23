@@ -38,13 +38,19 @@ async function selectTip(input: PetHintRequest, key: string, models: string[], s
           ], max_tokens: 64,
         }),
       });
-      if (response.status === 401 || response.status === 403) return null;
-      if (!response.ok) continue;
+      if (!response.ok) {
+        // A 403 can apply to one model on the configured plan. A 401 rejects the credential.
+        const challenged = response.headers.get('cf-mitigated') === 'challenge';
+        console.warn('companion.provider_http', response.status, challenged ? 'challenge' : 'response');
+        if (response.status === 401 || challenged) return null;
+        continue;
+      }
       const json = await response.json();
       const tip = readTip(json?.choices?.[0]?.message?.content);
       if (tip) return tip;
-    } catch {
-      // A model can be offline even when the next model is available.
+      console.warn('companion.provider_unusable_response');
+    } catch (error) {
+      console.warn('companion.provider_fetch', error instanceof Error ? error.name : 'failed');
     }
   }
   return null;
@@ -81,7 +87,10 @@ export function createCompanionService(getConfig: () => CompanionConfig, send: t
     if (cached) return json(200, { tipId: cached });
     const { apiKey, models } = getConfig();
     const chain = [...new Set((models ?? '').split(',').map(id => id.trim()).filter(id => /^[a-z\d][a-z\d./_-]{0,79}$/i.test(id)))].slice(0, 4);
-    if (!apiKey || !chain.length) return json(503, { error: 'unavailable' });
+    if (!apiKey || !chain.length) {
+      console.warn('companion.configuration_missing', !apiKey ? 'key' : 'models');
+      return json(503, { error: 'unavailable' });
+    }
     let pending = inFlight.get(context);
     if (!pending) {
       if (Date.now() - windowStart >= 60000) { windowStart = Date.now(); calls = 0; }
