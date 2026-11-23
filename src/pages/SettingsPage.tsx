@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
   BookOpenText,
   CalendarCheck,
@@ -7,6 +7,8 @@ import {
   Eye,
   Info,
   Lock,
+  Music2,
+  PawPrint,
   Rocket,
   ShieldCheck,
   SunMoon,
@@ -18,12 +20,15 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { COLLECTION_LABEL, MODE_CHOICE_LABEL, xpWord } from '@/app/modeConfig';
 import type { Mode } from '@/content/schema';
-import { hasIndonesianVoiceAvailable } from '@/engine/speech';
+import { PET_VOICE_SAMPLE, petVoiceFiles } from '@/content/petVoiceClips';
+import { speakCompanion } from '@/engine/readAloud';
+import { getIndonesianVoices, isSpeechSupported, speakText, stopSpeaking, subscribeToVoices } from '@/engine/speech';
 import { getReadingComfort, setReadingComfort } from '@/engine/readingComfort';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/Button';
 import { CompanionGate } from '@/components/ui/CompanionGate';
 import { DialogModal } from '@/components/ui/DialogModal';
+import { PetSettings } from '@/components/pet/PetSettings';
 
 /* ------------------------------------------------------------------ controls (M09) */
 
@@ -135,7 +140,7 @@ const Row: React.FC<{
 }> = ({ id, icon: Icon, label, effect, control, below }) => (
   <div className="py-4 first:pt-0 last:pb-0">
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <div className="flex min-w-[14rem] flex-1 items-start gap-3">
+      <div className="flex min-w-0 flex-[1_1_14rem] items-start gap-3">
         <span
           aria-hidden="true"
           className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--world-50)] text-[var(--world-700)]"
@@ -165,6 +170,31 @@ const Group: React.FC<{ id: string; title: string; children: React.ReactNode }> 
     <div className="pw-card divide-y divide-[var(--line)] p-[var(--space-card)]">{children}</div>
   </section>
 );
+
+function VolumeSlider({ id, label, value, onChange }: {
+  id: string;
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)_3rem] items-center gap-x-3">
+      <label htmlFor={id} className="pw-small col-span-2 font-bold text-[var(--ink-2)]">{label}</label>
+      <input
+        id={id}
+        type="range"
+        min={0}
+        max={100}
+        step={5}
+        value={value}
+        aria-valuetext={`${value} persen`}
+        onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+        className="min-h-[var(--touch-min)] w-full cursor-pointer accent-[var(--world-700)]"
+      />
+      <span aria-hidden="true" className="pw-small text-right font-bold tabular-nums text-[var(--ink)]">{value}%</span>
+    </div>
+  );
+}
 
 /* ------------------------------------------------------------------ theme previews */
 
@@ -228,6 +258,18 @@ export const SettingsPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [comfort, setComfort] = useState(() => (profile ? getReadingComfort(profile.id) : false));
   const [sampled, setSampled] = useState<{ light: ThemeSample; dark: ThemeSample } | null>(null);
+  const [voices, setVoices] = useState(getIndonesianVoices);
+  const [previewing, setPreviewing] = useState<'lesson' | 'pet' | null>(null);
+  const [previewFailed, setPreviewFailed] = useState<'lesson' | 'pet' | null>(null);
+
+  useEffect(() => {
+    const refresh = () => setVoices(getIndonesianVoices());
+    const unsubscribe = subscribeToVoices(refresh);
+    refresh();
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => () => stopSpeaking('preview'), []);
 
   // Before the first paint: read both themes' real tokens for the three preview cards
   useLayoutEffect(() => {
@@ -238,7 +280,34 @@ export const SettingsPage: React.FC = () => {
   if (!profile) return null;
 
   const { settings, mode } = profile;
-  const voiceAvailable = hasIndonesianVoiceAvailable();
+  const selectedVoice = voices.find((voice) => voice.voiceURI === settings.speechVoice);
+  const voiceAvailable = Boolean(selectedVoice || voices.some((voice) => voice.localService));
+  const petPreviewAvailable = voiceAvailable || (settings.petVoice === 'studio' && petVoiceFiles(PET_VOICE_SAMPLE).length > 0 && typeof Audio === 'function');
+  const voiceHelp = !isSpeechSupported()
+    ? 'Browser ini belum mendukung baca nyaring.'
+    : voices.length > 0
+      ? 'Pilih salah satu suara online di atas atau pasang suara Bahasa Indonesia di pengaturan perangkat.'
+      : 'Jika pilihan suara belum muncul, pasang suara Bahasa Indonesia di pengaturan perangkat, lalu buka kembali halaman ini.';
+
+  const stopPreview = () => {
+    stopSpeaking('preview');
+    setPreviewing(null);
+    setPreviewFailed(null);
+  };
+
+  const previewVoice = (source: 'lesson' | 'pet') => {
+    stopPreview();
+    if (previewing === source) return;
+    setPreviewing(source);
+    const finish = (completed: boolean) => {
+      setPreviewing(null);
+      setPreviewFailed(completed ? null : source);
+    };
+    const started = source === 'lesson'
+      ? speakText('Halo, Petualang! Siap belajar hari ini? Yuk, kita coba satu langkah dulu.', finish, 'preview')
+      : speakCompanion(PET_VOICE_SAMPLE, finish, true);
+    if (!started) finish(false);
+  };
 
   const changeComfort = (on: boolean) => {
     setReadingComfort(profile.id, on);
@@ -267,7 +336,7 @@ export const SettingsPage: React.FC = () => {
   const unit = COLLECTION_LABEL[mode].unit;
 
   return (
-    <div className="mx-auto max-w-[720px] space-y-[var(--gap-group)] px-4 py-6 sm:px-6">
+    <div className="mx-auto w-full min-w-0 max-w-[720px] space-y-[var(--gap-group)] px-4 py-6 sm:px-6">
       <h1 className="pw-h1">Pengaturan</h1>
 
       <Group id="tampilan" title="Tampilan">
@@ -374,7 +443,7 @@ export const SettingsPage: React.FC = () => {
           id="sound"
           icon={Volume2}
           label="Suara efek"
-          effect="Bunyi lembut saat menjawab dan mendapat bintang."
+          effect="Bunyi saat mengetuk tombol, kembali, dan menjawab soal."
           control={
             <Switch
               checked={settings.soundEnabled}
@@ -383,13 +452,93 @@ export const SettingsPage: React.FC = () => {
               describedBy="sound-effect"
             />
           }
+          below={<VolumeSlider id="sound-volume" label="Volume efek" value={settings.soundVolume} onChange={(soundVolume) => updateSettings({ soundVolume })} />}
+        />
+
+        <Row
+          id="music"
+          icon={Music2}
+          label="Musik latar"
+          effect="Musik instrumental pelan yang mengecil saat ada suara bacaan."
+          control={
+            <Switch
+              checked={settings.musicEnabled}
+              onChange={(musicEnabled) => updateSettings({ musicEnabled })}
+              labelledBy="music-label"
+              describedBy="music-effect"
+            />
+          }
+          below={<VolumeSlider id="music-volume" label="Volume musik" value={settings.musicVolume} onChange={(musicVolume) => updateSettings({ musicVolume })} />}
+        />
+
+        <Row
+          id="speech-voice"
+          icon={Ear}
+          label="Suara bacaan"
+          effect="Pilih suara Bahasa Indonesia untuk membacakan pelajaran."
+          below={
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  aria-labelledby="speech-voice-label"
+                  aria-describedby="speech-voice-effect"
+                  className="min-h-[var(--touch-min)] min-w-0 flex-[1_1_14rem] cursor-pointer rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper-raised)] px-3 py-2 font-bold text-[var(--ink)]"
+                  value={selectedVoice?.voiceURI ?? ''}
+                  onChange={(event) => {
+                    stopPreview();
+                    updateSettings({ speechVoice: event.currentTarget.value });
+                  }}
+                >
+                  <option value="">Otomatis (suara perangkat)</option>
+                  {voices.map((voice) => (
+                    <option key={voice.voiceURI} value={voice.voiceURI}>
+                      {voice.name}{voice.localService ? '' : ' · online'}
+                    </option>
+                  ))}
+                </select>
+                <Button variant="secondary" data-sfx="off" onClick={() => previewVoice('lesson')} disabled={!voiceAvailable}>
+                  {previewing === 'lesson' ? 'Hentikan contoh' : 'Dengar contoh'}
+                </Button>
+              </div>
+              {!voiceAvailable && (
+                <div className="pw-well flex items-start gap-2.5" role="note">
+                  <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--ink-2)]" aria-hidden="true" />
+                  <p className="pw-small text-[var(--ink)]">{voiceHelp}</p>
+                </div>
+              )}
+              {selectedVoice && !selectedVoice.localService && (
+                <p className="pw-small text-[var(--ink-2)]">Suara online bisa mengirim teks bacaan ke layanan suara browser.</p>
+              )}
+              {previewFailed === 'lesson' && <p role="status" className="pw-small text-[var(--ink-2)]">Contoh suara belum bisa diputar. Coba pilih suara lain.</p>}
+              <div>
+                <p id="speech-rate-label" className="pw-small mb-1 font-bold text-[var(--ink-2)]">Kecepatan bicara</p>
+                <Segmented
+                  labelledBy="speech-rate-label"
+                  value={settings.speechRate}
+                  onChange={(speechRate) => {
+                    stopPreview();
+                    updateSettings({ speechRate });
+                  }}
+                  options={[
+                    { value: 0.85, label: 'Pelan' },
+                    { value: 1, label: 'Normal' },
+                    { value: 1.12, label: 'Lebih cepat' },
+                  ]}
+                />
+              </div>
+              <VolumeSlider id="speech-volume" label="Volume bacaan" value={settings.speechVolume} onChange={(speechVolume) => {
+                stopPreview();
+                updateSettings({ speechVolume });
+              }} />
+            </div>
+          }
         />
 
         <Row
           id="autoread"
           icon={Ear}
           label="Bacakan otomatis"
-          effect="Bito membacakan cerita, soal, pilihan, dan penjelasan."
+          effect="Cerita, soal, pilihan, dan penjelasan dibaca saat muncul."
           control={
             <Switch
               checked={settings.autoReadAloud}
@@ -399,19 +548,37 @@ export const SettingsPage: React.FC = () => {
               disabled={!voiceAvailable && !settings.autoReadAloud}
             />
           }
+        />
+
+        <Row
+          id="pet-voice"
+          icon={PawPrint}
+          label="Suara hewan pendamping"
+          effect="Studio memakai klip suara bawaan aplikasi. Kalimat lainnya mengikuti suara bacaan yang kamu pilih."
           below={
-            !voiceAvailable ? (
-              <div className="pw-well flex items-start gap-2.5" role="note">
-                <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--ink-2)]" aria-hidden="true" />
-                <p className="pw-small text-[var(--ink)]">
-                  Perangkat ini belum punya suara Bahasa Indonesia. Pasang lewat pengaturan suara di perangkat,
-                  lalu buka lagi halaman ini.
-                </p>
-              </div>
-            ) : undefined
+            <div className="space-y-2">
+              <Segmented
+                labelledBy="pet-voice-label"
+                value={settings.petVoice}
+                onChange={(petVoice) => {
+                  stopPreview();
+                  updateSettings({ petVoice });
+                }}
+                options={[
+                  { value: 'studio', label: 'Studio' },
+                  { value: 'system', label: 'Ikuti suara bacaan' },
+                ]}
+              />
+              <Button variant="secondary" data-sfx="off" onClick={() => previewVoice('pet')} disabled={!petPreviewAvailable}>
+                {previewing === 'pet' ? 'Hentikan contoh hewan' : 'Dengar contoh hewan'}
+              </Button>
+              {previewFailed === 'pet' && <p role="status" className="pw-small text-[var(--ink-2)]">Contoh suara hewan belum bisa diputar.</p>}
+            </div>
           }
         />
       </Group>
+
+      <PetSettings />
 
       <Group id="belajar" title="Belajar">
         <Row

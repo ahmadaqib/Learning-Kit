@@ -3,6 +3,7 @@ import { BookOpen, Hand, Pencil, Target, Volume2 } from 'lucide-react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { STICKERS_BY_ID } from '@/content/stickers';
 import { GLOSSARY_BY_ID } from '@/content/glossary';
+import type { PetContext } from '@/content/petTips';
 import { WORLD_META_BY_ID } from '@/content/worldMeta';
 import { loadWorldBundle } from '@/content/worldLoader';
 import { visibleSegments } from '@/content/rich';
@@ -28,18 +29,20 @@ import {
 import { createVisibleTimer, lessonRecordKey, recordAttempt, type RecordResult, type VisibleTimer } from '@/engine/records';
 import { XP_RULES } from '@/engine/scoring';
 import { getLessonFocus, setLessonFocus } from '@/engine/lessonNotes';
+import { usePetLessonOffer } from '@/engine/usePetLessonOffer';
 import { LessonReflection } from '@/components/lesson/LessonReflection';
 import { LESSON_STUBS, WORLD_STUBS } from '@/components/map/MapPath';
 import { isLessonUnlocked } from '@/engine/unlock';
 import { hasSeen, markSeen } from '@/engine/seen';
 import { isStoppingPoint, noteLessonFinished } from '@/engine/sitting';
 import { playSound } from '@/engine/sound';
-import { hasIndonesianVoiceAvailable } from '@/engine/speech';
+import { useIndonesianVoiceAvailable } from '@/engine/speech';
 import { finishFly, flyTo } from '@/motion/waapi';
 import { useMotionPrefs } from '@/motion/prefs';
 import { useAppStore } from '@/store/useAppStore';
 import { PageLoader } from '@/components/fx/PageLoader';
 import { ConceptVisual } from '@/components/illustrations/ConceptVisuals';
+import { workshopVisual } from '@/components/illustrations/workshopVisual';
 import { ActionBar, ReadAloudButton } from '@/components/lesson/ActionBar';
 import { FeedbackSheet, feedbackTitle } from '@/components/lesson/FeedbackSheet';
 import { LessonHeader } from '@/components/lesson/LessonHeader';
@@ -47,6 +50,7 @@ import { LessonResult } from '@/components/lesson/LessonResult';
 import { LimitCard } from '@/components/lesson/LimitCard';
 import { QuestionGuideOverlay } from '@/components/lesson/QuestionGuideOverlay';
 import { Bito } from '@/components/mascot/Bito';
+import { PetLauncher } from '@/components/pet/PetLauncher';
 import { ALMOST_RATIO, QuestionIntro, QuestionRenderer, judgeParts } from '@/components/questions/QuestionRenderer';
 import { SimulatorHost } from '@/components/sims/SimulatorHost';
 import { Button } from '@/components/ui/Button';
@@ -195,6 +199,9 @@ const ConceptCard: React.FC<CardProps & { step: Extract<CardStep, { kind: 'conce
   reading,
   readButton,
 }) => {
+  const diagram = step.visual.type === 'component'
+    ? workshopVisual(step.visual.name, resolveTxt(step.visual.alt, mode), step.visual.props)
+    : null;
   const visual =
     step.visual.type === 'component' ? (
       <ConceptVisual
@@ -213,27 +220,32 @@ const ConceptCard: React.FC<CardProps & { step: Extract<CardStep, { kind: 'conce
     );
   const code = step.code && mode === 'pro' ? step.code : null;
 
+  const stageDisplay = code && !diagram ? 'hidden min-[640px]:flex' : 'flex';
+  const stage = (
+    <div
+      data-workshop-visual={diagram && step.visual.type === 'component' ? step.visual.name : undefined}
+      className={`pw-stage min-w-0 min-h-[200px] items-center justify-center p-5 ${stageDisplay} flex-col gap-3`}
+    >
+      {diagram ?? visual}
+      {code && (
+        <div className="w-full">
+          <CodeBlock snippet={code} wrapLines={Boolean(diagram)} />
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="grid w-full flex-1 gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
-      {/* From 640 px the code sits in the stage with the illustration. Under 640 px the stage gives way to a small sticker by the title. */}
-      <div
-        className={`pw-stage min-h-[200px] items-center justify-center p-5 ${code ? 'hidden min-[640px]:flex' : 'flex'} flex-col gap-3`}
-      >
-        {visual}
-        {code && (
-          <div className="w-full">
-            <CodeBlock snippet={code} />
-          </div>
-        )}
-      </div>
-      <div className="space-y-4">
+      {!diagram && stage}
+      <div className={diagram ? 'space-y-4 lg:col-start-2 lg:row-start-1' : 'space-y-4'}>
         <KickerRow
           icon={<Pencil className="h-4 w-4" aria-hidden="true" />}
           label={mode === 'junior' ? 'Belajar' : 'Konsep'}
           action={readButton}
         />
         <div className="flex items-center gap-3">
-          {code && (
+          {code && !diagram && (
             <div className="pw-stage flex h-[72px] w-[72px] flex-shrink-0 items-center justify-center overflow-hidden !rounded-[var(--radius-md)] min-[640px]:hidden">
               <div className="w-[160px] origin-center scale-[0.4]">{visual}</div>
             </div>
@@ -243,12 +255,13 @@ const ConceptCard: React.FC<CardProps & { step: Extract<CardStep, { kind: 'conce
         <div className="pw-body m-0">
           <ReadAlongRich segments={step.body} mode={mode} reading={reading} />
         </div>
-        {code && (
+        {code && !diagram && (
           <div className="min-[640px]:hidden">
             <CodeBlock snippet={code} />
           </div>
         )}
       </div>
+      {diagram && stage}
     </div>
   );
 };
@@ -368,7 +381,7 @@ const BonusChallenge: React.FC<{
     >
       <div className="mx-auto flex min-h-full max-w-[720px] flex-col px-4 py-3 sm:px-6">
         <div className="mb-4 flex items-center justify-between gap-3 pw-safe-top">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" data-sfx="back" onClick={onClose}>
             ← Kembali
           </Button>
         </div>
@@ -670,12 +683,6 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
       setSession(createQuizSession(plan.questions));
       setMisses(0);
     }
-    setOfferOpen(
-      mode === 'junior' &&
-        !profile.settings.autoReadAloud &&
-        !hasSeen(profile.id, 'offer:autoread') &&
-        hasIndonesianVoiceAvailable(),
-    );
     setReady(true);
     return () => timer.dispose();
     // The plan follows the lesson. The profile changes on every save and must not restart the player.
@@ -715,6 +722,16 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
     item?.kind === 'warmup' ? item.q : inQuiz ? head?.question : undefined);
   const isRetryQ = inQuiz && head?.isRetry === true;
   const card = !prediction && item?.kind === 'card' ? item.step : null;
+  const petVisible = !focus && profile?.settings.petHidden !== true;
+  const stepKey = `${runKey}:${stepNumber}`;
+  const petOffer = usePetLessonOffer({
+    profileId,
+    stepKey,
+    enabled: petVisible,
+    blocked: !ready || (!card && !activeQuestion) || Boolean(
+      submitted || guideTypeOpen || hintModalOpen || breakModalOpen || exitConfirmOpen || resultSummary || reading,
+    ),
+  });
 
   // First time a question type shows up: how to answer it (V13 / F18)
   useEffect(() => {
@@ -762,8 +779,15 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
   })();
 
   const autoRead = Boolean(profile?.settings.autoReadAloud);
-  const canSpeak = Boolean(profile && (mode === 'junior' || autoRead) && hasIndonesianVoiceAvailable());
+  const voiceAvailable = useIndonesianVoiceAvailable();
+  const canSpeak = Boolean(profile && (mode === 'junior' || autoRead) && voiceAvailable);
   const speaking = reading !== null;
+
+  useEffect(() => {
+    if (ready && mode === 'junior' && !autoRead && voiceAvailable && profileId && !hasSeen(profileId, 'offer:autoread')) {
+      setOfferOpen(true);
+    }
+  }, [ready, mode, autoRead, voiceAvailable, profileId, runKey]);
 
   const toggleSpeak = () => {
     if (speaking) stopQueue();
@@ -795,7 +819,7 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
     speakTarget(readTarget, shownOrder);
     return () => stopQueue();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, stepNumber, runKey, autoRead, Boolean(resultSummary)]);
+  }, [ready, stepNumber, runKey, autoRead, canSpeak, Boolean(resultSummary)]);
 
   // Auto-read: the feedback is read when its sheet appears
   useEffect(() => {
@@ -932,6 +956,7 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
     if (!activeQuestion || !session || !lesson) return;
     stopQueue();
     const isCorrect = evaluateQuestionAnswer(activeQuestion, answerVal);
+    petOffer.recordAttempt(isCorrect);
 
     // The title already carries the verdict, so the fallback explanation is just the explanation
     let explanation = resolveTxt(activeQuestion.explainCorrect, mode);
@@ -1007,7 +1032,6 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
           setSessionXp((x) => x + gain);
           setBumpKey((k) => k + 1);
           if (combo !== null) setComboShown(combo);
-          playSound('tap', Boolean(profile?.settings.soundEnabled));
         },
       });
     } else if (submitted.correct && submitted.xp > 0) {
@@ -1155,7 +1179,7 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
             profileId={profile.id}
             soundEnabled={profile.settings.soundEnabled}
             autoRead={autoRead}
-            canSpeak={hasIndonesianVoiceAvailable()}
+            canSpeak={voiceAvailable}
             onClose={() => setBonusOpen(false)}
           />
         )}
@@ -1208,12 +1232,25 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
 
   // The first step has no entrance (the route already carries it). A returning question plays M13, every other step M12.
   const enter = stepNumber > 0 ? (isRetryQ ? 'retry' : 'right') : undefined;
+  const petContext: PetContext | undefined = activeQuestion
+    ? { surface: 'question', questionType: activeQuestion.type, hasHint: Boolean(activeQuestion.hints) }
+    : card ? { surface: 'lesson', stepKind: card.kind, worldId: lesson.worldId, topicId: lesson.id } : undefined;
 
   return (
     <WorldThemeWrapper worldId={worldId} className="mx-auto flex min-h-[100dvh] max-w-[1080px] flex-col px-4 py-3 sm:px-6">
       <LessonHeader
         mode={mode}
         focus={focus}
+        pet={petVisible && petContext && (
+          <PetLauncher
+            key={stepKey}
+            compact
+            offer={petOffer.offer}
+            onLaunch={petOffer.dismiss}
+            onQuestionHint={activeQuestion ? handleHint : undefined}
+            context={petContext}
+          />
+        )}
         onToggleFocus={() => {
           setLessonFocus(profileId, !focus);
           setFocus(!focus);

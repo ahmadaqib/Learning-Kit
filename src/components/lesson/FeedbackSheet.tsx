@@ -100,14 +100,14 @@ export const FeedbackSheet: React.FC<FeedbackSheetProps> = ({
       aria-live="polite"
       aria-label="Penjelasan jawaban"
       data-rm="fade"
-      className={`fixed inset-x-0 bottom-0 z-40 rounded-t-[var(--radius-xl)] border-t-[3px] px-4 pb-4 pt-5 shadow-[var(--elev-up)] pw-safe-bottom ${
+      className={`fixed inset-x-0 bottom-0 z-40 flex max-h-[calc(100dvh-max(2.25rem,env(safe-area-inset-top)))] rounded-t-[var(--radius-xl)] border-t-[3px] px-4 pt-5 shadow-[var(--elev-up)] pw-safe-bottom ${
         isCorrect
           ? 'border-[var(--ok-500)] bg-[var(--ok-50)]'
           : 'border-[var(--warn-500)] bg-[var(--warn-50)]'
       }`}
     >
-      <div className="mx-auto flex max-w-[720px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
+      <div className="mx-auto flex min-h-0 w-full max-w-[720px] flex-col gap-3 sm:flex-row sm:justify-between">
+        <div className="flex min-h-0 min-w-0 items-start gap-3">
           <Bito
             size={mode === 'junior' ? 72 : 40}
             expression={bitoExpression ?? (isCorrect ? 'happy' : 'think')}
@@ -115,7 +115,12 @@ export const FeedbackSheet: React.FC<FeedbackSheetProps> = ({
             react={false}
             className={`flex-shrink-0 ${mode === 'junior' ? '-mt-11' : ''}`}
           />
-          <div className="min-w-0 space-y-1.5">
+          <div
+            role="group"
+            aria-label="Isi penjelasan"
+            tabIndex={0}
+            className="min-w-0 flex-1 space-y-1.5 self-stretch overflow-y-auto overscroll-contain [overflow-wrap:anywhere] focus-visible:outline-offset-[-3px]"
+          >
             <div className="flex flex-wrap items-center gap-2">
               {isCorrect ? (
                 <CheckCircle2 className="h-5 w-5 text-[var(--ok-600)]" aria-hidden="true" />
@@ -163,7 +168,7 @@ export const FeedbackSheet: React.FC<FeedbackSheetProps> = ({
           variant="primary"
           onClick={onContinue}
           soundEnabled={activeProfile?.settings.soundEnabled}
-          className="sm:min-w-[160px]"
+          className="shrink-0 sm:min-w-[160px] sm:self-center"
           autoFocus
         >
           Lanjut →

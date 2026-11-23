@@ -2,6 +2,7 @@ import { clearLessonNotes } from '@/engine/lessonNotes';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import {
+  DEFAULT_AUDIO_SETTINGS,
   ProfileSchema,
   type MascotCustom,
   type Mode,
@@ -18,6 +19,7 @@ export const MAX_PROFILES = 4;
 
 export function createDefaultSettings(mode: Mode): Settings {
   return {
+    ...DEFAULT_AUDIO_SETTINGS,
     soundEnabled: mode === 'junior',
     autoReadAloud: false,
     textScale: 100,
@@ -741,7 +743,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => safeLocalStorage),
       migrate: (persisted) => migratePersistedState(persisted) as unknown as AppStore,
       partialize: (state) => ({

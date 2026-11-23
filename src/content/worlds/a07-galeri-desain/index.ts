@@ -27,7 +27,7 @@ export const world: World = {
   title: 'Galeri Desain',
   tagline: t(
     'Tata halaman supaya mata cepat menemukan yang penting. Buat tombol nyaman diketuk jempol.',
-    'Kamu bisa menata tampilan dengan prinsip desain visual dan hukum UX, lalu menilai tampilan orang lain.',
+    'Kamu bisa menata tampilan dengan prinsip desain visual dan hukum UX, lalu menilai tampilan aplikasi buatan orang lain.',
   ),
   color: '#D6336C',
   illustration: 'a07-galeri-desain',

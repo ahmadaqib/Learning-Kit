@@ -217,7 +217,7 @@ export const world: World = {
       }),
       makeAnchorMcq({
         id: 'b07-anc-p4',
-        prompt: t('Di mana token berumur panjang sebaiknya disimpan agar aman dari pencurian lewat XSS?'),
+        prompt: t('Di mana token berumur panjang bisa disimpan agar nilainya tidak dapat dibaca JavaScript?'),
         choices: [
           { id: 'http', label: t('Di cookie HttpOnly yang tidak bisa dibaca JavaScript') },
           {
@@ -232,7 +232,7 @@ export const world: World = {
           },
         ],
         answer: 'http',
-        explainCorrect: t('Cookie HttpOnly tidak bisa diakses JavaScript. Karena itu skrip XSS tidak bisa mencuri token itu.'),
+        explainCorrect: t('HttpOnly mencegah JavaScript membaca nilai cookie. Browser tetap bisa mengirim cookie pada permintaan yang sesuai.'),
         tags: ['refresh-token', 'cookie-cache'],
       }),
       makeAnchorMcq({
@@ -265,7 +265,7 @@ export const world: World = {
           {
             id: 'dec',
             label: t('Tulisan di gelang bisa dibaca siapa saja'),
-            explainWrong: t('Itu kesamaan, bukan batas. Isi JWT juga bisa dibaca siapa pun.'),
+            explainWrong: t('Tulisan gelang dan isi JWT bertanda tangan pada contoh ini sama-sama dapat dibaca oleh pemegangnya.'),
           },
           {
             id: 'holo',
@@ -285,7 +285,7 @@ export const lessons: Lesson[] = [
   makeLesson({
     id: 'b07-l01',
     worldId: 'b07',
-    title: '“Kamu siapa?” vs “Kamu boleh apa?”',
+    title: '“Kamu siapa?” dan “Kamu boleh apa?”',
     modes: ['junior', 'pro'],
     objective: t(
       'Aku bisa membedakan cek identitas dan cek izin.',
@@ -888,14 +888,14 @@ export const lessons: Lesson[] = [
     modes: ['junior', 'pro'],
     objective: t(
       'Aku bisa menyebut 3 bagian gelang JWT.',
-      'Kamu bisa membaca struktur Header.Payload.Signature pada JWT dan menjelaskan batas keamanannya.',
+      'Kamu bisa mengenali struktur Header.Payload.Signature dan menjelaskan batas perlindungan tanda tangan JWT.',
     ),
     estMinutes: 6,
     introducesTerms: ['jwt'],
     usesTerms: ['autentikasi', 'api-key', 'json', 'server', 'browser', 'status-code'],
     stickerId: 'gelang-hologram',
     warmupFrom: 'b07-l02',
-    atWork: 'Kamu akan membuka isi JWT di DevTools untuk memeriksa peran dan waktu berakhirnya saat login bermasalah.',
+    atWork: 'Pakai token rekaan di simulator untuk memeriksa peran dan masa berlaku tanpa menyalin token akun sungguhan.',
     steps: [
       storyStep('b07/gelang-hologram.svg', [
         rText(
@@ -904,10 +904,10 @@ export const lessons: Lesson[] = [
         ),
       ]),
       conceptStep({
-        title: t('Tiga bagian gelang', 'Tiga bagian JWT'),
+        title: t('Tiga bagian gelang', 'Tiga bagian JWT bertanda tangan'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b07', topic: 'tiga-bagian-jwt' },
-        alt: t('JWT terbagi tiga bagian dipisah titik: Header, Payload, dan Signature.'),
+        alt: t('Contoh JWT bertanda tangan punya tiga bagian: Header, Payload, dan Signature.'),
         code: {
           lang: 'text',
           code: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1IiwibmFtYSI6IlJhbmkiLCJyb2xlIjoicGVtYmVsaSIsImV4cCI6MTc5OTk5OTk5OX0.7mK2xQ9vR_sig',
@@ -916,10 +916,10 @@ export const lessons: Lesson[] = [
           rTerm('jwt', 'JWT', 'JWT'),
           rText(
             ' adalah gelang digital. Gelang itu punya tiga bagian: jenis gelang, tulisan, dan cap hologram.',
-            ', dibaca "jot", adalah teks tiga bagian yang dipisah titik. Header berisi algoritma. ',
+            ', dibaca "jot", adalah teks yang berisi data untuk diperiksa server. Contoh JWT bertanda tangan punya tiga bagian dipisah titik. Header berisi algoritma. ',
           ),
           rTermIn('pro', 'jwt', 'Payload'),
-          rPro(' berisi data seperti siapa, role, dan exp. Signature adalah cap yang dibuat server dengan kunci rahasianya.'),
+          rPro(' berisi data seperti siapa, role, dan exp. Pada contoh HS256, Signature dibuat memakai kunci rahasia bersama.'),
         ],
       }),
       qStep(
@@ -952,7 +952,7 @@ export const lessons: Lesson[] = [
           answer: 'sig',
           explainCorrect: t(
             'Cap hologram menjaga gelang tetap asli. Orang iseng sulit meniru capnya.',
-            'Signature adalah cap yang dibuat server dengan kunci rahasianya. Ia membuktikan token tidak diubah.',
+            'Signature membantu server memastikan token berasal dari penerbit tepercaya dan isinya masih utuh.',
           ),
           hints: [t('Ingat tiga bagian gelang di kartu tadi.')],
           tags: ['jwt'],
@@ -966,7 +966,7 @@ export const lessons: Lesson[] = [
         body: [
           rText(
             'Tulisan di gelang bisa dibaca siapa saja. Cap hologram sulit dipalsukan. Jadi jangan tulis rahasia di gelang.',
-            'Server membuat Signature dari Header, Payload, dan kunci miliknya sendiri. Kalau seseorang mengubah "pembeli" menjadi "admin", Signature tidak cocok lagi dan token ditolak dengan 401.',
+            'Server memeriksa tanda tangan dan klaim, termasuk penerbit, tujuan, dan masa berlaku. Token yang isinya berubah gagal diperiksa.',
           ),
         ],
       }),
@@ -978,14 +978,14 @@ export const lessons: Lesson[] = [
         ),
       ),
       conceptStep({
-        title: t('JWT bukan enkripsi'),
+        title: t('Tanda tangan tidak menyembunyikan isi'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b07', topic: 'jwt-bukan-enkripsi' },
-        alt: t('Peringatan: isi JWT hanya disandikan Base64, jadi kata sandi dan KTP dilarang masuk.'),
+        alt: t('Isi JWT bertanda tangan pada contoh ini dapat dibaca oleh siapa pun yang memegangnya.'),
         modes: ['pro'],
         body: [
           rPro(
-            'JWT tidak dienkripsi. Isinya hanya disandikan dengan Base64, jadi siapa pun bisa membacanya. Jangan menaruh kata sandi atau nomor KTP di dalam JWT.',
+            'JWT bertanda tangan seperti ini memakai Base64url. Pemegang token bisa membaca isinya. JWT juga bisa memakai format terenkripsi (JWE). Hindari memasukkan kata sandi atau nomor KTP ke token.',
           ),
         ],
       }),
@@ -994,16 +994,16 @@ export const lessons: Lesson[] = [
           id: 'b07-l03-q3',
           prompt: t(
             'Tulisan di gelang disembunyikan, jadi orang lain tidak bisa membacanya.',
-            'Karena bentuknya acak seperti eyJzdWIi..., isi JWT tidak bisa dibaca tanpa kunci rahasia.',
+            'Isi JWT bertanda tangan pada contoh tadi hanya bisa dibaca dengan kunci rahasia.',
           ),
           answer: false,
           explainCorrect: t(
             'Tulisan di gelang terbuka. Siapa saja bisa membacanya, seperti papan pengumuman.',
-            'Payload JWT hanya disandikan dengan Base64. Siapa pun bisa membacanya.',
+            'Payload pada contoh itu dikodekan dengan Base64url. Siapa pun yang memegang token bisa membacanya.',
           ),
           explainWrong: t(
             'Hanya cap hologram yang sulit ditiru. Tulisannya sendiri terbuka untuk dibaca.',
-            'Bentuk acak itu bukan enkripsi. Base64 langsung terbaca kalau didekode.',
+            'Base64url mengubah bentuk penulisan data. Pemegang token dapat membaca isi aslinya.',
           ),
           hints: [t('Bayangkan tulisan di gelang saat antre masuk.')],
           tags: ['jwt'],
@@ -1047,23 +1047,23 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b07-l03-q4',
           modes: ['pro'],
-          prompt: t('Mengapa server bisa memverifikasi JWT dengan cepat tanpa bertanya ke database sesi?'),
+          prompt: t('Bagaimana server memeriksa keaslian JWT bertanda tangan tanpa mencari sesi di database?'),
           choices: [
-            { id: 'chk', label: t('Server memeriksa Signature dengan kunci rahasianya sendiri') },
+            { id: 'chk', label: t('Server memeriksa Signature dengan kunci yang sesuai') },
             {
               id: 'ask',
               label: t('Server menanyakan keaslian token ke browser milik pembeli lebih dulu'),
-              explainWrong: t('Server tidak boleh mempercayai pengakuan browser. Pemeriksaannya memakai kunci milik server.'),
+              explainWrong: t('Server memeriksa tanda tangan memakai kunci yang sesuai.'),
             },
             {
               id: 'skip',
               label: t('Server menerima token yang bentuknya benar'),
-              explainWrong: t('Bentuk yang benar belum cukup. Server tetap memeriksa Signature dan waktu exp.'),
+              explainWrong: t('Server tetap memeriksa Signature dan klaim yang diperlukan, termasuk exp.'),
             },
           ],
           answer: 'chk',
-          explainCorrect: t('Kunci rahasia cukup untuk mengecek apakah Signature cocok dengan isi token.'),
-          hints: [t('Server punya kunci rahasia yang tidak dimiliki orang lain.')],
+          explainCorrect: t('Kunci yang sesuai memeriksa Signature. Server juga memeriksa klaim sebelum menerima token.'),
+          hints: [t('Ingat fungsi tanda tangan token.')],
           tags: ['jwt', 'server'],
         }),
       ),
@@ -1166,7 +1166,7 @@ export const lessons: Lesson[] = [
         id: 'b07-l03-r1',
         prompt: t(
           'Gelang JWT punya berapa bagian?',
-          'Berapa bagian utama JWT yang dipisah tanda titik?',
+          'Berapa bagian pada contoh JWT bertanda tangan di pelajaran ini?',
         ),
         choices: [
           { id: '3', label: t('Tiga bagian', 'Tiga: Header, Payload, Signature') },
@@ -1199,16 +1199,16 @@ export const lessons: Lesson[] = [
         id: 'b07-l03-r2',
         prompt: t(
           'Kata sandi aman ditulis di gelang JWT karena sudah terkunci.',
-          'Payload JWT aman untuk menyimpan kata sandi karena terenkripsi otomatis.',
+          'Payload JWT bertanda tangan pada contoh ini aman untuk menyimpan kata sandi.',
         ),
         answer: false,
         explainCorrect: t(
           'Tulisan gelang terbuka untuk semua orang. Rahasia tidak boleh ditulis di sana.',
-          'Payload JWT hanya Base64 biasa. Data rahasia tidak boleh disimpan di dalamnya.',
+          'Pemegang token bisa membaca Payload dalam contoh ini. Jangan masukkan kata sandi ke dalam token.',
         ),
         explainWrong: t(
           'Gelang JWT tidak mengunci tulisannya. Siapa saja bisa membacanya.',
-          'Base64 bukan enkripsi, jadi kata sandi dilarang masuk ke JWT.',
+          'Base64url mengodekan isi agar mudah dikirim. Pemegang token dapat membaca isinya.',
         ),
         hints: [t('Ingat tulisan gelang saat antre masuk.')],
         tags: ['jwt'],
@@ -1216,7 +1216,7 @@ export const lessons: Lesson[] = [
     ],
     recap: t(
       'Gelang JWT punya tiga bagian: cap hologram menjaga keasliannya, tulisannya terbuka.',
-      'JWT berisi Header, Payload (Base64 terbuka), dan Signature (bukti keaslian), dengan masa berlaku singkat.',
+      'Contoh JWT bertanda tangan berisi Header, Payload yang bisa dibaca, dan Signature untuk memeriksa keaslian.',
     ),
     companion: {
       talkPrompts: [

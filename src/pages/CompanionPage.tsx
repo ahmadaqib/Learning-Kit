@@ -96,7 +96,7 @@ export const CompanionPage: React.FC = () => {
     return (
       <div data-mode="pro" className="mx-auto max-w-[780px] space-y-6 p-6">
         <div className="no-print flex justify-between">
-          <Button variant="secondary" onClick={() => setCertificateWorldId(null)}>
+          <Button variant="secondary" data-sfx="back" onClick={() => setCertificateWorldId(null)}>
             ← Kembali
           </Button>
           <Button variant="primary" onClick={() => window.print()}>
@@ -128,7 +128,7 @@ export const CompanionPage: React.FC = () => {
   return (
     <div data-mode="pro" className="mx-auto max-w-[960px] space-y-[var(--gap-group)] px-4 py-6 sm:px-6">
       <div className="flex items-center justify-between">
-        <Link to="/pengaturan" className="inline-flex items-center gap-2 font-bold text-[var(--ink)]">
+        <Link to="/pengaturan" data-sfx="back" className="inline-flex items-center gap-2 font-bold text-[var(--ink)]">
           <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           Pengaturan
         </Link>

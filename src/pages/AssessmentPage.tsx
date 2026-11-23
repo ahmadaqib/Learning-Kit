@@ -167,6 +167,7 @@ export const AssessmentPage: React.FC = () => {
           type="button"
           onClick={() => navigate(`/dunia/${world.id}`)}
           aria-label="Kembali"
+          data-sfx="back"
           className="pw-pressable flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] cursor-pointer"
         >
           <ArrowLeft className="h-5 w-5" aria-hidden="true" />

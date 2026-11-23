@@ -195,7 +195,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, hideNav = false })
                 key={item.to}
                 to={item.to}
                 aria-current={active ? 'page' : undefined}
-                className={`pw-pressable relative flex min-h-[var(--touch-min)] min-w-[56px] flex-col items-center justify-center gap-0.5 rounded-[var(--radius-md)] px-2 py-1 text-[11px] font-bold ${
+                className={`pw-pressable relative flex min-h-[var(--touch-min)] min-w-0 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-md)] px-1 py-1 text-center text-[11px] leading-tight font-bold [overflow-wrap:anywhere] ${
                   active ? 'bg-[var(--world-50)] text-[var(--world-700)]' : 'text-[var(--ink-2)]'
                 }`}
               >
