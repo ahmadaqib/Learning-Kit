@@ -36,7 +36,7 @@ export const world: World = {
   title: 'Restoran API',
   tagline: t(
     'Kenalan dengan pelayan dan buku menu. Mereka menghubungkan satu aplikasi dengan aplikasi lain.',
-    'Kamu bisa menjelaskan API, yaitu kontrak yang mengatur cara dua aplikasi saling meminta data.',
+    'Kamu bisa menjelaskan API, yaitu kontrak yang mengatur cara dua aplikasi saling meminta dan mengirim data.',
   ),
   color: '#0E9AA7',
   illustration: 'b01-restoran-api',

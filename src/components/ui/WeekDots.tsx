@@ -64,7 +64,7 @@ export const WeekDots: React.FC<WeekDotsProps> = ({ weeks, weeklyTarget, consecu
         {reached && <Check className="h-5 w-5 text-[var(--ok-600)]" aria-hidden="true" />}
       </div>
 
-      <ul className="m-0 flex list-none items-center justify-between gap-2 p-0">
+      <ul className="m-0 grid list-none grid-cols-7 gap-1 overflow-x-clip p-0 [overflow-clip-margin:8px]">
         {days.map((day, idx) => {
           const done = activeDates.has(day.date);
           const isToday = day.date === todayStr;
@@ -72,14 +72,14 @@ export const WeekDots: React.FC<WeekDotsProps> = ({ weeks, weeklyTarget, consecu
           return (
             <li
               key={`${day.date}-${idx}`}
-              className={`flex flex-col items-center gap-1.5 ${play.week ? 'pw-fx-hop' : ''}`}
+              className={`flex min-w-0 flex-col items-center gap-1.5 ${play.week ? 'pw-fx-hop' : ''}`}
               style={play.week ? ({ '--at': `${200 + idx * 45}ms` } as React.CSSProperties) : undefined}
             >
               <span className="text-xs font-bold text-[var(--ink-2)]" aria-hidden="true">
                 {day.label}
               </span>
               <span
-                className={`flex h-7 w-7 items-center justify-center rounded-full border-2 pw-t-colors ${
+                className={`flex aspect-square w-full max-w-7 items-center justify-center rounded-full border-2 pw-t-colors ${
                   done
                     ? 'border-[var(--ok-600)] bg-[var(--ok-500)] text-white'
                     : isToday
@@ -94,7 +94,7 @@ export const WeekDots: React.FC<WeekDotsProps> = ({ weeks, weeklyTarget, consecu
                     : undefined
                 }
               >
-                {done && <Check className="h-4 w-4" strokeWidth={3} aria-hidden="true" />}
+                {done && <Check className="h-4 w-4 max-h-[65%] max-w-[65%]" strokeWidth={3} aria-hidden="true" />}
               </span>
               <span className="visually-hidden">
                 {DAY_NAMES[idx]}

@@ -1,6 +1,7 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { useAppStore } from '@/store/useAppStore';
+import { useAppStore, type AppStore } from '@/store/useAppStore';
+import type { Settings } from '@/content/schema';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageLoader } from '@/components/fx/PageLoader';
 import { ProfileSelectPage } from '@/pages/ProfileSelectPage';
@@ -8,6 +9,8 @@ import { OnboardingPage } from '@/pages/OnboardingPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { Bito } from '@/components/mascot/Bito';
 import { Button } from '@/components/ui/Button';
+import { configureSound, listenForInterfaceSounds } from '@/engine/sound';
+import { configureSpeech, stopSpeaking } from '@/engine/speech';
 
 // Lazy-load halaman berat agar initial bundle JS <= 180 KB gzip
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
@@ -74,6 +77,30 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { 
 }
 
 export const App: React.FC = () => {
+  useEffect(() => {
+    let activeProfileId: string | undefined;
+    let appliedSettings: Settings | undefined;
+    const syncAudio = (state: AppStore) => {
+      const profile = state.profiles[state.activeProfileId];
+      if (profile?.id !== activeProfileId) stopSpeaking();
+      activeProfileId = profile?.id;
+      if (profile?.settings === appliedSettings) return;
+      appliedSettings = profile?.settings;
+      configureSound(appliedSettings);
+      configureSpeech(appliedSettings);
+    };
+    syncAudio(useAppStore.getState());
+    const unsubscribe = useAppStore.subscribe(syncAudio);
+    const stopListening = listenForInterfaceSounds();
+    return () => {
+      unsubscribe();
+      stopListening();
+      stopSpeaking();
+      configureSound();
+      configureSpeech();
+    };
+  }, []);
+
   return (
     <AppErrorBoundary>
     <BrowserRouter>

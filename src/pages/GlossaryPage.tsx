@@ -5,6 +5,7 @@ import { GLOSSARY_TERMS } from '@/content/glossary';
 import { WORLD_META_BY_ID } from '@/content/worldMeta';
 import { resolveTxt } from '@/content/schema';
 import { useAppStore } from '@/store/useAppStore';
+import { PetLauncher } from '@/components/pet/PetLauncher';
 
 const SEARCH_ALIASES: Record<string, string[]> = {
   fe: ['frontend'],
@@ -106,6 +107,7 @@ export const GlossaryPage: React.FC = () => {
             Sudah dipelajari
           </button>
         </div>
+        <PetLauncher context={{ surface: 'glossary' }} />
       </header>
 
       <div className="relative">

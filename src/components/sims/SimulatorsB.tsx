@@ -401,8 +401,8 @@ export const PembacaGelangJwtSim: React.FC<SimComponentProps> = ({ onCompleteInt
         <div><strong>Payload terbaca:</strong> {tampered ? '{"role":"admin"}' : '{"role":"pembeli"}'}</div>
         <div className={`font-extrabold ${tampered ? 'text-[var(--warn-700)]' : 'text-[var(--ok-600)]'}`}>
           {tampered
-            ? '✗ Hologram Signature TIDAK COCOK! Penjaga menolak gelang palsu ini (401).'
-            : '✓ Hologram Signature sah dari server.'}
+            ? '✗ Dalam simulasi, tanda tangan tidak cocok dan penjaga menolak token (401).'
+            : '✓ Dalam simulasi, penjaga menerima token contoh.'}
         </div>
       </div>
       <Button

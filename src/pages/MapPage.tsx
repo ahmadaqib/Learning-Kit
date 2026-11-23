@@ -22,6 +22,7 @@ import {
 } from '@/components/map/MapPath';
 import { WorldNode, type WorldNodeState } from '@/components/map/WorldNode';
 import { Doodle, type DoodleName } from '@/components/fx/Doodle';
+import { PetLauncher } from '@/components/pet/PetLauncher';
 import { Button } from '@/components/ui/Button';
 import { Poster, PosterHeading } from '@/components/ui/Poster';
 import { StorageWarningBanner } from '@/components/ui/StorageWarningBanner';
@@ -210,27 +211,30 @@ const MapContent: React.FC<{ profile: Profile }> = ({ profile }) => {
         </div>
 
         {/* Segmented control on --paper-2 with a sliding pill (M09): transform 160 ms, colours 140 ms */}
-        <nav aria-label="Pilih jalur">
-          <div className="relative inline-grid grid-cols-2 rounded-full bg-[var(--paper-2)] p-1">
-            <span
-              aria-hidden="true"
-              className="pw-t-move absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-[var(--paper-raised)] shadow-[var(--elev-1)]"
-              style={{ transform: pillTrack === 'A' ? 'translateX(0)' : 'translateX(100%)' }}
-            />
-            {(['A', 'B'] as const).map((t) => (
-              <Link
-                key={t}
-                to={`/peta/${t}`}
-                aria-current={track === t ? 'page' : undefined}
-                className={`pw-t-colors relative z-10 inline-flex min-h-[var(--touch-min)] items-center justify-center whitespace-nowrap rounded-full px-5 text-center text-sm font-extrabold ${
-                  track === t ? 'text-[var(--ink)]' : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
-                }`}
-              >
-                {junior ? (t === 'A' ? 'Tampilan' : 'API') : `Jalur ${t} · ${t === 'A' ? 'Tampilan' : 'API'}`}
-              </Link>
-            ))}
-          </div>
-        </nav>
+        <div className="flex flex-wrap items-center gap-2">
+          <nav aria-label="Pilih jalur">
+            <div className="relative inline-grid grid-cols-2 rounded-full bg-[var(--paper-2)] p-1">
+              <span
+                aria-hidden="true"
+                className="pw-t-move absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-[var(--paper-raised)] shadow-[var(--elev-1)]"
+                style={{ transform: pillTrack === 'A' ? 'translateX(0)' : 'translateX(100%)' }}
+              />
+              {(['A', 'B'] as const).map((t) => (
+                <Link
+                  key={t}
+                  to={`/peta/${t}`}
+                  aria-current={track === t ? 'page' : undefined}
+                  className={`pw-t-colors relative z-10 inline-flex min-h-[var(--touch-min)] items-center justify-center whitespace-nowrap rounded-full px-5 text-center text-sm font-extrabold ${
+                    track === t ? 'text-[var(--ink)]' : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+                  }`}
+                >
+                  {junior ? (t === 'A' ? 'Tampilan' : 'API') : `Jalur ${t} · ${t === 'A' ? 'Tampilan' : 'API'}`}
+                </Link>
+              ))}
+            </div>
+          </nav>
+          <PetLauncher context={{ surface: 'map' }} />
+        </div>
       </header>
 
       {lockedTip && (
