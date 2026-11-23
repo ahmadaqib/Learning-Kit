@@ -36,6 +36,14 @@ describe('server-side pet hints', () => {
     }
     expect(send).not.toHaveBeenCalled();
   });
+  it('tries the next configured model when access to one model is denied', async () => {
+    const send = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(null, { status: 403 }))
+      .mockResolvedValueOnce(answer('predict'));
+    const res = await createCompanionService(config, send)(request(context));
+    expect(await res.json()).toEqual({ tipId: 'predict' });
+    expect(send).toHaveBeenCalledTimes(2);
+  });
   it('stops on invalid credentials and returns a generic error', async () => {
     const send = vi.fn<typeof fetch>().mockResolvedValue(new Response('private provider details', { status: 401 }));
     const res = await createCompanionService(config, send)(request(context));
