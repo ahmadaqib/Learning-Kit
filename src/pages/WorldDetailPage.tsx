@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Check, Flag, Lock, Play, Shield, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WORLD_METAS, WORLD_META_BY_ID } from '@/content/worldMeta';
-import { resolveTxt, type Lesson, type World } from '@/content/schema';
+import { resolveTxt, type Profile } from '@/content/schema';
+import { STICKERS_BY_ID } from '@/content/stickers';
 import { prefetchWorldBundle, loadWorldBundle } from '@/content/worldLoader';
 import { getWorldStarStats, isBossUnlocked, isLessonUnlocked, isWorldUnlocked } from '@/engine/unlock';
+import { hasSeen, markSeen } from '@/engine/seen';
+import { xpWord } from '@/app/modeConfig';
 import { useAppStore } from '@/store/useAppStore';
-import { WorldIslandIllustration } from '@/components/illustrations/ConceptVisuals';
+import { LESSON_STUBS, WORLD_STUBS } from '@/components/map/MapPath';
+import { Annot } from '@/components/fx/Annot';
+import { BossCard } from '@/components/world/BossCard';
+import { LessonTrail, type TrailRow, type TrailSideQuest } from '@/components/world/LessonTrail';
 import { Button } from '@/components/ui/Button';
+import { Poster, PosterHeading } from '@/components/ui/Poster';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { StarRow } from '@/components/ui/StarRow';
+import { StorageWarningBanner } from '@/components/ui/StorageWarningBanner';
 import { WorldThemeWrapper } from '@/components/ui/WorldThemeWrapper';
 
 export const WorldDetailPage: React.FC = () => {
@@ -32,7 +39,7 @@ export const WorldDetailPage: React.FC = () => {
 
   if (!profile || !meta) {
     return (
-      <div className="mx-auto max-w-[640px] p-6 text-center space-y-4">
+      <div className="mx-auto max-w-[640px] space-y-4 p-6 text-center">
         <h1 className="pw-h1">Dunia tidak ditemukan</h1>
         <Button variant="primary" onClick={() => navigate('/peta/A')}>
           Kembali ke Peta
@@ -41,63 +48,75 @@ export const WorldDetailPage: React.FC = () => {
     );
   }
 
-  const worldsAsStubs: World[] = WORLD_METAS.map((wm) => ({
-    id: wm.id,
-    track: wm.track,
-    order: wm.order,
-    title: wm.title,
-    tagline: wm.tagline,
-    color: wm.color,
-    illustration: wm.illustration,
-    sourceChapters: [],
-    requires: wm.requires,
-    lessons: wm.lessons.map((l) => l.id),
-    sideQuests: wm.sideQuests.map((l) => l.id),
-    boss: {
-      title: wm.guardianName,
-      greeting: wm.tagline,
-      guardianName: wm.guardianName,
-      junior: { count: 8, pool: 'world' },
-      pro: { count: 12, pool: 'world' },
-      passRatio: 0.8,
-    },
-    anchors: { junior: [], pro: [] },
-  }));
+  return <WorldDetailContent profile={profile} worldId={meta.id} chunkError={chunkError} />;
+};
 
-  const lessonsStub: Record<string, Lesson> = {};
-  for (const wm of WORLD_METAS) {
-    for (const lm of [...wm.lessons, ...wm.sideQuests]) {
-      lessonsStub[lm.id] = {
-        id: lm.id,
-        worldId: lm.worldId,
-        title: lm.title,
-        modes: lm.modes,
-        isSideQuest: lm.isSideQuest,
-        objective: { pro: '' },
-        estMinutes: lm.estMinutes,
-        introducesTerms: [],
-        usesTerms: [],
-        steps: [],
-        reviewCards: [],
-        recap: { pro: '' },
-      };
-    }
-  }
+const WorldDetailContent: React.FC<{ profile: Profile; worldId: string; chunkError: boolean }> = ({
+  profile,
+  worldId,
+  chunkError,
+}) => {
+  const navigate = useNavigate();
+  const meta = WORLD_META_BY_ID[worldId];
+  const junior = profile.mode === 'junior';
+  const soundEnabled = profile.settings.soundEnabled;
 
-  const worldStub = worldsAsStubs.find((w) => w.id === meta.id)!;
-  const worldUnlocked = isWorldUnlocked(worldStub, profile, worldsAsStubs);
+  const [offerHidden, setOfferHidden] = useState(false);
+
+  const worldStub = WORLD_STUBS.find((w) => w.id === meta.id)!;
+  const worldUnlocked = isWorldUnlocked(worldStub, profile, WORLD_STUBS);
   const visibleLessons = meta.lessons.filter((l) => l.modes.includes(profile.mode));
   const visibleSideQuests = meta.sideQuests.filter((l) => l.modes.includes(profile.mode));
-  const stats = getWorldStarStats(worldStub, lessonsStub, profile);
-  const bossOpen = isBossUnlocked(worldStub, lessonsStub, profile, worldsAsStubs);
+  const stats = getWorldStarStats(worldStub, LESSON_STUBS, profile);
+  const bossOpen = isBossUnlocked(worldStub, LESSON_STUBS, profile, WORLD_STUBS);
+  const bossPassed = Boolean(profile.bosses[meta.id]?.passed);
   const preDone = Boolean(profile.assessments[meta.id]?.pre);
 
+  const rows: TrailRow[] = visibleLessons.map((lesson, idx) => {
+    const rec = profile.lessons[lesson.id];
+    const completed = Boolean(rec?.completedAt);
+    const unlocked = preDone && isLessonUnlocked(lesson.id, worldStub, LESSON_STUBS, profile, WORLD_STUBS);
+    const sticker = lesson.stickerId ? STICKERS_BY_ID[lesson.stickerId] : undefined;
+    return {
+      id: lesson.id,
+      title: lesson.title,
+      estMinutes: lesson.estMinutes,
+      number: idx + 1,
+      state: completed ? 'done' : unlocked ? 'active' : 'locked',
+      stars: (rec?.stars ?? 0) as TrailRow['stars'],
+      resume: rec?.stepIndex !== undefined,
+      rewardName: sticker ? (junior ? sticker.title : sticker.concept) : undefined,
+      bonus: junior && completed && hasSeen(profile.id, `bonus:${lesson.id}`),
+      unseen: (completed || unlocked) && !hasSeen(profile.id, `unlock:lesson:${lesson.id}`),
+    };
+  });
+
+  const sideQuests: TrailSideQuest[] = visibleSideQuests.map((sq) => {
+    const done = Boolean(profile.lessons[sq.id]?.completedAt);
+    const unlocked = preDone && isLessonUnlocked(sq.id, worldStub, LESSON_STUBS, profile, WORLD_STUBS);
+    return { id: sq.id, title: sq.title, state: done ? 'done' : unlocked ? 'open' : 'locked' };
+  });
+
+  // "Siap naik ke Pro?": Junior only, once per profile, after this world's guardian with 2.5 stars a lesson or more
+  const avgStars = visibleLessons.length
+    ? visibleLessons.reduce((sum, l) => sum + (profile.lessons[l.id]?.stars ?? 0), 0) / visibleLessons.length
+    : 0;
+  const showProOffer = junior && bossPassed && avgStars >= 2.5 && !offerHidden && !hasSeen(profile.id, 'offer:pro');
+  const dismissOffer = () => {
+    markSeen(profile.id, 'offer:pro');
+    setOfferHidden(true);
+  };
+
+  const bossBest = profile.bosses[meta.id]?.best;
+
   return (
-    <WorldThemeWrapper worldId={meta.id} className="mx-auto max-w-[920px] px-4 py-6 sm:px-6">
+    <WorldThemeWrapper worldId={meta.id} className="mx-auto max-w-[920px] px-[var(--screen-pad)] py-6 sm:px-6">
+      <StorageWarningBanner />
+
       <div className="mb-4 flex items-center justify-between">
         <Link
           to={`/peta/${meta.track}`}
-          className="inline-flex min-h-[44px] items-center gap-2 font-bold text-[var(--ink)]"
+          className="pw-pressable -ml-2 inline-flex min-h-[var(--touch-min)] items-center gap-2 rounded-[var(--radius-md)] px-2 font-bold text-[var(--ink)]"
         >
           <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           <span>Peta Jalur {meta.track}</span>
@@ -105,7 +124,10 @@ export const WorldDetailPage: React.FC = () => {
       </div>
 
       {chunkError && (
-        <div role="alert" className="mb-4 rounded-xl border border-[var(--warn-500)] bg-[var(--warn-50)] p-4 flex items-center justify-between">
+        <div
+          role="alert"
+          className="mb-4 flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--warn-500)] bg-[var(--warn-50)] p-4"
+        >
           <span className="pw-small font-bold">Bito tersesat sebentar. Periksa koneksi, lalu coba lagi.</span>
           <Button variant="secondary" onClick={() => window.location.reload()}>
             Coba lagi
@@ -113,168 +135,110 @@ export const WorldDetailPage: React.FC = () => {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.3fr]">
-        {/* Header dunia */}
-        <section className="pw-card overflow-hidden">
-          <div className="flex flex-col items-center justify-center bg-[var(--world-50)] p-6">
-            <WorldIslandIllustration worldId={meta.id} size={140} locked={!worldUnlocked} />
-          </div>
-          <div className="p-5 space-y-3">
-            <span className="pw-kicker">DUNIA {meta.id.toUpperCase()}</span>
-            <h1 className="pw-h1">{meta.title}</h1>
-            <p className="pw-body text-[var(--ink-2)]">{resolveTxt(meta.tagline, profile.mode)}</p>
-            <div className="space-y-1.5 pt-2">
-              <div className="flex justify-between text-xs font-bold text-[var(--ink-2)]">
-                <span>{stats.completedLessons} dari {stats.totalLessons} pelajaran</span>
-                <span>{stats.earned}/{stats.max} ★</span>
-              </div>
-              <ProgressBar
-                value={stats.totalLessons ? (stats.completedLessons / stats.totalLessons) * 100 : 0}
-                label="Progres dunia"
-              />
-            </div>
+      <div className="grid grid-cols-1 gap-[var(--gap-group)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start">
+        {/* World poster: the one saturated block, with the world's progress */}
+        <Poster className="space-y-[var(--gap-stack)] lg:sticky lg:top-6">
+          <PosterHeading worldId={meta.id} worldTitle={meta.title} locked={!worldUnlocked}>
+            <span className="pw-kicker">{junior ? 'Dunia' : `Dunia ${meta.id.toUpperCase()}`}</span>
+            <h1 className="pw-h1 mt-1 text-balance">{meta.title}</h1>
+          </PosterHeading>
+          <p className="pw-body">{resolveTxt(meta.tagline, profile.mode)}</p>
 
-            {/* Tes Penempatan Pro (§4.2 aturan 6) */}
-            {profile.mode === 'pro' && worldUnlocked && !profile.bosses[meta.id]?.passed && !bossOpen && (
-              <div className="pt-3 border-t border-[var(--line)]">
-                <p className="pw-small text-[var(--ink-2)] mb-2">
-                  Sudah menguasai seluruh materi {meta.title}?
-                </p>
+          <div className="space-y-2">
+            <p className="pw-small m-0 font-bold">
+              {stats.completedLessons} dari {stats.totalLessons} pelajaran · {stats.earned}/{stats.max} ★
+            </p>
+            <ProgressBar
+              variant="poster"
+              segments={stats.totalLessons}
+              value={stats.totalLessons ? (stats.completedLessons / stats.totalLessons) * 100 : 0}
+              label="Progres dunia"
+            />
+          </div>
+
+          {/* Tes Penempatan: Pro only (spec 4.2 rule 6) */}
+          {!junior && worldUnlocked && !bossPassed && !bossOpen && (
+            <div className="space-y-2 border-t border-[var(--on-poster)] pt-[var(--gap-stack)]">
+              <p className="pw-small m-0">Sudah menguasai seluruh materi {meta.title}? Langsung ke Penjaga.</p>
+              <Button variant="inverse" fullWidth onClick={() => navigate(`/penjaga/${meta.id}?placement=1`)}>
+                Tes Penempatan
+              </Button>
+            </div>
+          )}
+        </Poster>
+
+        <div className="space-y-[var(--gap-group)]">
+          {showProOffer && (
+            <section aria-label="Siap naik ke Pro?" className="pw-card space-y-[var(--gap-stack)] p-[var(--space-card)]">
+              <h2 className="pw-h3">Siap naik ke Pro?</h2>
+              <p className="pw-body m-0 text-[var(--ink-2)]">
+                Kamu sudah jago di sini. Mau coba mode Pro? Ada istilah asli dan kode sungguhan.
+              </p>
+              <div className="flex flex-wrap gap-[var(--gap-stack)]">
                 <Button
-                  variant="secondary"
-                  fullWidth
-                  onClick={() => navigate(`/penjaga/${meta.id}?placement=1`)}
+                  variant="primary"
+                  soundEnabled={soundEnabled}
+                  onClick={() => {
+                    dismissOffer();
+                    navigate('/pengaturan#mode');
+                  }}
                 >
-                  Tes Penempatan (Langsung Tantangan Penjaga)
+                  Lihat mode Pro
+                </Button>
+                <Button variant="ghost" onClick={dismissOffer}>
+                  Nanti saja
                 </Button>
               </div>
-            )}
-          </div>
-        </section>
+            </section>
+          )}
 
-        {/* Daftar pelajaran */}
-        <section className="space-y-3">
+          {/* Pre-test */}
           {!preDone && worldUnlocked && (
             <button
               type="button"
               onClick={() => navigate(`/tes/${meta.id}/awal`)}
-              className="pw-card flex min-h-[68px] w-full items-center justify-between gap-3 border-2 border-[var(--world-600)] bg-[var(--world-50)] p-4 text-left cursor-pointer"
+              data-press="lg"
+              className="pw-card pw-pressable flex min-h-[72px] w-full cursor-pointer items-stretch gap-0 overflow-hidden p-0 text-left"
             >
-              <div className="flex items-center gap-3">
-                <Sparkles className="h-5 w-5 text-[var(--world-700)]" aria-hidden="true" />
-                <div>
-                  <div className="font-extrabold">
-                    {profile.mode === 'junior' ? 'Tebak-tebakan Awal' : 'Cek Titik Awal'}
-                  </div>
-                  <div className="pw-small text-[var(--ink-2)]">
-                    5–6 pertanyaan singkat sebelum belajar (+10 XP)
-                  </div>
-                </div>
-              </div>
-              <span className="font-extrabold text-[var(--world-700)]">Mulai →</span>
+              <span aria-hidden="true" className="flex w-14 flex-shrink-0 items-center justify-center bg-[var(--world-50)]">
+                <Sparkles className="h-6 w-6 text-[var(--world-700)]" />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col justify-center gap-1 p-4">
+                <span className="font-extrabold text-[var(--ink)]">{junior ? 'Tebak-tebakan Awal' : 'Cek Titik Awal'}</span>
+                <span className="pw-small text-[var(--ink-2)]">
+                  {junior ? 5 : 6} pertanyaan singkat sebelum belajar (+10 {xpWord(profile.mode)})
+                </span>
+                <Annot>{junior ? 'belum tahu? tidak apa-apa' : 'belum tahu? lewati saja'}</Annot>
+              </span>
+              <span className="flex flex-shrink-0 items-center pr-4 font-extrabold text-[var(--world-700)]">Mulai →</span>
             </button>
           )}
 
-          {visibleLessons.map((lesson, idx) => {
-            const rec = profile.lessons[lesson.id];
-            const completed = Boolean(rec?.completedAt);
-            const unlocked =
-              preDone && isLessonUnlocked(lesson.id, worldStub, lessonsStub, profile, worldsAsStubs);
-            const active = unlocked && !completed;
+          {/* Lesson trail and side quests */}
+          <LessonTrail
+            rows={rows}
+            sideQuests={sideQuests}
+            mode={profile.mode}
+            soundEnabled={soundEnabled}
+            onOpen={(id) => navigate(`/belajar/${id}`)}
+            onSeen={(id) => markSeen(profile.id, `unlock:lesson:${id}`)}
+          />
 
-            return (
-              <button
-                key={lesson.id}
-                type="button"
-                disabled={!unlocked}
-                onClick={() => navigate(`/belajar/${lesson.id}`)}
-                className={`pw-card pw-pressable flex min-h-[68px] w-full items-center justify-between gap-3 p-4 text-left ${
-                  active ? 'border-2 border-[var(--world-600)] bg-[var(--world-50)] shadow-[0_3px_0_var(--world-700)] cursor-pointer' : ''
-                } ${unlocked ? 'cursor-pointer hover:border-[var(--world-600)]' : 'opacity-65 cursor-not-allowed'}`}
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${
-                      completed
-                        ? 'bg-[var(--ok-500)] text-white'
-                        : active
-                          ? 'bg-[var(--world-600)] text-[var(--world-btn-text)]'
-                          : 'bg-[var(--cream)] text-[var(--ink-2)]'
-                    }`}
-                  >
-                    {completed ? <Check className="h-4 w-4" /> : unlocked ? idx + 1 : <Lock className="h-4 w-4" />}
-                  </span>
-                  <div>
-                    <div className="font-bold text-[var(--ink)]">{lesson.title}</div>
-                    <div className="text-xs text-[var(--ink-2)]">± {lesson.estMinutes} menit</div>
-                  </div>
-                </div>
-                {completed ? (
-                  <StarRow stars={rec?.stars ?? 1} size={18} />
-                ) : active ? (
-                  <span className="inline-flex items-center gap-1 text-sm font-extrabold text-[var(--world-700)]">
-                    <Play className="h-4 w-4" aria-hidden="true" />
-                    Lanjut
-                  </span>
-                ) : (
-                  <span className="text-xs font-bold text-[var(--ink-3)]">Terkunci</span>
-                )}
-              </button>
-            );
-          })}
-
-          {/* Side quests */}
-          {visibleSideQuests.map((sq) => {
-            const sqDone = Boolean(profile.lessons[sq.id]?.completedAt);
-            const sqUnlocked =
-              preDone && isLessonUnlocked(sq.id, worldStub, lessonsStub, profile, worldsAsStubs);
-            return (
-              <button
-                key={sq.id}
-                type="button"
-                disabled={!sqUnlocked}
-                onClick={() => navigate(`/belajar/${sq.id}`)}
-                className="pw-card flex min-h-[64px] w-full items-center justify-between gap-3 border-dashed p-4 text-left disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
-              >
-                <div className="flex items-center gap-3">
-                  <Flag className="h-5 w-5 text-[var(--world-700)]" aria-hidden="true" />
-                  <div>
-                    <div className="font-bold">{sq.title} (Misi Bonus)</div>
-                    <div className="text-xs text-[var(--ink-2)]">Opsional · +25 XP</div>
-                  </div>
-                </div>
-                <span className="text-xs font-extrabold text-[var(--world-700)]">
-                  {sqDone ? 'Selesai ✓' : sqUnlocked ? 'Buka →' : 'Terkunci'}
-                </span>
-              </button>
-            );
-          })}
-
-          {/* Boss Quiz */}
-          <button
-            type="button"
-            disabled={!bossOpen}
-            onClick={() => navigate(`/penjaga/${meta.id}`)}
-            className={`pw-card flex min-h-[72px] w-full items-center justify-between gap-3 p-4 text-left ${
-              bossOpen ? 'border-2 border-[var(--ink)] bg-[var(--paper)] cursor-pointer' : 'opacity-60 cursor-not-allowed'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <Shield className="h-6 w-6 text-[var(--world-700)]" aria-hidden="true" />
-              <div>
-                <div className="font-extrabold">{meta.guardianName}</div>
-                <div className="text-xs text-[var(--ink-2)]">
-                  Ujian campuran dunia · Lulus ≥ 80% (+50 XP)
-                </div>
-              </div>
-            </div>
-            <span className="text-sm font-extrabold text-[var(--world-700)]">
-              {profile.bosses[meta.id]?.passed ? 'Lulus ✓' : bossOpen ? 'Mulai →' : 'Terkunci'}
-            </span>
-          </button>
-        </section>
+          {/* Boss */}
+          <BossCard
+            guardianName={meta.guardianName}
+            state={bossPassed ? 'passed' : bossOpen ? 'open' : 'locked'}
+            mode={profile.mode}
+            totalLessons={stats.totalLessons}
+            doneLessons={stats.completedLessons}
+            worldLocked={!worldUnlocked}
+            best={bossBest}
+            soundEnabled={soundEnabled}
+            onOpen={() => navigate(`/penjaga/${meta.id}`)}
+          />
+        </div>
       </div>
+
     </WorldThemeWrapper>
   );
 };

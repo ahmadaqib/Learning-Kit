@@ -1,0 +1,256 @@
+{
+ "world": "a08",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "Codex",
+  "verdicts": [
+   {
+    "issue": 1,
+    "source": "naya-8",
+    "where": "a08-l02 conceptStep 'Tiga sifat warna' (junior body)",
+    "verdict": "Accept",
+    "reason": "The first Junior concept uses three everyday controls. English names remain in the Pro explanation."
+   },
+   {
+    "issue": 2,
+    "source": "wulan-38",
+    "where": "a08-l02 hook + a08-l02-q5j",
+    "verdict": "Adapt",
+    "reason": "Map hue to the visible drink color and use a drawing for the question. The visible limit card distinguishes saturation from darkness."
+   },
+   {
+    "issue": 3,
+    "source": "wulan-38",
+    "where": "a08-l05-q2 (junior correct choice)",
+    "verdict": "Accept",
+    "reason": "Describe difficulty distinguishing the color of the line."
+   },
+   {
+    "issue": 4,
+    "source": "naya-8",
+    "where": "a08-l08 conceptStep Tipografi (junior) + a08-anc-j4",
+    "verdict": "Adapt",
+    "reason": "Show a real letter n with and without serifs. Keep all four matching pairs, teaching the other two shapes in everyday words."
+   },
+   {
+    "issue": 5,
+    "source": "wulan-38",
+    "where": "a08-anc-j4 explainCorrect",
+    "verdict": "Accept",
+    "reason": "Explain the shape of the stroke. Readability also depends on size and spacing."
+   },
+   {
+    "issue": 6,
+    "source": "sari-27",
+    "where": "a08-l05-q5, a08-l04-q5, a08-l08-q5 (pro labels)",
+    "verdict": "Accept",
+    "reason": "Shorten the correct Pro labels in the three scenarios."
+   },
+   {
+    "issue": 7,
+    "source": "dimas-14",
+    "where": "a08-l04-q6 (pro distractors)",
+    "verdict": "Accept",
+    "reason": "Use saturation and text contrast as distractors, with explanations that address each claim."
+   },
+   {
+    "issue": 8,
+    "source": "sari-27",
+    "where": "a08-l04-q2 (pro prompt)",
+    "verdict": "Accept",
+    "reason": "Name the three competing surfaces and ask why the button is hard to find."
+   },
+   {
+    "issue": 9,
+    "source": "sari-27",
+    "where": "a08-l06-q4 (pro prompt)",
+    "verdict": "Accept",
+    "reason": "Connect the office monitor to the outdoor readability example and distinguish ratio from ambient lighting."
+   },
+   {
+    "issue": 10,
+    "source": "wulan-38",
+    "where": "a08-l02 limitStep (after q2), junior 'different'",
+    "verdict": "Adapt",
+    "reason": "Use the stronger saturation and lightness distinction in the limit card. Anchor feedback covers repeatable settings."
+   },
+   {
+    "issue": 11,
+    "source": "dimas-14",
+    "where": "a08-l02 hook (pro) 'Bayangkan segelas sirup'",
+    "verdict": "Accept",
+    "reason": "The Pro hook now asks for a darker button state from a supplied brand color."
+   },
+   {
+    "issue": 12,
+    "source": "naya-8",
+    "where": "a08-l04 limitStep (after q1), junior 'different'",
+    "verdict": "Accept",
+    "reason": "Explain success and failure rather than requiring the next lesson’s terminology."
+   },
+   {
+    "issue": 13,
+    "source": "naya-8",
+    "where": "a08-l04 objective + a08-anc-j2 (junior)",
+    "verdict": "Accept",
+    "reason": "Introduce a ten-square example and ask how the remaining accent square is used."
+   },
+   {
+    "issue": 14,
+    "source": "sari-27",
+    "where": "a08-l08 (pro body vs a08-l08-q5)",
+    "verdict": "Accept",
+    "reason": "Use decimal points and demonstrate a valid unitless line-height declaration."
+   },
+   {
+    "issue": 15,
+    "source": "wulan-38",
+    "where": "a08-l05 conceptStep 'Psikologi warna merek' + a08-l05-q6",
+    "verdict": "Accept",
+    "reason": "Present color associations as choices by brands, qualified by cultural context."
+   },
+   {
+    "issue": 16,
+    "source": "dimas-14",
+    "where": "a08-anc-p3 (pro)",
+    "verdict": "Accept",
+    "reason": "Offer format names only in the Pro anchor."
+   },
+   {
+    "issue": 17,
+    "source": "raka-11",
+    "where": "a08-l05-q2/q5 + a08-l04-q4 junior explainWrong",
+    "verdict": "Adapt",
+    "reason": "Vary the explanations in the shared status questions. The cited clothing question is already Pro-only."
+   }
+  ],
+  "counts": {
+   "accepted": 13,
+   "adapted": 4,
+   "rejected": 0,
+   "deferred": 0
+  },
+  "verification": "Zero a08 findings. Question IDs, answer keys and mode gates preserved."
+ },
+ "judgeIssues": [
+  {
+   "persona": "naya-8",
+   "where": "a08-l02 conceptStep 'Tiga sifat warna' (junior body)",
+   "problem": "Too dense for a new reader. In one block: 'HSL adalah tiga sifat warna: jenis, kepekatan, dan terang-gelap. Jenis itu rasa sirup, kepekatan itu kentalnya, dan terang itu lampu. Nama Inggrisnya Hue, Saturation, dan Lightness.' That is 3 new abstract words, 3 analogy mappings and 3 English terms (9 new ideas).",
+   "suggestion": "Junior: drop the English names and the HSL acronym. Show one property per card or tap, e.g. 'Warna bisa diubah tiga cara: jenisnya, pekatnya, terangnya.' Move Hue/Saturation/Lightness to Pro only.",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a08-l02 hook + a08-l02-q5j",
+   "problem": "Meaning error in the analogy. 'Rasa, kekentalan, dan terang lampu mengubah tampilannya': taste does not change how sirup looks, so the hue=rasa mapping cannot be seen. Also, in real life sirup with less water looks DARKER, so 'kental = pekat' clashes with q5j 'Kepekatan yang turun membuat biru jadi pudar, bukan lebih gelap'. A child who has made sirup will get confused.",
+   "suggestion": "Map hue to the sirup flavor/color (merah stroberi, hijau melon) rather than 'rasa'. State that the analogy is weak (riskyAnalogy: true) and add a limit line: 'Sirup kental juga tampak lebih gelap, tetapi di layar pekat dan gelap diatur terpisah.'",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a08-l05-q2 (junior correct choice)",
+   "problem": "Factual inaccuracy: 'Orang buta warna tidak melihat tandanya'. People with color blindness see the border but cannot tell it is red (or red from green). It teaches children a misconception about color blindness.",
+   "suggestion": "Junior: 'Teman yang buta warna tidak tahu garis itu merah'. Pro already says 'tidak tahu yang salah'; keep that.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a08-l08 conceptStep Tipografi (junior) + a08-anc-j4",
+   "problem": "Too much foreign jargon for an 8-year-old: 'Ada empat jenis huruf. Serif berkaki, sans-serif bersih, monospace untuk kode, dan display untuk judul.' The anchor quiz then asks her to pick the term 'Sans-serif' against 'Display' and 'Monospace'. 'kode' is meaningless to her.",
+   "suggestion": "Junior: only 2 kinds, 'huruf berkaki' and 'huruf tanpa kaki', with a picture. Ask her to recognize the shape, not the English name. Keep monospace/display for Pro.",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a08-anc-j4 explainCorrect",
+   "problem": "Wrong analogy: 'Huruf sans-serif terlihat jernih di layar kecil. Seperti tulisan tangan yang rapi.' Handwriting is not a good model for sans-serif, and it does not explain WHY (no small feet means less clutter on small pixels).",
+   "suggestion": "'Tanpa kaki kecil, hurufnya tidak berdempetan di layar HP yang kecil.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a08-l05-q5, a08-l04-q5, a08-l08-q5 (pro labels)",
+   "problem": "Choices of unequal length: the correct answer is consistently the longest and most detailed. Examples: 'Biru sebagai warna utama, hijau dengan ikon centang untuk \"Berhasil\"', 'Latar netral 60%, aksen cerah 10% khusus tombol utama', 'Isi minimal 16px, line-height 1.5–1.7, abu gelap, baris 45–75 karakter'. You can guess right by length.",
+   "suggestion": "Lengthen the distractors so they are just as specific (e.g. 'Turunkan line-height ke 0.8, ukuran 14px, lebar penuh') or shorten the correct answer.",
+   "severity": "major"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a08-l04-q6 (pro distractors)",
+   "problem": "Distractors are so absurd they are giveaways and feel condescending: 'Menggandakan kecepatan Wi-Fi', 'Mengurangi kebutuhan kode HTML'. Dimas will feel the question is a joke.",
+   "suggestion": "Use plausible distractors, e.g. 'Membuat warna merek lebih pekat', 'Meningkatkan kontras teks otomatis'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a08-l04-q2 (pro prompt)",
+   "problem": "Awkward sentence and mismatched roles: 'Latar oranye menyala 60%, tombol biru neon 30%, teks kuning terang 10%. Kesalahan apa yang terjadi, seperti cara berpakaian?' The clause 'seperti cara berpakaian' hangs. Buttons at 30% and text at 10% also contradict the 60-30-10 roles just taught, which is confusing.",
+   "suggestion": "'Latar oranye menyala, kartu biru neon, tombol kuning terang. Apa yang salah dengan takaran warnanya?'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a08-l06-q4 (pro prompt)",
+   "problem": "Confusing logic: 'Mengapa menilai keterbacaan dengan mata di kamar gelap bisa menipu dibanding alat uji rasio?' The correct answer talks about sunlight ('Di bawah matahari, teks dengan rasio rendah hilang'), which does not match the 'kamar gelap' setup. It reads like two ideas joined together.",
+   "suggestion": "'Mengapa cek dengan mata di monitor kantor bisa menipu?' with answer 'Di HP di bawah matahari, teks berasio rendah hilang'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a08-l02 limitStep (after q2), junior 'different'",
+   "problem": "Does not explain WHY, and the contrast is weak: 'Sirup asli bisa meluap. Angka warna selalu rapi.' 'Meluap' has nothing to do with how color is set.",
+   "suggestion": "'Takaran sirup bisa meleset. Angka warna selalu memberi hasil yang sama persis.' This matches anc-j5.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a08-l02 hook (pro) 'Bayangkan segelas sirup'",
+   "problem": "For the Pro track, the sirup analogy and the Nadia 'minuman kelasnya' story feel childish to a 14-year-old who wants to feel cool.",
+   "suggestion": "Pro: use a real case instead, e.g. 'Desainer memberi satu warna merek; kamu butuh versi hover, disabled, dan latar.' Keep sirup in Junior.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a08-l04 limitStep (after q1), junior 'different'",
+   "problem": "'Aplikasi juga butuh abu-abu netral dan warna status.' The term 'warna status' is only taught in l05, so a child does not know it yet.",
+   "suggestion": "'Aplikasi juga butuh warna untuk tanda berhasil atau salah.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a08-l04 objective + a08-anc-j2 (junior)",
+   "problem": "'Aku bisa membagi warna halaman: 60 bagian, 30 bagian, 10 bagian.' A 3rd grader is not used to proportions of 100; '60 bagian' without 'dari 100' is meaningless.",
+   "suggestion": "Use a visual and simple words: 'banyak, sedang, sedikit' (e.g. '6 kotak latar, 3 kotak kartu, 1 kotak tombol').",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a08-l08 (pro body vs a08-l08-q5)",
+   "problem": "Inconsistent decimals for CSS values: 'line-height 1,5–1,7' in the body and summary, but '1.5–1.7' and 'line-height 1.0' in the quizzes. A career switcher will copy the comma into CSS and it breaks.",
+   "suggestion": "Write CSS values with a dot everywhere (1.5–1.7) when they refer to code, and add a code mark.",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a08-l05 conceptStep 'Psikologi warna merek' + a08-l05-q6",
+   "problem": "Cultural color stereotypes presented as fact: 'ungu terasa kreatif dan mewah, hitam terasa premium', then tested as the single right answer. That contradicts the same lesson's own point that 'Arti warna juga berbeda antarbudaya'.",
+   "suggestion": "Add 'sering' or 'umumnya' in the body and the explanation, or change q6 into 'kesan yang paling sering dikaitkan'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a08-anc-p3 (pro)",
+   "problem": "Giveaway: the correct choice 'HSL, ubah angka Lightness' repeats the prompt's keyword ('terang atau gelap' = Lightness). The other choices do not have a name that matches the prompt.",
+   "suggestion": "Make the labels format-only ('HSL', 'HEX', 'RGB'), or give each a parameter name ('RGB, ubah nilai Blue').",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a08-l05-q2/q5 + a08-l04-q4 junior explainWrong",
+   "problem": "Repetitive tone: several explanations repeat 'teman yang buta warna' / 'Ingat teman yang sulit membedakan warna' almost word for word in 4+ items. Raka gets bored and feels lectured.",
+   "suggestion": "Vary the hints, or give one rule once in the concept card and have the quizzes refer to it briefly ('Ingat aturan centang').",
+   "severity": "minor"
+  }
+ ]
+}

@@ -1,0 +1,298 @@
+{
+ "world": "b03",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "codex",
+  "accepted": 15,
+  "adapted": 3,
+  "rejected": 2,
+  "deferred": 0,
+  "done": true,
+  "instructions": "Applied in src/content/worlds/b03-gudang-json/index.ts.\n\n2. b03-l01 match question (Pasangkan isian dengan jenisnya)\nKeep Ya as the example and use Dua kemungkinan as the category. Give Junior a spoken hint about names and quantities.\n\n3. b03-l02 review card 1 (junior) + concept 'Tanpa koma akhir dan catatan'\nUse the extra note ini tas baru in the Junior concept and review prompt.\n\n5. b03-l02 concept 'Aturan tanda kutip' (code block)\nShow Salah and Benar as labels in a plain-text snippet, without JSON comment markers.\n\n6. b03-l03 MCQ 'Apa yang TIDAK ikut terbawa saat JSON.stringify()'\nSay JSON has several data types and stringify skips function and undefined object properties.\n\n7. world.tagline (pro)\nSynchronize the Pro tagline with worldMeta.ts, which already distinguishes program data from JSON text.\n\n8. b03-l04 sort question (teks vs biner)\nTeach MessagePack as another binary format in the Protobuf card. Keep the bin and answer map.\n\n9. b03-l02 review card 1 (pro) explainWrong\nSay that standard JSON disallows comments and that JavaScript and some other formats allow them.\n\n10. b03-l04 limitStep (surat vs sandi morse)\nDescribe JSON as a readable letter and Protobuf as an encoded message in the shared-trait field.\n\n11. b03-l03 concept 'Kemas dan rakit' (junior body)\nUse packing into text and unpacking to use data in the Junior body.\n\n12. b03-anc-j3\nAnswer with what a comma signals: another item should follow.\n\n13. b03-l02 MCQ Bito tanpa Content-Type, distractor explainWrong\nSay that this request puts the submission in the body, and the URL gives the destination. URLs can carry more than short parameters.\n\n14. b03-l04 MCQ 'Mengapa layanan publik kebanyakan memilih JSON'\nAsk why JSON is practical for a public API and say Protobuf is an open format used beyond Google.\n\n15. b03-l01 TF 'Formulir kecil boleh ada di dalam formulir besar.' (junior)\nUse a toko field holding the shop name and city as a true case.\n\n16. b03-l01 MCQ 'Apa yang membedakan JSON dengan formulir kertas biasa?' (pro)\nAsk what happens to a missing quote in paper and program reading. Preserve the answer IDs.\n\n17. b03-l04 concept 'XML, YAML, dan CSV' + match\nIntroduce tag and define it as a label like one in HTML.\n\n18. b03-anc-p5 / b03-l04 Protobuf concept\nRequire the schema and a reader for structured decoding. Say the binary form can make a message smaller.\n\n19. b03-l04 MCQ upload, distractor text/csv\nSay CSV is a text-table format and instruct learners to choose a format that carries the photo or PDF as a file. Teach one multipart part per file or field.\n\n20. b03-l01 companion.talkPrompts / b03-l03 companion.talkPrompts\nUse hewan favoritmu and lemari rakitan in the companion prompts.",
+  "verdicts": [
+   {
+    "number": 1,
+    "source": "naya-8",
+    "issue": "b03-l02 limitStep (line ~811, no modes)",
+    "verdict": "reject",
+    "reason": "The shipped limit helper and lesson renderer already hide steps marked riskyAnalogy false from Junior."
+   },
+   {
+    "number": 2,
+    "source": "naya-8",
+    "issue": "b03-l01 match question (Pasangkan isian dengan jenisnya)",
+    "verdict": "adapt",
+    "reason": "Keep Ya as the example and use Dua kemungkinan as the category. Give Junior a spoken hint about names and quantities."
+   },
+   {
+    "number": 3,
+    "source": "wulan-38",
+    "issue": "b03-l02 review card 1 (junior) + concept 'Tanpa koma akhir dan catatan'",
+    "verdict": "accept",
+    "reason": "Use the extra note ini tas baru in the Junior concept and review prompt."
+   },
+   {
+    "number": 4,
+    "source": "raka-11",
+    "issue": "b03-l02 concept 'Tanpa koma akhir' / 'Wajib kutip dua' and b03-l01 concept 'Apa itu JSON?'",
+    "verdict": "reject",
+    "reason": "ConceptCard already gates step.code to Pro across all three named concepts."
+   },
+   {
+    "number": 5,
+    "source": "sari-27",
+    "issue": "b03-l02 concept 'Aturan tanda kutip' (code block)",
+    "verdict": "accept",
+    "reason": "Show Salah and Benar as labels in a plain-text snippet, without JSON comment markers."
+   },
+   {
+    "number": 6,
+    "source": "sari-27",
+    "issue": "b03-l03 MCQ 'Apa yang TIDAK ikut terbawa saat JSON.stringify()'",
+    "verdict": "accept",
+    "reason": "Say JSON has several data types and stringify skips function and undefined object properties."
+   },
+   {
+    "number": 7,
+    "source": "dimas-14",
+    "issue": "world.tagline (pro)",
+    "verdict": "accept",
+    "reason": "Synchronize the Pro tagline with worldMeta.ts, which already distinguishes program data from JSON text."
+   },
+   {
+    "number": 8,
+    "source": "sari-27",
+    "issue": "b03-l04 sort question (teks vs biner)",
+    "verdict": "accept",
+    "reason": "Teach MessagePack as another binary format in the Protobuf card. Keep the bin and answer map."
+   },
+   {
+    "number": 9,
+    "source": "sari-27",
+    "issue": "b03-l02 review card 1 (pro) explainWrong",
+    "verdict": "accept",
+    "reason": "Say that standard JSON disallows comments and that JavaScript and some other formats allow them."
+   },
+   {
+    "number": 10,
+    "source": "wulan-38",
+    "issue": "b03-l04 limitStep (surat vs sandi morse)",
+    "verdict": "accept",
+    "reason": "Describe JSON as a readable letter and Protobuf as an encoded message in the shared-trait field."
+   },
+   {
+    "number": 11,
+    "source": "naya-8",
+    "issue": "b03-l03 concept 'Kemas dan rakit' (junior body)",
+    "verdict": "accept",
+    "reason": "Use packing into text and unpacking to use data in the Junior body."
+   },
+   {
+    "number": 12,
+    "source": "raka-11",
+    "issue": "b03-anc-j3",
+    "verdict": "accept",
+    "reason": "Answer with what a comma signals: another item should follow."
+   },
+   {
+    "number": 13,
+    "source": "sari-27",
+    "issue": "b03-l02 MCQ Bito tanpa Content-Type, distractor explainWrong",
+    "verdict": "adapt",
+    "reason": "Say that this request puts the submission in the body, and the URL gives the destination. URLs can carry more than short parameters."
+   },
+   {
+    "number": 14,
+    "source": "sari-27",
+    "issue": "b03-l04 MCQ 'Mengapa layanan publik kebanyakan memilih JSON'",
+    "verdict": "accept",
+    "reason": "Ask why JSON is practical for a public API and say Protobuf is an open format used beyond Google."
+   },
+   {
+    "number": 15,
+    "source": "wulan-38",
+    "issue": "b03-l01 TF 'Formulir kecil boleh ada di dalam formulir besar.' (junior)",
+    "verdict": "accept",
+    "reason": "Use a toko field holding the shop name and city as a true case."
+   },
+   {
+    "number": 16,
+    "source": "dimas-14",
+    "issue": "b03-l01 MCQ 'Apa yang membedakan JSON dengan formulir kertas biasa?' (pro)",
+    "verdict": "accept",
+    "reason": "Ask what happens to a missing quote in paper and program reading. Preserve the answer IDs."
+   },
+   {
+    "number": 17,
+    "source": "sari-27",
+    "issue": "b03-l04 concept 'XML, YAML, dan CSV' + match",
+    "verdict": "accept",
+    "reason": "Introduce tag and define it as a label like one in HTML."
+   },
+   {
+    "number": 18,
+    "source": "sari-27",
+    "issue": "b03-anc-p5 / b03-l04 Protobuf concept",
+    "verdict": "accept",
+    "reason": "Require the schema and a reader for structured decoding. Say the binary form can make a message smaller."
+   },
+   {
+    "number": 19,
+    "source": "sari-27",
+    "issue": "b03-l04 MCQ upload, distractor text/csv",
+    "verdict": "adapt",
+    "reason": "Say CSV is a text-table format and instruct learners to choose a format that carries the photo or PDF as a file. Teach one multipart part per file or field."
+   },
+   {
+    "number": 20,
+    "source": "wulan-38",
+    "issue": "b03-l01 companion.talkPrompts / b03-l03 companion.talkPrompts",
+    "verdict": "accept",
+    "reason": "Use hewan favoritmu and lemari rakitan in the companion prompts."
+   }
+  ],
+  "verification": "node --import tsx scripts/validate-content.ts --world=b03 passed with zero errors."
+ },
+ "judgeIssues": [
+  {
+   "persona": "naya-8",
+   "where": "b03-l02 limitStep (line ~811, no modes)",
+   "problem": "This card has no modes set, so Junior sees it too: 'JSON mirip object JavaScript' / 'Di JavaScript, kutip satu, key tanpa kutip, koma akhir, dan komentar boleh. Di JSON semuanya dilarang.' Naya and Raka have never heard of JavaScript, object, key or array. It is Pro-only content showing in Junior.",
+   "suggestion": "Add modes: ['pro'] to this limitStep. If Junior needs a limit card here, write a separate one with the robot analogy and no JS terms.",
+   "severity": "blocker"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b03-l01 match question (Pasangkan isian dengan jenisnya)",
+   "problem": "Giveaway: the left item 'Ya' pairs with the right item 'Ya atau tidak', so the word matches. The explanation 'Teks memakai kutip, angka berdiri sendiri' and the hint 'Teks diapit tanda kutip, angka tidak.' don't fit the Junior labels either, because 'Tas Ransel' has no quotes.",
+   "suggestion": "Use 'Benar' or a thumbs-up word instead of 'Ya', or rename the category to 'Benar atau salah'. Either write the Junior label as '\"Tas Ransel\"' with quotes, or change the hint to 'Teks berupa kata-kata, angka berupa bilangan.'",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b03-l02 review card 1 (junior) + concept 'Tanpa koma akhir dan catatan'",
+   "problem": "'Robot gudang menemukan catatan kecil di tengah formulir JSON' and 'Robot juga menolak catatan kecil di tengah JSON.' Junior never sees an example of a catatan, and the code block only shows a comma error. The rule stays abstract, which adds cognitive load.",
+   "suggestion": "Add one concrete Junior example, e.g. 'Catatan seperti \"ini tas baru\" yang ditulis di luar isian', or drop the comment rule from Junior entirely.",
+   "severity": "major"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b03-l02 concept 'Tanpa koma akhir' / 'Wajib kutip dua' and b03-l01 concept 'Apa itu JSON?'",
+   "problem": "These concept steps include code blocks with no modes, so Junior sees raw code like '// SALAH: { nama: \\'Tas\\' }' and '{\\n  \"nama\": \"Tas\",\\n  \"stok\": 5,\\n}'. The brief says no code in Junior.",
+   "suggestion": "Check whether the code field renders in Junior. If it does, gate it to Pro or swap in a picture-based visual for Junior.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l02 concept 'Aturan tanda kutip' (code block)",
+   "problem": "The block is tagged lang 'json' and contains '// SALAH: { nama: \\'Tas\\' }\\n// BENAR: { \"nama\": \"Tas\" }'. It uses // comments inside a JSON block in the same lesson that says comments are forbidden in JSON. Beginners will copy it.",
+   "suggestion": "Show two separate snippets labelled SALAH and BENAR outside the code, or change lang to 'text' and drop the //.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l03 MCQ 'Apa yang TIDAK ikut terbawa saat JSON.stringify()'",
+   "problem": "Factual slip: 'JSON hanya menyimpan data teks.' contradicts the earlier lesson that JSON has number, boolean, null, array and object.",
+   "suggestion": "'JSON hanya menyimpan data, bukan perilaku. Fungsi dan undefined dilewati saat stringify.'",
+   "severity": "major"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "world.tagline (pro)",
+   "problem": "'Kamu bisa menulis JSON yang valid dan mengubahnya menjadi teks yang siap dikirim.' JSON is already text. What gets serialised is an object.",
+   "suggestion": "'Kamu bisa menulis JSON yang valid dan mengubah object menjadi teks JSON yang siap dikirim.'",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l04 sort question (teks vs biner)",
+   "problem": "'MessagePack' appears as a sort item but no step introduces it. Sari can only guess.",
+   "suggestion": "Replace it with a format already taught (CSV or YAML in the text bin), or add one line about MessagePack to the Protobuf concept.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l02 review card 1 (pro) explainWrong",
+   "problem": "'JSON melarang semua bentuk komentar. Hanya JavaScript yang mengizinkannya.' This is wrong: YAML, JSONC/JSON5 and most languages allow comments.",
+   "suggestion": "'Standar JSON melarang komentar, walaupun JavaScript dan beberapa format lain mengizinkannya.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b03-l04 limitStep (surat vs sandi morse)",
+   "problem": "The 'same' field, 'Surat tulisan tangan mudah dibaca langsung. Sandi morse jauh lebih ringkas dan cepat.', restates the analogy instead of saying what the analogy and reality share. That breaks the same/different structure.",
+   "suggestion": "same: 'JSON mudah dibaca manusia seperti surat. Protobuf ringkas seperti sandi morse.' Keep the different field as it is.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b03-l03 concept 'Kemas dan rakit' (junior body)",
+   "problem": "'Pengirim mengemas data dengan perintah stringify. Penerima merakitnya lagi dengan perintah parse.' These English code words mean nothing to an 8-year-old and are never used again in Junior.",
+   "suggestion": "'Pengirim mengemas data menjadi teks. Penerima merakitnya lagi menjadi data.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b03-anc-j3",
+   "problem": "'Mengapa koma di ujung isian terakhir itu salah?' The correct answer is 'Aturan JSON tidak mengizinkannya', which is circular. The why only shows up in the explanation.",
+   "suggestion": "Make the correct choice the reason: 'Koma berarti masih ada isian, padahal sudah habis'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l02 MCQ Bito tanpa Content-Type, distractor explainWrong",
+   "problem": "'URL hanya memuat alamat dan catatan kecil.' The phrase 'catatan kecil' is vague and clashes with the meaning 'komentar' used elsewhere in the lesson.",
+   "suggestion": "'URL hanya memuat alamat dan query parameter singkat.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l04 MCQ 'Mengapa layanan publik kebanyakan memilih JSON'",
+   "problem": "'layanan publik' reads as government public services. The explainWrong 'Banyak perusahaan memakai Protobuf, dan formatnya sangat cepat lewat gRPC' doesn't refute 'hanya server Google' directly.",
+   "suggestion": "Use 'API publik'. Change the explainWrong to 'Protobuf open source dan dipakai banyak perusahaan, bukan hanya Google.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b03-l01 TF 'Formulir kecil boleh ada di dalam formulir besar.' (junior)",
+   "problem": "Giveaway: the statement copies the concept text word for word ('Formulir kecil boleh ada di dalam formulir besar.'). It tests recall of the sentence, not understanding.",
+   "suggestion": "Use a concrete case: 'Kolom \"toko\" boleh berisi nama dan kota sekaligus.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b03-l01 MCQ 'Apa yang membedakan JSON dengan formulir kertas biasa?' (pro)",
+   "problem": "It comes straight after the limitStep that says 'JSON ketat soal kutip, kurung, dan koma', so the answer 'JSON menolak kutip dan kurung yang salah' is given away. Too easy, and it feels patronising.",
+   "suggestion": "Move it to reviewCards, or rephrase it around a concrete case (e.g. a typo in the 'harga' field).",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l04 concept 'XML, YAML, dan CSV' + match",
+   "problem": "The concept says 'label pembuka dan penutup', then the match and review say 'Bertag seperti HTML' and 'tag'. The term changes without being introduced.",
+   "suggestion": "Write 'tag (label) pembuka dan penutup' in the concept.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-anc-p5 / b03-l04 Protobuf concept",
+   "problem": "'Manusia tidak bisa membacanya tanpa skema .proto' implies the schema alone makes it readable. In practice you also need a decoder tool (protoc --decode). 'jauh lebih kecil daripada teks' overclaims.",
+   "suggestion": "'Perlu skema .proto dan alat decoder untuk membacanya.' Say 'lebih kecil' instead of 'jauh lebih kecil'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b03-l04 MCQ upload, distractor text/csv",
+   "problem": "The explainWrong 'CSV adalah format tabel teks yang dipisah koma.' doesn't say WHY it is wrong for uploading a photo or PDF.",
+   "suggestion": "'CSV hanya untuk tabel teks, tidak bisa membawa file foto atau PDF.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b03-l01 companion.talkPrompts / b03-l03 companion.talkPrompts",
+   "problem": "'formulir data kucingmu' assumes the child has a cat, which excludes some children. 'meja rakitan' in l03 doesn't match the 'lemari' analogy used throughout the lesson.",
+   "suggestion": "Use 'hewan favoritmu' and 'lemari rakitan'.",
+   "severity": "minor"
+  }
+ ]
+}

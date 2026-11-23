@@ -8,13 +8,31 @@ import {
   qStep,
   rBold,
   rCode,
+  rJunior,
+  rPro,
   rTerm,
   rText,
   simStep,
   storyStep,
   t,
 } from '@/content/lessonHelpers';
-import type { Lesson, World } from '@/content/schema';
+import type { Lesson, Rich, World } from '@/content/schema';
+
+/** Bold or term parts that only one mode sees. Used where Petualang and Pro read two separate sentence paths. */
+const rBoldJ = (text: string): Rich => ({ t: 'bold', v: { junior: text, pro: text }, modes: ['junior'] });
+const rBoldP = (text: string): Rich => ({ t: 'bold', v: { pro: text }, modes: ['pro'] });
+const rTermJ = (termId: string, text: string): Rich => ({
+  t: 'term',
+  termId,
+  v: { junior: text, pro: text },
+  modes: ['junior'],
+});
+const rTermP = (termId: string, text: string): Rich => ({
+  t: 'term',
+  termId,
+  v: { pro: text },
+  modes: ['pro'],
+});
 
 export const world: World = {
   id: 'a10',
@@ -22,8 +40,8 @@ export const world: World = {
   order: 10,
   title: 'Taman Ramah Semua',
   tagline: t(
-    'Membuat website yang mudah dipakai semua orang dalam kondisi apa pun.',
-    'Menerapkan aksesibilitas web (a11y), empat prinsip WCAG POUR, keyboard navigation, dan ARIA.',
+    'Buat halaman yang bisa dipakai semua orang. Halamanmu tetap mudah dipakai dalam keadaan apa pun.',
+    'Kamu bisa membuat halaman yang bisa dipakai semua orang, termasuk lewat keyboard dan pembaca layar.',
   ),
   color: '#2BA84A',
   illustration: 'a10-taman-ramah',
@@ -34,8 +52,8 @@ export const world: World = {
   boss: {
     title: 'Tantangan Penjaga Taman',
     greeting: t(
-      'Selamat datang di Taman Ramah Semua! Ayo pastikan semua pengunjung bisa ikut bermain!',
-      'Buktikan kemampuanmu membangun web yang aksesibel sesuai prinsip WCAG POUR dan daftar periksa a11y.',
+      'Selamat datang di Taman Ramah Semua. Ayo pastikan semua pengunjung bisa ikut bermain!',
+      'Buktikan kamu bisa membuat web yang dipakai semua orang. Soalnya mencakup prinsip POUR dan daftar periksa a11y.',
     ),
     guardianName: 'Penjaga Taman',
     junior: { count: 8, pool: 'world' },
@@ -46,191 +64,197 @@ export const world: World = {
     junior: [
       makeAnchorMcq({
         id: 'a10-anc-j1',
-        prompt: t('Siapa yang ikut terbantu oleh bidang miring di trotoar selain pengguna kursi roda?'),
+        prompt: t('Selain kursi roda, siapa lagi yang terbantu jalur miring di trotoar?'),
         choices: [
-          { id: 'all', label: t('Semua orang, seperti pendorong kereta bayi dan penarik koper') },
+          { id: 'all', label: t('Orang dengan kereta bayi dan koper') },
           {
             id: 'car',
-            label: t('Hanya mobil balap di jalan tol'),
-            explainWrong: t('Bidang miring trotoar memudahkan pejalan kaki dan pengguna roda.'),
+            label: t('Orang yang naik sepeda motor ke pasar'),
+            explainWrong: t(
+              'Motor lewat jalan raya. Jalur miring membantu orang membawa koper atau mendorong kereta bayi.',
+              'Jalur miring di trotoar membantu pejalan kaki yang membawa barang beroda.',
+            ),
           },
           {
             id: 'none',
-            label: t('Tidak ada orang lain sama sekali'),
-            explainWrong: t('Desain ramah disabilitas justru membantu banyak orang.'),
+            label: t('Orang yang suka berjalan cepat'),
+            explainWrong: t('Jalur miring tidak membuat orang lebih cepat. Ia membuat jalan lebih mudah.'),
           },
         ],
         answer: 'all',
-        explainCorrect: t('Desain aksesibel membuat tempat dan website jadi lebih nyaman bagi semua orang.'),
+        explainCorrect: t('Satu jalur menolong banyak orang. Web yang ramah juga begitu.'),
         tags: ['aksesibilitas'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-j2',
-        prompt: t('Jika lenganmu sedang digips selama dua minggu dan susah memakai mouse, itu keterbatasan…'),
+        prompt: t('Lenganmu digips 2 minggu, jadi sulit memakai mouse. Itu kesulitan jenis apa?'),
         choices: [
           { id: 'temp', label: t('Sementara') },
           {
             id: 'perm',
-            label: t('Permanen'),
-            explainWrong: t('Gips hanya sementara sampai tangan sembuh.'),
+            label: t('Tetap'),
+            explainWrong: t('Gips dilepas saat tangan sembuh. Jadi kesulitannya tidak tetap.'),
           },
           {
             id: 'none',
-            label: t('Bukan keterbatasan sama sekali'),
-            explainWrong: t('Kesulitan memakai mouse selama masa pemulihan termasuk keterbatasan sementara.'),
+            label: t('Karena situasi'),
+            explainWrong: t('Kesulitan ini datang dari tangan yang cedera. Bukan dari tempatmu berada.'),
           },
         ],
         answer: 'temp',
-        explainCorrect: t('Keterbatasan bisa bersifat permanen, sementara, atau situasional.'),
+        explainCorrect: t('Gips dilepas saat tangan sembuh. Kesulitan seperti ini hanya sementara.'),
         tags: ['aksesibilitas'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-j3',
-        prompt: t('Mengapa pesan kesalahan formulir sebaiknya tidak cuma memberi garis merah saja?'),
+        prompt: t('Mengapa kolom yang salah tidak cukup diberi garis merah saja?'),
         choices: [
-          { id: 'cb', label: t('Pengguna buta warna butuh tambahan ikon dan tulisan agar tahu apa yang salah') },
+          { id: 'cb', label: t('Sebagian orang sulit membedakan warna merah') },
           {
             id: 'ink',
-            label: t('Karena warna merah menghabiskan baterai layar'),
-            explainWrong: t('Alasannya agar semua orang, termasuk yang buta warna, menangkap pesan error.'),
+            label: t('Warna merah kurang menarik perhatian'),
+            explainWrong: t('Merah memang mencolok. Masalahnya, warna saja tidak cukup untuk semua orang.'),
           },
           {
             id: 'hide',
-            label: t('Supaya pesan error tidak perlu dibaca'),
-            explainWrong: t('Justru pesan error wajib jelas terbaca.'),
+            label: t('Garis merah membuat tulisan hilang'),
+            explainWrong: t('Garis merah tidak menghapus tulisan. Hanya saja, tidak semua mata melihat merah.'),
           },
         ],
         answer: 'cb',
-        explainCorrect: t('Gabungan warna, ikon, dan teks memastikan informasi tersampaikan kepada semua orang.'),
+        explainCorrect: t('Warna saja tidak cukup. Tambahkan ikon dan tulisan.'),
         tags: ['aksesibilitas', 'kontras'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-j4',
-        prompt: t('Jika mouse rusak, tombol keyboard apa yang dipakai berpindah dari satu tombol ke tombol berikutnya?'),
+        prompt: t('Mouse-mu rusak. Tombol keyboard mana yang memindahkan pilihan ke tombol berikutnya?'),
         choices: [
           { id: 'tab', label: t('Tombol Tab') },
           {
             id: 'esc',
             label: t('Tombol Caps Lock'),
-            explainWrong: t('Caps Lock hanya mengganti huruf besar dan kecil.'),
+            explainWrong: t('Caps Lock hanya mengganti huruf besar dan kecil. Ia tidak memindahkan pilihan.'),
           },
           {
             id: 'vol',
-            label: t('Tombol pengecil suara'),
-            explainWrong: t('Navigasi fokus antar-elemen menggunakan tombol Tab.'),
+            label: t('Tombol Enter'),
+            explainWrong: t('Enter menekan tombol yang sedang dipilih. Ia tidak berpindah.'),
           },
         ],
         answer: 'tab',
-        explainCorrect: t('Tombol Tab memindahkan fokus berurutan agar web tetap bisa dipakai tanpa mouse.'),
+        explainCorrect: t('Tab memindahkan pilihan ke tombol berikutnya, seperti menunjuk murid satu per satu.'),
         tags: ['aksesibilitas'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-j5',
-        prompt: t('Apa perbedaan batas analogi antara jalan miring trotoar dan website aksesibel?'),
+        prompt: t('Apa yang perlu dipikirkan di web, tetapi tidak di jalur miring?'),
         type: 'limit',
-        analogy: t('Bidang miring trotoar untuk aksesibilitas'),
+        analogy: t('Jalur miring di trotoar untuk aksesibilitas'),
         choices: [
-          { id: 'soft', label: t('Website juga harus ramah alat bantu digital seperti pembaca layar dan pembesar huruf') },
+          { id: 'soft', label: t('Keyboard atau layar dibacakan') },
           {
             id: 'help',
-            label: t('Sama-sama membantu banyak pengguna di luar target awal'),
-            explainWrong: t('Ini justru kesamaan keduanya.'),
+            label: t('Orang lain ikut terbantu'),
+            explainWrong: t('Itu kesamaannya. Jalur miring pun menolong banyak orang.'),
           },
           {
             id: 'ease',
-            label: t('Sama-sama menghilangkan penghalang saat dipakai'),
-            explainWrong: t('Ini juga persamaannya.'),
+            label: t('Hambatan di jalan dihilangkan'),
+            explainWrong: t('Itu juga kesamaannya. Keduanya menghilangkan hambatan.'),
           },
         ],
         answer: 'soft',
-        explainCorrect: t('Di web, pengguna memakai alat bantu seperti keyboard, screen reader, dan zoom layar.'),
+        explainCorrect: t(
+          'Ada orang yang memakai keyboard atau mendengar layar dibacakan. Halaman perlu mendukung kedua cara itu.',
+          'Komponen web harus bisa dikendalikan lewat keyboard dan terbaca oleh pembaca layar.',
+        ),
         tags: ['aksesibilitas'],
       }),
     ],
     pro: [
       makeAnchorMcq({
         id: 'a10-anc-p1',
-        prompt: t('Pengunjung membaca artikel di HP di bawah terik matahari sehingga layar tampak silau. Ini termasuk keterbatasan…'),
+        prompt: t('Pengunjung membaca artikel di HP di bawah terik matahari, dan layar tampak silau. Ini keterbatasan jenis apa?'),
         choices: [
           { id: 'sit', label: t('Situasional') },
           {
             id: 'perm',
             label: t('Permanen'),
-            explainWrong: t('Silau matahari bergantung pada kondisi lingkungan saat itu.'),
+            explainWrong: t('Silau hilang saat pembaca pindah ke tempat teduh. Itu bukan kondisi permanen.'),
           },
           {
             id: 'temp',
-            label: t('Sementara akibat cedera medis'),
-            explainWrong: t('Masalah lingkungan seperti silau atau tempat bising adalah keterbatasan situasional.'),
+            label: t('Sementara akibat cedera'),
+            explainWrong: t('Cedera berasal dari tubuh. Silau berasal dari lingkungan, jadi disebut situasional.'),
           },
         ],
         answer: 'sit',
-        explainCorrect: t('Keterbatasan situasional muncul karena lingkungan, seperti cahaya silau, suara bising, atau satu tangan penuh.'),
+        explainCorrect: t('Silau datang dari lingkungan, bukan dari tubuh. Contoh lain: tempat bising atau satu tangan yang penuh.'),
         tags: ['aksesibilitas'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-p2',
-        prompt: t('Pada standar WCAG, tingkat kepatuhan mana yang menjadi target umum sebagian besar situs web?'),
+        prompt: t('Level kepatuhan WCAG mana yang menjadi target umum situs web?'),
         choices: [
-          { id: 'aa', label: t('Tingkat AA') },
+          { id: 'aa', label: t('Level AA') },
           {
             id: 'z',
-            label: t('Tingkat Z'),
-            explainWrong: t('Tingkatan WCAG adalah A, AA, dan AAA.'),
+            label: t('Level AAA'),
+            explainWrong: t('AAA sangat ketat, dan tidak semua konten bisa memenuhinya. Target umumnya AA.'),
           },
           {
             id: 'b',
-            label: t('Tingkat B'),
-            explainWrong: t('Tingkatan WCAG adalah A, AA, dan AAA; target umumnya AA.'),
+            label: t('Level A'),
+            explainWrong: t('Level A hanya syarat dasar. Target umumnya AA.'),
           },
         ],
         answer: 'aa',
-        explainCorrect: t('WCAG memiliki level A, AA, dan AAA; level AA menjadi standar praktis yang umum dituju.'),
+        explainCorrect: t('WCAG punya level A, AA, dan AAA. Level AA menjadi target yang paling umum.'),
         tags: ['pour'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-p3',
-        prompt: t('Memberi takarir (caption) pada video dan teks alt pada gambar termasuk prinsip WCAG…'),
+        prompt: t('Takarir (teks ucapan) pada video dan alt text pada gambar termasuk prinsip POUR yang mana?'),
         choices: [
           { id: 'p', label: t('Perceivable (dapat ditangkap indra)') },
           {
             id: 'o',
             label: t('Operable (dapat dioperasikan)'),
-            explainWrong: t('Operable berkaitan dengan keyboard, target sentuh, dan batas waktu.'),
+            explainWrong: t('Operable membahas keyboard, target sentuh, dan batas waktu.'),
           },
           {
             id: 'r',
             label: t('Robust (kode kokoh)'),
-            explainWrong: t('Robust fokus pada standar kode lintas browser dan alat bantu.'),
+            explainWrong: t('Robust membahas kode standar yang bekerja di berbagai browser dan alat bantu.'),
           },
         ],
         answer: 'p',
-        explainCorrect: t('Perceivable memastikan informasi tersedia lewat indra lihat maupun dengar.'),
+        explainCorrect: t('Perceivable berarti informasi sampai lewat mata atau telinga. Takarir dan alt text menyediakan versi teksnya.'),
         tags: ['pour', 'alt-text'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-p4',
-        prompt: t('Apa aturan pertama saat ingin memakai atribut ARIA pada elemen HTML?'),
+        prompt: t('Apa aturan pertama saat ingin memakai ARIA pada elemen HTML?'),
         choices: [
-          { id: 'html', label: t('Jika ada tag HTML semantik asli yang cocok seperti <button>, pakai tag HTML asli dulu') },
+          { id: 'html', label: t('Pakai elemen HTML asli yang cocok, seperti <button>') },
           {
             id: 'div',
-            label: t('Selalu ubah semua elemen menjadi <div> lalu tambahkan ARIA sebanyak mungkin'),
-            explainWrong: t('Tag semantik asli lebih andal dan sudah membawa dukungan keyboard bawaan.'),
+            label: t('Ubah semua elemen menjadi <div>, lalu tambah ARIA'),
+            explainWrong: t('Elemen asli sudah membawa dukungan keyboard bawaan. <div> polos belum punya.'),
           },
           {
             id: 'hide',
-            label: t('Hapus semua atribut alt saat memakai ARIA'),
-            explainWrong: t('Atribut alt tetap wajib untuk gambar bermakna.'),
+            label: t('Tambah ARIA pada setiap elemen agar lebih aman'),
+            explainWrong: t('ARIA yang berlebihan bisa membingungkan pembaca layar. Pakai seperlunya.'),
           },
         ],
         answer: 'html',
-        explainCorrect: t('ARIA hanya dipakai bila elemen HTML asli belum cukup menjelaskan peran seperti tombol ikon ×.'),
+        explainCorrect: t('ARIA menambah keterangan seperti nama tombol ikon ×. Tombol HTML sudah mendukung keyboard.'),
         tags: ['pour', 'semantik'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-p5',
-        prompt: t('Untuk gambar hiasan murni agar dilewati dengan tenang oleh pembaca layar, penulisannya adalah…'),
+        prompt: t('Bagaimana menulis gambar hiasan murni agar dilewati pembaca layar?'),
         choices: [
           { id: 'empty', label: t('<img src="hiasan.png" alt="">') },
           {
@@ -240,34 +264,34 @@ export const world: World = {
           },
           {
             id: 'desc',
-            label: t('<img src="hiasan.png" alt="gambar dekorasi latar biru nomor lima">'),
-            explainWrong: t('Gambar hiasan murni cukup diberi alt kosong agar tidak mengganggu pembaca layar.'),
+            label: t('<img src="hiasan.png" alt="hiasan biru nomor lima">'),
+            explainWrong: t('Gambar hiasan murni cukup diberi alt kosong supaya tidak mengganggu pembaca layar.'),
           },
         ],
         answer: 'empty',
-        explainCorrect: t('Atribut alt="" menandai gambar murni dekoratif sehingga screen reader melewatinya.'),
+        explainCorrect: t('alt="" menandai gambar hiasan, jadi pembaca layar melewatinya.'),
         tags: ['alt-text', 'aksesibilitas'],
       }),
       makeAnchorMcq({
         id: 'a10-anc-p6',
         type: 'limit',
-        analogy: t('Daftar periksa aksesibilitas otomatis seperti Lighthouse'),
+        analogy: t('Audit aksesibilitas otomatis seperti Lighthouse'),
         choices: [
-          { id: 'auto', label: t('Alat otomatis tidak bisa menilai apakah bahasa tulisan jelas atau alur Tab terasa masuk akal bagi manusia') },
+          { id: 'auto', label: t('Kejelasan bahasa dan urutan Tab yang masuk akal') },
           {
             id: 'col',
-            label: t('Alat otomatis bisa menghitung rasio kontras warna'),
-            explainWrong: t('Alat otomatis memang hebat memeriksa hal terukur seperti kontras.'),
+            label: t('Rasio kontras antara teks dan latar'),
+            explainWrong: t('Rasio kontras berupa angka, jadi alat otomatis bisa menghitungnya.'),
           },
           {
             id: 'alt',
-            label: t('Alat otomatis bisa mendeteksi gambar yang lupa diberi atribut alt'),
-            explainWrong: t('Deteksi alt hilang juga bisa dilakukan alat otomatis, tapi kualitas kalimat alt dinilai manusia.'),
+            label: t('Gambar yang lupa diberi alt'),
+            explainWrong: t('Alat otomatis bisa mendeteksi alt yang hilang. Kualitas kalimat alt tetap dinilai manusia.'),
           },
         ],
-        prompt: t('Mengapa skor Lighthouse Accessibility 100 belum otomatis menjamin website nyaman dipakai penyandang disabilitas?'),
+        prompt: t('Bagian mana dari aksesibilitas yang tidak bisa dinilai alat otomatis seperti Lighthouse?'),
         answer: 'auto',
-        explainCorrect: t('Audit otomatis hanya menangkap sebagian masalah teknis; uji keyboard dan pembaca layar langsung tetap wajib.'),
+        explainCorrect: t('Audit otomatis hanya menangkap sebagian masalah teknis. Uji dengan keyboard dan pembaca layar tetap perlu.'),
         tags: ['aksesibilitas', 'pour'],
       }),
     ],
@@ -281,165 +305,244 @@ export const lessons: Lesson[] = [
     title: 'Untuk siapa aksesibilitas',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa menjelaskan siapa saja yang terbantu oleh website yang ramah semua orang.',
-      'Aku bisa menjelaskan makna a11y serta tiga kategori keterbatasan (permanen, sementara, dan situasional).',
+      'Aku bisa menyebut siapa saja yang terbantu oleh web ramah.',
+      'Kamu bisa membedakan hambatan permanen, sementara, dan situasional.',
     ),
     estMinutes: 5,
+    atWork:
+      'Di tim produk, kamu akan menandai halaman yang sulit dipakai saat layar silau atau satu tangan penuh.',
     introducesTerms: ['aksesibilitas'],
     usesTerms: ['ui', 'ux', 'alt-text', 'kontras'],
     stickerId: 'bidang-miring',
     warmupFrom: 'a09-l06',
     steps: [
       storyStep('a10/bidang-miring.svg', [
-        rText(
-          'Bidang miring di trotoar awalnya dibuat untuk kursi roda. Ternyata orang tua dengan kereta bayi, penarik koper, dan pengantar barang juga ikut senang memakainya!',
-          'Bidang miring di trotoar dibangun untuk pengguna kursi roda, tetapi turut memudahkan pendorong kereta bayi, penarik koper, dan kurir barang. Desain yang ramah bagi yang paling membutuhkan membuat semuanya nyaman.',
+        rJunior(
+          'Tukang membuat jalur miring di trotoar untuk kursi roda. Ibu dengan kereta bayi ikut memakainya. Mengapa banyak orang terbantu?',
+        ),
+        rPro(
+          'Jalur miring di trotoar dibangun untuk kursi roda. Pendorong kereta bayi, penarik koper, dan kurir ikut memakainya.',
         ),
       ]),
       conceptStep({
-        title: t('Apa Itu Aksesibilitas?', 'Makna Aksesibilitas (a11y)'),
+        title: t('Apa itu aksesibilitas?', 'Makna aksesibilitas'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a10', topic: 'apa-itu-a11y' },
-        alt: t('Singkatan a11y berarti huruf a, 11 huruf di tengah, dan huruf y.'),
+        alt: t('Tulisan a11y: huruf a, angka 11, lalu huruf y.'),
         body: [
-          rTerm('aksesibilitas', 'Aksesibilitas', 'Aksesibilitas (a11y)'),
-          rText(
-            ' membuat web bisa dipakai siapa saja. Singkatannya ',
-            ' berarti membuat web dapat dipakai semua orang. Angka 11 pada ',
+          rTerm('aksesibilitas', 'Aksesibilitas', 'Aksesibilitas'),
+          rJunior(
+            ' artinya web bisa dipakai semua orang. Jalur miring membantu orang memakai kursi roda, membawa koper, atau mendorong kereta. Kata Inggrisnya accessibility, disingkat ',
           ),
-          rCode('a11y'),
-          rText(' dari jumlah hurufnya.', ' mewakili 11 huruf di antara a dan y pada kata accessibility.'),
+          rCode('a11y', ['junior']),
+          rJunior(' karena ada 11 huruf di tengah.'),
+          rPro(' adalah kemampuan web untuk dipakai semua orang. Singkatannya '),
+          rCode('a11y', ['pro']),
+          rPro(', karena ada 11 huruf di antara a dan y pada kata accessibility.'),
         ],
       }),
+      // Cek cepat (Pro): the first card already shows where the 11 comes from.
+      qStep(
+        makeMcq({
+          id: 'a10-l01-q3',
+          modes: ['pro'],
+          prompt: t('Angka 11 di tulisan a11y berasal dari mana?'),
+          choices: [
+            { id: 'len', label: t('Jumlah 11 huruf di antara a dan y') },
+            {
+              id: 'ver',
+              label: t('Nomor versi ke-11 dari standar aksesibilitas'),
+              explainWrong: t('a11y adalah singkatan kata accessibility, bukan nomor versi.'),
+            },
+            {
+              id: 'rule',
+              label: t('Jumlah 11 aturan pokok aksesibilitas'),
+              explainWrong: t('Angka 11 menghitung huruf di antara a dan y, bukan jumlah aturan.'),
+            },
+          ],
+          answer: 'len',
+          explainCorrect: t(
+            'Kata accessibility punya 11 huruf di antara a dan y. Karena itu, singkatannya ditulis a11y.',
+          ),
+          hints: [t('Hitung huruf di antara a dan y.')],
+          tags: ['aksesibilitas'],
+        }),
+      ),
+      // Cek cepat (Petualang dan Pro): the story and the first card answer this.
+      qStep(
+        makeMcq({
+          id: 'a10-l01-q1',
+          type: 'analogy',
+          prompt: t(
+            'Mengapa jalur miring sering dipakai sebagai contoh aksesibilitas?',
+            'Mengapa aksesibilitas sering diumpamakan dengan jalur miring di trotoar?',
+          ),
+          choices: [
+            { id: 'all', label: t('Jalur itu menolong banyak orang sekaligus') },
+            {
+              id: 'slide',
+              label: t('Jalur itu hanya menolong orang berkursi roda'),
+              explainWrong: t(
+                'Koper dan kereta bayi juga lancar di jalur itu. Banyak orang terbantu.',
+                'Pendorong kereta bayi dan penarik koper juga memakainya. Manfaatnya lebih luas dari satu kelompok.',
+              ),
+            },
+            {
+              id: 'fast',
+              label: t('Jalur itu membuat trotoar tampak lebih indah'),
+              explainWrong: t(
+                'Jalur miring dibuat supaya mudah dilewati. Bukan untuk hiasan.',
+                'Jalur miring dibuat untuk memudahkan lewat, bukan sebagai hiasan. Manfaat praktisnya yang dijadikan contoh.',
+              ),
+            },
+          ],
+          answer: 'all',
+          explainCorrect: t(
+            'Satu perbaikan menolong banyak orang. Kursi roda, koper, dan kereta bayi lewat di jalur yang sama.',
+            'Perbaikan untuk satu kelompok ikut menolong banyak orang lain. Fitur aksesibilitas di web bekerja dengan cara yang sama.',
+          ),
+          hints: [t('Ingat siapa lagi yang lewat di jalur miring.')],
+          tags: ['aksesibilitas'],
+        }),
+      ),
       conceptStep({
-        title: t('Bukan Cuma Kondisi Tetap', 'Permanen & Sementara'),
+        title: t('Tiga macam kesulitan', 'Permanen dan sementara'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a10', topic: 'disabilitas-permanen-sementara' },
-        alt: t('Contoh keterbatasan permanen seperti tunanetra dan sementara seperti tangan digips.'),
+        alt: t(
+          'Contoh kesulitan tetap dan sementara: mata yang tidak melihat dan tangan digips.',
+          'Contoh hambatan permanen (tunanetra) dan sementara (lengan digips).',
+        ),
         body: [
-          rText('Ada keterbatasan '),
-          rBold('permanen', 'permanen'),
-          rText(' seperti tunanetra atau tuli. Ada juga yang ', ' (tunanetra, buta warna, tuli, gerak terbatas) dan '),
-          rBold('sementara', 'sementara'),
-          rText(' seperti tangan digips.', ' seperti lengan digips, mata lelah, atau baru pulih operasi.'),
-        ],
-      }),
-      conceptStep({
-        title: t('Kondisi Sekitar Kita', 'Keterbatasan Situasional'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'a10', topic: 'keterbatasan-situasional' },
-        alt: t('Situasi silau matahari, satu tangan menggendong adik, dan tempat bising.'),
-        body: [
-          rText('Kondisi '),
-          rBold('situasional', 'situasional'),
-          rText(
-            ' dialami semua orang. Layar silau matahari, tempat bising, atau memegang barang.',
-            ' bisa menimpa siapa saja: layar silau di luar ruangan, tempat sangat bising, atau hanya satu tangan yang bebas.',
-          ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Bidang miring trotoar untuk aksesibilitas'),
-        same: [
-          t('Memperbaiki akses bagi satu kelompok pengguna langsung memudahkan banyak orang lain juga.'),
-        ],
-        different: [
-          t('Trotoar beton bentuknya tetap, sedangkan website harus bisa menyesuaikan diri lewat teks alt, keyboard, dan alat pembaca layar.'),
+          rJunior('Ada kesulitan yang '),
+          rBoldJ('tetap'),
+          rJunior(', seperti mata yang tidak bisa melihat. Ada yang '),
+          rBoldJ('sementara'),
+          rJunior(', seperti tangan yang digips. Ada juga yang '),
+          rBoldJ('karena situasi'),
+          rJunior(', seperti layar silau di bawah matahari.'),
+          rPro('Hambatan '),
+          rBoldP('permanen'),
+          rPro(' tidak berubah: tunanetra, buta warna, tuli, atau gerak terbatas. Hambatan '),
+          rBoldP('sementara'),
+          rPro(' akan pulih: lengan digips, mata lelah, atau baru pulih operasi.'),
         ],
       }),
       simStep(
         'taman-akses',
         t(
-          'Ketuk setiap syarat taman ramah agar kamu tahu apa saja yang membantu pengunjung!',
-          'Telusuri pilar aksesibilitas di simulator Taman Ramah Semua.',
+          'Ketuk setiap syarat taman untuk melihat apa yang membantu pengunjung.',
+          'Buka panel Pemeriksa Aksesibilitas dan coba tiap syarat.',
         ),
       ),
+      conceptStep({
+        title: t('Keterbatasan situasional'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a10', topic: 'keterbatasan-situasional' },
+        alt: t('Situasi silau matahari, satu tangan menggendong adik, dan tempat bising.'),
+        body: [
+          rPro('Hambatan '),
+          rBoldP('situasional'),
+          rPro(
+            ' datang dari lingkungan, bukan dari tubuh. Contohnya layar silau di luar ruangan, tempat sangat bising, atau hanya satu tangan yang bebas.',
+          ),
+        ],
+        modes: ['pro'],
+      }),
       qStep(
-        makeMcq({
-          id: 'a10-l01-q1',
-          type: 'analogy',
-          prompt: t('Mengapa aksesibilitas sering diumpamakan seperti jalur bidang miring di trotoar?'),
-          choices: [
-            { id: 'all', label: t('Karena membantu kursi roda sekaligus memudahkan koper, kereta bayi, dan semua orang') },
-            {
-              id: 'slide',
-              label: t('Karena dipakai anak-anak untuk bermain perosotan'),
-              explainWrong: t('Bidang miring membantu pergerakan pengguna roda agar tidak terhalang tangga.'),
-            },
-            {
-              id: 'fast',
-              label: t('Karena membuat jalan menjadi lebih sempit'),
-              explainWrong: t('Tujuannya justru membuka akses bagi lebih banyak orang.'),
-            },
-          ],
-          answer: 'all',
-          explainCorrect: t('Benar! Fitur ramah akses membuat produk nyaman dipakai oleh semua kondisi pengguna.'),
+        makeTf({
+          id: 'a10-l01-q6',
+          prompt: t(
+            'Web yang ramah bisa menolong siapa saja.',
+            'Aksesibilitas web berguna bagi semua orang, bukan hanya penyandang disabilitas permanen.',
+          ),
+          answer: true,
+          explainCorrect: t(
+            'Tulisan ucapan di video menolong saat tempat berisik. Beda terang huruf dan latar membantu saat layar silau.',
+            'Siapa pun bisa mengalami hambatan sementara atau situasional setiap hari. Silau, bising, dan tangan yang penuh adalah contohnya.',
+          ),
+          explainWrong: t(
+            'Pernyataan itu benar. Layar silau atau tangan penuh bisa dialami siapa saja.',
+            'Pernyataan itu benar: hambatan sementara dan situasional bisa dialami siapa saja.',
+          ),
+          hints: [t('Ingat saat layar HP-mu silau.', 'Ingat contoh orang di luar ruangan.')],
           tags: ['aksesibilitas'],
         }),
       ),
       qStep({
         id: 'a10-l01-q2',
         type: 'sort',
-        prompt: t('Kelompokkan kondisi pengguna berikut ke Permanen, Sementara, atau Situasional:'),
+        prompt: t(
+          'Kelompokkan tiap kejadian ke Tetap, Sementara, atau Karena situasi.',
+          'Kelompokkan tiap kondisi ke Permanen, Sementara, atau Situasional.',
+        ),
         difficulty: 2,
         items: [
           { id: 'c1', label: t('Layar silau di bawah matahari') },
           { id: 'c2', label: t('Tangan kanan sedang digips') },
-          { id: 'c3', label: t('Tunanetra sejak lahir') },
+          { id: 'c3', label: t('Mata yang tidak bisa melihat sejak lahir', 'Tunanetra sejak lahir') },
           { id: 'c4', label: t('Satu tangan memegang tas belanja') },
         ],
         bins: [
-          { id: 'perm', label: t('Permanen') },
-          { id: 'temp', label: t('Sementara') },
-          { id: 'sit', label: t('Situasional') },
+          { id: 'perm', label: t('Tetap', 'Permanen'), icon: 'lock' },
+          { id: 'temp', label: t('Sementara'), icon: 'clock' },
+          { id: 'sit', label: t('Karena situasi', 'Situasional'), icon: 'map-pin' },
         ],
         answer: { c1: 'sit', c2: 'temp', c3: 'perm', c4: 'sit' },
-        explainCorrect: t('Hebat! Kamu membedakan tiga jenis keterbatasan manusia dengan tepat.'),
+        explainCorrect: t(
+          'Gips dipakai sementara, gangguan penglihatan bisa menetap. Silau reda di tempat teduh, tas belanja bisa ditaruh.',
+          'Hambatan situasional muncul dari keadaan sekitar dan hilang saat keadaan berubah. Gangguan dari tubuh bisa sementara atau menetap.',
+        ),
+        hints: [
+          t(
+            'Tanyakan: sampai kapan kesulitan itu ada?',
+            'Dari tubuh atau lingkungan? Kalau dari tubuh, apakah akan pulih?',
+          ),
+          undefined,
+        ],
         tags: ['aksesibilitas'],
       }),
-      qStep(
-        makeMcq({
-          id: 'a10-l01-q3',
-          prompt: t('Di singkatan "a11y", angka 11 berasal dari…'),
-          choices: [
-            { id: 'len', label: t('Jumlah 11 huruf di antara huruf a dan y pada kata accessibility') },
-            {
-              id: 'ver',
-              label: t('Versi browser ke-11'),
-              explainWrong: t('a11y adalah singkatan kata accessibility, bukan nomor versi.'),
-            },
-            {
-              id: 'rule',
-              label: t('Jumlah maksimal tombol di satu halaman'),
-              explainWrong: t('Angka 11 merujuk jumlah huruf tengah pada kata accessibility.'),
-            },
-          ],
-          answer: 'len',
-          explainCorrect: t('Tepat! a + (ccessibilit = 11 huruf) + y menjadi a11y.'),
-          tags: ['aksesibilitas'],
-        }),
-      ),
+      limitStep({
+        analogy: t('Jalur miring di trotoar untuk aksesibilitas'),
+        same: [
+          t(
+            'Satu perbaikan menolong banyak orang.',
+            'Perbaikan untuk satu kelompok ikut menolong banyak orang lain.',
+          ),
+        ],
+        different: [
+          t(
+            'Jalur dilewati roda. Web juga bisa dipakai lewat keyboard.',
+            'Trotoar itu beton yang tetap. Web harus bekerja dengan keyboard, pembaca layar, dan zoom.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
       qStep(
         makeMcq({
           id: 'a10-l01-q4',
           type: 'limit',
-          analogy: t('Bidang miring di trotoar'),
-          prompt: t('Apa hal yang HARUS diperhatikan di website tetapi tidak ada di bidang miring trotoar?'),
+          modes: ['pro'],
+          analogy: t('Jalur miring di trotoar'),
+          prompt: t('Apa yang perlu diperhatikan di web, tetapi tidak ada di jalur miring?'),
           choices: [
-            { id: 'sr', label: t('Membantu alat pembaca layar dan keyboard karena penggunanya tidak menyentuh beton fisik') },
+            { id: 'sr', label: t('Dukungan untuk pembaca layar dan keyboard') },
             {
               id: 'wide',
               label: t('Menghilangkan hambatan bagi orang yang membutuhkan'),
-              explainWrong: t('Itu kesamaan antara bidang miring dan web aksesibel.'),
+              explainWrong: t('Itu kesamaan jalur miring dan web yang aksesibel.'),
             },
             {
               id: 'nice',
-              label: t('Berguna juga untuk orang lain saat membawa barang'),
-              explainWrong: t('Ini juga persamaan keduanya.'),
+              label: t('Ikut berguna bagi orang yang membawa barang'),
+              explainWrong: t('Itu juga kesamaannya: banyak orang ikut terbantu.'),
             },
           ],
           answer: 'sr',
-          explainCorrect: t('Benar! Di web, hambatan datang dari kode yang tak terbaca pembaca layar atau tak bisa diklik dengan keyboard.'),
+          explainCorrect: t(
+            'Di web, hambatan datang dari kode yang tidak terbaca pembaca layar atau tidak bisa dipakai dengan keyboard. Jalur miring tidak punya masalah itu.',
+          ),
+          hints: [t('Pikirkan cara orang menjangkau web, bukan trotoar.')],
           tags: ['aksesibilitas'],
         }),
       ),
@@ -447,34 +550,42 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a10-l01-q5',
           type: 'scenario',
-          story: t('Rani menonton video tutorial memasak di kereta api yang sangat berisik tanpa membawa earphone.'),
-          prompt: t('Fitur aksesibilitas apa yang langsung menolong Rani dalam kondisi situasional itu?'),
+          story: t(
+            'Rani menonton video masak di kereta yang berisik. Ia tidak membawa earphone.',
+            'Rani menonton video tutorial memasak di kereta yang berisik. Ia tidak membawa earphone.',
+          ),
+          prompt: t('Apa yang paling menolong Rani?', 'Fitur aksesibilitas apa yang langsung menolong Rani?'),
           difficulty: 2,
           choices: [
-            { id: 'cap', label: t('Takarir atau teks terjemahan (caption) pada video') },
+            { id: 'cap', label: t('Tulisan ucapan di video', 'Takarir (teks ucapan) pada video') },
             {
               id: 'anim',
-              label: t('Menambah suara musik latar lebih keras'),
-              explainWrong: t('Tanpa earphone di tempat bising, suara justru tetap tidak terdengar jelas.'),
+              label: t('Volume suara dinaikkan sampai penuh', 'Volume video dinaikkan sampai maksimal'),
+              explainWrong: t(
+                'Kereta tetap berisik. Suara keras bisa tenggelam oleh bunyi kereta.',
+                'Kebisingan kereta menutupi suara, jadi volume besar belum tentu membantu.',
+              ),
             },
             {
               id: 'tiny',
-              label: t('Memperkecil layar video hingga seukuran prangko'),
-              explainWrong: t('Memperkecil video malah menyulitkan Rani melihat langkahnya.'),
+              label: t('Warna video dibuat lebih terang', 'Kecerahan layar dinaikkan sampai penuh'),
+              explainWrong: t(
+                'Terang layar tidak menolong telinga. Rani butuh cara lain untuk mengerti ucapan.',
+                'Kecerahan layar tidak mengubah suara. Rani butuh versi teks dari ucapan.',
+              ),
             },
           ],
           answer: 'cap',
-          explainCorrect: t('Tepat! Takarir awalnya wajib bagi teman tuli, sekaligus menolong siapa saja di tempat bising.'),
-          tags: ['aksesibilitas'],
-        }),
-      ),
-      qStep(
-        makeTf({
-          id: 'a10-l01-q6',
-          prompt: t('Aksesibilitas web berguna bagi semua orang, bukan hanya penyandang disabilitas permanen.'),
-          answer: true,
-          explainCorrect: t('Betul! Siapa pun bisa mengalami keterbatasan sementara atau situasional setiap hari.'),
-          explainWrong: t('Hampir! Setiap orang pernah silau matahari, lelah mata, atau hanya bisa memakai satu tangan.'),
+          explainCorrect: t(
+            'Tulisan ucapan bisa dibaca saat suara tidak terdengar. Seperti membaca teks lagu di layar karaoke.',
+            'Takarir awalnya dibuat untuk orang tuli, dan menolong siapa saja di tempat bising. Itu contoh hambatan situasional.',
+          ),
+          hints: [
+            t(
+              'Ingat: Rani tidak bisa mendengar dengan jelas.',
+              'Rani butuh informasi yang tidak bergantung pada suara.',
+            ),
+          ],
           tags: ['aksesibilitas'],
         }),
       ),
@@ -483,47 +594,76 @@ export const lessons: Lesson[] = [
         type: 'type',
         modes: ['pro'],
         difficulty: 2,
-        prompt: t('Tulis singkatan internasional 4 karakter untuk kata accessibility yang sering dipakai developer.'),
+        prompt: t('Ketik tulisan 4 karakter yang dipakai developer untuk kata accessibility.'),
         accept: ['a11y', 'A11Y'],
-        explainCorrect: t('Tepat! a11y adalah singkatan standar industri untuk aksesibilitas.'),
+        explainCorrect: t(
+          'a11y adalah tulisan standar untuk aksesibilitas. Kamu akan menemukannya di nama kelas CSS dan dokumentasi.',
+        ),
+        hints: [t('Huruf pertama a, huruf terakhir y.'), undefined],
         tags: ['aksesibilitas'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a10-l01-r1',
-        prompt: t('Manakah contoh keterbatasan situasional saat memakai HP?'),
+        prompt: t(
+          'Mana yang terjadi karena situasi, bukan karena tubuh?',
+          'Mana contoh keterbatasan situasional saat memakai HP?',
+        ),
         choices: [
-          { id: 'sun', label: t('Membaca layar di luar ruangan yang silau sinar matahari') },
+          { id: 'sun', label: t('Layar silau di luar rumah', 'Layar HP silau di luar ruangan') },
           {
             id: 'bw',
-            label: t('Buta warna sejak kecil'),
-            explainWrong: t('Buta warna termasuk kondisi permanen.'),
+            label: t('Mata yang buta warna sejak kecil', 'Buta warna sejak kecil'),
+            explainWrong: t(
+              'Buta warna ada pada tubuh dan tidak hilang. Jadi kesulitannya tetap.',
+              'Buta warna berasal dari tubuh dan tidak hilang, jadi termasuk kondisi permanen.',
+            ),
+          },
+          {
+            id: 'arm',
+            label: t('Lengan yang sedang digips'),
+            explainWrong: t(
+              'Gips berasal dari tangan yang cedera, bukan dari tempat. Nanti ia sembuh.',
+              'Lengan digips berasal dari tubuh dan akan pulih, jadi termasuk hambatan sementara.',
+            ),
           },
         ],
         answer: 'sun',
-        explainCorrect: t('Silau matahari atau tempat berisik adalah keterbatasan situasional.'),
+        explainCorrect: t(
+          'Silau datang dari tempatmu berada. Kalau kamu pindah ke tempat teduh, silaunya hilang.',
+          'Silau dan tempat bising berasal dari lingkungan, jadi termasuk situasional.',
+        ),
+        hints: [t('Ingat: tempat berubah, kesulitan ikut hilang.')],
         tags: ['aksesibilitas'],
       }),
       makeTf({
         id: 'a10-l01-r2',
-        prompt: t('Kontras warna yang jelas membantu penyandang gangguan penglihatan sekaligus orang yang melihat layar di luar ruangan.'),
+        prompt: t(
+          'Tulisan yang beda jelas dari warna belakangnya mudah dibaca semua orang.',
+          'Kontras warna yang jelas membantu penyandang gangguan penglihatan sekaligus orang yang melihat layar di luar ruangan.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! Kontras yang kuat menguntungkan semua pengguna.'),
-        explainWrong: t('Kontras baik membantu pengguna gangguan penglihatan maupun siapa pun di bawah cahaya terik.'),
+        explainCorrect: t(
+          'Tulisan gelap di kertas terang mudah dibaca siapa saja. Di bawah matahari pun tetap terbaca.',
+          'Kontras yang kuat menolong orang dengan gangguan penglihatan dan siapa pun di bawah cahaya terik.',
+        ),
+        explainWrong: t(
+          'Pernyataan itu benar. Tulisan yang mudah dibaca menolong banyak orang.',
+          'Pernyataan itu benar: kontras yang baik menolong gangguan penglihatan dan layar di bawah cahaya terik.',
+        ),
+        hints: [t('Bayangkan spidol hitam di kertas kuning.')],
         tags: ['aksesibilitas', 'kontras'],
       }),
     ],
     recap: t(
-      'Aksesibilitas membuat website ramah dipakai dalam kondisi permanen, sementara, maupun situasional.',
-      'Aksesibilitas (a11y) mengatasi hambatan permanen, sementara, dan situasional sehingga produk lebih nyaman bagi semua orang.',
+      'Aksesibilitas membuat web bisa dipakai semua orang, dalam keadaan apa pun.',
+      'Aksesibilitas (a11y) mengatasi hambatan permanen, sementara, dan situasional. Hasilnya, produk nyaman dipakai semua orang.',
     ),
     companion: {
-      talkPrompts: [
-        'Pernahkah kamu memakai HP sambil makan dengan satu tangan atau di tempat berisik? Fitur apa yang membantu saat itu?',
-      ],
+      talkPrompts: ['Siapa saja yang terbantu oleh jalur miring di trotoar?'],
       offlineActivity:
-        'Ajak anak menutup mata 1 menit lalu minta menebak isi kemasan makanan dari suara penjelasan kakak—rasakan pentingnya teks alt dan deskripsi jelas.',
+        'Minta orang di rumah membaca kemasan tanpa menunjukkan gambarnya. Gambar mana yang perlu dijelaskan?',
     },
   }),
 
@@ -532,56 +672,78 @@ export const lessons: Lesson[] = [
     worldId: 'a10',
     title: 'Empat prinsip POUR',
     modes: ['pro'],
-    objective: t(
-      'Aku bisa mengingat empat prinsip WCAG POUR dan peran dasar ARIA.',
-      'Aku bisa mengelompokkan aturan aksesibilitas ke empat prinsip WCAG POUR (Perceivable, Operable, Understandable, Robust) dan menerapkan aturan pertama ARIA.',
-    ),
+    objective: t('Kamu bisa mengelompokkan aturan aksesibilitas ke empat prinsip POUR.'),
     estMinutes: 5,
+    atWork:
+      'Kamu akan melihat POUR di laporan audit aksesibilitas saat klien meminta halaman lolos WCAG AA.',
     introducesTerms: ['pour'],
     usesTerms: ['aksesibilitas', 'alt-text', 'kontras', 'semantik'],
     warmupFrom: 'a10-l01',
     steps: [
       storyStep('a10/taman-pour.svg', [
         rText(
-          'Bayangkan sebuah taman umum bertaraf internasional: papan petunjuknya mudah dilihat atau didengar, pintunya bisa dibuka tanpa mengandalkan satu cara saja, bahasanya mudah dimengerti, dan bangkunya kokoh dipakai siapa pun. Itulah empat prinsip POUR di WCAG!',
+          'Bayangkan taman umum yang ramah: papan petunjuknya terbaca, pintunya mudah dibuka, aturannya jelas, dan bangkunya kokoh. Pedoman WCAG (Web Content Accessibility Guidelines) punya empat prinsip yang disebut ',
         ),
+        rTerm('pour', 'POUR'),
+        rText('.'),
       ]),
       conceptStep({
-        title: t('WCAG & P — Perceivable, O — Operable'),
+        title: t('P dan O: terlihat dan bisa dipakai'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a10', topic: 'pour-po' },
-        alt: t('P Perceivable (indra lihat/dengar) dan O Operable (keyboard & target sentuh).'),
+        alt: t('P Perceivable (indra lihat dan dengar) dan O Operable (keyboard dan target sentuh).'),
         body: [
-          rTerm('pour', 'WCAG POUR'),
-          rText(' punya target umum kepatuhan '),
-          rBold('AA'),
-          rText('. '),
-          rBold('P (Perceivable)'),
-          rText(': info dapat dilihat/didengar ('),
+          rBold('P (Perceivable, dapat ditangkap indra)'),
+          rText(': informasi bisa dilihat atau didengar, misalnya lewat '),
           rTerm('alt-text', 'alt text'),
           rText(', '),
           rTerm('kontras', 'kontras'),
-          rText(', takarir). '),
-          rBold('O (Operable)'),
-          rText(': bisa lewat keyboard, target sentuh besar, tanpa batas waktu menjebak.'),
+          rText(', dan teks ucapan di video. '),
+          rBold('O (Operable, dapat dioperasikan)'),
+          rText(': semua fungsi bisa dipakai lewat keyboard, dengan target sentuh besar dan tanpa batas waktu mendadak.'),
         ],
       }),
+      simStep('taman-akses', t('Buka panel Pemeriksa Aksesibilitas dan coba tiap syarat.')),
       conceptStep({
-        title: t('U — Understandable & R — Robust'),
+        title: t('U dan R: dipahami dan kokoh'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a10', topic: 'pour-ur' },
-        alt: t('U Understandable (bahasa jelas & error membantu) dan R Robust (kode standar rapi).'),
+        alt: t('U Understandable (bahasa jelas dan error membantu) dan R Robust (kode standar rapi).'),
         body: [
-          rBold('U (Understandable)'),
-          rText(': bahasa jelas, navigasi konsisten, pesan error menjelaskan cara memperbaiki. '),
-          rBold('R (Robust)'),
-          rText(': kode '),
-          rTerm('semantik', 'HTML semantik'),
-          rText(' rapi dan standar sehingga bekerja di berbagai browser dan alat bantu.'),
+          rBold('U (Understandable, dapat dipahami)'),
+          rText(': bahasanya jelas, menu konsisten, dan pesan error menjelaskan cara memperbaikinya. '),
+          rBold('R (Robust, kokoh)'),
+          rText(': kode yang rapi dan standar bekerja di banyak browser dan alat bantu. WCAG punya level A, AA, dan AAA. Target umumnya '),
+          rBold('AA'),
+          rText('.'),
         ],
       }),
+      qStep({
+        id: 'a10-l02-q1',
+        type: 'match',
+        prompt: t('Pasangkan tiap huruf POUR dengan contohnya di web.'),
+        difficulty: 2,
+        left: [
+          { id: 'p', label: t('Perceivable') },
+          { id: 'o', label: t('Operable') },
+          { id: 'u', label: t('Understandable') },
+          { id: 'r', label: t('Robust') },
+        ],
+        right: [
+          { id: 'r1', label: t('Semua menu bisa dibuka lewat Tab dan Enter') },
+          { id: 'r2', label: t('Pesan error menjelaskan cara memperbaiki isian') },
+          { id: 'r3', label: t('Gambar punya alt text, video punya takarir') },
+          { id: 'r4', label: t('HTML rapi dan valid di banyak browser') },
+        ],
+        answer: { p: 'r3', o: 'r1', u: 'r2', r: 'r4' },
+        explainCorrect: t(
+          'Tiap huruf menjawab satu pertanyaan: bisa ditangkap, bisa dipakai, bisa dipahami, atau kokoh. Contoh tiap huruf ada di kolom kanan.',
+        ),
+        hints: [t('Ingat arti tiap huruf: ditangkap, dipakai, dipahami, kokoh.'), undefined],
+        tags: ['pour'],
+      }),
       conceptStep({
-        title: t('Sekilas ARIA dan Aturan Pertamanya'),
+        title: t('ARIA dan aturan pertamanya'),
         visualName: 'HtmlTreeDiagram',
         visualProps: { worldId: 'a10', topic: 'aria-label' },
         alt: t('Contoh tombol ikon silang memakai aria-label="Tutup" bila tidak ada teks.'),
@@ -591,105 +753,94 @@ export const lessons: Lesson[] = [
         },
         body: [
           rBold('ARIA'),
-          rText(' memberi keterangan peran kepada pembaca layar, misalnya '),
+          rText(' adalah kumpulan atribut yang memberi informasi tentang nama, peran, atau keadaan elemen. Tombol ikon × sudah punya peran tombol dan bisa diberi nama dengan '),
           rCode('aria-label="Tutup"'),
-          rText(' pada tombol ikon. Aturan pertamanya: jika ada tag HTML asli yang cocok, pakai tag asli dulu sebelum menambah ARIA.'),
+          rText(' supaya terbaca sebagai "Tutup". Aturan pertamanya: kalau ada elemen HTML asli yang cocok, pakai elemen itu dulu.'),
         ],
       }),
       limitStep({
-        analogy: t('POUR seperti standar fasilitas taman umum yang ramah'),
+        analogy: t('POUR seperti standar fasilitas taman umum'),
         same: [
-          t('Pintu masuk, papan informasi, dan pegangan mengikuti standar ukuran baku agar aman dipakai semua tamu.'),
+          t('Pintu, papan informasi, dan pegangan mengikuti ukuran baku supaya aman dipakai semua tamu.'),
         ],
         different: [
-          t('Di taman fisik tidak ada kode HTML; di web, prinsip Robust menuntut struktur kode standar supaya pembaca layar bisa menerjemahkannya ke suara atau braille.'),
-          t('Memasang aria-label pada <div> tidak otomatis membuatnya bisa diklik dengan tombol Enter keyboard seperti <button> asli!'),
+          t('Taman tidak punya kode. Web butuh kode standar agar pembaca layar bisa membacanya.'),
+          t('aria-label pada div tidak membuatnya bisa ditekan dengan Enter. Tombol asli sudah bisa.'),
         ],
-      }),
-      simStep(
-        'taman-akses',
-        t('Uji ketiga komponen POUR utama pada panel Pemeriksa Aksesibilitas.'),
-      ),
-      qStep({
-        id: 'a10-l02-q1',
-        type: 'match',
-        prompt: t('Pasangkan keempat huruf POUR dengan contoh penerapannya di web:'),
-        difficulty: 2,
-        left: [
-          { id: 'p', label: t('Perceivable') },
-          { id: 'o', label: t('Operable') },
-          { id: 'u', label: t('Understandable') },
-          { id: 'r', label: t('Robust') },
-        ],
-        right: [
-          { id: 'r1', label: t('Semua menu dapat dibuka lewat tombol Tab & Enter') },
-          { id: 'r2', label: t('Pesan error menjelaskan cara memperbaiki isian') },
-          { id: 'r3', label: t('Gambar punya alt text dan video punya takarir') },
-          { id: 'r4', label: t('HTML rapi dan valid di berbagai browser & pembaca layar') },
-        ],
-        answer: { p: 'r3', o: 'r1', u: 'r2', r: 'r4' },
-        explainCorrect: t('Tepat sekali! P (Indra), O (Dioperasikan), U (Dipahami), R (Kokoh).'),
-        tags: ['pour'],
+        riskyAnalogy: false,
       }),
       qStep(
         makeMcq({
           id: 'a10-l02-q2',
-          type: 'analogy',
-          prompt: t('Tombol ikon tanda silang "×" tanpa teks tertulis di sampingnya membutuhkan…'),
+          type: 'mcq',
+          prompt: t('Tombol ikon × tidak punya teks di sampingnya. Apa yang perlu ditambahkan?'),
           choices: [
-            { id: 'aria', label: t('Atribut aria-label="Tutup" di dalam tag <button>') },
+            { id: 'aria', label: t('Beri aria-label="Tutup" pada <button>') },
             {
               id: 'div',
-              label: t('Mengubahnya menjadi <div> polos tanpa teks apa pun'),
-              explainWrong: t('Pembaca layar tidak tahu itu tombol tutup jika hanya berupa <div> dengan simbol ×.'),
+              label: t('Ubah tombol menjadi <div> dengan simbol ×'),
+              explainWrong: t(
+                'Pembaca layar tidak tahu <div> dengan simbol × adalah tombol tutup. Elemen itu juga tidak bisa difokus dengan Tab.',
+              ),
             },
             {
               id: 'color',
-              label: t('Mewarnai latar menjadi merah muda saja'),
-              explainWrong: t('Warna tidak terbaca oleh screen reader.'),
+              label: t('Tampilkan tooltip saat mouse menyentuh tombol'),
+              explainWrong: t(
+                'Tooltip muncul saat mouse menyentuh tombol. Pembaca layar dan keyboard belum tentu membacanya.',
+              ),
             },
           ],
           answer: 'aria',
-          explainCorrect: t('Benar! aria-label memberi label suara yang jelas bagi pembaca layar pada tombol ikon.'),
+          explainCorrect: t(
+            'aria-label memberi nama bagi pembaca layar. Tombol × akan dibacakan sebagai "Tutup".',
+          ),
+          hints: [t('Pembaca layar butuh nama untuk tombol tanpa teks.')],
           tags: ['pour'],
         }),
       ),
       qStep({
         id: 'a10-l02-q3',
         type: 'spotbug',
-        prompt: t('Ketuk baris kode HTML yang melanggar aturan pertama ARIA karena memakai <div> alih-alih tag HTML asli untuk tombol:'),
+        prompt: t('Ketuk baris yang memakai div sebagai tombol, padahal ada elemen button asli.'),
         difficulty: 2,
         lines: [
           '<header>',
           '  <div role="button" onclick="tutup()">X</div>',
-          '  <button aria-label="Cari">Cari</button>',
+          '  <button>Cari</button>',
           '</header>',
         ],
         answer: [2],
-        explainCorrect: t('Jeli! Baris 2 memakai <div role="button"> yang tidak otomatis mendukung tombol Tab dan Enter. Pakailah <button> asli!'),
+        explainCorrect: t(
+          '<div role="button"> tidak otomatis bisa ditekan dengan Tab dan Enter. <button> asli sudah membawa dukungan itu.',
+        ),
+        hints: [t('Cari elemen yang menyamar sebagai tombol.'), undefined],
         tags: ['pour', 'semantik'],
       }),
       qStep(
         makeMcq({
           id: 'a10-l02-q4',
           type: 'limit',
-          analogy: t('Fasilitas taman ramah berstandar internasional'),
-          prompt: t('Apa kesalahan yang sering muncul ketika developer mengandalkan ARIA tanpa tag HTML asli?'),
+          analogy: t('POUR seperti standar fasilitas taman umum'),
+          prompt: t('Papan Pintu tidak membuat dinding bisa dibuka. Apa kesalahan serupa saat ARIA dipakai tanpa elemen HTML asli?'),
           choices: [
-            { id: 'kbd', label: t('Menambahkan role="button" pada <div> tidak otomatis memberi fungsi fokus Tab dan Enter') },
+            { id: 'kbd', label: t('role="button" pada <div> belum membuatnya bisa difokus Tab') },
             {
               id: 'look',
-              label: t('ARIA langsung mengubah warna huruf menjadi hijau'),
-              explainWrong: t('ARIA tidak mengubah tampilan visual CSS.'),
+              label: t('ARIA mengubah tampilan elemen menjadi tombol sungguhan'),
+              explainWrong: t('ARIA hanya memberi keterangan untuk alat bantu. Tampilan diatur oleh CSS.'),
             },
             {
               id: 'net',
-              label: t('ARIA membuat ukuran gambar bertambah besar'),
-              explainWrong: t('ARIA hanya atribut metadata teks pada HTML.'),
+              label: t('ARIA hanya berfungsi di browser lama'),
+              explainWrong: t('Browser modern mendukung ARIA. Masalahnya ada pada elemen yang salah dipilih.'),
             },
           ],
           answer: 'kbd',
-          explainCorrect: t('Tepat! Tag <button> asli sudah punya dukungan fokus dan Enter/Spasi dari browser secara gratis.'),
+          explainCorrect: t(
+            'Elemen <button> asli sudah punya dukungan fokus dan Enter dari browser. ARIA saja belum menambahkannya.',
+          ),
+          hints: [t('Ingat apa yang dibawa tombol asli sejak awal.')],
           tags: ['pour', 'semantik'],
         }),
       ),
@@ -697,15 +848,17 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a10-l02-q5',
           type: 'scenario',
-          story: t('Di halaman pendaftaran lomba, pesan error hanya menulis "Error 12!" tanpa menjelaskan kolom mana yang salah atau cara memperbaikinya.'),
-          prompt: t('Prinsip POUR mana yang paling dilanggar oleh pesan error tersebut?'),
+          story: t(
+            'Halaman pendaftaran lomba hanya menampilkan "Error 12!". Tidak ada petunjuk kolom mana yang salah atau cara memperbaikinya.',
+          ),
+          prompt: t('Prinsip POUR mana yang paling dilanggar?'),
           difficulty: 2,
           choices: [
             { id: 'u', label: t('Understandable (dapat dipahami)') },
             {
               id: 'r',
               label: t('Robust (kode valid)'),
-              explainWrong: t('Kode mungkin valid, tetapi bahasanya membingungkan pengguna.'),
+              explainWrong: t('Kodenya bisa saja valid. Pesannya yang membingungkan orang.'),
             },
             {
               id: 'o',
@@ -714,7 +867,10 @@ export const lessons: Lesson[] = [
             },
           ],
           answer: 'u',
-          explainCorrect: t('Benar! Prinsip Understandable meminta pesan error jelas dan memberi tahu cara memperbaikinya.'),
+          explainCorrect: t(
+            'Understandable meminta pesan error yang mudah dipahami dan menunjukkan cara memperbaikinya.',
+          ),
+          hints: [t('Pikirkan apakah orang paham apa yang harus dilakukan.')],
           tags: ['pour'],
         }),
       ),
@@ -722,55 +878,61 @@ export const lessons: Lesson[] = [
         id: 'a10-l02-q6',
         type: 'fill',
         difficulty: 2,
-        prompt: t('Lengkapi singkatan empat prinsip pedoman aksesibilitas WCAG berikut:'),
+        prompt: t('Lengkapi nama empat prinsip WCAG.'),
         template: 'Perceivable, Operable, ___, ___',
         bank: ['Understandable', 'Robust', 'Reusable', 'Responsive'],
         answer: ['Understandable', 'Robust'],
-        explainCorrect: t('Sempurna! P-O-U-R: Perceivable, Operable, Understandable, Robust.'),
+        explainCorrect: t(
+          'Urutannya P-O-U-R: Perceivable, Operable, Understandable, Robust. Hurufnya membentuk kata POUR.',
+        ),
+        hints: [t('Huruf depan yang hilang membentuk kata POUR.'), undefined],
         tags: ['pour'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a10-l02-r1',
-        prompt: t(
-          'Kalau ada tag HTML asli seperti <button>, kapan kita memakai ARIA tambahan?',
-          'Menurut aturan pertama ARIA, kapan atribut ARIA sebaiknya digunakan?',
-        ),
+        prompt: t('Kapan atribut ARIA sebaiknya dipakai?'),
         choices: [
-          { id: 'only', label: t('Hanya jika tag HTML biasa belum cukup menjelaskan peran elemen, seperti tombol ikon') },
+          { id: 'only', label: t('Saat HTML asli belum cukup menjelaskan elemen') },
           {
             id: 'always',
-            label: t('Selalu ganti semua tag HTML menjadi <div> lalu pasang ARIA'),
-            explainWrong: t('Selalu utamakan tag HTML semantik asli lebih dulu.'),
+            label: t('Di semua elemen, supaya halaman pasti aksesibel'),
+            explainWrong: t('ARIA yang berlebihan bisa membingungkan. Utamakan elemen HTML asli.'),
+          },
+          {
+            id: 'never',
+            label: t('Tidak pernah, karena pembaca layar hanya membaca HTML'),
+            explainWrong: t('ARIA berguna untuk tombol ikon dan komponen khusus yang HTML saja belum cukup.'),
           },
         ],
         answer: 'only',
-        explainCorrect: t('Gunakan HTML asli dulu; tambahkan ARIA seperlunya bila HTML biasa belum cukup.'),
+        explainCorrect: t('Pakai HTML asli dulu. Tambahkan ARIA seperlunya bila HTML biasa belum cukup.'),
         tags: ['pour', 'semantik'],
       }),
       makeMcq({
         id: 'a10-l02-r2',
-        prompt: t(
-          'Target tingkat kepatuhan WCAG yang umum dipakai website adalah…',
-          'Pada standar WCAG, level kepatuhan yang menjadi target umum adalah…',
-        ),
+        prompt: t('Level WCAG mana yang menjadi target umum situs?'),
         choices: [
           { id: 'aa', label: t('Level AA') },
           {
             id: 'aaa',
-            label: t('Wajib Level AAA di seluruh konten'),
-            explainWrong: t('Level AAA sangat ketat untuk semua jenis konten; target umumnya adalah AA.'),
+            label: t('Level AAA di seluruh konten'),
+            explainWrong: t('AAA sangat ketat dan tidak semua konten bisa memenuhinya. Target umumnya AA.'),
+          },
+          {
+            id: 'a',
+            label: t('Level A saja'),
+            explainWrong: t('Level A hanya syarat dasar. Target umumnya AA.'),
           },
         ],
         answer: 'aa',
-        explainCorrect: t('Target praktis dan standar industri di sebagian besar situs adalah WCAG AA.'),
+        explainCorrect: t('AA menjadi target praktis dan standar industri di sebagian besar situs.'),
         tags: ['pour'],
       }),
     ],
     recap: t(
-      'Empat syarat web ramah: bisa dilihat/didengar, bisa dipakai, mudah dipahami, dan kokoh.',
-      'WCAG berpegang pada empat prinsip POUR (Perceivable, Operable, Understandable, Robust) dengan target umum AA serta aturan pertama ARIA.',
+      'Empat prinsip POUR: dapat ditangkap, dapat dipakai, mudah dipahami, dan kokoh. Targetnya AA, dan ARIA dipakai setelah HTML asli.',
     ),
   }),
 
@@ -780,22 +942,26 @@ export const lessons: Lesson[] = [
     title: 'Daftar periksa aksesibilitas',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa mengecek tombol, gambar, warna, dan keyboard agar halaman web ramah semua orang.',
-      'Aku bisa menerapkan daftar periksa aksesibilitas dasar mulai dari alt text, label form, kontras, fokus keyboard, target sentuh, hingga prefers-reduced-motion.',
+      'Aku bisa mengecek warna, tombol, dan keyboard agar web ramah.',
+      'Kamu bisa menjalankan daftar periksa aksesibilitas dasar, dari alt text sampai prefers-reduced-motion.',
     ),
     estMinutes: 5,
+    atWork:
+      'Kamu akan menjalankan daftar ini dengan tombol Tab dan audit Lighthouse sebelum rilis halaman.',
     introducesTerms: [],
     usesTerms: ['aksesibilitas', 'alt-text', 'semantik', 'kontras', 'rem-unit', 'fitts-law'],
     warmupFrom: 'a10-l02',
     steps: [
       storyStep('a10/daftar-periksa-taman.svg', [
-        rText(
-          'Sebelum taman dibuka untuk pengunjung, Pak Udin membawa papan daftar periksa: lampu cukup terang, papan arah jelas, jalur tidak licin, dan pintu mudah dibuka.',
-          'Seperti petugas keselamatan memeriksa taman sebelum dibuka, developer memeriksa daftar periksa aksesibilitas dasar agar tidak ada pengguna yang tertinggal di belakang pintu tertutup.',
+        rJunior(
+          'Pak Udin memeriksa lampu, papan arah, dan jalur sebelum taman dibuka. Apa yang perlu dicek di web?',
+        ),
+        rPro(
+          'Sebelum halaman baru dirilis, tim memeriksa aksesibilitas seperti petugas mengecek taman sebelum dibuka.',
         ),
       ]),
       conceptStep({
-        title: t('Gambar, Label, dan Tag Jelas', 'Alt Text, Semantik & Label Form'),
+        title: t('Alt text, semantik, dan label form'),
         visualName: 'HtmlTreeDiagram',
         visualProps: { worldId: 'a10', topic: 'checklist-html' },
         alt: t('Contoh gambar ber-alt, label terhubung ke input, dan HTML semantik.'),
@@ -804,146 +970,268 @@ export const lessons: Lesson[] = [
           code: '<label for="email">Email</label>\n<input id="email" type="email">',
         },
         body: [
-          rText('Beri ', 'Pasang '),
-          rTerm('alt-text', 'teks alt', 'alt text'),
-          rText(' pada gambar. Pakai ', ' pada gambar (alt="" untuk hiasan), gunakan '),
-          rTerm('semantik', 'tag jelas', 'HTML semantik'),
-          rText(', dan sambungkan label dengan input.', ', dan hubungkan <label for="..."> dengan id input.'),
+          rText('Beri gambar '),
+          rTerm('alt-text', 'alt text'),
+          rText(', dan sambungkan setiap label ke inputnya. Gambar hiasan diberi alt kosong. Nilai '),
+          rCode('for'),
+          rText(' pada label harus sama dengan '),
+          rCode('id'),
+          rText(' pada input. Pakai '),
+          rTerm('semantik', 'HTML semantik'),
+          rText(' untuk struktur halaman.'),
         ],
+        modes: ['pro'],
+      }),
+      // Cek cepat (Pro): the label and input pair is on the card above.
+      qStep({
+        id: 'a10-l03-q7',
+        type: 'fill',
+        modes: ['pro'],
+        difficulty: 2,
+        prompt: t('Lengkapi atribut agar pembaca layar tahu label milik input email.'),
+        template: '<label ___="email">Email</label>\n<input ___="email" type="email">',
+        bank: ['for', 'id', 'alt', 'class'],
+        answer: ['for', 'id'],
+        explainCorrect: t(
+          'Nilai for pada label harus sama dengan id pada input. Dengan begitu, mengetuk label akan memilih kolomnya.',
+        ),
+        hints: [t('Label menunjuk input lewat satu atribut, input membalas lewat atribut lain.'), undefined],
+        tags: ['aksesibilitas', 'semantik'],
       }),
       conceptStep({
-        title: t('Warna Jelas Plus Ikon', 'Kontras 4.5:1 & Bukan Warna Saja'),
+        title: t('Warna ditemani ikon dan tulisan', 'Kontras 4,5:1 dan bukan warna saja'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a10', topic: 'checklist-warna' },
-        alt: t('Perbandingan error hanya garis merah vs error dengan warna, ikon peringatan, dan teks.'),
+        alt: t(
+          'Dua pesan salah: hanya garis merah, atau warna dengan ikon dan tulisan.',
+          'Perbandingan error hanya garis merah dengan error berwarna, berikon peringatan, dan bertulisan.',
+        ),
         body: [
-          rText('Jaga ', 'Jaga '),
-          rTerm('kontras', 'kontras', 'rasio kontras'),
-          rText(
-            ' minimal 4,5 banding 1. Jangan pakai warna saja. Tambah ikon dan teks agar jelas.',
-            ' minimal 4,5:1 untuk teks normal. Sampaikan error lewat warna + ikon + teks agar ramah pengguna buta warna.',
+          rJunior('Tulisan harus '),
+          rTermJ('kontras', 'jelas beda'),
+          rJunior(
+            ' dari warna belakangnya. Jangan memberi tanda dengan warna saja. Tambahkan ikon dan tulisan agar semua orang mengerti.',
+          ),
+          rPro('Jaga '),
+          rTermP('kontras', 'rasio kontras'),
+          rPro(
+            ', yaitu beda terang teks dan latarnya, minimal 4,5:1 untuk teks normal. Sampaikan error lewat warna, ikon, dan teks agar jelas bagi orang buta warna.',
           ),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'a10-l03-q1',
+          prompt: t(
+            'Kolom yang salah hanya diberi garis merah. Mengapa itu kurang ramah?',
+            'Mengapa menandai kolom form yang salah hanya dengan warna merah kurang aksesibel?',
+          ),
+          choices: [
+            {
+              id: 'cb',
+              label: t(
+                'Sebagian orang sulit membedakan warna merah',
+                'Orang buta warna mungkin tidak bisa membedakan garis merah',
+              ),
+            },
+            {
+              id: 'slow',
+              label: t(
+                'Garis merah terlalu tipis',
+                'Garis merah terlalu tipis untuk terlihat di layar HP',
+              ),
+              explainWrong: t(
+                'Tebal garis bukan masalahnya. Masalahnya, sebagian orang sulit melihat warna merah.',
+                'Tebal garis bisa diatur. Masalah utamanya, warna saja tidak cukup untuk orang buta warna.',
+              ),
+            },
+            {
+              id: 'css',
+              label: t(
+                'Warna merah terlalu mencolok',
+                'Warna merah terlalu mencolok bagi pembaca halaman',
+              ),
+              explainWrong: t(
+                'Merah memang mencolok. Masalahnya, warna saja tidak cukup untuk semua orang.',
+                'Mencolok justru membantu orang yang melihat warna. Masalahnya ada pada orang yang tidak bisa membedakannya.',
+              ),
+            },
+          ],
+          answer: 'cb',
+          explainCorrect: t(
+            'Warna saja tidak cukup. Tambahkan ikon dan tulisan, seperti "Email belum diisi".',
+            'Tambahkan ikon peringatan dan tulisan seperti "Email belum diisi". Informasi tidak boleh hanya bergantung pada warna.',
+          ),
+          hints: [t('Ingat: tidak semua mata melihat warna yang sama.')],
+          tags: ['aksesibilitas', 'kontras'],
+        }),
+      ),
       conceptStep({
-        title: t('Keyboard, Tombol Besar, dan Gerak Lembut', 'Keyboard, Focus, Target Sentuh & Gerak'),
+        title: t('Keyboard, tombol besar, gerak lembut', 'Keyboard, fokus, target sentuh, gerak'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a10', topic: 'checklist-keyboard-gerak' },
-        alt: t('Tombol fokus outline terlihat, target sentuh 44-48px, huruf rem, dan reduced motion.'),
+        alt: t(
+          'Tombol dengan garis penanda, tombol besar, dan gerakan yang bisa dikurangi.',
+          'Tombol dengan outline fokus, target sentuh 44–48 px, huruf rem, dan reduced motion.',
+        ),
         body: [
-          rText('Pastikan bisa pakai keyboard '),
-          rCode('Tab'),
-          rText(
-            ' dengan garis fokus jelas. Buat tombol selebar ',
-            ' dengan outline fokus jelas. Jaga target sentuh ',
-          ),
-          rTerm('fitts-law', '44–48px', '44–48px'),
-          rText(', huruf ', ', font '),
-          rTerm('rem-unit', 'rem', 'rem'),
-          rText(', dan kurangi animasi bila diminta.', ', dan hormati prefers-reduced-motion.'),
-        ],
-      }),
-      limitStep({
-        analogy: t('Daftar periksa keamanan taman sebelum dibuka'),
-        same: [
-          t('Menemukan kekurangan penting lebih awal sebelum banyak pengunjung mengalami kesulitan.'),
-        ],
-        different: [
-          t('Pemeriksaan otomatis di DevTools Lighthouse hanya menangkap sebagian masalah seperti kontras atau alt hilang; menguji langsung memakai tombol Tab tanpa mouse tetap wajib dilakukan.'),
+          rJunior('Halaman harus bisa dipakai hanya dengan keyboard. Tombol '),
+          rCode('Tab', ['junior']),
+          rJunior(' memindahkan garis penanda ke tombol berikutnya. Buat '),
+          rTermJ('fitts-law', 'tombol besar'),
+          rJunior(', '),
+          rTermJ('rem-unit', 'huruf yang bisa dibesarkan'),
+          rJunior(', dan gerakan lembut.'),
+          rPro('Pastikan semua fungsi bisa dipakai lewat keyboard, dengan '),
+          rCode('Tab', ['pro']),
+          rPro(' untuk berpindah dan outline fokus yang jelas. Jaga '),
+          rTermP('fitts-law', 'target sentuh 44–48 px'),
+          rPro(' agar mudah diketuk. WCAG 2.2 AA memakai batas dasar 24 × 24 px dengan beberapa pengecualian. Atur ukuran huruf dalam '),
+          rTermP('rem-unit', 'rem'),
+          rPro('. Hormati juga '),
+          rCode('prefers-reduced-motion', ['pro']),
+          rPro(', pengaturan yang meminta animasi dikurangi.'),
         ],
       }),
       simStep(
         'taman-akses',
         t(
-          'Klik ketiga langkah di Pemeriksa Aksesibilitas untuk menandai ceklis taman ramah!',
-          'Jalankan simulasi pemeriksaan aksesibilitas dasar dari gambar hingga pesan yang jelas.',
+          'Ketuk ketiga langkah untuk menandai daftar periksa.',
+          'Jalankan pemeriksaan dasar, dari alt text sampai pesan error yang jelas.',
         ),
       ),
-      qStep(
-        makeMcq({
-          id: 'a10-l03-q1',
-          prompt: t('Mengapa menandai kolom formulir yang salah HANYA dengan warna merah dianggap tidak ramah aksesibilitas?'),
-          choices: [
-            { id: 'cb', label: t('Pengguna buta warna mungkin tidak bisa membedakan garis merah dari garis biasa') },
-            {
-              id: 'slow',
-              label: t('Karena warna merah membuat internet lambat'),
-              explainWrong: t('Warna merah tidak memperlambat jaringan.'),
-            },
-            {
-              id: 'css',
-              label: t('Karena browser tidak mengenal warna merah'),
-              explainWrong: t('Browser mengenal warna merah; masalahnya ada pada pengguna buta warna.'),
-            },
-          ],
-          answer: 'cb',
-          explainCorrect: t('Benar! Tambahkan ikon peringatan dan tulisan jelas seperti "Email belum diisi".'),
-          tags: ['aksesibilitas', 'kontras'],
-        }),
-      ),
-      qStep({
-        id: 'a10-l03-q2',
-        type: 'sort',
-        prompt: t('Kelompokkan praktik di bawah ini ke Ramah Aksesibilitas atau Kurang Ramah:'),
-        difficulty: 2,
-        items: [
-          { id: 'g1', label: t('Menulis <label for="nama"> tersambung ke input') },
-          { id: 'b1', label: t('Menghapus outline fokus tombol tanpa pengganti') },
-          { id: 'g2', label: t('Ukuran tombol minimal 44–48px dengan jarak lega') },
-          { id: 'b2', label: t('Mengunci zoom layar HP agar teks tak bisa dibesarkan') },
+      limitStep({
+        analogy: t('Daftar periksa keamanan taman sebelum dibuka'),
+        same: [
+          t(
+            'Kekurangan penting ketemu lebih awal.',
+            'Keduanya menemukan kekurangan penting sebelum banyak orang kesulitan.',
+          ),
         ],
-        bins: [
-          { id: 'good', label: t('Ramah Aksesibilitas') },
-          { id: 'bad', label: t('Kurang Ramah') },
+        different: [
+          t(
+            'Di web, cek jalur tombol Tab tanpa mouse.',
+            'Audit otomatis Lighthouse hanya menangkap sebagian masalah. Uji dengan Tab tanpa mouse tetap perlu.',
+          ),
         ],
-        answer: { g1: 'good', b1: 'bad', g2: 'good', b2: 'bad' },
-        explainCorrect: t('Tepat! Jangan pernah menghapus indikator fokus tanpa pengganti atau mengunci zoom pengguna.'),
-        tags: ['aksesibilitas', 'fitts-law'],
+        riskyAnalogy: false,
       }),
       qStep(
         makeMcq({
           id: 'a10-l03-q3',
           type: 'analogy',
-          prompt: t('Apa cara termudah menguji apakah website milikmu sudah lolos aturan navigasi keyboard?'),
+          prompt: t(
+            'Bagaimana cara termudah mencoba web hanya dengan keyboard?',
+            'Apa cara tercepat menguji navigasi keyboard di halaman buatanmu?',
+          ),
           choices: [
-            { id: 'nomouse', label: t('Lepaskan mouse lalu jelajahi seluruh halaman hanya pakai Tab, Shift+Tab, dan Enter') },
+            {
+              id: 'nomouse',
+              label: t(
+                'Lepas mouse dan uji dengan Tab',
+                'Lepas mouse lalu coba Tab, Shift+Tab, dan Enter',
+              ),
+            },
             {
               id: 'bright',
-              label: t('Naikkan kecerahan layar laptop ke 100%'),
-              explainWrong: t('Kecerahan layar tidak menguji fungsi tombol keyboard.'),
+              label: t(
+                'Tekan Caps Lock untuk berpindah tombol',
+                'Naikkan kecerahan layar laptop sampai maksimal',
+              ),
+              explainWrong: t(
+                'Caps Lock hanya mengganti huruf besar dan kecil. Tab yang memindahkan pilihan.',
+                'Kecerahan layar tidak menguji alur fokus keyboard.',
+              ),
             },
             {
               id: 'wifi',
-              label: t('Matikan Wi-Fi lalu lihat gambarnya'),
-              explainWrong: t('Mematikan Wi-Fi tidak menguji alur fokus keyboard.'),
+              label: t('Tekan Enter berkali-kali di tombol pertama', 'Perbesar zoom browser sampai 200%'),
+              explainWrong: t(
+                'Enter menekan tombol yang dipilih. Pakai Tab untuk pindah tombol.',
+                'Zoom menguji tata letak, bukan alur fokus keyboard.',
+              ),
             },
           ],
           answer: 'nomouse',
-          explainCorrect: t('Benar! Uji tanpa mouse langsung memperlihatkan tombol mana yang terlupakan atau kehilangan indikator fokus.'),
+          explainCorrect: t(
+            'Coba berpindah tanpa mouse. Kamu bisa melihat tombol mana yang tidak terpilih.',
+            'Uji tanpa mouse memperlihatkan tombol yang terlupakan atau kehilangan indikator fokus.',
+          ),
+          hints: [t('Ingat: mouse rusak, tombol apa yang tersisa?')],
           tags: ['aksesibilitas'],
         }),
       ),
+      qStep({
+        id: 'a10-l03-q2',
+        type: 'sort',
+        prompt: t(
+          'Kelompokkan tiap kebiasaan ke Ramah atau Kurang ramah.',
+          'Kelompokkan praktik di bawah ini ke Ramah aksesibilitas atau Kurang ramah.',
+        ),
+        difficulty: 2,
+        items: [
+          {
+            id: 'g1',
+            label: t('Memberi ikon dan tulisan di samping warna', 'Menulis <label for="nama"> tersambung ke input'),
+          },
+          {
+            id: 'b1',
+            label: t('Menghapus garis yang menandai tombol pilihan', 'Menghapus garis penanda tombol tanpa pengganti'),
+          },
+          {
+            id: 'g2',
+            label: t('Membuat tombol besar dengan jarak lega', 'Ukuran tombol minimal 44–48 px dengan jarak lega'),
+          },
+          {
+            id: 'b2',
+            label: t('Mengunci layar agar tulisan tak bisa dibesarkan', 'Mengunci zoom layar HP agar teks tak bisa dibesarkan'),
+          },
+        ],
+        bins: [
+          { id: 'good', label: t('Ramah', 'Ramah aksesibilitas'), icon: 'users' },
+          { id: 'bad', label: t('Kurang ramah'), icon: 'lock' },
+        ],
+        answer: { g1: 'good', b1: 'bad', g2: 'good', b2: 'bad' },
+        explainCorrect: t(
+          'Tombol besar dan penanda yang mudah dilihat menolong jari dan mata. Seperti papan arah yang mudah dibaca di taman.',
+          'Indikator fokus dan zoom adalah jalan masuk bagi orang yang memakai keyboard dan orang yang butuh tulisan besar. Jangan dihapus tanpa pengganti.',
+        ),
+        hints: [
+          t(
+            'Tanyakan: apakah ini menolong atau menyulitkan orang?',
+            'Tanyakan: apakah praktik ini menambah atau menutup akses?',
+          ),
+          undefined,
+        ],
+        tags: ['aksesibilitas', 'fitts-law'],
+      }),
       qStep(
         makeMcq({
           id: 'a10-l03-q4',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('Daftar periksa otomatis di browser'),
-          prompt: t('Apa hal yang TIDAK bisa sepenuhnya digantikan oleh audit otomatis Lighthouse Accessibility?'),
+          prompt: t('Bagian mana yang tidak bisa sepenuhnya dinilai audit otomatis Lighthouse?'),
           choices: [
-            { id: 'human', label: t('Menguji langsung pakai keyboard dan memastikan kalimat serta urutan fokus masuk akal') },
+            { id: 'human', label: t('Uji keyboard dan urutan fokus yang masuk akal') },
             {
               id: 'ratio',
-              label: t('Menghitung angka rasio kontras teks dan latar'),
-              explainWrong: t('Menghitung rasio kontras bisa dilakukan alat otomatis.'),
+              label: t('Menghitung rasio kontras antara teks dan latar'),
+              explainWrong: t('Rasio kontras berupa angka, jadi alat otomatis bisa menghitungnya.'),
             },
             {
               id: 'attr',
-              label: t('Mengecek apakah elemen <img> lupa memiliki atribut alt'),
-              explainWrong: t('Alat otomatis dapat mengecek keberadaan atribut alt.'),
+              label: t('Mengecek elemen <img> yang tidak punya alt'),
+              explainWrong: t(
+                'Alat otomatis bisa mendeteksi atribut alt yang hilang. Kualitas kalimat alt tetap dinilai manusia.',
+              ),
             },
           ],
           answer: 'human',
-          explainCorrect: t('Tepat! Alat otomatis membantu mendeteksi angka teknis, tetapi kenyamanan nyata tetap diuji manusia.'),
+          explainCorrect: t(
+            'Alat otomatis menangkap hal yang bisa diukur. Kenyamanan sungguhan tetap diuji oleh manusia.',
+          ),
+          hints: [t('Pikirkan bagian yang butuh penilaian manusia.')],
           tags: ['aksesibilitas'],
         }),
       ),
@@ -951,31 +1239,51 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a10-l03-q5',
           type: 'scenario',
-          story: t('Bito mudah merasa pusing jika melihat kartu animasi yang terus berputar kencang di layar HP-nya.'),
-          prompt: t('Pengaturan CSS apa yang sebaiknya dihormati pembuat website untuk membantu Bito?'),
+          story: t(
+            'Bito pusing kalau melihat kartu yang berputar terus di layar HP.',
+            'Bito pusing kalau melihat kartu animasi yang terus berputar di layar HP-nya.',
+          ),
+          prompt: t(
+            'Apa yang bisa dilakukan pembuat web untuk menolong Bito?',
+            'Apa yang sebaiknya dilakukan halaman untuk membantu Bito?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'prm', label: t('Mengurangi animasi saat preferensi prefers-reduced-motion aktif') },
+            {
+              id: 'prm',
+              label: t('Beri tombol untuk menghentikan gerakan', 'Mengurangi animasi saat reduced motion aktif'),
+            },
             {
               id: 'fast',
-              label: t('Mempercepat putaran animasi jadi dua kali lipat'),
-              explainWrong: t('Animasi lebih cepat justru membuat pusing makin parah.'),
+              label: t('Memutar kartu lebih cepat saat tombol disentuh', 'Mempercepat animasi menjadi dua kali lipat'),
+              explainWrong: t(
+                'Gerakan lebih cepat membuat pusing lebih parah. Bito butuh gerakan yang lebih tenang.',
+                'Animasi lebih cepat memperburuk rasa pusing. Pengaturan reduced motion justru meminta gerakan dikurangi.',
+              ),
             },
             {
               id: 'lock',
-              label: t('Memaksa ukuran huruf tidak bisa diubah'),
-              explainWrong: t('Mengunci zoom huruf juga melanggar aksesibilitas.'),
+              label: t('Memperbesar kartu yang berputar', 'Mengganti animasi putar dengan animasi memantul'),
+              explainWrong: t(
+                'Kartu besar tetap berputar. Bito butuh gerakan yang dikurangi.',
+                'Animasi memantul tetap bergerak. Reduced motion meminta gerakan dikurangi atau dimatikan.',
+              ),
             },
           ],
           answer: 'prm',
-          explainCorrect: t('Benar! Media query prefers-reduced-motion menonaktifkan atau melambatkan animasi bagi pengguna yang sensitif gerak.'),
+          explainCorrect: t(
+            'Tombol itu menghentikan kartu berputar supaya Bito lebih nyaman. Seperti menghentikan komidi putar saat ada yang pusing.',
+            'prefers-reduced-motion memberi tahu halaman untuk mematikan atau melambatkan animasi bagi orang yang sensitif terhadap gerak.',
+          ),
+          hints: [t('Apa yang membuat Bito pusing?', 'Bito butuh gerakan yang lebih sedikit atau berhenti.')],
           tags: ['aksesibilitas'],
         }),
       ),
       qStep({
         id: 'a10-l03-q6',
         type: 'spotbug',
-        prompt: t('Ketuk baris CSS yang berbahaya bagi pengguna keyboard karena menghilangkan penanda kotak yang sedang terpilih:'),
+        modes: ['pro'],
+        prompt: t('Ketuk baris CSS yang menghapus penanda fokus untuk orang yang memakai keyboard.'),
         difficulty: 2,
         lines: [
           'button {',
@@ -985,57 +1293,74 @@ export const lessons: Lesson[] = [
           '}',
         ],
         answer: [3],
-        explainCorrect: t('Jeli! Baris 3 menghapus outline fokus tanpa menyediakan gaya pengganti, sehingga pengguna keyboard tersesat.'),
+        explainCorrect: t(
+          'Baris 3 menghapus outline fokus tanpa gaya pengganti. Orang yang memakai keyboard tidak tahu sedang berada di tombol mana.',
+        ),
+        hints: [t('Cari baris yang menyembunyikan garis penanda tombol.'), undefined],
         tags: ['aksesibilitas'],
-      }),
-      qStep({
-        id: 'a10-l03-q7',
-        type: 'fill',
-        modes: ['pro'],
-        difficulty: 2,
-        prompt: t('Lengkapi pasangan HTML aksesibel agar pembaca layar mengenali label untuk input email:'),
-        template: '<label ___="email">Email</label>\n<input ___="email" type="email">',
-        bank: ['for', 'id', 'alt', 'class'],
-        answer: ['for', 'id'],
-        explainCorrect: t('Tepat! Nilai atribut for pada <label> harus sama persis dengan atribut id pada <input>.'),
-        tags: ['aksesibilitas', 'semantik'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a10-l03-r1',
-        prompt: t('Berapakah rasio kontras minimal WCAG AA untuk teks biasa agar mudah dibaca?'),
+        prompt: t(
+          'Mana tulisan yang paling mudah dibaca?',
+          'Berapa rasio kontras minimal WCAG AA untuk teks biasa?',
+        ),
         choices: [
-          { id: 'c45', label: t('Minimal 4,5 : 1') },
+          { id: 'c45', label: t('Tulisan hitam di kertas kuning', 'Minimal 4,5 : 1') },
           {
             id: 'c11',
-            label: t('1,1 : 1 sudah cukup'),
-            explainWrong: t('1,1 : 1 hampir sama warnanya dengan latar sehingga sangat sulit dibaca.'),
+            label: t('Tulisan kuning muda di kertas kuning', '1,1 : 1 sudah cukup'),
+            explainWrong: t(
+              'Warnanya hampir sama dengan kertas, jadi sulit dibaca.',
+              '1,1 : 1 hampir sama dengan warna latar, jadi sangat sulit dibaca.',
+            ),
+          },
+          {
+            id: 'c2',
+            label: t('Tulisan abu-abu muda di kertas putih', 'Minimal 2 : 1'),
+            explainWrong: t(
+              'Abu-abu muda di kertas putih masih pudar. Pilih yang paling beda.',
+              'Rasio 2 : 1 masih terlalu rendah. Teks normal butuh minimal 4,5 : 1.',
+            ),
           },
         ],
         answer: 'c45',
-        explainCorrect: t('Teks normal minimal memiliki rasio kontras 4,5 : 1.'),
+        explainCorrect: t(
+          'Hitam di kuning sangat beda, jadi mudah dibaca. Seperti spidol hitam di kertas kuning.',
+          'Teks normal butuh rasio kontras minimal 4,5 : 1.',
+        ),
+        hints: [t('Pilih yang paling beda dari warna belakangnya.')],
         tags: ['kontras', 'aksesibilitas'],
       }),
       makeTf({
         id: 'a10-l03-r2',
-        prompt: t('Untuk gambar hiasan murni, kita tetap menulis alt="" agar pembaca layar melewatinya tanpa membacakan nama file.'),
+        prompt: t(
+          'Tombol besar lebih mudah diketuk jari.',
+          'Untuk gambar hiasan murni, alt="" membuat pembaca layar melewatinya tanpa membacakan nama file.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! alt="" membuat gambar hiasan tidak mengganggu pendengaran pengguna pembaca layar.'),
-        explainWrong: t('Hampir! Menulis alt="" memang cara tepat menandai gambar dekoratif.'),
+        explainCorrect: t(
+          'Jari lebih mudah mengenai tombol yang besar. Seperti bola yang lebih mudah masuk ke gawang lebar.',
+          'alt="" menandai gambar dekoratif, jadi pembaca layar tidak membacakan nama file yang mengganggu.',
+        ),
+        explainWrong: t(
+          'Tombol besar memberi ruang lebih luas untuk jari.',
+          'Pernyataan itu benar: alt="" adalah cara yang tepat menandai gambar dekoratif.',
+        ),
+        hints: [t('Ingat main bola. Lebih mudah masuk ke gawang mana?', 'Ingat hiasan dinding di kelas.')],
         tags: ['alt-text', 'aksesibilitas'],
       }),
     ],
     recap: t(
-      'Cek alt gambar, label isian, kontras, warna + ikon, tombol besar, huruf rem, dan tombol Tab.',
-      'Terapkan daftar periksa a11y: alt text, HTML semantik, label terhubung, kontras 4.5:1, info tak bergantung warna saja, navigasi keyboard dengan indikator fokus, target 44–48px, huruf rem, dan prefers-reduced-motion.',
+      'Cek warna, ikon, keyboard, tombol besar, dan gerakan sebelum halaman dibuka.',
+      'Periksa alt text, label, dan kontras. Lalu uji fokus keyboard, target sentuh, dan prefers-reduced-motion.',
     ),
     companion: {
-      talkPrompts: [
-        'Ayo coba buka satu website di laptop lalu tekan tombol Tab berkali-kali tanpa menyentuh mouse—apakah selalu kelihatan sedang ada di tombol mana?',
-      ],
+      talkPrompts: ['Tombol apa yang memindahkan pilihan tanpa mouse?'],
       offlineActivity:
-        'Buat papan "Tanda Peringatan Ramah Semua" di kertas: jangan hanya pakai warna merah, tambahkan ikon seru dan tulisan singkat jelas.',
+        'Buat papan tanda peringatan di kertas. Jangan hanya memakai warna merah. Tambahkan ikon seru dan tulisan singkat.',
     },
   }),
 ];

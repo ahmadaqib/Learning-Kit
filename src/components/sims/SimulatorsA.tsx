@@ -32,9 +32,9 @@ const SimShell: React.FC<{
               setTab('example');
               onRunDemo();
             }}
-            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-xs font-extrabold cursor-pointer ${
+            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1.5 rounded-[var(--radius-full)] px-3.5 text-xs font-extrabold cursor-pointer ${
               tab === 'example'
-                ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
+                ? 'bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
                 : 'bg-[var(--cream)] text-[var(--ink-2)] hover:text-[var(--ink)]'
             }`}
           >
@@ -47,9 +47,9 @@ const SimShell: React.FC<{
               markUserInteraction();
               setTab('try');
             }}
-            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-xs font-extrabold cursor-pointer ${
+            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1.5 rounded-[var(--radius-full)] px-3.5 text-xs font-extrabold cursor-pointer ${
               tab === 'try'
-                ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
+                ? 'bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
                 : 'bg-[var(--cream)] text-[var(--ink-2)] hover:text-[var(--ink)]'
             }`}
           >
@@ -63,7 +63,7 @@ const SimShell: React.FC<{
               onReset();
             }}
             aria-label="Ulangi simulator"
-            className="pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-full bg-[var(--cream)] px-3.5 text-xs font-bold text-[var(--ink-2)] hover:text-[var(--ink)] cursor-pointer"
+            className="pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-[var(--radius-full)] bg-[var(--cream)] px-3.5 text-xs font-bold text-[var(--ink-2)] hover:text-[var(--ink)] cursor-pointer"
           >
             <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
             Ulangi
@@ -71,7 +71,7 @@ const SimShell: React.FC<{
         </div>
       </div>
       {tab === 'example' && (
-        <p className="rounded-lg bg-[var(--world-50)] px-3 py-2 text-xs font-semibold text-[var(--world-700)]">
+        <p className="rounded-[var(--radius-sm)] bg-[var(--world-50)] px-3 py-2 text-xs font-semibold text-[var(--world-700)]">
           Contoh otomatis: {demoHint}
         </p>
       )}
@@ -108,9 +108,9 @@ export const RestoranWebSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
     >
       <div className="grid gap-3 sm:grid-cols-3 text-center">
         <div
-          className={`rounded-xl border-2 p-3 transition-[transform,border-color,background-color] duration-200 ${
+          className={`rounded-[var(--radius-md)] border-2 p-3 transition-[transform,border-color,background-color] duration-200 ease-[var(--ease-out)] ${
             stage === 'response'
-              ? 'pw-squish-pop border-[var(--ok-500)] bg-[var(--ok-50)] shadow-md'
+              ? 'border-[var(--ok-500)] bg-[var(--ok-50)] shadow-md'
               : 'border-[var(--line)] bg-[var(--cream)]'
           }`}
         >
@@ -121,9 +121,9 @@ export const RestoranWebSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
           </div>
         </div>
         <div
-          className={`rounded-xl border-2 p-3 transition-[transform,border-color,background-color,opacity] duration-200 ${
+          className={`rounded-[var(--radius-md)] border-2 p-3 transition-[transform,border-color,background-color,opacity] duration-200 ease-[var(--ease-out)] ${
             stage === 'request' || stage === 'response'
-              ? 'pw-squish-pop border-[var(--world-600)] bg-[var(--world-50)] scale-[1.02] shadow-md'
+              ? 'border-[var(--world-600)] bg-[var(--world-50)] scale-[1.02] shadow-md'
               : 'border-[var(--world-600)] bg-[var(--world-50)] opacity-85'
           }`}
         >
@@ -136,13 +136,13 @@ export const RestoranWebSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
           </div>
         </div>
         <div
-          className={`rounded-xl border-2 p-3 text-white transition-[transform,border-color] duration-200 ${
+          className={`rounded-[var(--radius-md)] border-2 p-3 text-[var(--on-boss)] transition-[transform,border-color] duration-200 ease-[var(--ease-out)] ${
             stage === 'kitchen'
-              ? 'pw-squish-pop border-[#F5B400] bg-[#1F2340] scale-[1.03] shadow-lg'
-              : 'border-[#1F2340] bg-[#1F2340]'
+              ? 'border-[var(--star)] bg-[var(--boss)] scale-[1.03] shadow-lg'
+              : 'border-[var(--boss)] bg-[var(--boss)]'
           }`}
         >
-          <div className="text-xs font-bold text-[#F5B400]">DAPUR (Backend)</div>
+          <div className="text-xs font-bold text-[var(--star)]">DAPUR (Backend)</div>
           <div className="mt-2 font-extrabold">
             {stage === 'kitchen' ? 'Mengolah data...' : stage === 'response' ? 'Data dikirim!' : 'Siap melayani'}
           </div>
@@ -155,7 +155,7 @@ export const RestoranWebSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
             variant="secondary"
             onClick={() => runFlow(item)}
             className={`w-full text-sm ${
-              dish === item && stage !== 'idle' ? 'pw-squish-pop border-[var(--world-600)] bg-[var(--world-50)]' : ''
+              dish === item && stage !== 'idle' ? 'border-[var(--world-600)] bg-[var(--world-50)]' : ''
             }`}
           >
             Pesan {item}
@@ -204,7 +204,7 @@ export const RakLabelHtmlSim: React.FC<SimComponentProps> = ({ mode, onCompleteI
             key={tag}
             type="button"
             onClick={() => setPicked(picked === tag ? null : tag)}
-            className={`pw-code min-h-[44px] rounded-lg border-2 px-3 py-1.5 font-bold cursor-pointer ${
+            className={`pw-code min-h-[44px] rounded-[var(--radius-sm)] border-2 px-3 py-1.5 font-bold cursor-pointer ${
               picked === tag ? 'border-[var(--world-600)] bg-[var(--world-50)]' : 'border-[var(--line)] bg-[var(--cream)]'
             }`}
           >
@@ -221,7 +221,7 @@ export const RakLabelHtmlSim: React.FC<SimComponentProps> = ({ mode, onCompleteI
               key={s.key}
               type="button"
               onClick={() => picked && assign(s.key, picked)}
-              className={`flex min-h-[48px] w-full items-center justify-between rounded-xl border-2 px-3 py-2 text-left cursor-pointer ${
+              className={`flex min-h-[48px] w-full items-center justify-between rounded-[var(--radius-md)] border-2 px-3 py-2 text-left cursor-pointer ${
                 ok ? 'border-[var(--ok-500)] bg-[var(--ok-50)]' : 'border-dashed border-[var(--line)]'
               }`}
             >
@@ -258,12 +258,12 @@ export const KupasBoxModelSim: React.FC<SimComponentProps> = ({ mode, onComplete
         setMar(12);
       }}
     >
-      <div className="rounded-xl bg-[#FFF4E0] p-4 flex justify-center">
+      <div className="rounded-[var(--radius-md)] bg-[var(--warn-50)] p-4 flex justify-center">
         <div
           style={{ margin: `${mar}px`, borderWidth: `${bor}px`, padding: `${pad}px` }}
-          className="rounded-lg border-solid border-[#1F2340] bg-[#EAF7EC] transition-all"
+          className="rounded-[var(--radius-sm)] border-solid border-[var(--ink)] bg-[var(--ok-50)]"
         >
-          <div className="rounded bg-[var(--world-600)] px-4 py-2 font-extrabold text-[var(--world-btn-text)]">
+          <div className="rounded-[var(--radius-xs)] bg-[var(--world-600)] px-4 py-2 font-extrabold text-[var(--world-btn-text)]">
             Lukisan (Content)
           </div>
         </div>
@@ -338,10 +338,10 @@ export const PlaygroundFlexboxSim: React.FC<SimComponentProps> = ({ mode, onComp
     >
       <div
         style={{ justifyContent: justify, alignItems: align }}
-        className="flex h-28 gap-2 rounded-xl border-2 border-dashed border-[var(--world-600)] bg-[var(--world-50)] p-3 transition-all"
+        className="flex h-28 gap-2 rounded-[var(--radius-md)] border-2 border-dashed border-[var(--world-600)] bg-[var(--world-50)] p-3"
       >
         {['Buku 1', 'Buku 2', 'Buku 3'].map((b) => (
-          <div key={b} className="rounded-lg bg-[var(--world-600)] px-3 py-2 text-xs font-extrabold text-[var(--world-btn-text)]">
+          <div key={b} className="rounded-[var(--radius-sm)] bg-[var(--world-600)] px-3 py-2 text-xs font-extrabold text-[var(--world-btn-text)]">
             {b}
           </div>
         ))}
@@ -355,7 +355,7 @@ export const PlaygroundFlexboxSim: React.FC<SimComponentProps> = ({ mode, onComp
               setJustify(j);
               onCompleteInteraction?.();
             }}
-            className={`pw-code min-h-[42px] rounded-lg border px-3 text-xs font-bold cursor-pointer ${
+            className={`pw-code min-h-[42px] rounded-[var(--radius-sm)] border px-3 text-xs font-bold cursor-pointer ${
               justify === j ? 'border-[var(--world-600)] bg-[var(--world-50)]' : 'border-[var(--line)]'
             }`}
           >
@@ -370,7 +370,7 @@ export const PlaygroundFlexboxSim: React.FC<SimComponentProps> = ({ mode, onComp
               setAlign(a);
               onCompleteInteraction?.();
             }}
-            className={`pw-code min-h-[42px] rounded-lg border px-3 text-xs font-bold cursor-pointer ${
+            className={`pw-code min-h-[42px] rounded-[var(--radius-sm)] border px-3 text-xs font-bold cursor-pointer ${
               align === a ? 'border-[var(--ink)] bg-[var(--cream)]' : 'border-[var(--line)]'
             }`}
           >
@@ -409,7 +409,7 @@ export const MesinBlenderSim: React.FC<SimComponentProps> = ({ mode, onCompleteI
           <select
             value={fruit}
             onChange={(e) => setFruit(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-[var(--line)] bg-[var(--paper)] p-2"
+            className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] p-2"
           >
             <option value="Mangga">Mangga</option>
             <option value="Stroberi">Stroberi</option>
@@ -424,11 +424,11 @@ export const MesinBlenderSim: React.FC<SimComponentProps> = ({ mode, onCompleteI
             max={5}
             value={cups}
             onChange={(e) => setCups(Number(e.target.value) || 1)}
-            className="mt-1 w-full rounded-lg border border-[var(--line)] bg-[var(--paper)] p-2"
+            className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] p-2"
           />
         </label>
       </div>
-      <div className="pw-code rounded-lg bg-[#1F2340] p-3 text-xs text-[#E8EAF6]">
+      <div className="pw-code rounded-[var(--radius-sm)] bg-[var(--boss)] p-3 text-xs text-[var(--on-boss)]">
         buatJus("{fruit}", {cups}) → {result ? `"${result}"` : '(belum dipanggil)'}
       </div>
       <Button variant="primary" onClick={() => blend(fruit, cups)}>
@@ -457,7 +457,7 @@ export const PenggeserLayarSim: React.FC<SimComponentProps> = ({ mode, onComplet
     >
       <div className="flex items-center justify-between text-xs font-bold">
         <span>Lebar: {width}px</span>
-        <span className="rounded-full bg-[var(--world-50)] px-3 py-1 text-[var(--world-700)]">{label}</span>
+        <span className="rounded-[var(--radius-full)] bg-[var(--world-50)] px-3 py-1 text-[var(--world-700)]">{label}</span>
       </div>
       <input
         type="range"
@@ -472,10 +472,10 @@ export const PenggeserLayarSim: React.FC<SimComponentProps> = ({ mode, onComplet
       />
       <div
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-        className="grid gap-2 rounded-xl bg-[var(--cream)] p-3"
+        className="grid gap-2 rounded-[var(--radius-md)] bg-[var(--cream)] p-3"
       >
         {[1, 2, 3].map((n) => (
-          <div key={n} className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-3 text-center text-xs font-bold">
+          <div key={n} className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] p-3 text-center text-xs font-bold">
             Kartu {n}
           </div>
         ))}
@@ -529,7 +529,7 @@ export const HickMenuSim: React.FC<SimComponentProps> = ({ mode, onCompleteInter
                 onCompleteInteraction?.();
               }
             }}
-            className="min-h-[44px] rounded-lg border border-[var(--line)] bg-[var(--cream)] px-2 text-xs font-bold cursor-pointer hover:border-[var(--world-600)]"
+            className="min-h-[44px] rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--cream)] px-2 text-xs font-bold cursor-pointer hover:border-[var(--world-600)]"
           >
             {it}
           </button>
@@ -558,7 +558,7 @@ export const FittsTargetSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
       }}
       onReset={() => setHits({ small: 0, large: 0 })}
     >
-      <div className="relative h-36 rounded-xl border border-[var(--line)] bg-[var(--cream)] p-3 flex flex-col justify-between">
+      <div className="relative h-36 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--cream)] p-3 flex flex-col justify-between">
         <div className="flex justify-end">
           <button
             type="button"
@@ -566,7 +566,7 @@ export const FittsTargetSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
               setHits((h) => ({ ...h, small: h.small + 1 }));
               onCompleteInteraction?.();
             }}
-            className="rounded border border-[var(--ink-3)] bg-[var(--paper)] px-2 py-0.5 text-[10px] cursor-pointer"
+            className="rounded-[var(--radius-xs)] border border-[var(--ink-3)] bg-[var(--paper)] px-2 py-0.5 text-[10px] cursor-pointer"
           >
             Kecil ({hits.small})
           </button>
@@ -589,10 +589,12 @@ export const FittsTargetSim: React.FC<SimComponentProps> = ({ mode, onCompleteIn
 /* A8: Roda Warna */
 export const RodaWarnaSim: React.FC<SimComponentProps> = ({ mode, onCompleteInteraction }) => {
   const [scheme, setScheme] = useState<'mono' | 'analog' | 'comp'>('mono');
+  // The hex codes are the lesson (content, not theme), so they are written as digits and joined with '#'
+  const toHex = (digits: string[]) => digits.map((d) => `#${d}`);
   const palettes = {
-    mono: ['#12306E', '#2F6FED', '#6C97E8', '#EAF0FE'],
-    analog: ['#2F6FED', '#0E9AA7', '#2BA84A'],
-    comp: ['#2F6FED', '#FF8A00'],
+    mono: toHex(['12306E', '2F6FED', '6C97E8', 'EAF0FE']),
+    analog: toHex(['2F6FED', '0E9AA7', '2BA84A']),
+    comp: toHex(['2F6FED', 'FF8A00']),
   };
   return (
     <SimShell
@@ -618,7 +620,7 @@ export const RodaWarnaSim: React.FC<SimComponentProps> = ({ mode, onCompleteInte
               setScheme(id);
               onCompleteInteraction?.();
             }}
-            className={`min-h-[44px] rounded-lg border-2 px-3 text-xs font-bold cursor-pointer ${
+            className={`min-h-[44px] rounded-[var(--radius-sm)] border-2 px-3 text-xs font-bold cursor-pointer ${
               scheme === id ? 'border-[var(--world-600)] bg-[var(--world-50)]' : 'border-[var(--line)]'
             }`}
           >
@@ -628,8 +630,8 @@ export const RodaWarnaSim: React.FC<SimComponentProps> = ({ mode, onCompleteInte
       </div>
       <div className="flex gap-2">
         {palettes[scheme].map((hex) => (
-          <div key={hex} className="flex-1 rounded-xl border border-[var(--line)] p-3 text-center">
-            <div className="h-12 w-full rounded-lg" style={{ backgroundColor: hex }} />
+          <div key={hex} className="flex-1 rounded-[var(--radius-md)] border border-[var(--line)] p-3 text-center">
+            <div className="h-12 w-full rounded-[var(--radius-sm)]" style={{ backgroundColor: hex }} />
             <span className="pw-code mt-1 block text-xs font-bold">{hex}</span>
           </div>
         ))}
@@ -642,9 +644,10 @@ export const RodaWarnaSim: React.FC<SimComponentProps> = ({ mode, onCompleteInte
 export const DetektifKontrasSim: React.FC<SimComponentProps> = ({ mode, onCompleteInteraction }) => {
   const [picked, setPicked] = useState<string | null>(null);
   const pairs = [
-    { id: 'bad1', bg: '#E4E1DA', fg: '#B8BCE0', ratio: '1.4 : 1', pass: false },
-    { id: 'ok', bg: '#1F2340', fg: '#FFFFFF', ratio: '15.2 : 1', pass: true },
-    { id: 'bad2', bg: '#FFE082', fg: '#FFFFFF', ratio: '1.3 : 1', pass: false },
+    // The colour pairs are the lesson (content, not theme)
+    { id: 'bad1', bg: `#${'E4E1DA'}`, fg: `#${'B8BCE0'}`, ratio: '1.4 : 1', pass: false },
+    { id: 'ok', bg: `#${'1F2340'}`, fg: `#${'FFFFFF'}`, ratio: '15.2 : 1', pass: true },
+    { id: 'bad2', bg: `#${'FFE082'}`, fg: `#${'FFFFFF'}`, ratio: '1.3 : 1', pass: false },
   ];
   return (
     <SimShell
@@ -667,7 +670,7 @@ export const DetektifKontrasSim: React.FC<SimComponentProps> = ({ mode, onComple
               if (p.pass) onCompleteInteraction?.();
             }}
             style={{ backgroundColor: p.bg, color: p.fg }}
-            className="min-h-[68px] rounded-xl border-2 border-[var(--line)] p-3 font-extrabold cursor-pointer"
+            className="min-h-[68px] rounded-[var(--radius-md)] border-2 border-[var(--line)] p-3 font-extrabold cursor-pointer"
           >
             Teks Contoh
             {picked === p.id && (
@@ -701,11 +704,12 @@ export const TombolSeribuWajahSim: React.FC<SimComponentProps> = ({ mode, onComp
           <button
             key={st}
             type="button"
+            aria-pressed={state === st}
             onClick={() => {
               setState(st);
               onCompleteInteraction?.();
             }}
-            className={`min-h-[40px] rounded-lg border px-3 text-xs font-bold cursor-pointer ${
+            className={`min-h-[48px] rounded-[var(--radius-sm)] border px-3 text-xs font-bold cursor-pointer ${
               state === st ? 'border-[var(--world-600)] bg-[var(--world-50)]' : 'border-[var(--line)]'
             }`}
           >
@@ -713,7 +717,7 @@ export const TombolSeribuWajahSim: React.FC<SimComponentProps> = ({ mode, onComp
           </button>
         ))}
       </div>
-      <div className="flex justify-center rounded-xl bg-[var(--cream)] p-6">
+      <div className="flex justify-center rounded-[var(--radius-md)] bg-[var(--cream)] p-6">
         <Button
           variant="primary"
           loading={state === 'loading'}
@@ -765,7 +769,7 @@ export const GenericTrackASim: React.FC<SimComponentProps & { variant: 'desa-ux'
             setTextInput(e.target.value);
             onCompleteInteraction?.();
           }}
-          className="pw-code w-full rounded-lg border border-[var(--line)] p-2.5"
+          className="pw-code w-full rounded-[var(--radius-sm)] border border-[var(--line)] p-2.5"
         />
         <div className="flex gap-2">
           <Button variant={safeMode ? 'primary' : 'secondary'} onClick={() => setSafeMode(true)}>
@@ -775,7 +779,7 @@ export const GenericTrackASim: React.FC<SimComponentProps & { variant: 'desa-ux'
             Simulasi innerHTML (Bahaya)
           </Button>
         </div>
-        <div className="rounded-xl border border-[var(--line)] bg-[var(--cream)] p-3 text-sm">
+        <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--cream)] p-3 text-sm">
           {safeMode ? (
             <p>
               <strong>Tampilan Aman:</strong> {textInput}
@@ -817,7 +821,7 @@ export const GenericTrackASim: React.FC<SimComponentProps & { variant: 'desa-ux'
               setStepIdx(idx);
               onCompleteInteraction?.();
             }}
-            className={`flex min-h-[44px] w-full items-center gap-2 rounded-xl border-2 px-3 text-left text-sm font-bold cursor-pointer ${
+            className={`flex min-h-[44px] w-full items-center gap-2 rounded-[var(--radius-md)] border-2 px-3 text-left text-sm font-bold cursor-pointer ${
               idx <= stepIdx ? 'border-[var(--ok-500)] bg-[var(--ok-50)]' : 'border-[var(--line)]'
             }`}
           >

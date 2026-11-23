@@ -1,0 +1,92 @@
+{
+ "/": {
+  "path": "/beranda",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 500,
+  "overflowing": []
+ },
+ "/beranda": {
+  "path": "/beranda",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 500,
+  "overflowing": []
+ },
+ "/peta/a": {
+  "path": "/peta/a",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 629,
+  "overflowing": []
+ },
+ "/dunia/a01": {
+  "path": "/dunia/a01",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 701,
+  "overflowing": []
+ },
+ "/belajar/a01-l02": {
+  "path": "/belajar/a01-l02",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 364,
+  "overflowing": []
+ },
+ "/penjaga/a01": {
+  "path": "/penjaga/a01",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 205,
+  "overflowing": []
+ },
+ "/stiker": {
+  "path": "/stiker",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 3621,
+  "overflowing": []
+ },
+ "/profil": {
+  "path": "/profil",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 1387,
+  "overflowing": []
+ },
+ "/pengaturan": {
+  "path": "/pengaturan",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 1225,
+  "overflowing": []
+ },
+ "/mulai": {
+  "path": "/mulai",
+  "viewportWidth": 390,
+  "scrollWidth": 390,
+  "horizontalScroll": false,
+  "rootChildren": 1,
+  "textLength": 215,
+  "overflowing": []
+ }
+}

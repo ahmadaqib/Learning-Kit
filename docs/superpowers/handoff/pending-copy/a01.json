@@ -1,0 +1,309 @@
+{
+ "world": "a01",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "codex",
+  "done": true,
+  "accepted": 14,
+  "adapted": 6,
+  "rejected": 0,
+  "deferred": 0,
+  "instructions": [
+   "src/content/worlds/a01-kota-web/index.ts → a01-anc-j3/j4 → Ask where a waiter takes Rani’s order and what the waiter does when the dish is ready. Keep the original answer and choice IDs. Use request and response tags.",
+   "src/content/worlds/a01-kota-web/index.ts → a01-l01-r1 → Ask “Kamu duduk di restoran dan memilih makanan. Di bagian mana kamu berada?” Use Ruang makan, Dapur restoran, and Gudang bahan as the choices for the a01-l02 warm-up.",
+   "src/content/worlds/a01-kota-web/index.ts → a01-l04/l05 → Keep formal DNS and HTTPS instruction in Pro. Junior follows the shop address book and uses the delivery method, shop, shelf, and size from a fictional shoe order to identify the purposes of an address.",
+   "src/content/worlds/a01-kota-web/index.ts and src/content/worldMeta.ts → a01-l06 → Use the title “Kerangka, tampilan, dan gerak web”. Junior names HTML and CSS and learns page behavior as “Penggerak halaman”. Pro names JavaScript in its own card.",
+   "scripts/validate-content.ts → X08 → Keep the cap. Exempt declared terms from the Junior count only when a glossary link explicitly teaches them in Pro only and no Junior item shows the term."
+  ],
+  "verdicts": [
+   {
+    "number": 1,
+    "source": "sari-27",
+    "issue": "a01-anc-p6",
+    "verdict": "Accept",
+    "reason": "The prompt now asks what differs. Capacity is the graded difference."
+   },
+   {
+    "number": 2,
+    "source": "dimas-14",
+    "issue": "a01-l01-q4 (pro)",
+    "verdict": "Accept",
+    "reason": "The comparison now asks about actual differences and removes the arbitrary visitor count."
+   },
+   {
+    "number": 3,
+    "source": "wulan-38",
+    "issue": "a01-anc-j4",
+    "verdict": "Adapt",
+    "reason": "The Junior anchor now asks about returning an order. The Pro HTTPS card states that fake sites can use HTTPS too."
+   },
+   {
+    "number": 4,
+    "source": "naya-8",
+    "issue": "a01-l05-q1, a01-l05-r2, a01-l05-q3 (junior)",
+    "verdict": "Adapt",
+    "reason": "Junior questions use a fictional order address and ask what each part does. The existing lesson needs no new visual component."
+   },
+   {
+    "number": 5,
+    "source": "raka-11",
+    "issue": "a01-l01-r1, a01-l01-q1, a01-l02-q1 (junior)",
+    "verdict": "Accept",
+    "reason": "Choice labels use parallel wording. The warm-up uses a restaurant scene, and the UI quick check avoids using UX before its card."
+   },
+   {
+    "number": 6,
+    "source": "naya-8",
+    "issue": "a01-l02 hook and UX concept (junior)",
+    "verdict": "Accept",
+    "reason": "The story and concept frame UX through effort and ease of use."
+   },
+   {
+    "number": 7,
+    "source": "naya-8",
+    "issue": "a01-l02-q3 vs a01-l02-r2 (junior)",
+    "verdict": "Accept",
+    "reason": "The true review statement uses a concrete example of small button text."
+   },
+   {
+    "number": 8,
+    "source": "sari-27",
+    "issue": "a01-l02-q5 (pro) and l02 limitStep",
+    "verdict": "Adapt",
+    "reason": "The analogy limit now uses layout changes from laptop to phone. Both physical products and websites can be tested."
+   },
+   {
+    "number": 9,
+    "source": "sari-27",
+    "issue": "a01-l04-q4 (pro)",
+    "verdict": "Adapt",
+    "reason": "The Pro question checks site availability after a laptop shuts down. The preceding card teaches that distinction without adding another term."
+   },
+   {
+    "number": 10,
+    "source": "wulan-38",
+    "issue": "a01-l04-q1 (junior)",
+    "verdict": "Adapt",
+    "reason": "The address lookup and outgoing request share item s2. All four item IDs and the existing answer order remain valid."
+   },
+   {
+    "number": 11,
+    "source": "raka-11",
+    "issue": "a01-l04-q5 (junior)",
+    "verdict": "Accept",
+    "reason": "The answer omits the photocopy cue and compares the server with a cake shop in its hint."
+   },
+   {
+    "number": 12,
+    "source": "naya-8",
+    "issue": "a01-l04-q3 (junior)",
+    "verdict": "Accept",
+    "reason": "The prompt asks for the role of the package, which matches the descriptive answer."
+   },
+   {
+    "number": 13,
+    "source": "dimas-14",
+    "issue": "a01-anc-p5, a01-l05 recap and concept (pro)",
+    "verdict": "Accept",
+    "reason": "The Pro anchor and concept define a protocol as rules for sending data. The recap names the four URL parts."
+   },
+   {
+    "number": 14,
+    "source": "sari-27",
+    "issue": "a01-l04 Pro concept, a01-l04-r1",
+    "verdict": "Accept",
+    "reason": "The Pro card names IP addresses and the review uses the documentation address 203.0.113.5."
+   },
+   {
+    "number": 15,
+    "source": "dimas-14",
+    "issue": "a01-l06 limitStep (pro) 'same'",
+    "verdict": "Accept",
+    "reason": "The limit card uses updating a cart without reloading as the specific JavaScript behavior."
+   },
+   {
+    "number": 16,
+    "source": "dimas-14",
+    "issue": "a01-l01 limitStep (pro)",
+    "verdict": "Adapt",
+    "reason": "Backend capacity is described as a design property. Throughput depends on implementation and hardware."
+   },
+   {
+    "number": 17,
+    "source": "naya-8",
+    "issue": "a01-anc-j2",
+    "verdict": "Accept",
+    "reason": "The Junior anchors replace the paint and road shorthand with plain descriptions."
+   },
+   {
+    "number": 18,
+    "source": "naya-8",
+    "issue": "a01-anc-j1",
+    "verdict": "Accept",
+    "reason": "The opener says the learner is browsing a shop on a phone."
+   },
+   {
+    "number": 19,
+    "source": "wulan-38",
+    "issue": "a01-l01-q4 (junior) choice 'hide'",
+    "verdict": "Accept",
+    "reason": "The explanation compares concurrent digital orders with a kitchen limited by its room and staff."
+   },
+   {
+    "number": 20,
+    "source": "sari-27",
+    "issue": "a01-anc-p1..p6",
+    "verdict": "Accept",
+    "reason": "All six Pro anchors have short hints using the existing local anchor helper."
+   }
+  ],
+  "verification": [
+   "node --import tsx scripts/validate-content.ts --world=a01: zero a01 findings. The copydeck.done marker is present.",
+   "npm run typecheck: passed.",
+   "Runtime content check: all 59 question keys and item IDs match the original. Checked Junior anchors, lesson plans, warm-up and reviews, and presence of the Pro concept terms.",
+   "In-memory regression check: inserting JavaScript into a Junior review makes X08 fail with a three-term Junior count."
+  ]
+ },
+ "judgeIssues": [
+  {
+   "persona": "sari-27",
+   "where": "a01-anc-p6",
+   "problem": "Logic is reversed. The prompt reads 'Pada analogi restoran, mana yang TIDAK berlaku untuk backend?' but the correct answer is 'Satu backend melayani banyak pengunjung sekaligus', which IS true of a backend. The wrong options ('Pengunjung tidak melihat langsung isi dapur', 'Pesanan disampaikan lewat pelayan') are also true. A careful learner who reads the question literally gets marked wrong.",
+   "suggestion": "Reword it as 'Di bagian mana analogi restoran TIDAK cocok dengan backend?' or 'Apa yang berbeda antara dapur restoran dan backend?', and keep the answer as the scale difference.",
+   "severity": "blocker"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a01-l01-q4 (pro)",
+   "problem": "Same reversal. The prompt reads 'Pada analogi restoran, mana yang TIDAK berlaku untuk web?' and the correct answer is 'Satu backend melayani 1.000 pengunjung sekaligus', which is true for the web. The wrong answers' explanations say 'Pernyataan itu berlaku di web juga', so the question asks for the opposite of what it grades.",
+   "suggestion": "Change the prompt to 'Di bagian mana analogi restoran tidak cocok untuk web?'. Also remove the specific '1.000' from the answer, because the exact number makes that option stand out from the others.",
+   "severity": "blocker"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a01-anc-j4",
+   "problem": "Safety error. 'Situs bergembok justru terbuka dan aman' teaches children that the padlock means the site is safe. Phishing sites also have a padlock. HTTPS only protects the message in transit.",
+   "suggestion": "Write 'Gembok berarti pesanmu dikunci di jalan. Gembok tidak menjamin situsnya baik, jadi tetap tanya orang tua.' Also drop 'aman' from the description of the site.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a01-l05-q1, a01-l05-r2, a01-l05-q3 (junior)",
+   "problem": "Answers can be matched by repeated words. The prompt 'mana yang seperti nama toko di papan depan?' has the answer 'Bagian yang menyebut nama toko'. In q3, 'Bagian nama toko' pairs with 'Nama toko di internet' and 'Bagian catatan ukuran' pairs with 'Catatan tambahan untuk toko'. Junior is never shown an actual URL (rCode is Pro-only), so these questions test word matching, not understanding.",
+   "suggestion": "Show Junior a simple colored URL or address picture. Make the labels point to the visual (for example 'bagian biru'), or ask about the purpose ('Kamu mau pindah ke toko lain. Bagian mana yang kamu ganti?').",
+   "severity": "major"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a01-l01-r1, a01-l01-q1, a01-l02-q1 (junior)",
+   "problem": "The choice labels give away the answer. The prompt 'Bagian web mana yang kamu lihat dan ketuk?' has the answer 'Frontend, yang kamu lihat'. 'Tombol kuning bergambar bintang' has the answer 'UI, yang terlihat'. Raka will match the words and won't feel he earned the point.",
+   "suggestion": "Keep the analogy name in the labels ('Frontend, si ruang makan') but take out the words that repeat the prompt ('yang kamu lihat', 'yang terlihat').",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a01-l02 hook and UX concept (junior)",
+   "problem": "'Mengapa rasanya berbeda?' and 'UX adalah rasa saat memakai sesuatu' appear right next to bottles of sauce, so 'rasa' reads as taste. An 8-year-old will think about how the sauce tastes.",
+   "suggestion": "Use 'enak atau susah dipakai' / 'nyaman dipakai' instead of 'rasa', for example 'UX itu soal mudah atau susahnya dipakai.'",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a01-l02-q3 vs a01-l02-r2 (junior)",
+   "problem": "These two true/false statements almost match but have opposite answers. 'Tampilan yang cantik pasti membuat aplikasi mudah dipakai' is FALSE and 'Tampilan yang rapi ikut membuat aplikasi enak dipakai' is TRUE. Telling 'pasti' from 'ikut' and 'cantik' from 'rapi' is too subtle for a third grader and feels like a trick question.",
+   "suggestion": "Make the contrast concrete in r2, for example 'Tulisan tombol yang terlalu kecil membuat aplikasi susah dipakai' (BENAR).",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a01-l02-q5 (pro) and l02 limitStep",
+   "problem": "Meaning error. 'Pada botol, bentuk dan rasa bisa terpisah. Di web, tampilan yang buruk langsung merusak UX' contradicts this same lesson, where the shape of the glass bottle is exactly what makes it hard to pour. The claimed difference between the analogy and the web is not true.",
+   "suggestion": "Pick a real limit of the analogy, for example: 'Di web, UX bisa diukur dan diuji (klik, waktu, data). Botol jarang diuji begitu.' Or drop the limit and teach that UI is part of UX.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a01-l04-q4 (pro)",
+   "problem": "'Hosting berarti menyewa ruang di server...' is quizzed, but no concept card teaches hosting. On top of that, a true/false question that restates a definition gives no reason why.",
+   "suggestion": "Add one sentence about hosting to the 'Server dan response' card, or replace the question with a scenario ('Laptopmu dimatikan, situs ikut mati. Kenapa situs butuh hosting?').",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a01-l04-q1 (junior)",
+   "problem": "The ordering question skips the request. It goes 'Buku alamat mencari nomor toko' and then straight to 'Toko mengirim paket balasan', yet explainCorrect says 'lalu paket dikirim'. The journey loses the step where the order is sent, which contradicts the lesson's concept card.",
+   "suggestion": "Add the step 'Pesananmu dikirim ke toko' between s2 and s3, or keep 4 steps by merging 'Halaman muncul' into the delivery step.",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a01-l04-q5 (junior)",
+   "problem": "'fotokopi' appears only in the correct answer ('Isinya tetap utuh karena dikirim fotokopi') and in the limit card he just read, so it works as a keyword giveaway. The hint 'Bayangkan toko ojek saat barangnya terjual' is also wrong: an ojek is a courier, not a shop.",
+   "suggestion": "Remove 'karena dikirim fotokopi' from the label so it reads 'Isinya tetap utuh'. Change the hint to 'Bayangkan toko kue saat kuenya dibeli.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a01-l04-q3 (junior)",
+   "problem": "'Paket itu disebut apa?' asks for a name, but the answer 'Jawaban dari toko' is a description, not a name, so the question and answer don't match.",
+   "suggestion": "Change the prompt to 'Paket dari toko itu apa?' or 'Paket itu berisi apa?'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a01-anc-p5, a01-l05 recap and concept (pro)",
+   "problem": "Factual mistake. 'Protokol, cara bicara aman' and the recap 'URL berisi cara bicara aman' imply the protocol is always secure, but http:// is a protocol too. 'cara bicara' is also vague and sounds childish.",
+   "suggestion": "Write 'Protokol (aturan kirim data, misalnya http atau https)' and 'URL berisi protokol, domain, path, dan query.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a01-l04 Pro concept, a01-l04-r1",
+   "problem": "'nomor alamat server' never names the real term, IP address. Sari will see 'IP address' in her work and in DevTools.",
+   "suggestion": "In Pro, add '(alamat IP, misalnya 203.0.113.5)' after 'nomor alamat server' once.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a01-l06 limitStep (pro) 'same'",
+   "problem": "'Tanpa JavaScript halaman tidak bereaksi' is inaccurate: links, forms and :hover all work without JS. Dimas will look for this kind of mistake.",
+   "suggestion": "Change it to 'Tanpa JavaScript halaman tetap bisa dibuka, tetapi tidak bisa bereaksi secara dinamis (misalnya menambah isi keranjang tanpa memuat ulang halaman).'",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a01-l01 limitStep (pro)",
+   "problem": "'Backend tidak memasak.' sounds patronizing to a teen, and the number '1.000 pengunjung' is arbitrary.",
+   "suggestion": "Write 'Dapur restoran melayani puluhan tamu. Satu backend bisa melayani ribuan request per detik.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a01-anc-j2",
+   "problem": "The label 'UI, tampilan catnya' borrows the house-painting analogy that only appears in l06. In the anchor, 'cat' means nothing yet. 'Kabel internet, jalan pesan' in anc-j1 is also hard to understand.",
+   "suggestion": "Write 'UI, tampilannya' and 'Kabel internet, pengantar pesan'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a01-anc-j1",
+   "problem": "'Kamu membuka toko online' is ambiguous: it can mean starting a shop or visiting one. If the child is the owner, 'tampil di layarmu' gets confusing.",
+   "suggestion": "Write 'Kamu melihat-lihat toko online di HP.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a01-l01-q4 (junior) choice 'hide'",
+   "problem": "The explanation 'Dapur web tidak melayani satu per satu. Berbeda dari dapur restoran yang sibuk.' is self-contradictory. A busy restaurant kitchen also doesn't serve one guest at a time, so it doesn't explain why.",
+   "suggestion": "Write 'Dapur web bisa melayani banyak sekali orang dalam waktu yang sama. Dapur restoran hanya bisa sedikit.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a01-anc-p1..p6",
+   "problem": "The Pro anchor questions have no hints at all. A total beginner who is stuck on her phone can only pick 'Belum tahu'.",
+   "suggestion": "Add one short hint to each Pro anchor, for example p4 'Apa yang harus diketahui sebelum mengirim pesan?'.",
+   "severity": "minor"
+  }
+ ]
+}

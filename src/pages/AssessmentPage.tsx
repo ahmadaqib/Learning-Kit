@@ -1,16 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loadWorldBundle } from '@/content/worldLoader';
-import { resolveTxt, type Lesson, type Question, type World } from '@/content/schema';
+import type { Lesson, Mode, Question, World } from '@/content/schema';
+import { xpWord } from '@/app/modeConfig';
+import { celebrate } from '@/engine/celebrations';
 import { evaluateQuestionAnswer, shuffleArray } from '@/engine/queue';
 import { XP_RULES } from '@/engine/scoring';
+import { runSequence } from '@/motion/waapi';
 import { useAppStore } from '@/store/useAppStore';
+import { Annot } from '@/components/fx/Annot';
+import { CountUp } from '@/components/fx/CountUp';
+import { PageLoader } from '@/components/fx/PageLoader';
+import { ActionBar, ReadAloudButton } from '@/components/lesson/ActionBar';
+import { LevelUpBanner, detectLevelUp } from '@/components/lesson/LessonResult';
 import { Bito } from '@/components/mascot/Bito';
-import { QuestionRenderer } from '@/components/questions/QuestionRenderer';
+import { QuestionIntro, QuestionRenderer, useQuestionReader } from '@/components/questions/QuestionRenderer';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { WorldThemeWrapper } from '@/components/ui/WorldThemeWrapper';
+
+interface AssessmentDone {
+  score: number;
+  max: number;
+  forgotTags: string[];
+  xpEarned: number;
+  xpBefore: number;
+}
 
 export const AssessmentPage: React.FC = () => {
   const { duniaId = 'a01', jenis = 'awal' } = useParams<{ duniaId: string; jenis: string }>();
@@ -25,10 +41,11 @@ export const AssessmentPage: React.FC = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [idx, setIdx] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [done, setDone] = useState<{ score: number; max: number; forgotTags: string[] } | null>(null);
+  // Kept as the renderer gives them (a true/false answer is a boolean), and stored as text
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const [done, setDone] = useState<AssessmentDone | null>(null);
 
-  const mode = profile?.mode ?? 'junior';
+  const mode: Mode = profile?.mode ?? 'junior';
 
   useEffect(() => {
     loadWorldBundle(duniaId).then((bundle) => {
@@ -39,13 +56,16 @@ export const AssessmentPage: React.FC = () => {
     });
   }, [duniaId, mode, kind]);
 
-  if (!profile || !world || questions.length === 0) {
-    return (
-      <div className="flex min-h-[60dvh] items-center justify-center p-6">
-        <p className="pw-body font-bold text-[var(--ink-2)]">Menyiapkan soal...</p>
-      </div>
-    );
-  }
+  const curQ: Question | undefined = questions[idx];
+  const reader = useQuestionReader({
+    mode,
+    autoRead: Boolean(profile?.settings.autoReadAloud),
+    question: done ? null : (curQ ?? null),
+    stepKey: `${duniaId}-${kind}-${idx}-${questions.length}`,
+    shownOrder: undefined,
+  });
+
+  if (!profile || !world || questions.length === 0 || !curQ) return <PageLoader label="Bito sedang menyiapkan soal…" />;
 
   const titleText =
     kind === 'pre'
@@ -60,14 +80,22 @@ export const AssessmentPage: React.FC = () => {
           ? 'Masih Ingat?'
           : 'Cek Ingatan 7 Hari';
 
+  // Pro reads the facts and nothing else: no comfort, no comment on how learning works (copydeck 2.2)
   const introText =
     kind === 'pre'
-      ? 'Belum belajar? Tidak apa-apa salah atau pilih "Belum tahu". Ini cuma untuk melihat nanti kamu tambah pintar sebanyak apa.'
+      ? mode === 'junior'
+        ? 'Belum belajar? Tidak apa-apa salah atau pilih "Belum tahu". Kita catat apa yang kamu tahu sekarang. Nanti kamu bisa melihat kemajuanmu.'
+        : 'Soal titik awal untuk dunia ini. Pilih "Belum tahu" bila belum yakin.'
       : kind === 'post'
-        ? 'Ingat soal-soal di awal dunia ini? Sekarang coba jawab lagi setelah belajar!'
-        : `Seminggu lalu kamu menuntaskan ${world.title}. Yuk cek bagian mana yang masih menempel!`;
+        ? mode === 'junior'
+          ? 'Ingat soal-soal di awal dunia ini? Sekarang coba jawab lagi setelah belajar!'
+          : 'Soal yang sama dengan di awal dunia ini.'
+        : mode === 'junior'
+          ? `Seminggu lalu kamu menuntaskan ${world.title}. Yuk cek bagian mana yang masih menempel!`
+          : `Tujuh hari setelah ${world.title}: seberapa banyak yang masih kamu ingat.`;
 
   const handleNext = () => {
+    reader.stop();
     if (idx + 1 < questions.length) {
       setIdx((i) => i + 1);
       return;
@@ -83,7 +111,7 @@ export const AssessmentPage: React.FC = () => {
         score += 1;
       } else {
         forgotTags.push(...q.tags);
-        // Jika salah di Tes Ingat, masukkan reviewCard terkait ke Kotak Ulang kotak 1 (§7.10, F17)
+        // Jika salah di Tes Ingat, masukkan reviewCard terkait ke Kotak Ulang kotak 1 (7.10, F17)
         if (kind === 'retain') {
           for (const l of lessons) {
             for (const rc of l.reviewCards) {
@@ -96,87 +124,216 @@ export const AssessmentPage: React.FC = () => {
       }
     }
 
-    completeAssessment({
+    const xpBefore = profile.xp;
+    const res = completeAssessment({
       worldId: world.id,
       kind,
       score,
       max: questions.length,
-      answers,
+      answers: Object.fromEntries(Object.entries(answers).map(([id, v]) => [id, String(v)])),
       wrongAnchorReviewCardIds: [...new Set(wrongCardIds)],
     });
 
-    setDone({ score, max: questions.length, forgotTags: [...new Set(forgotTags)] });
+    setDone({ score, max: questions.length, forgotTags: [...new Set(forgotTags)], xpEarned: res.xpEarned, xpBefore });
   };
 
+  /* ---- Result ---- */
   if (done) {
     const rec = profile.assessments[world.id];
-    const preScore = kind === 'pre' ? done.score : rec?.pre?.score ?? 0;
-    const postScore = kind === 'post' ? done.score : rec?.post?.score;
-    const retainScore = kind === 'retain' ? done.score : rec?.retain?.score;
-
-    const xpMsg =
-      kind === 'pre'
-        ? `+${XP_RULES.PRE_TEST} XP karena sudah mencoba!`
-        : kind === 'post'
-          ? `+${XP_RULES.POST_TEST} XP Cek Kemajuan!`
-          : `+${XP_RULES.RETAIN_TEST} XP Cek Ingatan!`;
-
     return (
-      <WorldThemeWrapper worldId={world.id} className="mx-auto max-w-[600px] px-5 py-8 space-y-6">
-        <div className="text-center space-y-3">
-          <Bito expression="happy" size={112} className="mx-auto" />
+      <AssessmentResult
+        world={world}
+        mode={mode}
+        kind={kind}
+        done={done}
+        preScore={kind === 'pre' ? done.score : (rec?.pre?.score ?? 0)}
+        postScore={kind === 'post' ? done.score : rec?.post?.score}
+        retainScore={kind === 'retain' ? done.score : rec?.retain?.score}
+        mascot={profile.mascot}
+        soundEnabled={profile.settings.soundEnabled}
+        onNavigate={navigate}
+      />
+    );
+  }
+
+  /* ---- A question ---- */
+  const given = answers[curQ.id];
+  const hasAnswer = (given !== undefined && given !== '') || curQ.type === 'order';
+
+  return (
+    <WorldThemeWrapper worldId={world.id} className="mx-auto flex min-h-[100dvh] max-w-[680px] flex-col px-4 py-5">
+      <header className="mb-5 flex items-center gap-3 pw-safe-top">
+        <button
+          type="button"
+          onClick={() => navigate(`/dunia/${world.id}`)}
+          aria-label="Kembali"
+          className="pw-pressable flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] cursor-pointer"
+        >
+          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+        </button>
+        <div className="min-w-0 flex-1">
+          <ProgressBar value={(idx / questions.length) * 100} label="Kemajuan tes" />
+        </div>
+        <span className="text-xs font-extrabold text-[var(--ink-2)]">
+          {idx + 1}/{questions.length}
+        </span>
+      </header>
+
+      <div className="mb-4 rounded-[var(--radius-md)] bg-[var(--world-50)] p-3.5">
+        <div className="pw-kicker">
+          {titleText} · {world.title}
+        </div>
+        <p className="pw-small m-0 mt-1 text-[var(--ink)]">{introText}</p>
+        {kind === 'pre' && (
+          <p className="m-0 mt-1">
+            <Annot>{mode === 'junior' ? 'belum tahu? tidak apa-apa' : 'belum tahu? lewati saja'}</Annot>
+          </p>
+        )}
+      </div>
+
+      <main
+        key={curQ.id}
+        data-enter={idx > 0 ? 'right' : undefined}
+        data-rm="fade"
+        className={`flex flex-1 flex-col gap-5 ${idx > 0 ? 'pw-enter' : ''}`}
+      >
+        <QuestionIntro
+          question={curQ}
+          mode={mode}
+          kicker={`Soal ${idx + 1} dari ${questions.length}`}
+          as="h1"
+          reading={reader.reading}
+          action={
+            reader.canSpeak ? <ReadAloudButton mode={mode} speaking={reader.speaking} onToggle={reader.toggle} /> : undefined
+          }
+        />
+        <QuestionRenderer
+          question={curQ}
+          mode={mode}
+          value={answers[curQ.id]}
+          onChange={(val) => setAnswers((a) => ({ ...a, [curQ.id]: val }))}
+          reading={reader.reading}
+          withContext={false}
+        />
+      </main>
+
+      <ActionBar
+        mode={mode}
+        primaryLabel={idx + 1 < questions.length ? 'Lanjut →' : 'Selesai ✓'}
+        onPrimary={handleNext}
+        primaryDisabled={!hasAnswer}
+        soundEnabled={profile.settings.soundEnabled}
+        focusKey={idx}
+      />
+    </WorldThemeWrapper>
+  );
+};
+
+/* ------------------------------------------------------------------------------------------------
+ * The result: the score counts up and the bars fill (the before and after pair for the post-test)
+ * ---------------------------------------------------------------------------------------------- */
+
+const AssessmentResult: React.FC<{
+  world: World;
+  mode: Mode;
+  kind: 'pre' | 'post' | 'retain';
+  done: AssessmentDone;
+  preScore: number;
+  postScore: number | undefined;
+  retainScore: number | undefined;
+  mascot: React.ComponentProps<typeof Bito>['custom'];
+  soundEnabled: boolean;
+  onNavigate: (to: string) => void;
+}> = ({ world, mode, kind, done, preScore, postScore, retainScore, mascot, soundEnabled, onNavigate }) => {
+  const pro = mode === 'pro';
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [skipped, setSkipped] = useState(false);
+  const [filled, setFilled] = useState(false);
+  const [banner, setBanner] = useState(false);
+  const level = detectLevelUp(done.xpBefore, done.xpEarned, mode);
+  const word = xpWord(mode);
+  const at = (ms: number) => ({ '--at': `${ms}ms` }) as React.CSSProperties;
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return undefined;
+    const handle = runSequence(root, [
+      // The bars fill once the numbers have started to count: cause, then effect
+      { at: 300, run: () => setFilled(true) },
+      {
+        at: 1100,
+        run: ({ skipped: s }) => {
+          if (s) setSkipped(true);
+          if (!level.leveledUp) return;
+          if (pro) setBanner(true);
+          else celebrate({ kind: 'levelUp', level: level.after.level, title: level.after.title });
+        },
+      },
+    ]);
+    return () => handle.cancel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const xpMsg =
+    kind === 'pre'
+      ? `+${XP_RULES.PRE_TEST} ${word} karena sudah mencoba`
+      : kind === 'post'
+        ? `+${XP_RULES.POST_TEST} ${word} untuk Cek Kemajuan`
+        : `+${XP_RULES.RETAIN_TEST} ${word} untuk Cek Ingatan`;
+
+  const bar = (label: string, score: number, barLabel: string, color: string, start: number) => (
+    <div className="pw-fx-rise space-y-2" style={at(start)}>
+      <div className="flex justify-between text-sm font-bold">
+        <span>{label}</span>
+        <span className={pro ? 'font-mono tabular-nums' : ''}>
+          <CountUp value={score} delay={start} duration={600} skip={skipped} />/{done.max}
+        </span>
+      </div>
+      <ProgressBar value={filled ? (score / done.max) * 100 : 0} label={barLabel} color={color} />
+    </div>
+  );
+
+  return (
+    <WorldThemeWrapper worldId={world.id} className="mx-auto max-w-[600px] px-5 py-8">
+      <div ref={rootRef} data-rm="fade" className="pw-seq space-y-6">
+        {banner && <LevelUpBanner before={level.before} after={level.after} />}
+        <div className="space-y-3 text-center">
+          <div className="pw-stage flex justify-center py-4">
+            <Bito expression="happy" size={pro ? 96 : 112} custom={mascot} />
+          </div>
           <h1 className="pw-h1">
             {kind === 'pre'
-              ? 'Bagus! Sekarang kita pelajari jawabannya bersama.'
+              ? pro
+                ? 'Titik awalmu tercatat. Lanjut ke pelajaran pertama.'
+                : 'Bagus! Sekarang kita pelajari jawabannya bersama.'
               : `Kemajuanmu di ${world.title}`}
           </h1>
-          <span className="inline-block rounded-full bg-[var(--star)] px-4 py-1 text-sm font-extrabold text-[#1F2340]">
+          <span className="inline-block rounded-[var(--radius-full)] bg-[var(--star)] px-4 py-1 text-sm font-extrabold text-[var(--on-star)]">
             {xpMsg}
           </span>
         </div>
 
-        {/* Grafik Batang 3 Tahap (§7.10) untuk Tes Akhir & Tes Ingat */}
+        {/* Grafik Batang 3 Tahap (7.10) untuk Tes Akhir & Tes Ingat */}
         {kind !== 'pre' && (
-          <div className="pw-card p-5 space-y-3">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm font-bold">
-                <span>Awal</span>
-                <span>{preScore}/{done.max}</span>
-              </div>
-              <ProgressBar value={(preScore / done.max) * 100} label="Skor awal" color="var(--ink-3)" />
-            </div>
-
-            {postScore !== undefined && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm font-bold">
-                  <span>Akhir</span>
-                  <span>{postScore}/{done.max}</span>
-                </div>
-                <ProgressBar value={(postScore / done.max) * 100} label="Skor akhir" color="var(--ok-500)" />
-              </div>
-            )}
-
-            {retainScore !== undefined && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm font-bold">
-                  <span>7 Hari</span>
-                  <span>{retainScore}/{done.max}</span>
-                </div>
-                <ProgressBar value={(retainScore / done.max) * 100} label="Skor 7 hari" color="var(--world-600)" />
-              </div>
-            )}
+          <div className="pw-card space-y-3 p-5">
+            {bar('Awal', preScore, 'Skor awal', 'var(--ink-3)', 200)}
+            {postScore !== undefined && bar('Akhir', postScore, 'Skor akhir', 'var(--ok-500)', 320)}
+            {retainScore !== undefined && bar('7 Hari', retainScore, 'Skor 7 hari', 'var(--world-600)', 440)}
 
             {postScore !== undefined && postScore > preScore && (
-              <p className="pw-body font-extrabold text-[var(--ok-600)] pt-2">
-                Kamu naik dari {preScore} ke {postScore}!
+              <p className="pw-body pw-fx-rise m-0 pt-2 font-extrabold text-[var(--ok-600)]" style={at(560)}>
+                {pro ? `Naik dari ${preScore} ke ${postScore}.` : `Kamu naik dari ${preScore} ke ${postScore}!`}
               </p>
             )}
 
             {kind === 'retain' && done.forgotTags.length > 0 && (
-              <div className="rounded-xl bg-[var(--cream)] p-3 text-sm">
-                <p className="font-bold">Wajar ada yang mulai lupa. Itulah gunanya Kotak Ulang!</p>
-                <p className="text-[var(--ink-2)] mt-1">
-                  Topik yang dimasukkan ke Kotak Ulang: {done.forgotTags.join(', ')}.
+              <div className="pw-well pw-fx-fade text-sm" style={at(560)}>
+                <p className="m-0 font-bold">
+                  {pro ? 'Topik berikut masuk ke Kotak Ulang.' : 'Wajar ada yang mulai lupa. Itulah gunanya Kotak Ulang!'}
+                </p>
+                <p className="m-0 mt-1 text-[var(--ink-2)]">
+                  {pro ? '' : 'Topik yang dimasukkan ke Kotak Ulang: '}
+                  {done.forgotTags.join(', ')}.
                 </p>
               </div>
             )}
@@ -186,8 +343,9 @@ export const AssessmentPage: React.FC = () => {
         <Button
           variant="primary"
           fullWidth
+          soundEnabled={soundEnabled}
           onClick={() =>
-            navigate(
+            onNavigate(
               kind === 'pre'
                 ? `/belajar/${world.lessons[0]}`
                 : kind === 'retain' && done.forgotTags.length > 0
@@ -201,55 +359,6 @@ export const AssessmentPage: React.FC = () => {
             : kind === 'retain' && done.forgotTags.length > 0
               ? 'Ulang yang mulai lupa →'
               : 'Lanjut ke Peta Dunia →'}
-        </Button>
-      </WorldThemeWrapper>
-    );
-  }
-
-  const curQ = questions[idx];
-
-  return (
-    <WorldThemeWrapper worldId={world.id} className="mx-auto flex min-h-[100dvh] max-w-[680px] flex-col px-4 py-5">
-      <header className="mb-5 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => navigate(`/dunia/${world.id}`)}
-          aria-label="Kembali"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--paper)] cursor-pointer"
-        >
-          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-        </button>
-        <div className="flex-1">
-          <ProgressBar value={((idx + 1) / questions.length) * 100} label="Progres tes" />
-        </div>
-        <span className="text-xs font-extrabold text-[var(--ink-2)]">
-          {idx + 1}/{questions.length}
-        </span>
-      </header>
-
-      <div className="mb-4 rounded-xl bg-[var(--world-50)] p-3.5">
-        <div className="pw-kicker">{titleText} · {world.title}</div>
-        <p className="pw-small mt-1 text-[var(--ink)]">{introText}</p>
-      </div>
-
-      <div className="flex-1 flex flex-col justify-between gap-6 pb-6">
-        <div className="space-y-4">
-          <h1 className="pw-h2">{resolveTxt(curQ.prompt, mode)}</h1>
-          <QuestionRenderer
-            question={curQ}
-            mode={mode}
-            value={answers[curQ.id]}
-            onChange={(val) => setAnswers((a) => ({ ...a, [curQ.id]: String(val) }))}
-          />
-        </div>
-
-        <Button
-          variant="primary"
-          fullWidth
-          disabled={!answers[curQ.id]}
-          onClick={handleNext}
-        >
-          {idx + 1 < questions.length ? 'Lanjut →' : 'Selesai ✓'}
         </Button>
       </div>
     </WorldThemeWrapper>

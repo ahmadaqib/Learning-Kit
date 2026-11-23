@@ -1,0 +1,157 @@
+{
+ "world": "a11",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "opus",
+  "accepted": 15,
+  "adapted": 5,
+  "rejected": 0,
+  "deferred": 0,
+  "done": true,
+  "applicationNotes": "Split two Pro concept sentences to avoid C02 and C21 while preserving the approved explanations. The existing M02 and M03 metadata warnings remain.",
+  "instructions": "FILE (only file to edit): src/content/worlds/a11-menara-alat/index.ts (repo folder name has a trailing space; use cwd-relative paths). Keep every id, answer value and the step order. \"J:\" means the first (junior) argument of t(...), \"P:\" means the second (pro) argument. Where t() has only one argument, replace that argument.\n\n=== ANCHORS ===\n1. a11-anc-j1 (about line 50)\n - prompt J: 'Library seperti perabot pilihan sendiri, framework seperti rumah jadi. Apa beda utamanya?' -> 'Apa beda utama library dan framework?' (P stays the same)\n - choice 'ctrl' label J: 'Library kamu atur sendiri, framework sudah beraturan' -> 'Library kamu pilih sendiri, framework sudah punya aturan'\n - choice 'free' explainWrong J: 'Library bisa kecil atau besar. Bedanya ada pada siapa yang mengatur alur.' -> 'Library bisa kecil atau besar. Bedanya ada pada siapa yang membuat aturan.'\n2. a11-anc-j4 (about line 170), choice id 'insp' (keep the id):\n - label: t('Inspect') -> t('Commit')\n - explainWrong -> t('Commit hanya membuat titik simpan di laptop. Web belum tayang.', 'Commit mencatat titik simpan di repo lokal, bukan menayangkan situs ke server.')\n3. a11-anc-j5 (about line 240), explainCorrect J: 'Git dibuat untuk kerja bersama. Game satu pemain hanya punya satu pemain.' -> 'Di Git, kamu dan teman menyimpan di jalur masing-masing, lalu menyatukannya.' (P stays the same. Do not change the choices.)\n\n=== LESSON a11-l01 ===\n4. storyStep rText J: 'Library seperti membeli meja dan kursi untuk rumah gambaranmu sendiri. Framework seperti membeli rumah perumahan yang denahnya sudah jadi. Apa bedanya?' -> 'Library seperti memilih meja dan kursi sendiri untuk rumahmu. Framework seperti rumah jadi, lengkap dengan denah dan aturannya. Apa bedanya?'\n5. concept 'Library: kamu yang mengatur', rText J: ' adalah kumpulan alat siap pakai. Kamu memanggilnya saat perlu, dan alurnya kamu atur sendiri. Seperti memilih meja dan kursi untuk rumah buatanmu.' -> ' adalah kumpulan alat siap pakai. Kamu memanggilnya saat perlu. Kamu sendiri yang menentukan cara kerjanya. Seperti memilih meja dan kursi untuk rumahmu.'\n6. The question after that card (choice 'fw' explainWrong):\n - J: 'Framework seperti rumah perumahan. Denah dan aturannya sudah ditentukan.' -> 'Framework seperti rumah jadi. Denah dan aturannya sudah ditentukan.'\n - P: 'Framework ibarat rumah perumahan yang denah dan aturannya sudah ditentukan. Kamu mengisinya, bukan menyusunnya.' -> 'Framework ibarat rumah jadi yang denah dan aturannya sudah ditentukan. Kamu mengisinya, bukan menyusunnya.'\n - explainCorrect J: 'Library dipanggil saat kamu perlu, jadi kamu yang mengatur alur. Seperti memilih perabot satu per satu.' -> 'Library dipanggil saat kamu perlu, jadi kamu yang mengatur. Seperti memilih perabot satu per satu.'\n7. concept 'Framework: mengisi kerangka', rText J: ' seperti rumah di perumahan. Denah dan aturannya sudah jadi. Kamu tinggal mengisi bagian yang disediakan.' -> ' seperti rumah jadi. Denah dan aturannya sudah ada. Kamu tinggal mengisi bagiannya. Halamannya dipecah jadi keping kecil, seperti balok susun.' (P stays the same.)\n8. a11-l01-q3 (sort):\n - item i1 label J: 'Kamu mengatur alurnya sendiri' -> 'Kamu memilih dan mengatur sendiri'\n - item i4 label: J 'Seperti mengisi rumah perumahan' -> 'Seperti mengisi rumah jadi'; P 'Ibarat mengisi rumah perumahan yang denahnya sudah ada' -> 'Ibarat mengisi rumah jadi yang denahnya sudah ada'\n - explainCorrect J -> 'Library kamu pilih sendiri, framework sudah punya aturan. Seperti perabot pilihanmu dan rumah jadi.'\n9. limitStep analogy (about line 521): t('Library seperti perabot sendiri, framework seperti rumah perumahan') -> t('Library seperti perabot sendiri, framework seperti rumah jadi')\n10. a11-l01-q4 analogy: t('Library sebagai perabot, framework sebagai rumah perumahan') -> t('Library sebagai perabot, framework sebagai rumah jadi')\n11. a11-l01-q6 (TF, answer stays true):\n - prompt J -> 'Seperti sepeda, bisa satu framework membuat framework lain lebih mudah dipelajari.'\n - explainCorrect J -> 'Ide dasarnya mirip. Seperti naik sepeda, belajar satu membantu belajar yang lain.'\n - hints J: 'Ingat denah perumahan yang mirip-mirip.' -> 'Ingat: bisa naik satu sepeda, sepeda lain terasa mudah.' (P hint stays the same)\n12. a11-l01-q5, choice 'old' explainWrong J: 'Pemula boleh memakai framework. Tetapi dasarnya perlu dipelajari dulu.' -> 'Pemula boleh memakai framework, tetapi dasarnya perlu dipelajari dulu.'\n13. a11-l01-r1:\n - choice 'lib' explainWrong J: 'Library hanya menyediakan alat. Kamu sendiri yang mengatur alurnya.' -> 'Library hanya menyediakan alat. Kamu sendiri yang mengatur cara kerjanya.'\n - explainCorrect J: 'Framework menyiapkan kerangka kerja lengkap. Seperti rumah jadi di perumahan.' -> 'Framework menyiapkan kerangka kerja lengkap. Seperti rumah jadi dengan denahnya.'\n - hints: t('Ingat rumah di perumahan.') -> t('Ingat rumah jadi yang denahnya sudah ada.')\n14. a11-l01-r2: no change. Item 7 now teaches \"keping kecil, seperti balok susun\" to Junior.\n\n=== LESSON a11-l02 (Pro) ===\n15. concept 'Empat pilihan dan meta-framework':\n - rText(' (buatan Meta) memakai JSX dan punya ekosistem terbesar; ') -> rText(' (buatan Meta) memakai JSX, yaitu cara menulis tampilan mirip HTML di dalam JavaScript. Ekosistemnya terbesar. ')\n - rText(' memakai compiler, penerjemah kode saat build. Di atasnya ada meta-framework, yaitu paket tambahan untuk halaman dan render server: ') -> rText(' memakai compiler yang menerjemahkan kode saat build (tahap mengemas kode sebelum tayang). Di atasnya ada meta-framework, yaitu paket tambahan untuk halaman dan render server: ')\n16. a11-l02-q3 (spotbug) prompt: t('Ketuk baris yang salah karena tidak memakai setSuka untuk memperbarui state.') -> t('Angka di tombol tidak bertambah saat diklik. Ketuk baris penyebabnya.') (lines, answer [3] and hint stay the same)\n\n=== LESSON a11-l03 (Pro) ===\n17. a11-l03-q5, choice 'bs' explainWrong: t('Bootstrap bukan komponen React dengan Tailwind.') -> t('Bootstrap memakai CSS-nya sendiri dan bukan komponen React, jadi tidak menyatu dengan proyek Tailwind Raka.')\n\n=== LESSON a11-l04 (Pro) ===\n18. a11-l04-q3 (spotbug):\n - prompt -> t('Halaman ini lambat tampil dan layarnya meloncat. Ketuk baris penyebabnya.')\n - lines -> [\n   '<main>',\n   '  <img src=\"banner-utama.png\" loading=\"lazy\" alt=\"Promo\">',\n   '  <h1>Koleksi Baru</h1>',\n   '  <img src=\"galeri-1.png\" loading=\"lazy\" width=\"400\" height=\"300\" alt=\"Sepatu lari\">',\n   '</main>',\n ]\n - answer stays [2]\n - explainCorrect -> t('Baris 2 memasang loading=\"lazy\" pada banner utama, padahal gambar itu harus dimuat paling dulu, dan width serta height belum ada. Gambar galeri di bawah boleh lazy.')\n - hint stays the same\n\n=== LESSON a11-l05 (Pro) ===\n19. a11-l05-q2 prompt: t('Ketuk baris kode yang melanggar praktik SEO untuk judul halaman.') -> t('Ketuk baris yang membuat halaman ini sulit dibedakan di hasil pencarian.')\n20. concept 'Kecepatan, SSR/SSG, dan audit Lighthouse': replace rTerm('tailwind-css', 'SSR atau SSG') with rBold('SSR atau SSG'), and replace the next rText('. Cek hasilnya di tab ') with rText(' (halaman disusun di server, bukan di browser). Cek hasilnya di tab '). Leave the lesson's usesTerms array as it is.\n\n=== LESSON a11-l06 ===\n21. concept with the git code block: rPro('Alur kerja harian Git hanya butuh empat perintah. ') -> rPro('Empat perintah dasar Git: '); rPro(' memulai catatan, ') -> rPro(' memulai catatan (sekali di awal proyek), ')\n22. concept 'Repo, Clone, Pull Request, Conflict': in its rText, replace the last sentence 'Kalau dua orang mengubah baris yang sama, terjadilah conflict yang harus kamu pilih sendiri.' with 'Kalau dua orang mengubah baris yang sama, terjadilah conflict. Kamu menyelesaikannya dengan memilih baris mana yang dipakai.'\n23. a11-l06-q6 prompt (answer stays false): J 'Git dan GitHub adalah benda yang sama.' -> 'Git dan GitHub adalah alat yang sama.'; P 'Git dan GitHub adalah benda yang sama, tidak ada bedanya.' -> 'Git dan GitHub adalah dua nama untuk alat yang sama.'\n\n=== LESSON a11-l07 ===\n24. a11-l07-q3: delete the line `type: 'analogy',` so the question becomes a plain mcq. Change nothing else.\n25. concept 'Tujuh langkah dari ide sampai tayang':\n - alt J -> 'Tujuh langkah: cari ide, sketsa, desain, serahkan desain, buat kode, uji, tayang.'\n - first rText J: 'Langkahnya: riset, sketsa, desain, serah terima, koding, uji, lalu tayang. Sketsa kasar tata letak disebut ' -> 'Ada tujuh langkah. Cari ide, buat sketsa, lalu desain. Serahkan desain, buat kode, uji, lalu tayang. Sketsa kasar tata letak disebut '\n - second rText P: ', desain, handoff (serah terima desain ke developer), lalu slicing dan integrasi API. Setelah itu uji lintas browser di staging, lalu ' -> ', desain, handoff (serah terima desain ke developer), lalu slicing dan integrasi API (menyambung halaman ke data server). Uji lintas browser di staging, yaitu server uji coba yang mirip aslinya. Lalu '\n - last rText P: ' (menayangkan ke internet) ke production lewat Vercel atau Netlify.' -> ' (menayangkan ke internet) ke production, yaitu situs yang dipakai pengunjung, lewat Vercel atau Netlify.' (J '.' stays the same)\n26. a11-l07-q1, item 'code' label J: 'Koding halaman web' -> 'Menulis kode halaman web'\n27. concept 'Jangan panik saat ada error':\n - alt J -> 'Baca pesan error, cari bagian yang rusak, lalu jelaskan ulang.'\n - rText J -> 'Ada kesalahan, atau bug? Jangan panik. Baca pesan error pelan-pelan. Pesannya muncul di alat periksa browser. Cari bagian kecil yang rusak. Lalu ceritakan masalahnya dengan kata-katamu sendiri.' (P stays the same)\n28. a11-l07-q5 story P: 'Nadia menaruh website Toko Rani di Chrome laptopnya dan tampil rapi. ...' -> 'Nadia mengetes website Toko Rani di Chrome laptopnya dan tampil rapi. Saat dibuka Bu Laras di Safari HP, tata letaknya berantakan.'\n29. a11-l07-r1 (answer stays 'ver'; all P strings stay the same):\n - prompt J -> 'Web sudah jadi di laptopmu. Apa langkah agar orang lain bisa membukanya?'\n - choice 'ver' label J -> 'Memasang web ke internet'\n - choice 'fig' label J -> 'Menggambar sketsa baru'; explainWrong J -> 'Sketsa dibuat di awal. Web belum bisa dibuka orang lain.'\n - choice 'git' label J -> 'Menyimpan titik simpan baru'; explainWrong J -> 'Titik simpan hanya mencatat kode di laptop. Web belum tayang.'\n - explainCorrect J -> 'Memasang web ke internet disebut deploy. Setelah itu siapa saja bisa membukanya.'\n - hint J stays the same\n\nAfter editing, run: npx tsx scripts/validate-content.ts (or the repo's npm validate script) and npx tsc --noEmit. There should be no new C10, C24, C32 or sentence-length notes for a11.\n\nNo changes are needed outside this file.",
+  "rationale": "I followed docs/superpowers/specs/2026-11-23-decision-guide.md. Correctness comes first, then the copydeck rules, then persona taste. The prompt named no spec file for the verdict table, so I give it here and edited no files.\n\n# | source | issue | verdict | reason\n1 | sari-27 | l05 SSR/SSG linked to the tailwind-css term | Accept | Factual error. No SSR glossary term exists, so I used rBold plus an inline explanation.\n2 | sari-27 | JSX never defined before l02-r1 | Accept | The Pro rule says jargon is explained the first time it appears.\n3 | dimas-14 | l04-q3 prompt gives the answer away | Accept | Neutral prompt plus a lazy gallery image as a distractor. The answer is still line 2.\n4 | dimas-14 | l02-q3 prompt gives the answer away | Accept | The prompt now describes the symptom. The hint already covers setSuka.\n5 | sari-27 | l05-q2 prompt gives the answer away | Accept | Neutral prompt. No extra line needed.\n6 | naya-8 | l01-r2 tests components that Junior never saw | Accept | I took the option of adding a short \"balok susun\" line to the Junior framework card. No new concept card, so C32 is safe.\n7 | wulan-38 | l01-q6 is abstract and its hint uses an analogy Junior never saw | Adapt | Kept in Junior and reworded with the bicycle analogy, so Junior does not lose a question.\n8 | sari-27 | \"build\" never defined | Accept | Defined where it first appears in l02.\n9 | sari-27 | staging/production and API not taught before anc-p5 | Accept | Explanations added to the l07 Pro card.\n10 | naya-8 | anc-j5 answer length and repetitive explanation | Adapt | Choice lengths are already similar (7/7/4 words) and the \"satu pemain\" framing is needed for the limit question type. Only explainCorrect changes, so it now says why.\n11 | naya-8 | l01 story/concept use hard words (alur, rumah perumahan) | Accept | Everyday words. \"rumah perumahan\" is replaced with \"rumah jadi\" throughout, Pro included.\n12 | raka-11 | anc-j1 answer repeats the prompt's analogy | Accept | Analogy removed from the Junior prompt. Answer reworded (\"punya aturan\").\n13 | naya-8 | l07 Junior step list and debugging card too heavy | Adapt | Kept seven steps to match the title and visual. Split into sentences of 12 words or fewer, used simpler words and dropped \"Console\" from Junior.\n14 | naya-8 | anc-j4 distractor \"Inspect\" is not taught in Junior | Accept | Replaced with Commit, which Junior learns in l06. The id stays.\n15 | raka-11 | l07-r1 answer repeats the prompt | Adapt | Vercel and Netlify are never taught in Junior, so I used action-based choices of similar length.\n16 | sari-27 | l07-q5 \"menaruh di Chrome\" | Accept | Meaning error. Changed to \"mengetes\".\n17 | dimas-14 | git init described as a daily command; conflict wording | Accept | Factual accuracy.\n18 | sari-27 | l03-q5 explainWrong does not say why | Accept | The guide requires explanations to say why.\n19 | wulan-38 | grammar (\"Tetapi\" after a full stop, \"benda\", redundancy) | Accept | Standard Indonesian. The TF answer is still false.\n20 | dimas-14 | l07-q3 mislabelled as analogy | Accept | Removed the type so it becomes a plain mcq. No analogy field needed.\n\nCounts: 15 accepted, 5 adapted, 0 rejected, 0 deferred. There are 7 major issues, and every one is covered by these instructions. All edits are in one owned file, src/content/worlds/a11-menara-alat/index.ts, so this is a single batch. done: true once the executor applies the edits and the validator passes."
+ },
+ "judgeIssues": [
+  {
+   "persona": "sari-27",
+   "where": "a11-l05 concept 'Kecepatan, SSR/SSG, dan audit Lighthouse'",
+   "problem": "Meaning error: rTerm('tailwind-css', 'SSR atau SSG') links the text 'SSR atau SSG' to the Tailwind glossary entry. Tapping it explains Tailwind, not rendering.",
+   "suggestion": "Use rBold('SSR atau SSG'), or link it to a render glossary term if one exists. Do not use tailwind-css.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a11-l02-r1",
+   "problem": "The review asks 'Apa fungsi JSX di komponen React?', but the concept card only says 'React (buatan Meta) memakai JSX' and never says what JSX is. The answer cannot be worked out from the lesson.",
+   "suggestion": "Add to the l02 concept: 'JSX, yaitu cara menulis tampilan mirip HTML langsung di dalam JavaScript'.",
+   "severity": "major"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a11-l04-q3",
+   "problem": "Giveaway: the prompt 'Ketuk baris untuk foto utama di paling atas halaman yang memperlambat LCP' points straight at the only <img> line. No debugging is needed.",
+   "suggestion": "Neutral prompt: 'Ketuk baris yang membuat LCP lambat dan layar bisa meloncat.' Add a second <img> lower down (e.g. a gallery image that also has loading=\"lazy\" plus width/height) as a distractor.",
+   "severity": "major"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a11-l02-q3",
+   "problem": "Giveaway: 'Ketuk baris yang salah karena tidak memakai setSuka untuk memperbarui state' states the bug. Only one line changes suka.",
+   "suggestion": "Prompt: 'Tombol tidak bertambah saat diklik. Ketuk baris penyebabnya.' Move the setSuka hint into hints.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a11-l05-q2",
+   "problem": "Giveaway: the prompt 'melanggar praktik SEO untuk judul halaman' names the <title> line, which is the only title line.",
+   "suggestion": "'Ketuk baris yang membuat halaman ini sulit dibedakan di hasil pencarian.' Optionally add a second plausible line, such as an empty og:title.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a11-l01-r2 (junior)",
+   "problem": "Junior TF 'Framework membantu memecah tampilan menjadi bagian kecil yang dipakai ulang.' with hint 'Ingat balok susun yang dipakai berulang.' Components and 'balok susun' appear only in the Pro-only concept card. Naya has never seen this idea.",
+   "suggestion": "Make r2 Pro-only, or add a short junior line to the framework card: 'Framework memecah halaman jadi keping kecil, seperti balok susun.'",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a11-l01-q6 (junior)",
+   "problem": "'Kalau kamu paham satu framework, framework lain lebih mudah dipelajari.' is abstract for an 8-year-old who knows no frameworks. The hint 'Ingat denah perumahan yang mirip-mirip' refers to an analogy no junior card taught. The answer can only be guessed.",
+   "suggestion": "Make it Pro-only, or reword the junior text: 'Kalau kamu sudah bisa naik satu sepeda, sepeda lain jadi lebih mudah.' with a matching hint.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a11-l02 concept 'Empat pilihan', a11-l03 CSR/SSR/SSG concept, a11-anc-p2",
+   "problem": "'build' ('penerjemah kode saat build', 'sekali saat build') is used as if known. It is never defined. A beginner on her commute cannot tell SSG from SSR without knowing what build means.",
+   "suggestion": "Define it once, where it first appears in l02: 'build (tahap mengemas kode sebelum tayang)'.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a11-anc-p5 / a11-l07 concept",
+   "problem": "The anchor asks 'Apa beda lingkungan Staging dan Production', but the lessons only say 'uji lintas browser di staging' and 'latihan di ruang ganti (staging)'. Production appears only in the l07-q2 match. 'integrasi API' is also left unexplained.",
+   "suggestion": "Add one sentence to the l07 Pro concept: 'Staging adalah server uji coba yang mirip aslinya; production adalah situs yang dipakai pengunjung.' Gloss API briefly.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a11-anc-j5",
+   "problem": "The right answer 'Banyak teman bekerja bersamaan, lalu hasilnya digabung' is the longest choice, and the prompt's phrase 'game satu pemain' gives it away. The explainCorrect line 'Game satu pemain hanya punya satu pemain.' says the same thing twice and does not explain WHY.",
+   "suggestion": "Make the choices about the same length (e.g. 'Kerja bareng teman lalu digabung'). explainCorrect: 'Di Git, kamu dan teman bisa menyimpan di jalur masing-masing, lalu menyatukannya.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a11-l01 story + concept 'Library: kamu yang mengatur'",
+   "problem": "'rumah gambaranmu sendiri', 'rumah perumahan' and 'alurnya kamu atur sendiri' are hard for a beginning reader. 'Alur' is abstract, and 'rumah perumahan' is a redundant phrase. The story has three sentences of comparison before the question.",
+   "suggestion": "Junior: 'Library seperti memilih meja dan kursi sendiri. Framework seperti rumah yang sudah jadi, lengkap dengan aturannya.' Avoid 'alur'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a11-anc-j1",
+   "problem": "The right answer 'Library kamu atur sendiri, framework sudah beraturan' repeats the analogy in the prompt. 'beraturan' is vague. Raka can pick it without understanding.",
+   "suggestion": "Remove the analogy from the prompt, or reword the right answer to 'Library kamu pilih sendiri, framework sudah punya aturan'. Give the distractors comparable length.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a11-l07 junior concept 'Tujuh langkah' + 'Jangan panik saat ada error'",
+   "problem": "A list of seven steps, 'riset, sketsa, desain, serah terima, koding, uji, lalu tayang', with non-standard or difficult words ('riset', 'serah terima', 'koding'). The debugging card has 3 sentences with 'Console, bagian alat periksa di browser'. That is too much load for a beginning reader.",
+   "suggestion": "For junior, cut to 4-5 simple steps (cari ide, gambar sketsa, buat, coba, pasang). Drop 'Console' from junior, or put it in a separate short sentence.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a11-anc-j4",
+   "problem": "The distractor 'Inspect' is never taught in junior; it only appears in the companion talkPrompt. Naya meets an unknown English word in the anchor quiz.",
+   "suggestion": "Replace it with a term junior has learned, such as 'Commit' (explainWrong: 'Commit hanya menyimpan titik simpan, belum memasang web.').",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a11-l07-r1 (junior)",
+   "problem": "The right answer 'Tempat penayangan web di internet' repeats the prompt ('supaya semua orang bisa membukanya'), and 'penayangan' is formal. The other choices ('Alat menggambar desain', 'Alat pencatat titik simpan') are obviously wrong.",
+   "suggestion": "Use concrete names in junior too: 'Vercel / Netlify' vs 'Figma' vs 'Git', each with one short hint.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a11-l07-q5 (pro story)",
+   "problem": "Meaning error: 'Nadia menaruh website Toko Rani di Chrome laptopnya'. A website is not 'put' in Chrome; it is opened or tested there.",
+   "suggestion": "'Nadia mengetes website Toko Rani di Chrome laptopnya dan tampil rapi.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a11-l06 concept 'Perintah dasar Git sehari-hari'",
+   "problem": "'Alur kerja harian Git hanya butuh empat perintah. git init ...' is inaccurate: git init runs once per project, not daily. The Pro card's 'conflict yang harus kamu pilih sendiri' is awkward and does not explain what to do (resolve).",
+   "suggestion": "'Empat perintah dasar: git init (sekali di awal), git add, git commit, git push.' Conflict: 'conflict yang harus kamu selesaikan dengan memilih baris mana yang dipakai.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a11-l03-q5 explainWrong 'bs'",
+   "problem": "'Bootstrap bukan komponen React dengan Tailwind.' is awkward and does not explain WHY Bootstrap does not fit (it is not React components, and its CSS clashes with Tailwind).",
+   "suggestion": "'Bootstrap memakai CSS-nya sendiri dan bukan komponen React, jadi tidak menyatu dengan proyek Tailwind Raka.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a11-l01-q5 explainWrong 'old' (junior), a11-l06-q6",
+   "problem": "Indonesian grammar: 'Pemula boleh memakai framework. Tetapi dasarnya perlu dipelajari dulu.' starts a sentence with a conjunction after a full stop. Calling software a 'benda' in 'Git dan GitHub adalah benda yang sama' is imprecise. In Pro, ', tidak ada bedanya' is redundant.",
+   "suggestion": "'Pemula boleh memakai framework, tetapi dasarnya perlu dipelajari dulu.' Change 'benda' to 'alat'. Drop 'tidak ada bedanya'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a11-l07-q3",
+   "problem": "Labelled type 'analogy', but the question is a plain recall question about the DevTools tab, with no analogy. This mislabels the question category and may break the analogy-related UI and stats.",
+   "suggestion": "Change it to type 'scenario' with a short story (e.g. 'Tombol Beli tidak bereaksi...'), or drop the type.",
+   "severity": "minor"
+  }
+ ]
+}
