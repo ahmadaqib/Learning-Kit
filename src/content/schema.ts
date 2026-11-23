@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { CONTENT_ICONS } from './icons';
+import { PET_IDS, PET_PERSONALITIES } from './petContract';
 
 export type Mode = 'junior' | 'pro';
 
@@ -283,14 +284,37 @@ export const BadgeSchema = z.object({
 });
 export type Badge = z.infer<typeof BadgeSchema>;
 
+export const DEFAULT_AUDIO_SETTINGS = {
+  soundVolume: 65,
+  musicEnabled: false,
+  musicVolume: 35,
+  speechVoice: '',
+  speechRate: 1,
+  speechVolume: 90,
+  petVoice: 'studio' as const,
+};
+
+const VolumeSchema = z.number().int().min(0).max(100);
+
 export const SettingsSchema = z.object({
   soundEnabled: z.boolean(),
+  soundVolume: VolumeSchema.default(DEFAULT_AUDIO_SETTINGS.soundVolume),
+  musicEnabled: z.boolean().default(DEFAULT_AUDIO_SETTINGS.musicEnabled),
+  musicVolume: VolumeSchema.default(DEFAULT_AUDIO_SETTINGS.musicVolume),
+  speechVoice: z.string().default(DEFAULT_AUDIO_SETTINGS.speechVoice),
+  speechRate: z.number().min(0.75).max(1.25).default(DEFAULT_AUDIO_SETTINGS.speechRate),
+  speechVolume: VolumeSchema.default(DEFAULT_AUDIO_SETTINGS.speechVolume),
+  petVoice: z.enum(['studio', 'system']).default(DEFAULT_AUDIO_SETTINGS.petVoice),
   autoReadAloud: z.boolean(),
   textScale: z.union([z.literal(100), z.literal(115), z.literal(130)]),
   reducedMotion: z.enum(['system', 'always']),
   theme: z.enum(['light', 'dark', 'system']),
   weeklyTarget: z.union([z.literal(2), z.literal(3), z.literal(5)]),
   breakReminderMinutes: z.union([z.literal(0), z.literal(15), z.literal(20), z.literal(30)]),
+  petId: z.enum(PET_IDS).optional().catch(undefined),
+  petPersonality: z.enum(PET_PERSONALITIES).optional().catch(undefined),
+  petHidden: z.boolean().optional().catch(undefined),
+  petMuted: z.boolean().optional().catch(undefined),
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 

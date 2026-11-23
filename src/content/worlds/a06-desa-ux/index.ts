@@ -314,7 +314,7 @@ export const lessons: Lesson[] = [
   makeLesson({
     id: 'a06-l01',
     worldId: 'a06',
-    title: 'Kamu bukan pemakainya',
+    title: 'Kamu bukan pemakai halamanmu',
     modes: ['junior', 'pro'],
     objective: t(
       'Aku bisa menyebutkan 4 hal yang membuat aplikasi enak dipakai.',

@@ -21,11 +21,11 @@ Siapa pun **bebas menggunakan, mempelajari, memodifikasi, dan menyebarluaskan** 
   - **Jalur B (Aplikasi Saling Bicara):** Restoran API, Request/Response HTTP, JSON & Struktur Data, REST/GraphQL/gRPC, Polling vs SSE vs WebSocket, Webhook, Autentikasi & JWT, CORS & Rate Limiting, Integrasi Frontend, hingga Proyek Puncak.
 - **Dual Mode Adaptif:**
   - **Mode Junior (SD):** Kalimat ringkas, ukuran huruf lega, ilustrasi vektor ekspresif, dukungan bacakan suara (`id-ID`), dan tanpa mengetik kode rumit.
-  - **Mode Pro (SMP ke atas / Pemula):** Seluruh 113 pelajaran utama + 4 *side quest*, cuplikan kode nyata, soal melengkapi/mengetik sintaks, dan *placement test*.
+  - **Mode Pro (SMP ke atas / Pemula):** Seluruh 113 pelajaran utama + 11 misi bonus, cuplikan kode nyata, soal melengkapi/mengetik sintaks, dan *placement test*.
 - **21+ Simulator Interaktif:** Restoran Web, Rak Label HTML, Kupas Box Model, Playground Flexbox, Mesin Blender Fungsi JS, Detektif Kontras WCAG, Perakit Request API, Dokter JSON, Pelayan GraphQL, Balap Realtime, Pembaca Gelang JWT, dan lainnya.
 - **13 Tipe Soal Interaktif & Antrean Belajar:** Pilihan ganda, analogi, sebab-akibat, skenario, batas analogi, benar/salah, urutkan langkah, pasangkan kartu, kelompokkan (*sorting*), cari bug (*spot the bug*), area visual (*hotspot*), isi rumpang, dan ketik jawaban — dilengkapi pengulangan soal salah di akhir sesi.
 - **Gamifikasi Bermakna:** Sistem 5 Kotak **Leitner** (*spaced repetition*), **53 Stiker Analogi**, kustomisasi maskot **Bito** & **8 karakter vektor orisinal**, XP & level, target mingguan, lencana pencapaian, serta uji Awal/Akhir/Retensi 7 hari.
-- **Mode Pendamping & Privasi Total:** Bahan obrolan tanpa layar, ringkasan perkembangan anak, sertifikat kelulusan dunia siap cetak (A4), **hingga 4 profil lokal**, ekspor/impor kode progres (`PW1.`), tema Terang/Gelap/Sistem, tanpa akun server, dan nol pelacakan.
+- **Mode Pendamping & Profil Lokal:** Bahan obrolan tanpa layar, ringkasan perkembangan anak, sertifikat kelulusan dunia siap cetak (A4), **hingga 4 profil lokal**, ekspor/impor kode progres (`PW1.`), tema Terang/Gelap/Sistem, tanpa akun server, dan nol pelacakan.
 
 ---
 
@@ -44,6 +44,25 @@ npm install
 # 3. Jalankan server pengembangan lokal
 npm run dev
 ```
+
+### Hewan pendamping dan audio
+
+Di **Pengaturan → Hewan pendamping**, pilih satu dari lima hewan dan gaya bicaranya. Petunjuk dasar berjalan lokal. Selama pelajaran, pendamping bisa menawarkan bantuan, dan peserta memilih kapan membukanya atau mendengarkan suaranya. Mode Fokus menghentikan tawaran. Di bagian suara, peserta dapat mencoba suara studio untuk pendamping, memilih suara Indonesia yang disediakan perangkat, dan mengatur efek serta musik.
+
+Ilustrasi Piko (tarsius dengan buku) berasal dari OpenArt. Mobi (kucing dengan pensil), Lumba (lumba-lumba dengan tas), Ruru (burung hantu dengan buku), dan Kora (kura-kura dengan peta) dibuat dengan ImageGen, dengan garis tinta biru tua dan latar krem. Aset berada di `public/pets/`. Narasi studio dibuat dari naskah petunjuk Indonesia menggunakan suara preset Supertonic 3 dan disimpan di `public/audio/pet/`. Pemutaran klip berlangsung di perangkat. [Model dan lisensi sumber suara](https://huggingface.co/Supertone/supertonic-3)
+
+### Petunjuk AI Pro di Vercel
+
+Fungsi `/api/companion` hanya dipanggil saat peserta Pro memilih petunjuk AI di kartu materi. Browser mengirim pengenal materi, jenis kartu, gaya dan kategori bantuan. Server menyusun masukan dari katalog dan meminta TokenPortal memilih satu strategi. Aplikasi menampilkan petunjuk dari naskah lokal. Jika layanan gagal, petunjuk lokal tetap tersedia.
+
+Pada proyek Vercel, buka **Settings → Environment Variables**. Tetapkan kedua variabel server pada environment yang dituju. Pada mesin pengembangan, Vite dan Vite Preview membaca nama yang sama dari `.env.local`.
+
+| Variabel server | Nilai |
+| --- | --- |
+| `TOKENPORTAL_API_KEY` | Kunci TokenPortal. Gunakan tipe Sensitive di Vercel. |
+| `TOKENPORTAL_MODELS` | ID model utama lalu cadangan, dipisahkan koma dalam urutan percobaan. Maksimal empat. |
+
+Perubahan environment Vercel berlaku pada deployment berikutnya. Proyek memakai fungsi Node untuk rute API dan pengalihan ke halaman utama untuk rute aplikasi. [Environment variables Vercel](https://vercel.com/docs/environment-variables) · [Panduan TokenPortal](https://api.tokenportal.id/docs)
 
 ### Skrip Pengembangan & Verifikasi
 

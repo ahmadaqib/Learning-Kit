@@ -10,7 +10,8 @@
  */
 import { resolveTxt, type Mode, type Question, type Rich, type Step, type Txt } from '@/content/schema';
 import { richToPlainText } from '@/content/rich';
-import { speakText, stopSpeaking } from '@/engine/speech';
+import { petVoiceFiles } from '@/content/petVoiceClips';
+import { hasIndonesianVoiceAvailable, playRecordedSpeech, speakText, stopSpeaking, usesStudioPetVoice } from '@/engine/speech';
 
 export interface ReadSentence {
   /** Plain text handed to the speech engine. */
@@ -252,9 +253,10 @@ export function playQueue(queue: ReadSentence[], onSentence?: SentenceListener):
     for (let i = index; i < queue.length; i += 1) {
       const sentence = queue[i];
       listener(sentence, i);
-      const started = speakText(sentence.text, () => {
+      const started = speakText(sentence.text, (completed) => {
         if (mine !== token) return;
-        speak(i + 1);
+        if (completed === false) finish();
+        else speak(i + 1);
       });
       if (started) return;
       if (mine !== token) return;
@@ -270,8 +272,25 @@ export function stopQueue(): void {
   token += 1;
   const listener = activeListener;
   activeListener = null;
-  stopSpeaking();
+  stopSpeaking('reader');
   listener?.(null, -1);
+}
+
+/** Companion dialogue yields to a lesson already being read. The text stays visible if speech is unavailable. */
+export function canSpeakCompanion(text: string): boolean {
+  return (usesStudioPetVoice() && typeof Audio === 'function' && petVoiceFiles(text).length > 0) || hasIndonesianVoiceAvailable();
+}
+
+export function speakCompanion(text: string, onEnd?: (completed: boolean) => void, preview = false): boolean {
+  if (isQueuePlaying()) return false;
+  const owner = preview ? 'preview' : 'companion';
+  const speakWithDevice = () => speakText(text, onEnd, owner);
+  const files = usesStudioPetVoice() ? petVoiceFiles(text) : [];
+  return playRecordedSpeech(files, onEnd, owner, speakWithDevice) || speakWithDevice();
+}
+
+export function stopCompanionSpeaking(): void {
+  stopSpeaking('companion');
 }
 
 /** Tests only. */

@@ -1198,8 +1198,8 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     term: 'JWT (JSON Web Token)',
     pronunciation: 'jot',
     shortDef: {
-      junior: 'JWT seperti gelang tiket wahana berhologram. Isinya bisa dibaca, tetapi tidak bisa dipalsukan. Penjaga cukup melihat gelangnya.',
-      pro: 'Token berisi data pemakai yang ditandatangani server. Bentuknya tiga bagian: header, payload (isi data), dan signature (tanda tangan). Server bisa memeriksanya tanpa membuka database.',
+      junior: 'Contoh JWT ini seperti gelang wahana berhologram. Tulisannya bisa dibaca. Cap membantu penjaga memastikan gelangnya asli.',
+      pro: 'JWT membawa klaim dalam format bertanda tangan atau terenkripsi. Contoh bertanda tangan memakai header, payload yang bisa dibaca, dan signature untuk memeriksa keaslian.',
     },
     stickerId: 'gelang-hologram',
     introducedIn: 'b07-l03',

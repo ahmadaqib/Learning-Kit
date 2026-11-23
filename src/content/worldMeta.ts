@@ -433,7 +433,7 @@ export const WORLD_METAS: WorldMeta[] = [
       lm('b04-l02', 'b04', 'REST: perpustakaan dan rak bernomor', ['junior', 'pro'], 6, 'perpustakaan-rest'),
       lm('b04-l03', 'b04', 'Pagination, error, versioning', ['pro'], 6),
       lm('b04-l04', 'b04', 'GraphQL: pelayan pribadi', ['junior', 'pro'], 6, 'pelayan-pribadi'),
-      lm('b04-l05', 'b04', 'gRPC: interkom berkode', ['pro'], 5, 'interkom-grpc'),
+      lm('b04-l05', 'b04', 'gRPC: interkom berkode', ['pro'], 6, 'interkom-grpc'),
     ],
     sideQuests: [lm('b04-sq1', 'b04', 'SOAP, JSON-RPC, tRPC', ['pro'], 5, undefined, true)],
   },
@@ -488,7 +488,7 @@ export const WORLD_METAS: WorldMeta[] = [
     order: 7,
     title: 'Gerbang Login',
     tagline: {
-      junior: 'Bedakan tiket masuk, gelang konser, dan kunci parkir. Masing-masing punya tugas sendiri.',
+      junior: 'Bedakan KTP, kartu kamar, dan gelang konser. Masing-masing punya tugas sendiri.',
       pro: 'Kamu bisa membedakan login dari izin akses, lalu menjelaskan cara kerja token dan OAuth.',
     },
     color: '#6C5CE7',
@@ -520,8 +520,8 @@ export const WORLD_METAS: WorldMeta[] = [
     guardianName: 'Penjaga Pos Satpam',
     lessons: [
       lm('b08-l01', 'b08', 'CORS: satpam di browser', ['pro'], 6, 'satpam-apartemen'),
-      lm('b08-l02', 'b08', 'Rate limit: wahana bermain', ['junior', 'pro'], 5, 'wahana-bermain'),
-      lm('b08-l03', 'b08', 'Retry dan backoff: menelepon dengan sopan', ['junior', 'pro'], 6, 'telepon-sopan'),
+      lm('b08-l02', 'b08', 'Jatah naik wahana', ['junior', 'pro'], 5, 'wahana-bermain'),
+      lm('b08-l03', 'b08', 'Menelepon dengan sopan', ['junior', 'pro'], 6, 'telepon-sopan'),
       lm('b08-l04', 'b08', 'Idempotency key: nomor nota', ['pro'], 5, 'nomor-nota'),
       lm('b08-l05', 'b08', 'Celah API paling umum', ['pro'], 6),
     ],

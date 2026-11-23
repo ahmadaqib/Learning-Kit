@@ -26,7 +26,7 @@ import {
   type ReadTarget,
   type ReadingMark,
 } from '@/engine/readAloud';
-import { hasIndonesianVoiceAvailable } from '@/engine/speech';
+import { useIndonesianVoiceAvailable } from '@/engine/speech';
 import { EASE } from '@/motion/tokens';
 import { fx } from '@/motion/waapi';
 import { Doodle } from '@/components/fx/Doodle';
@@ -165,7 +165,8 @@ export function useQuestionReader(opts: {
 }) {
   const { mode, autoRead, question, stepKey, shownOrder } = opts;
   const [reading, setReading] = useState<ReadingMark | null>(null);
-  const canSpeak = (mode === 'junior' || autoRead) && hasIndonesianVoiceAvailable();
+  const voiceAvailable = useIndonesianVoiceAvailable();
+  const canSpeak = (mode === 'junior' || autoRead) && voiceAvailable;
 
   const speak = (target: ReadTarget) =>
     playQueue(buildReadQueue(target, mode, shownOrder), (s) => setReading(s ? { el: s.el, part: s.part } : null));
@@ -174,7 +175,7 @@ export function useQuestionReader(opts: {
     if (autoRead && canSpeak && question) speak({ kind: 'question', question });
     return () => stopQueue();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepKey, autoRead]);
+  }, [stepKey, autoRead, canSpeak]);
 
   return {
     reading,
@@ -352,8 +353,8 @@ export const QuestionIntro: React.FC<QuestionIntroProps> = ({
 }) => (
   <div className="space-y-3">
     {eyebrow}
-    <div className="flex min-h-[var(--touch-min)] items-center justify-between gap-3">
-      <span className="pw-kicker inline-flex items-center gap-1.5">
+    <div className="flex min-h-[var(--touch-min)] flex-wrap items-center justify-between gap-x-3 gap-y-2">
+      <span className="pw-kicker inline-flex min-w-0 items-center gap-1.5 [overflow-wrap:anywhere]">
         <CircleHelp className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
         {kicker}
         {retry && mode === 'junior' && <Doodle name="curl" width={18} />}

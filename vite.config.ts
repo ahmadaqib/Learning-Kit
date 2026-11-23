@@ -1,9 +1,10 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import { companionPlugin } from './server/companionVite';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), companionPlugin()],
   resolve: {
     alias: {
       '@': decodeURIComponent(new URL('./src', import.meta.url).pathname),

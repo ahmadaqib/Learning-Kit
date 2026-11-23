@@ -20,7 +20,7 @@ export const NotFoundPage: React.FC = () => {
           ? 'Alamat ini tidak ada di Petualang Web. Kembali ke Beranda untuk melanjutkan.'
           : 'Sepertinya Bito salah belok. Alamat halaman ini tidak ada di peta Petualang Web.'}
       </p>
-      <Button variant="primary" onClick={() => navigate('/beranda')}>
+      <Button variant="primary" data-sfx="back" onClick={() => navigate('/beranda')}>
         Kembali ke Beranda →
       </Button>
     </div>

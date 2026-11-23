@@ -23,8 +23,8 @@ export const arraysAndObjects: Lesson = {
     qStep(orderQuestion('q1', 'Apa isi pesanan[1].nama pada daftar Ayu lalu Bayu?', ['Ayu', 'Bayu', 'undefined'], 1,
       ['Ayu ada pada indeks nol.', 'Indeks satu menunjuk pesanan kedua, milik Bayu.', 'Pesanan kedua memiliki properti nama.'], 'Hitung posisi mulai dari nol.')),
     conceptStep({
-      title: pro('Saring dahulu, lalu ambil nama'), visualName: 'DiagramConcept',
-      visualProps: { worldId: 'a04', topic: 'Daftar siap kirim' }, alt: pro('Pulau Pabrik JavaScript dengan roda gigi'),
+      title: pro('Saring dahulu, lalu ambil nama'), visualName: 'OrderPipeline',
+      visualProps: { worldId: 'a04', topic: 'Daftar siap kirim' }, alt: pro('Pilih langkah untuk melihat pesanan awal, hasil filter, dan nama hasil map.'),
       body: [rPro('filter membuat daftar baru berisi pesanan yang lolos syarat. map membuat daftar baru dengan mengubah setiap pesanan menjadi satu hasil.')],
       code: { lang: 'js', code: 'const pesanan = [{ nama: "Ayu", siap: false },\n  { nama: "Bayu", siap: true }];\nconst label = pesanan\n  .filter(p => p.siap)\n  .map(p => p.nama);\nconsole.log(label); // ["Bayu"]' },
     }),
@@ -68,8 +68,8 @@ export const handlingErrors: Lesson = {
     qStep(errorQuestion('q2', 'Apa arti SyntaxError saat JSON.parse membaca berkas?', ['Bentuk teks tidak sah', 'Daftar pesanan kosong', 'Pesanan belum dibayar'], 0,
       ['Susunan teks melanggar aturan format yang dibaca.', 'Daftar kosong yang ditulis [] masih sah.', 'Status pembayaran tidak mengubah aturan penulisan teks.'], 'Pisahkan bentuk teks dari isi pesanan.')),
     conceptStep({
-      title: pro('Periksa bentuk data setelah dibaca'), visualName: 'DiagramConcept',
-      visualProps: { worldId: 'a04', topic: 'Bentuk data' }, alt: pro('Pulau Pabrik JavaScript dengan roda gigi'),
+      title: pro('Periksa bentuk data setelah dibaca'), visualName: 'JsonBranches',
+      visualProps: { worldId: 'a04', topic: 'Bentuk data' }, alt: pro('Pilih masukan JSON untuk menelusuri jalur fungsi dan nilai kembali.'),
       body: [rPro('Teks yang sah belum tentu berisi daftar. Array.isArray memeriksa bentuk hasil. Gunakan finally untuk pekerjaan penutup seperti mematikan tanda sibuk.')],
       code: { lang: 'js', code: 'function baca(teks) {\n  try {\n    const isi = JSON.parse(teks);\n    if (!Array.isArray(isi)) return "Perlu daftar";\n    return isi.length;\n  } catch {\n    return "Periksa berkas";\n  } finally {\n    console.log("Pemeriksaan selesai");\n  }\n}' },
     }),

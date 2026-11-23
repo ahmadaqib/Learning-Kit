@@ -1,5 +1,4 @@
 import React from 'react';
-import { markUserInteraction, playSound } from '@/engine/sound';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'inverse';
 
@@ -26,7 +25,7 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   fullWidth = false,
   loading = false,
-  soundEnabled = false,
+  soundEnabled,
   className = '',
   children,
   onClick,
@@ -39,11 +38,8 @@ export const Button: React.FC<ButtonProps> = ({
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      onClick={(e) => {
-        markUserInteraction();
-        if (soundEnabled) playSound('tap', true);
-        onClick?.(e);
-      }}
+      onClick={onClick}
+      data-sfx-enabled={soundEnabled}
       className={`relative inline-flex items-center justify-center gap-2 ${VARIANT_CLASS[variant]} ${fullWidth ? 'w-full' : ''} ${className}`.trim()}
       {...rest}
     >

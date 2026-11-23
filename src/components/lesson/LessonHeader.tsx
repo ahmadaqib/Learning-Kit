@@ -18,6 +18,7 @@ interface LessonHeaderProps {
   /** First-try correct answers in a row (M48). The chip shows from 3 and fades out when it drops to 0. */
   combo: number;
   focus: boolean;
+  pet?: React.ReactNode;
   onToggleFocus: () => void;
   onExit: () => void;
 }
@@ -33,6 +34,7 @@ export const LessonHeader: React.FC<LessonHeaderProps> = ({
   combo,
   onExit,
   focus,
+  pet,
   onToggleFocus,
 }) => {
   const shown = useCountUp(sessionXp, { duration: 300, from: sessionXp });
@@ -53,9 +55,10 @@ export const LessonHeader: React.FC<LessonHeaderProps> = ({
   const label = mode === 'junior' ? `Poin sesi ini: ${sessionXp}` : `XP sesi ini: ${sessionXp}`;
 
   return (
-    <header className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 pw-safe-top">
+    <header className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-2 pw-safe-top sm:gap-x-3">
       <button
         type="button"
+        data-sfx="back"
         onClick={onExit}
         aria-label="Keluar pelajaran"
         className="pw-pressable flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] cursor-pointer"
@@ -71,6 +74,8 @@ export const LessonHeader: React.FC<LessonHeaderProps> = ({
         className="pw-pressable min-h-11 rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] px-3 font-bold aria-pressed:border-[var(--world-700)] aria-pressed:bg-[var(--world-50)]">
         Fokus
       </button>
+
+      {pet}
 
       <span
         ref={xpChipRef}
