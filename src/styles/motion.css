@@ -1249,6 +1249,14 @@
   .pw-t-move {
     transition: transform 160ms var(--ease-out);
   }
+  .pw-pet-travel {
+    transition-property: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-reduced-motion='always'], [data-lesson-focus]) .pw-pet-travel[data-pet-travel='on'] {
+      transition: transform calc(480ms * var(--motion-scale)) var(--ease-out);
+    }
+  }
   .pw-t-opacity {
     transition: opacity 140ms ease;
   }

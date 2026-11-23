@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { preparedPetStrategies } from './preparedPetStrategies.js';
 import { PET_SYSTEM_PROMPT } from './petSystemPrompt.js';
 import { PET_HINT_CUES, PET_AI_STEP_KINDS, PET_PERSONALITIES, type PetAiTipId, type PetHintRequest } from '../src/content/petContract.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
@@ -24,7 +25,7 @@ function readTip(answer: unknown): PetAiTipId | null {
   return match ? match[1].toLowerCase() as PetAiTipId : null;
 }
 
-async function selectTip(input: PetHintRequest, key: string, models: string[], send: typeof fetch): Promise<PetAiTipId | null> {
+async function selectTip(input: PetHintRequest, key: string, models: string[], send: typeof fetch, onChallenge: () => void): Promise<PetAiTipId | null> {
   const lesson = lessons.get(input.topicId)!;
   for (const model of models) {
     try {
@@ -35,14 +36,19 @@ async function selectTip(input: PetHintRequest, key: string, models: string[], s
           model, messages: [
             { role: 'system', content: PET_SYSTEM_PROMPT },
             { role: 'user', content: JSON.stringify({ pelajaran: lesson.title, kartu: input.stepKind, gaya: input.personality, isyarat: input.cue ?? 'requested' }) },
-          ], max_tokens: 64,
+          ], max_tokens: 4096,
         }),
       });
       if (!response.ok) {
-        // A 403 can apply to one model on the configured plan. A 401 rejects the credential.
         const challenged = response.headers.get('cf-mitigated') === 'challenge';
         console.warn('companion.provider_http', response.status, challenged ? 'challenge' : 'response');
-        if (response.status === 401 || challenged) return null;
+        if (challenged) {
+          const ray = response.headers.get('cf-ray');
+          if (ray && /^[a-f0-9]{12,32}-[A-Z]{3}$/i.test(ray)) console.warn('companion.challenge_ray', ray);
+          onChallenge();
+          return null;
+        }
+        if ([401, 402, 429].includes(response.status)) return null;
         continue;
       }
       const json = await response.json();
@@ -66,6 +72,7 @@ function json(status: number, value: object) {
 export function createCompanionService(getConfig: () => CompanionConfig, send: typeof fetch = fetch) {
   const choices = new Map<string, PetAiTipId>();
   const inFlight = new Map<string, Promise<PetAiTipId | null>>();
+  let retryGatewayAt = 0;
   let windowStart = 0;
   let calls = 0;
   return async (request: Request): Promise<Response> => {
@@ -84,25 +91,32 @@ export function createCompanionService(getConfig: () => CompanionConfig, send: t
     const input = parsed.data;
     const context = [input.topicId, input.stepKind, input.personality, input.cue ?? 'requested'].join('/');
     const cached = choices.get(context);
-    if (cached) return json(200, { tipId: cached });
+    if (cached) return json(200, { tipId: cached, source: 'live' });
+    const prepared = () => {
+      const tipId = preparedPetStrategies[input.topicId]?.[input.stepKind];
+      return tipId ? json(200, { tipId, source: 'prepared' }) : json(503, { error: 'unavailable' });
+    };
+    if (Date.now() < retryGatewayAt) return prepared();
     const { apiKey, models } = getConfig();
     const chain = [...new Set((models ?? '').split(',').map(id => id.trim()).filter(id => /^[a-z\d][a-z\d./_-]{0,79}$/i.test(id)))].slice(0, 4);
     if (!apiKey || !chain.length) {
       console.warn('companion.configuration_missing', !apiKey ? 'key' : 'models');
-      return json(503, { error: 'unavailable' });
+      return prepared();
     }
     let pending = inFlight.get(context);
     if (!pending) {
       if (Date.now() - windowStart >= 60000) { windowStart = Date.now(); calls = 0; }
-      if (calls >= 12 || inFlight.size >= 3) return json(429, { error: 'busy' });
+      if (calls >= 12 || inFlight.size >= 3) return prepared();
       calls++;
-      pending = selectTip(input, apiKey, chain, send).then(tip => {
+      pending = selectTip(input, apiKey, chain, send, () => {
+        retryGatewayAt = Date.now() + 120_000;
+      }).then(tip => {
         if (tip) choices.set(context, tip);
         return tip;
       }).finally(() => inFlight.delete(context));
       inFlight.set(context, pending);
     }
     const tip = await pending;
-    return tip ? json(200, { tipId: tip }) : json(503, { error: 'unavailable' });
+    return tip ? json(200, { tipId: tip, source: 'live' }) : prepared();
   };
 }

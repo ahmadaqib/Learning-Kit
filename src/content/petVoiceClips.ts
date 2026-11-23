@@ -5,7 +5,10 @@ const phrases: Readonly<Record<string, string>> = recordings;
 
 /** Return a complete spoken tip or let the device reader speak the whole text. */
 export function petVoiceFiles(text: string): string[] {
-  const sentences = text.trim().match(/[^.!?]+[.!?]+|[^.!?]+$/g) ?? [];
+  const spokenText = text.trim();
+  if (Object.hasOwn(phrases, spokenText)) return ['/audio/pet/' + phrases[spokenText] + '.mp3'];
+
+  const sentences = spokenText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) ?? [];
   const files: string[] = [];
   for (const sentence of sentences) {
     const phrase = sentence.trim();

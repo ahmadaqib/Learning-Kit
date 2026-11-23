@@ -24,4 +24,5 @@ export interface PetHintRequest {
 
 export interface PetHintResponse {
   tipId: PetAiTipId;
+  source: 'live' | 'prepared';
 }

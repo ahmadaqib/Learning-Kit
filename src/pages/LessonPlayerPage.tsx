@@ -50,6 +50,7 @@ import { LessonResult } from '@/components/lesson/LessonResult';
 import { LimitCard } from '@/components/lesson/LimitCard';
 import { QuestionGuideOverlay } from '@/components/lesson/QuestionGuideOverlay';
 import { Bito } from '@/components/mascot/Bito';
+import { getPetStudyExercise, getPetStudyGuide } from '@/content/petStudyGuide';
 import { PetLauncher } from '@/components/pet/PetLauncher';
 import { ALMOST_RATIO, QuestionIntro, QuestionRenderer, judgeParts } from '@/components/questions/QuestionRenderer';
 import { SimulatorHost } from '@/components/sims/SimulatorHost';
@@ -551,6 +552,7 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
   const [stepNumber, setStepNumber] = useState(0);
   const [answerVal, setAnswerVal] = useState<unknown>(undefined);
   const [submitted, setSubmitted] = useState<Submitted | null>(null);
+  const [petAnswer, setPetAnswer] = useState<{ step: number; correct: boolean } | null>(null);
   const [usedHintLevel, setUsedHintLevel] = useState<0 | 1 | 2>(0);
   const [selectionChanges, setSelectionChanges] = useState(0);
   const [limitRevealed, setLimitRevealed] = useState(false);
@@ -589,6 +591,7 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
     setStepNumber(0);
     setAnswerVal(undefined);
     setSubmitted(null);
+    setPetAnswer(null);
     setUsedHintLevel(0);
     setSelectionChanges(0);
     setLimitRevealed(false);
@@ -723,14 +726,14 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
   const isRetryQ = inQuiz && head?.isRetry === true;
   const card = !prediction && item?.kind === 'card' ? item.step : null;
   const petVisible = !focus && profile?.settings.petHidden !== true;
+  const pausePetTravel = Boolean(submitted || guideTypeOpen || hintModalOpen || breakModalOpen || exitConfirmOpen || resultSummary);
+  const pausePetMotion = pausePetTravel || Boolean(reading);
   const stepKey = `${runKey}:${stepNumber}`;
   const petOffer = usePetLessonOffer({
     profileId,
     stepKey,
     enabled: petVisible,
-    blocked: !ready || (!card && !activeQuestion) || Boolean(
-      submitted || guideTypeOpen || hintModalOpen || breakModalOpen || exitConfirmOpen || resultSummary || reading,
-    ),
+    blocked: !ready || (!card && !activeQuestion) || pausePetMotion,
   });
 
   // First time a question type shows up: how to answer it (V13 / F18)
@@ -1040,6 +1043,7 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
     if (!submitted.correct && inQuiz) setComboShown(0);
 
     if (prediction) setPredictionDone(true);
+    if (!pending.complete) setPetAnswer({ step: stepNumber + 1, correct: submitted.correct });
     setSession(pending.session);
     setMisses(pending.misses);
     setTimelineIndex(pending.stepIndex);
@@ -1235,20 +1239,28 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
   const petContext: PetContext | undefined = activeQuestion
     ? { surface: 'question', questionType: activeQuestion.type, hasHint: Boolean(activeQuestion.hints) }
     : card ? { surface: 'lesson', stepKind: card.kind, worldId: lesson.worldId, topicId: lesson.id } : undefined;
+  const petArrival = petAnswer?.step === stepNumber
+    ? (petAnswer.correct ? 'correct' : 'retry')
+    : stepNumber > 0 ? 'advance' : 'greet';
 
   return (
     <WorldThemeWrapper worldId={worldId} className="mx-auto flex min-h-[100dvh] max-w-[1080px] flex-col px-4 py-3 sm:px-6">
       <LessonHeader
         mode={mode}
         focus={focus}
+        petTravelPaused={pausePetTravel}
         pet={petVisible && petContext && (
           <PetLauncher
             key={stepKey}
             compact
+            arrival={petArrival}
+            pauseMotion={pausePetMotion}
             offer={petOffer.offer}
             onLaunch={petOffer.dismiss}
             onQuestionHint={activeQuestion ? handleHint : undefined}
             context={petContext}
+            studyExercise={card && !activeQuestion ? getPetStudyExercise(lesson) : undefined}
+            studyGuide={card && !activeQuestion ? getPetStudyGuide({ lesson, card, mode, limitRevealed }) : undefined}
           />
         )}
         onToggleFocus={() => {
