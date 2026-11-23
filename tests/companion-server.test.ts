@@ -44,6 +44,14 @@ describe('server-side pet hints', () => {
     expect(await res.json()).toEqual({ tipId: 'predict' });
     expect(send).toHaveBeenCalledTimes(2);
   });
+  it('uses local help without trying more models when the gateway challenges the server', async () => {
+    const send = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, {
+      status: 403, headers: { 'cf-mitigated': 'challenge' },
+    }));
+    const res = await createCompanionService(config, send)(request(context));
+    expect(res.status).toBe(503);
+    expect(send).toHaveBeenCalledTimes(1);
+  });
   it('stops on invalid credentials and returns a generic error', async () => {
     const send = vi.fn<typeof fetch>().mockResolvedValue(new Response('private provider details', { status: 401 }));
     const res = await createCompanionService(config, send)(request(context));

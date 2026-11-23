@@ -40,8 +40,9 @@ async function selectTip(input: PetHintRequest, key: string, models: string[], s
       });
       if (!response.ok) {
         // A 403 can apply to one model on the configured plan. A 401 rejects the credential.
-        console.warn('companion.provider_http', response.status, response.headers.get('cf-mitigated') === 'challenge' ? 'challenge' : 'response');
-        if (response.status === 401) return null;
+        const challenged = response.headers.get('cf-mitigated') === 'challenge';
+        console.warn('companion.provider_http', response.status, challenged ? 'challenge' : 'response');
+        if (response.status === 401 || challenged) return null;
         continue;
       }
       const json = await response.json();
