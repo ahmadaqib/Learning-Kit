@@ -8,6 +8,7 @@ type SpeechEnd = (completed: boolean) => void;
 
 const RETRIABLE_ERRORS = new Set(['network', 'language-unavailable', 'voice-unavailable', 'synthesis-failed', 'synthesis-unavailable']);
 const ENHANCED_VOICE = /\b(enhanced|natural|neural|premium)\b/i;
+const RECORDING_STALL_MS = 20_000;
 let preferences: SpeechPreferences = DEFAULT_AUDIO_SETTINGS;
 interface SpeechPlayback {
   owner: SpeechOwner;
@@ -166,10 +167,22 @@ export function playRecordedSpeech(
     clearTimeout(timeout);
     audio.onended = null;
     audio.onerror = null;
+    audio.onplaying = null;
     audio.pause();
     audio.removeAttribute('src');
   });
   const fail = () => speech.finish(false, false, tryFallback);
+
+  // Start a fresh interval when loading finishes. After that, only a lack of media progress is a failure.
+  const watchProgress = () => {
+    if (activeSpeech !== speech) return;
+    clearTimeout(timeout);
+    const position = audio.currentTime;
+    timeout = setTimeout(() => {
+      if (audio.currentTime > position) watchProgress();
+      else fail();
+    }, RECORDING_STALL_MS);
+  };
 
   const next = (index: number) => {
     if (activeSpeech !== speech) return;
@@ -182,7 +195,8 @@ export function playRecordedSpeech(
     audio.playbackRate = rate;
     audio.onended = () => next(index + 1);
     audio.onerror = fail;
-    timeout = setTimeout(fail, 20000);
+    audio.onplaying = watchProgress;
+    watchProgress();
     try {
       void audio.play()?.catch(fail);
     } catch {

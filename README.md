@@ -47,13 +47,15 @@ npm run dev
 
 ### Hewan pendamping dan audio
 
-Di **Pengaturan → Hewan pendamping**, pilih satu dari lima hewan dan gaya bicaranya. Petunjuk dasar berjalan lokal. Selama pelajaran, pendamping bisa menawarkan bantuan, dan peserta memilih kapan membukanya atau mendengarkan suaranya. Mode Fokus menghentikan tawaran. Di bagian suara, peserta dapat mencoba suara studio untuk pendamping, memilih suara Indonesia yang disediakan perangkat, dan mengatur efek serta musik.
+Di **Pengaturan → Hewan pendamping**, pilih satu dari lima hewan dan gaya bicaranya. Petunjuk dasar berjalan lokal. Selama pelajaran, pendamping bisa menawarkan bantuan, dan peserta memilih kapan membukanya atau mendengarkan suaranya. Hewan berjalan mengikuti kemajuan pelajaran. Setiap hewan punya gerak sapaan dan reaksi sendiri saat peserta membuka bantuan atau mendengarkan suara. Tombol Dengarkan pada kartu membacakan latihan pelajaran, atau strategi AI setelah dipilih. Mode Fokus menyembunyikan pet. Pengaturan kurangi gerak menampilkan pose diam. Di bagian suara, peserta dapat mencoba suara studio untuk pendamping, memilih suara Indonesia yang disediakan perangkat, dan mengatur efek serta musik.
 
 Ilustrasi Piko (tarsius dengan buku) berasal dari OpenArt. Mobi (kucing dengan pensil), Lumba (lumba-lumba dengan tas), Ruru (burung hantu dengan buku), dan Kora (kura-kura dengan peta) dibuat dengan ImageGen, dengan garis tinta biru tua dan latar krem. Aset berada di `public/pets/`. Narasi studio dibuat dari naskah petunjuk Indonesia menggunakan suara preset Supertonic 3 dan disimpan di `public/audio/pet/`. Pemutaran klip berlangsung di perangkat. [Model dan lisensi sumber suara](https://huggingface.co/Supertone/supertonic-3)
 
 ### Petunjuk AI Pro di Vercel
 
-Fungsi `/api/companion` hanya dipanggil saat peserta Pro memilih petunjuk AI di kartu materi. Browser mengirim pengenal materi, jenis kartu, gaya dan kategori bantuan. Server menyusun masukan dari katalog dan meminta TokenPortal memilih satu strategi. Aplikasi menampilkan petunjuk dari naskah lokal. Jika layanan gagal, petunjuk lokal tetap tersedia.
+Peserta Junior dan Pro mendapat saran langsung dari kartu materi yang sedang dibaca. Di mode Pro, tombol **Petunjuk AI** juga dapat meminta TokenPortal memilih strategi dari tiga pilihan. Server hanya mengirim judul pelajaran, jenis kartu, gaya pet dan kategori bantuan. Jika panggilan gagal, server menyajikan strategi yang sebelumnya dipilih TokenPortal untuk pelajaran dan jenis kartu itu. Panel menandai pilihan tersimpan. Kuis menggunakan petunjuk yang disiapkan penulis soal.
+
+Katalog tersimpan dapat diperbarui dengan `node --env-file=.env.local --import tsx scripts/prepare-pet-strategies.ts` dari akar proyek. Proses editorial ini mengirim judul kurikulum publik. Hasil baru ditulis setelah semua pilihan tervalidasi. Deployment memakai katalog yang sudah masuk git. Respons API menyebut sumber strategi melalui `source`. Nilai `live` menandai hasil permintaan peserta, termasuk pemakaian ulang untuk konteks yang sama. Nilai `prepared` menandai katalog editorial. Jika gateway menampilkan tantangan Cloudflare, log server mencatat Ray ID bila tersedia agar operator dapat menanyakannya kepada TokenPortal.
 
 Pada proyek Vercel, buka **Settings → Environment Variables**. Tetapkan kedua variabel server pada environment yang dituju. Pada mesin pengembangan, Vite dan Vite Preview membaca nama yang sama dari `.env.local`.
 
@@ -62,7 +64,7 @@ Pada proyek Vercel, buka **Settings → Environment Variables**. Tetapkan kedua 
 | `TOKENPORTAL_API_KEY` | Kunci TokenPortal. Gunakan tipe Sensitive di Vercel. |
 | `TOKENPORTAL_MODELS` | ID model utama lalu cadangan, dipisahkan koma dalam urutan percobaan. Maksimal empat. |
 
-Perubahan environment Vercel berlaku pada deployment berikutnya. Proyek memakai fungsi Node untuk rute API dan pengalihan ke halaman utama untuk rute aplikasi. [Environment variables Vercel](https://vercel.com/docs/environment-variables) · [Panduan TokenPortal](https://api.tokenportal.id/docs)
+Perubahan environment Vercel berlaku pada deployment berikutnya. Proyek memakai fungsi Node untuk rute API dan pengalihan ke halaman utama untuk rute aplikasi. [Environment variables Vercel](https://vercel.com/docs/environment-variables) · [Panduan TokenPortal](https://tokenportal.id/docs)
 
 ### Skrip Pengembangan & Verifikasi
 

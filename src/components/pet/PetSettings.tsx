@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { PET_IDS, PET_PERSONALITIES, type PetPersonality } from '@/content/petContract';
+import { PET_IDS, PET_PERSONALITIES, type PetId, type PetPersonality } from '@/content/petContract';
 import { getPetId, getPetPersonality, PET_DETAILS, PET_PERSONALITY_LABELS } from '@/content/petTips';
 import { useAppStore } from '@/store/useAppStore';
 import { PetPortrait } from './PetPortrait';
@@ -11,6 +11,7 @@ export function PetSettings() {
   const updateSettings = useAppStore((s) => s.updateSettings);
   const { hash, key } = useLocation();
   const section = useRef<HTMLElement>(null);
+  const [preview, setPreview] = useState<PetId>();
 
   useEffect(() => {
     if (hash === '#pet') section.current?.focus();
@@ -42,10 +43,13 @@ export function PetSettings() {
                 className="peer sr-only"
                 value={id}
                 checked={selected === id}
-                onChange={() => updateSettings({ petId: id })}
+                onChange={() => {
+                  setPreview(id);
+                  updateSettings({ petId: id });
+                }}
               />
               <span className="flex h-full min-w-0 flex-col items-center justify-start gap-1 rounded-[var(--radius-md)] border border-[var(--line-strong)] p-2 text-center peer-checked:border-[var(--world-700)] peer-checked:bg-[var(--world-50)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--world-700)]">
-                <PetPortrait petId={id} size={42} />
+                <PetPortrait petId={id} size={58} motion={selected === id && preview === id ? { arrival: 'selected' } : undefined} />
                 <span className="pw-small font-extrabold">{PET_DETAILS[id].name}</span>
                 <span className="pw-small text-[var(--ink-2)]">{PET_DETAILS[id].species}</span>
               </span>
