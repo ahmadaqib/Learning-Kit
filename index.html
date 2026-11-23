@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#FBF3E4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14162A" media="(prefers-color-scheme: dark)" />
     <script>
       try {
         var raw = localStorage.getItem('petualang-web');
@@ -17,12 +19,22 @@
           }
         }
         var meta = document.querySelector('meta[name="color-scheme"]');
+        // An explicit theme wins over the device setting in both theme-color metas
+        var setBar = function (color) {
+          var bars = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < bars.length; i++) {
+            bars[i].setAttribute('content', color);
+            bars[i].removeAttribute('media');
+          }
+        };
         if (theme === 'dark') {
           if (meta) meta.setAttribute('content', 'dark');
           document.documentElement.dataset.theme = 'dark';
+          setBar('#14162A');
         } else if (theme === 'light') {
           if (meta) meta.setAttribute('content', 'light');
           document.documentElement.dataset.theme = 'light';
+          setBar('#FBF3E4');
         } else {
           if (meta) meta.setAttribute('content', 'light dark');
           var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -30,7 +42,7 @@
         }
       } catch (e) {}
     </script>
-    <meta name="theme-color" content="#1F2340" />
+    <link rel="preload" href="/fonts/plus-jakarta-sans-var.woff2" as="font" type="font/woff2" crossorigin />
     <meta
       name="description"
       content="Petualang Web — Belajar membuat website dan memahami API lewat cerita restoran, kurir, dan radio, sedikit demi sedikit."
@@ -41,6 +53,7 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="fx-layer" aria-hidden="true"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

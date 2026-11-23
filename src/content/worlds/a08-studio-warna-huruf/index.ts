@@ -8,22 +8,40 @@ import {
   qStep,
   rBold,
   rCode,
+  rJunior,
+  rPro,
   rTerm,
   rText,
   simStep,
   storyStep,
   t,
 } from '@/content/lessonHelpers';
-import type { Lesson, World } from '@/content/schema';
+import type { Lesson, Rich, World } from '@/content/schema';
+
+/** Potongan teks kaya per jalur, supaya jalur Junior dan jalur Pro ditulis terpisah (panduan §7). */
+const rProBold = (text: string): Rich => ({ t: 'bold', v: { pro: text }, modes: ['pro'] });
+const rJBold = (text: string): Rich => ({ t: 'bold', v: { junior: text, pro: text }, modes: ['junior'] });
+const rJTerm = (termId: string, text: string): Rich => ({
+  t: 'term',
+  termId,
+  v: { junior: text, pro: text },
+  modes: ['junior'],
+});
+const rProTerm = (termId: string, text: string): Rich => ({
+  t: 'term',
+  termId,
+  v: { pro: text },
+  modes: ['pro'],
+});
 
 export const world: World = {
   id: 'a08',
   track: 'A',
   order: 8,
-  title: 'Studio Warna & Huruf',
+  title: 'Studio Warna dan Huruf',
   tagline: t(
-    'Memilih paduan warna yang serasi dan huruf yang enak dibaca.',
-    'Menguasai roda warna, HSL, skema warna, aturan 60-30-10, kontras WCAG, kode HEX/RGB, dan tipografi.',
+    'Pilih warna yang serasi. Pilih huruf yang enak dibaca.',
+    'Kamu bisa memilih warna dan huruf yang serasi dan lolos uji kontras.',
   ),
   color: '#6C5CE7',
   illustration: 'a08-studio-warna-huruf',
@@ -44,8 +62,8 @@ export const world: World = {
   boss: {
     title: 'Tantangan Penjaga Studio',
     greeting: t(
-      'Halo! Ayo padukan warna serasi dan huruf nyaman dibaca di Studio Warna & Huruf!',
-      'Uji kemampuanmu memilih palet warna, membaca HSL/HEX/RGB, menjaga kontras WCAG, dan menata tipografi.',
+      'Halo! Ayo pilih warna yang serasi dan huruf yang enak dibaca.',
+      'Uji kemampuanmu memilih palet, membaca kode warna, menjaga kontras, dan menata huruf.',
     ),
     guardianName: 'Penjaga Studio',
     junior: { count: 8, pool: 'world' },
@@ -56,228 +74,360 @@ export const world: World = {
     junior: [
       makeAnchorMcq({
         id: 'a08-anc-j1',
-        prompt: t('Pada roda warna tradisional, tiga warna dasar yang tidak bisa dibuat dari campuran warna lain adalah…'),
+        prompt: t(
+          'Tiga warna pokok tidak bisa dibuat dari campuran warna lain. Mana ketiganya?',
+          'Warna primer pada roda warna tradisional tidak bisa dibuat dari campuran warna lain. Mana tiga warna itu?',
+        ),
         choices: [
           { id: 'pri', label: t('Merah, kuning, dan biru') },
           {
             id: 'sec',
             label: t('Hijau, jingga, dan ungu'),
-            explainWrong: t('Hijau, jingga, dan ungu adalah warna sekunder hasil campuran.'),
+            explainWrong: t(
+              'Ketiganya hasil campuran dua warna pokok. Hijau berasal dari biru dan kuning.',
+              'Hijau, jingga, dan ungu adalah warna sekunder hasil campuran dua primer.',
+            ),
           },
           {
             id: 'gray',
             label: t('Hitam, putih, dan abu-abu'),
-            explainWrong: t('Itu warna netral, bukan tiga warna primer pada roda warna.'),
+            explainWrong: t(
+              'Itu warna netral, bukan warna pokok. Warna pokok bisa dicampur menjadi warna baru.',
+              'Hitam, putih, dan abu-abu adalah warna netral, bukan primer pada roda warna.',
+            ),
           },
         ],
         answer: 'pri',
-        explainCorrect: t('Benar! Merah, kuning, dan biru adalah tiga warna primer pembentuk roda warna.'),
+        explainCorrect: t(
+          'Merah, kuning, dan biru tidak lahir dari warna lain. Seperti tiga cat di palet Bu Laras.',
+          'Merah, kuning, dan biru adalah tiga warna primer. Dari ketiganya lahir warna lain.',
+        ),
         tags: ['roda-warna'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-j2',
-        prompt: t('Pada aturan 60-30-10, bagian paling kecil sebesar 10% dipakai untuk…'),
+        prompt: t(
+          'Enam kotak untuk latar, tiga untuk kartu. Satu kotak cerah untuk apa?',
+          'Pada aturan 60-30-10, bagian 10% dipakai untuk apa?',
+        ),
         choices: [
-          { id: 'acc', label: t('Warna aksen mencolok pada tombol utama dan sorotan penting') },
+          { id: 'acc', label: t('Tombol penting yang mencolok') },
           {
             id: 'bg',
-            label: t('Warna latar belakang seluruh halaman'),
-            explainWrong: t('Latar belakang netral menempati porsi terbesar 60%.'),
+            label: t('Latar halaman yang luas'),
+            explainWrong: t(
+              'Latar sudah punya enam kotak. Kotak cerah menarik perhatian.',
+              'Latar netral memakai porsi terbesar, yaitu 60%.',
+            ),
           },
           {
             id: 'card',
-            label: t('Warna semua tulisan biasa dan kotak kartu'),
-            explainWrong: t('Teks dan kartu biasanya masuk ke porsi sekunder 30%.'),
+            label: t('Tulisan biasa dan kartu'),
+            explainWrong: t(
+              'Tulisan dan kartu masuk bagian 30. Bagian 10 lebih kecil lagi.',
+              'Teks dan kartu biasanya masuk porsi sekunder, yaitu 30%.',
+            ),
           },
         ],
         answer: 'acc',
-        explainCorrect: t('Tepat! Porsi 10% membuat tombol utama langsung menonjol tanpa membuat mata lelah.'),
+        explainCorrect: t(
+          'Bagian kecil membuat tombol penting langsung terlihat. Seperti syal merah di baju netral.',
+          'Porsi 10% membuat tombol utama menonjol tanpa melelahkan mata.',
+        ),
         tags: ['aturan-60-30-10'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-j3',
-        prompt: t('Supaya teman yang buta warna tetap tahu arti pesan hijau (berhasil) atau merah (gagal), warna wajib ditemani…'),
+        prompt: t(
+          'Hijau berarti berhasil, merah berarti gagal. Teman yang buta warna butuh apa lagi?',
+          'Agar pesan hijau dan merah dipahami orang yang buta warna, warna harus ditemani apa?',
+        ),
         choices: [
-          { id: 'ico', label: t('Ikon atau teks penjelasan') },
+          { id: 'ico', label: t('Ikon atau tulisan') },
           {
             id: 'flash',
-            label: t('Suara sirine keras terus-menerus'),
-            explainWrong: t('Ikon dan tulisan jelas lebih nyaman bagi semua orang.'),
+            label: t('Suara sirene yang keras'),
+            explainWrong: t(
+              'Suara keras mengganggu semua orang. Ikon dan tulisan lebih nyaman.',
+              'Suara keras mengganggu dan tidak menggantikan informasi yang terlihat.',
+            ),
           },
           {
             id: 'none',
-            label: t('Tidak perlu apa-apa, cukup kotak warna polos saja'),
-            explainWrong: t('Mengandalkan warna saja menyulitkan pengguna dengan buta warna.'),
+            label: t('Kotak warna polos saja'),
+            explainWrong: t(
+              'Teman yang buta warna sulit membedakan warna polos. Tambahkan ikon atau tulisan.',
+              'Warna saja menyulitkan orang yang buta warna. Tambahkan ikon atau teks.',
+            ),
           },
         ],
         answer: 'ico',
-        explainCorrect: t('Benar! Tanda centang ✓ atau tanda seru ! beserta teks memastikan pesan dimengerti semua orang.'),
+        explainCorrect: t(
+          'Ikon centang atau tulisan "Berhasil" membantu semua orang. Warna bukan satu-satunya petunjuk.',
+          'Ikon centang dan teks memastikan pesan terbaca tanpa bergantung pada warna.',
+        ),
         tags: ['warna-semantik'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-j4',
-        prompt: t('Jenis huruf tanpa kaki kecil di ujungnya yang bersih dan mudah dibaca di layar HP adalah…'),
+        prompt: t(
+          'Huruf berkaki punya garis kecil di ujung. Apa ciri huruf tanpa kaki?',
+          'Jenis huruf tanpa kaki kecil di ujungnya, bersih dan mudah dibaca di layar HP, disebut apa?',
+        ),
         choices: [
-          { id: 'sans', label: t('Sans-serif') },
+          { id: 'sans', label: t('Ujungnya polos', 'Sans-serif') },
           {
             id: 'disp',
-            label: t('Display hias penuh lengkungan'),
-            explainWrong: t('Huruf Display hanya untuk judul besar, bukan paragraf panjang.'),
+            label: t('Ujungnya berhias', 'Display'),
+            explainWrong: t(
+              'Hiasan bisa beraneka bentuk. Lihat ujung garis hurufnya.',
+              'Huruf Display dipakai untuk judul besar, bukan paragraf panjang.',
+            ),
           },
           {
             id: 'mono',
-            label: t('Monospace berjarak kaku'),
-            explainWrong: t('Monospace dipakai khusus untuk baris kode dan angka tabel.'),
+            label: t('Semua huruf sama lebar', 'Monospace'),
+            explainWrong: t(
+              'Lebar huruf dan bentuk ujungnya adalah dua ciri berbeda.',
+              'Monospace dipakai untuk baris kode dan angka di tabel.',
+            ),
           },
         ],
         answer: 'sans',
-        explainCorrect: t('Tepat! Huruf sans-serif seperti Inter dan Roboto sangat jernih di layar digital.'),
+        explainCorrect: t(
+          'Ujung hurufnya polos tanpa garis kecil melintang.',
+          'Sans-serif berarti tanpa serif, yaitu kaki kecil pada ujung goresan huruf.',
+        ),
         tags: ['tipografi'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-j5',
         type: 'limit',
-        analogy: t('Gelas sirup dan lampu ruangan untuk Hue, Saturation, Lightness'),
-        prompt: t('Apa perbedaan mengatur warna di layar komputer dibanding mencampur gelas sirup asli?'),
+        analogy: t('Warna segelas sirup', 'Gelas sirup dan lampu ruangan untuk Hue, Saturation, Lightness'),
+        prompt: t(
+          'Di layar, warna diatur dengan angka. Apa bedanya dengan menakar sirup sungguhan?',
+          'Apa perbedaan mengatur warna dengan angka HSL dan mencampur sirup sungguhan?',
+        ),
         choices: [
-          { id: 'num', label: t('Di komputer kita cukup menggeser angka persentase cahaya 0–100% tanpa menambah air fisik') },
+          { id: 'num', label: t('Angka di layar selalu bisa diulang persis') },
           {
             id: 'hue',
-            label: t('Jenis rasa sirup ibarat nama warnanya (Hue)'),
-            explainWrong: t('Itu bagian persamaan dalam analogi HSL.'),
+            label: t('Warna sirup mirip jenis warna'),
+            explainWrong: t(
+              'Itu bagian yang mirip, bukan bedanya.',
+              'Itu bagian yang sama dalam analogi HSL, bukan perbedaannya.',
+            ),
           },
           {
             id: 'sat',
-            label: t('Kekentalan sirup mirip kepekatan warnanya (Saturation)'),
-            explainWrong: t('Itu juga persamaan analoginya.'),
+            label: t('Kentalnya sirup mirip kepekatan warna'),
+            explainWrong: t(
+              'Itu juga bagian yang mirip.',
+              'Itu juga bagian yang sama dalam analogi, bukan perbedaannya.',
+            ),
           },
         ],
         answer: 'num',
-        explainCorrect: t('Benar! Di kode CSS, perubahan warna langsung terukur presisi dari 0% hingga 100%.'),
+        explainCorrect: t(
+          'Tiga angka yang sama memberi warna yang sama di layar itu. Takaran sirup bisa meleset.',
+          'Di CSS, angka 0% sampai 100% selalu menghasilkan warna yang sama persis.',
+        ),
         tags: ['hsl'],
       }),
     ],
     pro: [
       makeAnchorMcq({
         id: 'a08-anc-p1',
-        prompt: t('Skema warna yang memadukan dua warna saling berseberangan pada roda warna untuk menghasilkan kontras terkuat adalah…'),
+        prompt: t(
+          'Skema warna mana yang memadukan dua warna berseberangan pada roda warna?',
+          'Skema warna mana yang memadukan dua warna berseberangan pada roda warna untuk kontras terkuat?',
+        ),
         choices: [
           { id: 'comp', label: t('Komplementer') },
           {
             id: 'mono',
             label: t('Monokromatik'),
-            explainWrong: t('Monokromatik memakai satu hue saja dengan variasi terang-gelap.'),
+            explainWrong: t(
+              'Monokromatik memakai satu hue dengan variasi terang-gelap.',
+              'Monokromatik memakai satu hue dengan variasi terang-gelap.',
+            ),
           },
           {
             id: 'ana',
             label: t('Analog'),
-            explainWrong: t('Skema analog memadukan warna-warna yang saling bersebelahan.'),
+            explainWrong: t(
+              'Skema analog memadukan warna yang bersebelahan.',
+              'Skema analog memadukan warna yang bersebelahan.',
+            ),
           },
         ],
         answer: 'comp',
-        explainCorrect: t('Tepat. Pasangan komplementer seperti biru dan jingga sangat efektif menonjolkan tombol CTA.'),
+        explainCorrect: t(
+          'Pasangan komplementer, seperti biru dan jingga, membuat tombol ajakan menonjol.',
+          'Pasangan komplementer, seperti biru dan jingga, membuat tombol ajakan menonjol.',
+        ),
         tags: ['skema-warna'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-p2',
-        prompt: t('Standar aksesibilitas WCAG AA menetapkan rasio kontras minimal antara teks ukuran biasa dan latarnya sebesar…'),
+        prompt: t(
+          'Berapa rasio kontras minimal WCAG AA untuk teks berukuran biasa?',
+          'Pedoman aksesibilitas WCAG AA menetapkan rasio kontras minimal berapa untuk teks berukuran biasa?',
+        ),
         choices: [
           { id: 'c45', label: t('4,5 : 1') },
           {
             id: 'c15',
             label: t('1,5 : 1'),
-            explainWrong: t('1,5 : 1 nyaris menyatu dengan latar dan gagal dibaca.'),
+            explainWrong: t(
+              'Rasio 1,5 : 1 nyaris menyatu dengan latar dan sulit dibaca.',
+              'Rasio 1,5 : 1 nyaris menyatu dengan latar dan sulit dibaca.',
+            ),
           },
           {
             id: 'c30',
-            label: t('3 : 1 untuk semua teks sangat kecil'),
-            explainWrong: t('3 : 1 hanya berlaku untuk teks berukuran besar, sedangkan teks biasa butuh minimal 4,5 : 1.'),
+            label: t('3 : 1'),
+            explainWrong: t(
+              'Rasio 3 : 1 hanya untuk teks besar. Teks biasa butuh minimal 4,5 : 1.',
+              'Rasio 3 : 1 hanya untuk teks besar. Teks biasa butuh minimal 4,5 : 1.',
+            ),
           },
         ],
         answer: 'c45',
-        explainCorrect: t('Benar. Rasio minimal 4,5 : 1 (dan 3 : 1 untuk teks besar) menjamin keterbacaan bagi semua pengguna.'),
+        explainCorrect: t(
+          'Rasio 4,5 : 1 untuk teks biasa dan 3 : 1 untuk teks besar menjaga teks tetap terbaca.',
+          'Rasio 4,5 : 1 untuk teks biasa dan 3 : 1 untuk teks besar menjaga teks tetap terbaca.',
+        ),
         tags: ['kontras'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-p3',
-        prompt: t('Format kode warna CSS mana yang paling memudahkan manusia menghasilkan versi lebih terang atau gelap hanya dengan mengubah satu angka?'),
+        prompt: t(
+          'Format warna CSS mana yang paling mudah dibuat lebih terang atau gelap dengan mengubah satu angka?',
+          'Format warna CSS mana yang paling mudah dibuat lebih terang atau gelap dengan mengubah satu angka?',
+        ),
         choices: [
-          { id: 'hsl', label: t('HSL (cukup ubah nilai Lightness)') },
+          { id: 'hsl', label: t('HSL') },
           {
             id: 'hex',
-            label: t('HEX (#RRGGBB)'),
-            explainWrong: t('Pada HEX, kamu harus menghitung ulang keenam digit heksadesimal untuk menggelapkan warna.'),
+            label: t('HEX'),
+            explainWrong: t(
+              'Di HEX, menggelapkan warna berarti menghitung ulang ketiga pasangan digit.',
+              'Di HEX, menggelapkan warna berarti menghitung ulang ketiga pasangan digit.',
+            ),
           },
           {
             id: 'rgb',
-            label: t('RGB (harus menggeser ketiga angka R, G, B bersamaan)'),
-            explainWrong: t('Menurunkan kecerahan di RGB menuntut penyesuaian proporsi tiga saluran sekaligus.'),
+            label: t('RGB'),
+            explainWrong: t(
+              'Di RGB, kecerahan berubah lewat penyesuaian ketiga angka sekaligus.',
+              'Di RGB, kecerahan berubah lewat penyesuaian ketiga angka sekaligus.',
+            ),
           },
         ],
         answer: 'hsl',
-        explainCorrect: t('Tepat. Di HSL, mengubah nilai persentase ketiga (Lightness) langsung menghasilkan tint atau shade konsisten.'),
+        explainCorrect: t(
+          'Di HSL, angka ketiga mengatur terang-gelap. Satu angka cukup untuk membuat tint atau shade.',
+          'Di HSL, angka ketiga mengatur terang-gelap. Satu angka cukup untuk membuat tint atau shade.',
+        ),
         tags: ['hsl', 'hex-rgb'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-p4',
-        prompt: t('Mengapa saat merancang Dark mode kita dianjurkan memakai abu sangat gelap (misal #121212) daripada hitam pekat #000000 dengan putih pekat #FFFFFF?'),
+        prompt: t(
+          'Mengapa mode gelap memakai abu sangat gelap, bukan hitam #000000 dengan putih #FFFFFF?',
+          'Mengapa mode gelap memakai abu sangat gelap, bukan hitam #000000 dengan putih #FFFFFF?',
+        ),
         choices: [
-          { id: 'glare', label: t('Kontras ekstrem #000 dan #FFF terlalu silau dan melelahkan mata di ruangan redup') },
+          { id: 'glare', label: t('Kontras ekstrem terlalu silau di ruangan redup') },
           {
             id: 'oled',
-            label: t('Karena layar browser tidak mendukung kode #000000'),
-            explainWrong: t('Browser mendukung #000000, tetapi kenyamanannya buruk jika dipadukan putih murni #FFF.'),
+            label: t('Browser tidak mendukung #000000'),
+            explainWrong: t(
+              'Browser mendukung #000000. Masalahnya, hitam dan putih murni terlalu silau.',
+              'Browser mendukung #000000. Masalahnya, hitam dan putih murni terlalu silau.',
+            ),
           },
           {
             id: 'wcag',
-            label: t('Karena rasio hitam di atas putih hanya 1 : 1'),
-            explainWrong: t('Hitam di atas putih justru rasio 21 : 1 yang terlalu menusuk bila dibalik di mode gelap.'),
+            label: t('Rasio hitam di atas putih hanya 1 : 1'),
+            explainWrong: t(
+              'Hitam di atas putih justru 21 : 1. Rasio setinggi itu menyilaukan di mode gelap.',
+              'Hitam di atas putih justru 21 : 1. Rasio setinggi itu menyilaukan di mode gelap.',
+            ),
           },
         ],
         answer: 'glare',
-        explainCorrect: t('Benar! Abu sangat gelap dengan teks putih sedikit redup serta warna aksen agak kalem jauh lebih nyaman di mata.'),
+        explainCorrect: t(
+          'Abu sangat gelap dengan teks putih yang diredupkan lebih nyaman di mata.',
+          'Abu sangat gelap dengan teks putih yang diredupkan lebih nyaman di mata.',
+        ),
         tags: ['aturan-60-30-10', 'kontras'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-p5',
-        prompt: t('Berapakah panjang baris paragraf yang paling ideal di layar agar mata tidak lelah dan bacaan tidak terasa terputus?'),
+        prompt: t(
+          'Berapa panjang baris paragraf yang ideal agar mata tidak lelah?',
+          'Berapa panjang baris paragraf yang ideal agar mata tidak lelah?',
+        ),
         choices: [
-          { id: 'ch', label: t('45–75 karakter per baris (sekitar max-width: 65ch)') },
+          { id: 'ch', label: t('45–75 karakter per baris') },
           {
             id: 'tiny',
             label: t('10–15 karakter per baris'),
-            explainWrong: t('Terlalu pendek membuat mata melompat ganti baris terus-menerus.'),
+            explainWrong: t(
+              'Baris sependek itu membuat mata terus melompat ke baris baru.',
+              'Baris sependek itu membuat mata terus melompat ke baris baru.',
+            ),
           },
           {
             id: 'wide',
-            label: t('180–220 karakter memenuhi seluruh lebar layar monitor'),
-            explainWrong: t('Terlalu lebar membuat mata sering tersesat saat berpindah ke baris berikutnya.'),
+            label: t('180–220 karakter per baris'),
+            explainWrong: t(
+              'Baris selebar itu membuat mata tersesat saat pindah ke baris berikutnya.',
+              'Baris selebar itu membuat mata tersesat saat pindah ke baris berikutnya.',
+            ),
           },
         ],
         answer: 'ch',
-        explainCorrect: t('Tepat. Rentang 45–75 karakter menjaga ritme gerak mata saat membaca paragraf panjang.'),
+        explainCorrect: t(
+          'Rentang 45–75 karakter menjaga ritme mata saat membaca paragraf panjang.',
+          'Rentang 45–75 karakter menjaga ritme mata saat membaca paragraf panjang.',
+        ),
         tags: ['tipografi', 'type-scale'],
       }),
       makeAnchorMcq({
         id: 'a08-anc-p6',
         type: 'limit',
         analogy: t('Mencampur cat kertas RYB vs cahaya piksel RGB di layar'),
-        prompt: t('Perbedaan fisika utama antara warna cat di kanvas (RYB) dan warna di layar monitor (RGB) adalah…'),
+        prompt: t(
+          'Apa beda utama warna cat di kanvas dengan warna di layar?',
+          'Apa beda utama warna cat di kanvas dengan warna di layar?',
+        ),
         choices: [
-          { id: 'light', label: t('Cat mencampur pigmen yang makin gelap bila ditumpuk, sedangkan layar memancarkan cahaya RGB yang menjadi putih saat maksimal') },
+          { id: 'light', label: t('Cat makin gelap saat dicampur, cahaya layar makin terang') },
           {
             id: 'wheel',
-            label: t('Keduanya sama-sama bisa disusun menjadi lingkaran keserasian warna'),
-            explainWrong: t('Keserasiannya tetap dipelajari lewat roda warna, bedanya pada sifat pigmen vs cahaya.'),
+            label: t('Hanya cat yang bisa disusun menjadi roda warna'),
+            explainWrong: t(
+              'Roda warna dipakai untuk belajar keserasian, baik untuk cat maupun layar.',
+              'Roda warna dipakai untuk belajar keserasian, baik untuk cat maupun layar.',
+            ),
           },
           {
             id: 'warm',
-            label: t('Warna merah, jingga, dan kuning sama-sama memberi kesan hangat'),
-            explainWrong: t('Kesan psikologis hangat-dingin tetap sama di kanvas maupun layar.'),
+            label: t('Merah, jingga, dan kuning hanya terasa hangat di cat'),
+            explainWrong: t(
+              'Kesan hangat tetap sama di kanvas maupun di layar.',
+              'Kesan hangat tetap sama di kanvas maupun di layar.',
+            ),
           },
         ],
         answer: 'light',
-        explainCorrect: t('Benar! Roda RYB dipakai belajar harmoni, sementara layar digital merakit warna dari cahaya Merah, Hijau, Biru (RGB).'),
+        explainCorrect: t(
+          'Cat mencampur pigmen, jadi makin gelap. Layar merakit warna dari cahaya merah, hijau, dan biru.',
+          'Cat mencampur pigmen, jadi makin gelap. Layar merakit warna dari cahaya merah, hijau, dan biru.',
+        ),
         tags: ['roda-warna', 'hex-rgb'],
       }),
     ],
@@ -291,9 +441,10 @@ export const lessons: Lesson[] = [
     title: 'Roda warna',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa mengelompokkan warna primer, sekunder, tersier, serta warna hangat dan dingin.',
-      'Aku bisa membaca roda warna 12 bagian (RYB), peran suhu warna, serta bedanya dengan cahaya layar RGB.',
+      'Aku bisa membedakan warna pokok, warna campuran, hangat, dan dingin.',
+      'Kamu bisa membaca roda warna 12 bagian, suhu warna, dan beda cat dengan cahaya layar.',
     ),
+    atWork: 'Kamu memilih warna merek untuk sebuah halaman web dan perlu tahu mana yang serasi.',
     estMinutes: 5,
     introducesTerms: ['roda-warna'],
     usesTerms: ['ui', 'css'],
@@ -301,79 +452,40 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('a08/roda-cat.svg', [
         rText(
-          'Di studio lukis Bu Laras, tiga cat utama—merah, kuning, biru—ditaruh melingkar di palet lalu dicampur memutar menjadi 12 warna serasi!',
-          'Warna bukanlah soal tebak-tebakan selera semata. Di studio lukis, warna disusun melingkar membentuk roda warna 12 bagian agar mudah melihat mana yang serasi.',
+          'Bu Laras punya 3 cat di palet: merah, kuning, dan biru. Ia mencampurnya menjadi banyak warna. Warna apa saja yang lahir?',
+          'Kamu memilih warna untuk sebuah halaman web, tetapi tidak yakin mana yang serasi. Roda warna adalah lingkaran 12 warna yang menunjukkan hubungan antarwarna.',
         ),
       ]),
       conceptStep({
-        title: t('Primer, Sekunder, dan Tersier', 'Tiga Lapisan Roda Warna'),
+        title: t('Warna pokok dan campuran', 'Primer, sekunder, dan tersier'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'roda-warna-12' },
-        alt: t('Roda warna 12 bagian berisi warna primer, sekunder, dan tersier.'),
-        body: [
-          rTerm('roda-warna', 'Roda warna', 'Roda warna'),
-          rText(
-            ' dimulai dari ',
-            ' dimulai dari warna ',
-          ),
-          rBold('primer', 'primer'),
-          rText(
-            ' (merah, kuning, biru). Campurannya menghasilkan ',
-            ' (merah, kuning, biru). Dua primer menghasilkan ',
-          ),
-          rBold('sekunder', 'sekunder'),
-          rText(
-            ' (jingga, hijau, ungu), lalu ',
-            ' (jingga, hijau, ungu), dan tambahannya menjadi ',
-          ),
-          rBold('tersier', 'tersier'),
-          rText(' seperti merah-jingga.', ' (misal merah-jingga).'),
-        ],
-      }),
-      conceptStep({
-        title: t('Warna Hangat dan Dingin', 'Suhu Warna: Hangat vs Dingin'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'a08', topic: 'hangat-vs-dingin' },
-        alt: t('Merah-jingga-kuning di sisi hangat dan hijau-biru-ungu di sisi dingin.'),
-        body: [
-          rText(
-            'Merah, jingga, dan kuning itu warna hangat: terasa dekat dan penuh semangat. Hijau, biru, dan ungu terasa tenang!',
-            'Warna hangat (merah, jingga, kuning) terasa dekat dan menarik perhatian. Warna dingin (hijau, biru, ungu) terasa tenang, profesional, dan tepercaya.',
-          ),
-        ],
-      }),
-      conceptStep({
-        title: t('Cat Kertas vs Cahaya Layar', 'Roda Cat RYB vs Cahaya Layar RGB'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'a08', topic: 'ryb-vs-rgb' },
-        alt: t('Lingkaran RYB untuk belajar keserasian vs piksel cahaya RGB di layar.'),
-        body: [
-          rText(
-            'Lingkaran merah-kuning-biru membantu kita belajar paduan serasi. Di dalam layar HP, warna dibuat dari cahaya merah, hijau, biru!',
-            'Roda RYB dipakai untuk mempelajari harmoni visual. Secara fisik, layar digital membentuk jutaan warna dari tiga cahaya primer: Merah, Hijau, Biru (RGB).',
-          ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Palet cat lukis RYB untuk roda warna layar'),
-        same: [
-          t('Menunjukkan hubungan mana warna yang bertetangga lembut dan mana yang berseberangan kuat.'),
-        ],
-        different: [
-          t('Mencampur semua cat pigmen menghasilkan warna gelap keruh, sedangkan menyalakan semua cahaya layar RGB maksimal justru menghasilkan cahaya putih terang!'),
-        ],
-      }),
-      simStep(
-        'roda-warna',
-        t(
-          'Lihat berbagai pilihan warna di roda warna lalu amati mana yang serasi dan mana yang mencolok!',
-          'Eksplorasi kombinasi warna pada roda warna untuk membedakan paduan harmonis dan kontras.',
+        alt: t(
+          'Roda warna dengan warna pokok dan warna campuran.',
+          'Roda warna 12 bagian berisi warna primer, sekunder, dan tersier.',
         ),
-      ),
+        body: [
+          rJTerm('roda-warna', 'Roda warna'),
+          rJunior(' adalah lingkaran warna. Merah, kuning, dan biru adalah warna '),
+          rJBold('primer'),
+          rJunior(' atau warna pokok. Campur dua warna pokok, hasilnya warna campuran: hijau, jingga, atau ungu.'),
+          rProTerm('roda-warna', 'Roda warna'),
+          rPro(' dimulai dari tiga warna '),
+          rProBold('primer'),
+          rPro(': merah, kuning, biru. Dua primer menghasilkan warna '),
+          rProBold('sekunder'),
+          rPro(': jingga, hijau, ungu. Primer ditambah sekunder di sebelahnya menghasilkan warna '),
+          rProBold('tersier'),
+          rPro(', misalnya merah-jingga.'),
+        ],
+      }),
       qStep({
         id: 'a08-l01-q1',
         type: 'sort',
-        prompt: t('Kelompokkan warna berikut ke golongan Primer atau Sekunder pada roda warna:'),
+        prompt: t(
+          'Kelompokkan warna ini: pokok atau campuran?',
+          'Kelompokkan warna ini sebagai primer atau sekunder.',
+        ),
         difficulty: 1,
         items: [
           { id: 'm', label: t('Merah') },
@@ -381,46 +493,126 @@ export const lessons: Lesson[] = [
           { id: 'k', label: t('Kuning') },
           { id: 'u', label: t('Ungu') },
           { id: 'b', label: t('Biru') },
-          { id: 'j', label: t('Jingga (Oranye)') },
+          { id: 'j', label: t('Jingga') },
         ],
         bins: [
-          { id: 'pri', label: t('Warna Primer') },
-          { id: 'sec', label: t('Warna Sekunder') },
+          { id: 'pri', label: t('Warna pokok', 'Primer'), icon: 'palette' },
+          { id: 'sec', label: t('Warna campuran', 'Sekunder'), icon: 'box' },
         ],
         answer: { m: 'pri', k: 'pri', b: 'pri', h: 'sec', u: 'sec', j: 'sec' },
-        explainCorrect: t('Hebat! Primer = merah, kuning, biru. Sekunder = jingga, hijau, ungu.'),
+        explainCorrect: t(
+          'Merah, kuning, dan biru tidak bisa dibuat dari warna lain. Hijau, jingga, dan ungu adalah campurannya, seperti cat di palet.',
+          'Primer (merah, kuning, biru) tidak bisa dibuat dari warna lain. Sekunder (jingga, hijau, ungu) adalah campuran dua primer.',
+        ),
+        hints: [t('Ingat tiga cat di palet Bu Laras.'), undefined],
         tags: ['roda-warna'],
+      }),
+      conceptStep({
+        title: t('Warna hangat dan dingin', 'Suhu warna: hangat dan dingin'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a08', topic: 'hangat-vs-dingin' },
+        alt: t('Merah, jingga, kuning di sisi hangat. Hijau, biru, ungu di sisi dingin.'),
+        body: [
+          rText(
+            'Merah, jingga, dan kuning terasa hangat dan menarik mata. Hijau, biru, dan ungu terasa dingin dan tenang.',
+            'Warna hangat (merah, jingga, kuning) terasa dekat dan menarik perhatian. Warna dingin (hijau, biru, ungu) terasa tenang dan tepercaya. Bank dan sekolah sering memakai warna dingin.',
+          ),
+        ],
       }),
       qStep(
         makeMcq({
           id: 'a08-l01-q2',
           type: 'analogy',
-          prompt: t('Jika kamu ingin memberi kesan tenang, aman, dan tepercaya untuk aplikasi bank atau sekolah, kelompok warna mana yang paling pas?'),
+          prompt: t(
+            'Poster bank harus terasa tenang dan aman. Warna apa yang cocok?',
+            'Aplikasi bank atau sekolah perlu terasa tenang dan tepercaya. Kelompok warna mana yang paling cocok?',
+          ),
           choices: [
-            { id: 'cold', label: t('Warna dingin seperti biru dan hijau') },
+            {
+              id: 'cold',
+              label: t('Warna dingin seperti biru', 'Warna dingin, misalnya biru dan hijau'),
+            },
             {
               id: 'hot',
-              label: t('Merah terang menyala di seluruh layar'),
-              explainWrong: t('Merah terang memberi kesan mendesak atau peringatan bahaya.'),
+              label: t('Warna hangat seperti merah', 'Warna hangat, misalnya merah terang'),
+              explainWrong: t(
+                'Merah terasa mendesak, seperti tanda bahaya. Poster bank perlu terasa tenang.',
+                'Merah terasa mendesak dan sering menandai bahaya. Aplikasi bank perlu kesan tenang.',
+              ),
             },
             {
               id: 'neon',
-              label: t('Semua 12 warna sekaligus tanpa batas'),
-              explainWrong: t('Terlalu banyak warna membuat mata lelah dan tidak fokus.'),
+              label: t('Warna neon seperti hijau stabilo', 'Warna neon yang menyala di seluruh layar'),
+              explainWrong: t(
+                'Warna neon menyilaukan mata. Poster yang tenang memakai warna lembut.',
+                'Warna neon menyilaukan dan membuat mata lelah. Kesan tepercaya butuh warna yang lebih kalem.',
+              ),
             },
           ],
           answer: 'cold',
-          explainCorrect: t('Benar! Warna dingin seperti biru sering dipakai untuk rasa tenang dan dapat dipercaya.'),
+          explainCorrect: t(
+            'Biru terasa tenang dan aman. Seperti langit cerah dan laut yang lapang.',
+            'Biru dan hijau terasa tenang, jadi bank dan sekolah sering memakainya. Warna dingin membangun rasa percaya.',
+          ),
+          hints: [
+            t(
+              'Ingat warna langit dan laut.',
+              'Pikirkan kesan yang dicari: tenang atau mendesak.',
+            ),
+          ],
           tags: ['roda-warna', 'ui'],
         }),
       ),
+      simStep(
+        'roda-warna',
+        t(
+          'Ketuk warna di roda, lalu lihat mana yang serasi.',
+          'Ketuk beberapa warna di roda dan bedakan paduan yang serasi dari yang mencolok.',
+        ),
+      ),
+      conceptStep({
+        title: t('Cat kertas dan cahaya layar', 'Roda cat RYB dan cahaya layar RGB'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a08', topic: 'ryb-vs-rgb' },
+        alt: t('Lingkaran cat merah-kuning-biru dan piksel cahaya merah-hijau-biru di layar.'),
+        modes: ['pro'],
+        body: [
+          rPro(
+            'Roda RYB (merah, kuning, biru) cocok untuk belajar keserasian warna. Layar membentuk warna dari tiga cahaya: merah, hijau, biru (RGB). Mencampur semua cat menghasilkan warna gelap, tetapi semua cahaya menyala menghasilkan putih.',
+          ),
+        ],
+      }),
+      limitStep({
+        analogy: t('Cat di palet dan warna di layar'),
+        same: [
+          t(
+            'Keduanya membuat banyak warna dari sedikit warna pokok.',
+            'Keduanya membentuk banyak warna dari beberapa warna dasar.',
+          ),
+        ],
+        different: [
+          t(
+            'Cat dicampur jadi gelap. Cahaya layar dicampur jadi putih.',
+            'Semua cat dicampur menghasilkan warna gelap keruh. Semua cahaya RGB menyala menghasilkan putih.',
+          ),
+        ],
+        riskyAnalogy: true,
+      }),
       qStep(
         makeTf({
           id: 'a08-l01-q3',
-          prompt: t('Warna tersier seperti "merah-jingga" dibuat dari campuran satu warna primer dengan satu warna sekunder di sebelahnya.'),
+          modes: ['pro'],
+          prompt: t(
+            'Warna tersier, misalnya merah-jingga, adalah campuran satu primer dengan satu sekunder di sebelahnya.',
+          ),
           answer: true,
-          explainCorrect: t('Betul! Primer + sekunder tetangganya menghasilkan 6 warna tersier pada roda 12 bagian.'),
-          explainWrong: t('Hampir! Gabungan satu warna primer dan satu sekunder tetangga membentuk warna tersier.'),
+          explainCorrect: t(
+            'Primer ditambah sekunder di sebelahnya menghasilkan 6 warna tersier. Bersama 3 primer dan 3 sekunder, jumlahnya 12 warna.',
+          ),
+          explainWrong: t(
+            'Pernyataan itu benar: satu primer dan satu sekunder tetangganya menghasilkan tersier.',
+          ),
+          hints: [t('Hitung dulu berapa primer dan sekunder di roda.')],
           tags: ['roda-warna'],
         }),
       ),
@@ -428,24 +620,42 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l01-q4',
           type: 'limit',
-          analogy: t('Palet cat lukis RYB'),
-          prompt: t('Apa perbedaan nyata antara warna cat di atas kertas dan warna di layar HP?'),
+          analogy: t('Cat di palet dan warna di layar'),
+          prompt: t(
+            'Semua cat dicampur menjadi gelap. Semua cahaya layar dicampur menjadi apa?',
+            'Semua cat dicampur menghasilkan warna gelap. Apa yang terjadi saat semua cahaya layar menyala penuh?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'rgb', label: t('Layar memancarkan cahaya Merah, Hijau, dan Biru (RGB), bukan cat RYB') },
+            { id: 'rgb', label: t('Putih terang', 'Putih, karena cahaya saling menambah') },
             {
               id: 'warm',
-              label: t('Kuning dan jingga tetap memberi kesan ceria serta hangat'),
-              explainWrong: t('Kesan hangat memang sama antara cat dan layar.'),
+              label: t('Hitam pekat', 'Hitam, karena warna saling menutup'),
+              explainWrong: t(
+                'Hitam adalah hasil campuran cat. Cahaya layar bekerja sebaliknya.',
+                'Hitam adalah hasil campuran pigmen cat. Cahaya layar bekerja sebaliknya: makin banyak, makin terang.',
+              ),
             },
             {
               id: 'wheel',
-              label: t('Kita tetap bisa mencari warna bersebelahan dan berseberangan'),
-              explainWrong: t('Cara mencari pasangan harmonis di roda warna tetap berlaku.'),
+              label: t('Cokelat keruh', 'Cokelat keruh, seperti campuran cat biasa'),
+              explainWrong: t(
+                'Cokelat keruh adalah hasil campuran cat. Cahaya layar makin terang, tidak keruh.',
+                'Cokelat keruh adalah hasil campuran pigmen. Cahaya yang ditambahkan justru makin terang.',
+              ),
             },
           ],
           answer: 'rgb',
-          explainCorrect: t('Tepat! Roda RYB membantu belajar keserasian, sedangkan piksel layar bekerja memakai cahaya RGB.'),
+          explainCorrect: t(
+            'Cahaya saling menambah, jadi layar menjadi putih. Cat saling menutup, jadi gelap.',
+            'Cahaya saling menambah: makin banyak menyala, makin terang. Pigmen cat saling menutup: makin banyak dicampur, makin gelap.',
+          ),
+          hints: [
+            t(
+              'Ingat senter: makin banyak, makin terang.',
+              'Bayangkan menumpuk tiga senter berwarna.',
+            ),
+          ],
           tags: ['roda-warna'],
         }),
       ),
@@ -453,47 +663,78 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l01-q5',
           type: 'scenario',
-          story: t('Dimas membuat banner promosi "DISKON KILAT HARI INI!" untuk tombol ajakan toko makanan yang ingin terasa energik dan langsung menarik mata.'),
-          prompt: t('Suhu warna manakah yang paling mendukung kesan mendesak dan bersemangat?'),
+          story: t(
+            'Dimas membuat poster diskon kilat untuk toko makanan. Poster itu harus terasa seru dan mendesak.',
+            'Dimas membuat banner diskon untuk toko makanan. Banner itu harus terasa mendesak dan bersemangat.',
+          ),
+          prompt: t('Warna apa yang paling cocok?', 'Suhu warna mana yang paling mendukung kesan itu?'),
           difficulty: 2,
           choices: [
-            { id: 'warm', label: t('Warna hangat seperti jingga atau merah') },
+            {
+              id: 'warm',
+              label: t('Warna hangat seperti jingga', 'Warna hangat, misalnya jingga atau merah'),
+            },
             {
               id: 'pale',
-              label: t('Abu-abu sangat pucat yang menyatu dengan latar'),
-              explainWrong: t('Abu-abu pucat tidak menarik perhatian dan lemah kontrasnya.'),
+              label: t('Warna dingin seperti biru', 'Warna dingin, misalnya biru atau hijau'),
+              explainWrong: t(
+                'Biru terasa tenang. Poster diskon butuh rasa seru.',
+                'Biru terasa tenang dan tepercaya, bukan mendesak. Diskon kilat butuh warna hangat.',
+              ),
             },
             {
               id: 'darkb',
-              label: t('Biru sangat pudar yang tersembunyi'),
-              explainWrong: t('Biru terasa tenang, kurang menonjolkan dorongan segera dibanding jingga/merah.'),
+              label: t('Warna netral seperti abu-abu', 'Warna netral, misalnya abu-abu pucat atau putih'),
+              explainWrong: t(
+                'Abu-abu terasa datar. Poster seru butuh warna yang menarik mata.',
+                'Abu-abu pucat menyatu dengan latar dan tidak menarik perhatian.',
+              ),
             },
           ],
           answer: 'warm',
-          explainCorrect: t('Benar! Merah dan jingga hangat sering dipakai untuk tombol ajakan dan e-commerce.'),
+          explainCorrect: t(
+            'Jingga dan merah terasa hangat dan seru. Seperti spanduk diskon di pasar.',
+            'Jingga dan merah terasa hangat dan mendesak, jadi sering dipakai untuk tombol ajakan dan diskon.',
+          ),
+          hints: [
+            t(
+              'Warna apa yang terasa dekat dan seru?',
+              'Pilih kelompok warna yang terasa dekat dan menarik perhatian.',
+            ),
+          ],
           tags: ['roda-warna', 'ui'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'a08-l01-q6',
-          prompt: t('Berapakah jumlah bagian warna utama pada roda warna standar yang memadukan primer, sekunder, dan tersier?'),
+          modes: ['pro'],
+          prompt: t(
+            'Berapa jumlah warna pada roda warna standar yang memuat primer, sekunder, dan tersier?',
+          ),
           difficulty: 1,
           choices: [
-            { id: '12', label: t('12 warna (3 primer, 3 sekunder, 6 tersier)') },
+            { id: '12', label: t('12 warna: 3 primer, 3 sekunder, 6 tersier') },
             {
               id: '2',
-              label: t('2 warna saja'),
-              explainWrong: t('Roda warna dasar memuat 12 titik campuran.'),
+              label: t('9 warna: 3 primer, 3 sekunder, 3 tersier'),
+              explainWrong: t(
+                'Roda standar punya 6 warna tersier, bukan 3. Setiap pasangan primer dan sekunder menghasilkan satu.',
+              ),
             },
             {
               id: '100',
-              label: t('100 warna primer'),
-              explainWrong: t('Warna primer hanya ada 3 buah.'),
+              label: t('24 warna: 6 primer, 6 sekunder, 12 tersier'),
+              explainWrong: t(
+                'Primer hanya ada 3 dan sekunder hanya 3. Jumlah totalnya 12.',
+              ),
             },
           ],
           answer: '12',
-          explainCorrect: t('Tepat! 3 primer + 3 sekunder + 6 tersier membentuk roda warna 12 bagian.'),
+          explainCorrect: t(
+            '3 primer, 3 sekunder, dan 6 tersier membentuk roda warna 12 bagian.',
+          ),
+          hints: [t('Jumlahkan ketiga kelompok warna.')],
           tags: ['roda-warna'],
         }),
       ),
@@ -501,55 +742,90 @@ export const lessons: Lesson[] = [
         id: 'a08-l01-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi pasangan warna primer pembentuk cahaya layar digital:'),
+        prompt: t('Cahaya apa yang melengkapi tiga cahaya dasar layar?'),
         difficulty: 2,
-        template: 'Layar komputer menyusun warna menggunakan campuran cahaya merah, ___, dan biru (RGB).',
+        template: 'Layar menyusun warna dari cahaya merah, ___, dan biru.',
         bank: ['hijau', 'kuning', 'ungu'],
         answer: ['hijau'],
-        explainCorrect: t('Benar! RGB adalah singkatan dari Red (merah), Green (hijau), dan Blue (biru).'),
+        explainCorrect: t('Layar memakai cahaya merah, hijau, dan biru (RGB). Kuning muncul dari merah dan hijau yang menyala bersama.'),
+        hints: [t('Layar tidak memakai kuning sebagai cahaya dasar.'), undefined],
         tags: ['roda-warna', 'css'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l01-r1',
-        prompt: t('Tiga warna sekunder pada roda warna RYB adalah…'),
+        prompt: t(
+          'Mana tiga warna campuran dari dua warna pokok?',
+          'Apa tiga warna sekunder pada roda warna?',
+        ),
         choices: [
           { id: 's', label: t('Jingga, hijau, dan ungu') },
-          { id: 'p', label: t('Merah, kuning, dan biru'), explainWrong: t('Merah, kuning, dan biru adalah tiga warna primer.') },
+          {
+            id: 'p',
+            label: t('Merah, kuning, dan biru'),
+            explainWrong: t(
+              'Itu warna pokok, bukan campuran. Warna pokok tidak bisa dibuat dari warna lain.',
+              'Itu tiga warna primer. Primer tidak bisa dibuat dari warna lain.',
+            ),
+          },
+          {
+            id: 'n',
+            label: t('Hitam, putih, dan abu-abu'),
+            explainWrong: t(
+              'Itu warna netral. Warna netral bukan campuran dua warna pokok.',
+              'Itu warna netral. Warna netral bukan campuran dua primer.',
+            ),
+          },
         ],
         answer: 's',
-        explainCorrect: t('Campuran dua warna primer menghasilkan jingga, hijau, dan ungu.'),
+        explainCorrect: t(
+          'Dua warna pokok dicampur menjadi jingga, hijau, atau ungu.',
+          'Campuran dua primer menghasilkan jingga, hijau, dan ungu.',
+        ),
+        hints: [t('Ingat tiga cat di palet.')],
         tags: ['roda-warna'],
       }),
       makeTf({
         id: 'a08-l01-r2',
-        prompt: t('Warna hijau, biru, dan ungu termasuk kelompok warna dingin yang memberi kesan tenang dan dapat dipercaya.'),
+        prompt: t(
+          'Hijau, biru, dan ungu terasa dingin dan tenang.',
+          'Hijau, biru, dan ungu termasuk warna dingin yang terasa tenang.',
+        ),
         answer: true,
-        explainCorrect: t('Betul!'),
-        explainWrong: t('Hijau, biru, dan ungu berada pada sisi warna dingin di roda warna.'),
+        explainCorrect: t(
+          'Ketiganya ada di sisi dingin roda warna. Seperti daun, langit, dan laut.',
+          'Ketiganya ada di sisi dingin roda warna dan memberi kesan tenang.',
+        ),
+        explainWrong: t(
+          'Ketiganya ada di sisi dingin. Warna hangat itu merah, jingga, dan kuning.',
+          'Ketiganya ada di sisi dingin roda warna. Sisi hangat berisi merah, jingga, dan kuning.',
+        ),
+        hints: [t('Ingat langit dan laut.')],
         tags: ['roda-warna'],
       }),
     ],
     recap: t(
-      'Roda warna membagi 12 warna menjadi primer, sekunder, tersier, serta warna hangat dan dingin.',
-      'Pahami roda warna 12 bagian (RYB) dan suhu warna hangat–dingin sebagai peta sebelum meracik palet digital RGB.',
+      'Roda warna punya warna pokok, warna campuran, hangat, dan dingin.',
+      'Roda warna membagi 12 warna menjadi primer, sekunder, dan tersier. Warna juga terbagi hangat dan dingin.',
     ),
     companion: {
-      talkPrompts: ['Kalau kita ingin menggambar poster toko es krim ceria vs aplikasi bank yang tenang, warna hangat atau dingin yang cocok?'],
-      offlineActivity: 'Gunakan pensil warna merah, kuning, dan biru untuk mencoba mencampur warna jingga, hijau, dan ungu di kertas.',
+      talkPrompts: ['Poster toko es krim cocok memakai warna hangat atau dingin?'],
+      offlineActivity:
+        'Campur cat atau pensil warna merah dan kuning di kertas. Warna apa yang muncul?',
     },
   }),
 
   makeLesson({
     id: 'a08-l02',
     worldId: 'a08',
-    title: 'Hue, saturation, lightness',
+    title: 'Warna seperti segelas sirup',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa membedakan jenis warna (Hue), kepekatan (Saturation), dan terang-gelapnya (Lightness).',
-      'Aku bisa mengatur sifat warna HSL serta membuat skala tint, shade, dan tone dari satu warna dasar.',
+      'Aku bisa membedakan jenis warna, kepekatan, dan terang-gelapnya.',
+      'Kamu bisa mengatur warna dengan HSL dan membuat varian tint, shade, dan tone.',
     ),
+    atWork: 'Kamu membuat warna hover yang sedikit lebih gelap dengan menurunkan satu angka di CSS.',
     estMinutes: 5,
     introducesTerms: ['hsl'],
     usesTerms: ['ui', 'roda-warna'],
@@ -558,133 +834,203 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('a08/sirup-hsl.svg', [
         rText(
-          'Bayangkan membuat segelas sirup! Kamu pilih rasa stroberi atau melon, takar banyak sirup atau banyak air, lalu atur terang lampu ruangannya.',
-          'Memahami satu warna digital paling mudah lewat segelas sirup: rasa sirup adalah jenis warnanya, kekentalan sirup adalah kepekatannya, dan lampu ruangan menentukan terang-gelapnya.',
+          'Sirup stroberi merah. Sirup melon hijau. Bayangkan kamu memilih salah satu warna itu untuk gambar minuman.',
+          'Tim memberi satu warna merek. Kamu perlu membuat versi lebih gelap saat penunjuk menyentuh tombol.',
         ),
       ]),
       conceptStep({
-        title: t('Tiga Sifat Warna: H, S, L', 'Mengenal Hue, Saturation, Lightness'),
+        title: t('Tiga sifat warna', 'Tiga angka dalam HSL'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'hsl-tiga-sifat' },
-        alt: t('Pengatur HSL: Hue sudut warna 0-360, Saturation kepekatan 0-100%, Lightness terang 0-100%.'),
-        body: [
-          rTerm('hsl', 'HSL', 'HSL'),
-          rText(
-            ': Hue itu jenis warnanya. Saturation itu kepekatannya. Lightness itu terang atau gelapnya.',
-            ' mengurai warna menjadi tiga angka: Hue (posisi sudut roda 0°–360°), Saturation (abu-abu 0% ke murni 100%), dan Lightness (hitam 0% ke putih 100%).',
-          ),
-        ],
-      }),
-      conceptStep({
-        title: t('Muda, Tua, dan Kalem', 'Tint, Shade, dan Tone'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'a08', topic: 'tint-shade-tone' },
-        alt: t('Tint campuran putih lebih muda, Shade campuran hitam lebih tegas, Tone campuran abu lebih kalem.'),
-        body: [
-          rText(
-            'Tambah putih jadi ',
-            'Dari satu warna lahir skala 50–900: ',
-          ),
-          rBold('Tint', 'Tint'),
-          rText(
-            ' (muda lembut). Tambah hitam jadi ',
-            ' (+ putih, lembut), ',
-          ),
-          rBold('Shade', 'Shade'),
-          rText(
-            ' (tua tegas). Tambah abu jadi ',
-            ' (+ hitam, tegas), dan ',
-          ),
-          rBold('Tone', 'Tone'),
-          rText(' (kalem).', ' (+ abu-abu, kalem).'),
-        ],
-      }),
-      conceptStep({
-        title: t('Menulis HSL di CSS', 'Memakai hsl() untuk Varian Warna'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'a08', topic: 'kode-hsl-css' },
-        alt: t('Contoh hsl(14, 77%, 54%) dengan angka terakhir diubah untuk versi terang dan gelap.'),
-        code: {
-          lang: 'css',
-          code: '/* Ubah angka terakhir (Lightness) untuk membuat tint & shade */\nbackground: hsl(14, 77%, 54%);',
-        },
-        body: [
-          rText(
-            'Di ',
-            'Format ',
-          ),
-          rCode('hsl(14, 77%, 54%)'),
-          rText(
-            ', angka terakhir mengatur terang-gelap dengan cepat!',
-            ' paling ramah manusia: cukup naikkan atau turunkan angka ketiga (Lightness) untuk membuat varian hover atau latar lembut.',
-          ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Gelas sirup dan lampu ruangan untuk HSL'),
-        same: [
-          t('Rasa (Hue), kekentalan (Saturation), dan terang lampu (Lightness) bisa diubah terpisah-pisah.'),
-        ],
-        different: [
-          t('Sirup di gelas nyata akan luber kalau terus ditambah air, sedangkan angka Saturation dan Lightness di layar selalu terukur rapi antara 0% sampai 100%.'),
-        ],
-      }),
-      simStep(
-        'roda-warna',
-        t(
-          'Lihat pada skema Monokromatik: satu rasa warna sama diubah terang-gelapnya menjadi satu keluarga warna serasi!',
-          'Amati variasi terang-gelap pada skema Monokromatik di simulator untuk melihat skala warna dari satu Hue.',
+        alt: t(
+          'Tiga sifat warna: jenis, kepekatan, dan terang-gelap.',
+          'Pengatur HSL: Hue 0-360, Saturation 0-100%, Lightness 0-100%.',
         ),
-      ),
+        body: [
+          rJTerm('hsl', 'Pengatur warna'),
+          rJunior(
+            ' punya tiga pilihan. Pilih jenisnya, seperti merah atau biru. Buat warnanya pekat atau pudar. Atur terang atau gelapnya.',
+          ),
+          rProTerm('hsl', 'HSL'),
+          rPro(
+            ' mengatur warna lewat tiga angka. Hue adalah posisi di roda (0°–360°), Saturation adalah kepekatan (0%–100%), dan Lightness adalah terang-gelap (0%–100%).',
+          ),
+        ],
+      }),
       qStep(
         makeMcq({
           id: 'a08-l02-q1',
           type: 'analogy',
-          prompt: t('Pada perumpamaan segelas sirup HSL, banyak sedikitnya sirup dibanding air (dari pucat abu ke pekat murni) adalah…'),
+          prompt: t(
+            'Sirup yang sedikit air terasa sangat kental. Itu mirip sifat warna yang mana?',
+            'Dalam perumpamaan sirup, perbandingan sirup dan air sama dengan sifat HSL yang mana?',
+          ),
           choices: [
-            { id: 'sat', label: t('Saturation (kepekatan)') },
+            { id: 'sat', label: t('Kepekatan warna', 'Saturation (kepekatan)') },
             {
               id: 'hue',
-              label: t('Hue (rasa sirup)'),
-              explainWrong: t('Hue adalah jenis warnanya seperti merah atau hijau.'),
+              label: t('Jenis warna', 'Hue (jenis warna)'),
+              explainWrong: t(
+                'Jenis warna itu seperti merah stroberi atau hijau melon. Kentalnya sirup itu hal lain.',
+                'Hue adalah jenis warna, seperti merah atau hijau, bukan kadar sirup.',
+              ),
             },
             {
               id: 'lit',
-              label: t('Lightness (terang lampu)'),
-              explainWrong: t('Lightness mengatur terang hingga gelap dari hitam ke putih.'),
+              label: t('Terang-gelap warna', 'Lightness (terang-gelap)'),
+              explainWrong: t(
+                'Terang-gelap itu seperti lampu ruangan. Kentalnya sirup itu hal lain.',
+                'Lightness mengatur terang-gelap dari hitam ke putih, bukan kadar sirup.',
+              ),
             },
           ],
           answer: 'sat',
-          explainCorrect: t('Benar! Saturation 0% menghasilkan abu-abu pudar, sedangkan 100% menghasilkan warna paling pekat.'),
+          explainCorrect: t(
+            'Sirup yang kental sama dengan warna yang pekat. Sirup yang encer sama dengan warna yang pudar.',
+            'Saturation 0% menghasilkan abu-abu pudar, dan 100% menghasilkan warna paling pekat.',
+          ),
+          hints: [t('Ingat sirup yang kental dan yang encer.')],
           tags: ['hsl'],
         }),
       ),
+      conceptStep({
+        title: t('Muda, tua, dan kalem', 'Tint, shade, dan tone'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a08', topic: 'tint-shade-tone' },
+        alt: t('Satu warna ditambah putih, hitam, atau abu-abu menjadi tiga versi.'),
+        body: [
+          rJunior(
+            'Campur warna dengan putih, hasilnya lebih muda. Campur dengan hitam, hasilnya lebih tua. Campur dengan abu-abu, hasilnya lebih kalem.',
+          ),
+          rPro('Satu warna dasar bisa dibuat menjadi skala 50–900. '),
+          rProBold('Tint'),
+          rPro(' (+ putih) lebih muda dan lembut, '),
+          rProBold('shade'),
+          rPro(' (+ hitam) lebih tua dan tegas, '),
+          rProBold('tone'),
+          rPro(' (+ abu-abu) lebih kalem.'),
+        ],
+      }),
       qStep({
         id: 'a08-l02-q2',
         type: 'match',
-        prompt: t('Pasangkan istilah turunan warna berikut dengan campurannya:'),
+        prompt: t(
+          'Pasangkan campuran warna dengan hasilnya.',
+          'Pasangkan istilah turunan warna dengan campurannya.',
+        ),
         difficulty: 2,
         left: [
-          { id: 'ti', label: t('Tint (lebih muda & lembut)') },
-          { id: 'sh', label: t('Shade (lebih tua & tegas)') },
-          { id: 'to', label: t('Tone (lebih kalem)') },
+          { id: 'ti', label: t('Tambah putih', 'Tint (lebih muda dan lembut)') },
+          { id: 'sh', label: t('Tambah hitam', 'Shade (lebih tua dan tegas)') },
+          { id: 'to', label: t('Tambah abu-abu', 'Tone (lebih kalem)') },
         ],
         right: [
-          { id: 'w', label: t('Warna dasar + Putih') },
-          { id: 'b', label: t('Warna dasar + Hitam') },
-          { id: 'g', label: t('Warna dasar + Abu-abu') },
+          { id: 'w', label: t('Warna lebih muda', 'Warna dasar + putih') },
+          { id: 'b', label: t('Warna lebih tua', 'Warna dasar + hitam') },
+          { id: 'g', label: t('Warna lebih kalem', 'Warna dasar + abu-abu') },
         ],
         answer: { ti: 'w', sh: 'b', to: 'g' },
-        explainCorrect: t('Hebat! Dari satu warna utama kamu bisa menghasilkan satu keluarga skala 50 sampai 900.'),
+        explainCorrect: t(
+          'Putih membuat warna muda, hitam membuat tua, abu-abu membuat kalem. Seperti cat yang dicampur sedikit demi sedikit.',
+          'Satu warna dasar menghasilkan satu keluarga skala 50 sampai 900.',
+        ),
+        hints: [t('Ingat warna biru yang dicampur susu putih.'), undefined],
         tags: ['hsl'],
+      }),
+      simStep(
+        'roda-warna',
+        t(
+          'Pilih satu warna di simulator, lalu lihat terang-gelapnya berubah.',
+          'Pilih skema Monokromatik di simulator dan amati skala terang-gelap dari satu Hue.',
+        ),
+      ),
+      conceptStep({
+        title: t('Menulis HSL di CSS', 'Memakai hsl() untuk varian warna'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a08', topic: 'kode-hsl-css' },
+        alt: t('Contoh hsl(14, 77%, 54%) dengan angka terakhir diubah untuk versi terang dan gelap.'),
+        modes: ['pro'],
+        code: {
+          lang: 'css',
+          code: '/* Ubah angka terakhir (Lightness) untuk membuat tint dan shade */\nbackground: hsl(14, 77%, 54%);',
+        },
+        body: [
+          rPro('Varian warna mudah dibuat dengan HSL: cukup ubah angka ketiga. Contoh: '),
+          rCode('hsl(14, 77%, 54%)', ['pro']),
+          rPro(' menjadi lebih gelap kalau angka 54% diturunkan, misalnya untuk warna hover.'),
+        ],
+      }),
+      limitStep({
+        analogy: t('Warna segelas sirup', 'Gelas sirup dan lampu ruangan untuk HSL'),
+        same: [
+          t(
+            'Sirup dan gambar sama-sama bisa tampak merah atau hijau.',
+            'Rasa, kekentalan, dan terang lampu bisa diubah satu per satu, seperti Hue, Saturation, Lightness.',
+          ),
+        ],
+        different: [
+          t(
+            'Sirup pekat kadang lebih gelap. Di layar, keduanya diatur terpisah.',
+            'Sirup pekat juga dapat tampak gelap. Dalam HSL, kepekatan dan terang bisa diatur terpisah.',
+          ),
+        ],
+        riskyAnalogy: true,
       }),
       qStep(
         makeTf({
           id: 'a08-l02-q3',
-          prompt: t('Dalam HSL, mengubah nilai Lightness menjadi 0% akan membuat warna apa pun tampak hitam.'),
+          prompt: t(
+            'Terang lampu dikecilkan sampai habis. Warnanya menjadi hitam.',
+            'Dalam HSL, Lightness 0% membuat warna apa pun tampak hitam.',
+          ),
           answer: true,
-          explainCorrect: t('Betul! Lightness 0% berarti tanpa cahaya (hitam), sedangkan 100% berarti putih penuh.'),
-          explainWrong: t('Hampir! Rentang Lightness dimulai dari 0% (hitam) menuju 100% (putih).'),
+          explainCorrect: t(
+            'Tanpa cahaya, semua warna tampak hitam. Seperti kamar yang lampunya mati.',
+            'Lightness 0% berarti tanpa cahaya, yaitu hitam. Lightness 100% berarti putih penuh.',
+          ),
+          explainWrong: t(
+            'Pernyataan itu benar. Lampu yang mati membuat semua warna tampak hitam.',
+            'Pernyataan itu benar: rentang Lightness dimulai dari 0% (hitam) sampai 100% (putih).',
+          ),
+          hints: [t('Ingat kamar yang lampunya mati.')],
+          tags: ['hsl'],
+        }),
+      ),
+      qStep(
+        makeMcq({
+          id: 'a08-l02-q5j',
+          type: 'scenario',
+          modes: ['junior'],
+          story: t(
+            'Nadia menggambar gelas biru di layar. Ia ingin biru yang sama, tetapi lebih gelap.',
+            'Nadia memakai sirup biru untuk minuman kelasnya. Ia ingin biru yang sama dengan hasil lebih gelap.',
+          ),
+          prompt: t('Sifat warna mana yang ia turunkan?'),
+          difficulty: 2,
+          choices: [
+            { id: 'lit', label: t('Terang-gelapnya') },
+            {
+              id: 'hue',
+              label: t('Jenis warnanya saja'),
+              explainWrong: t(
+                'Mengganti jenis membuat biru menjadi warna lain, misalnya merah. Nadia mau biru yang sama.',
+                'Mengganti Hue membuat biru berubah menjadi warna lain, misalnya merah. Nadia mau biru yang sama.',
+              ),
+            },
+            {
+              id: 'sat',
+              label: t('Kepekatannya'),
+              explainWrong: t(
+                'Saat kepekatan turun, biru mendekati abu-abu. Nadia ingin mengubah terangnya.',
+                'Saturation yang turun membuat biru pudar dan keabu-abuan, bukan lebih gelap.',
+              ),
+            },
+          ],
+          answer: 'lit',
+          explainCorrect: t(
+            'Turunkan terang warna. Gambar gelas menjadi biru yang lebih gelap.',
+          ),
+          hints: [t('Ingat lampu ruangan yang diredupkan.')],
           tags: ['hsl'],
         }),
       ),
@@ -692,24 +1038,35 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l02-q4',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('Gelas sirup dan lampu ruangan'),
-          prompt: t('Apa perbedaan sifat antara menakar sirup nyata dengan mengatur HSL di layar komputer?'),
+          prompt: t('Apa beda menakar sirup sungguhan dengan mengatur HSL di layar?'),
           difficulty: 2,
           choices: [
-            { id: 'pct', label: t('HSL memakai ukuran pasti sudut 0–360° dan persentase 0–100% yang bisa diulang persis sama') },
+            {
+              id: 'pct',
+              label: t('HSL memakai angka pasti yang bisa diulang persis'),
+            },
             {
               id: 'rasa',
-              label: t('Jenis warna tetap dibedakan layaknya memilih rasa sirup'),
-              explainWrong: t('Ini persamaan antara analogi rasa dan Hue.'),
+              label: t('HSL memakai jenis warna seperti memilih rasa sirup'),
+              explainWrong: t(
+                'Itu kesamaan antara rasa sirup dan Hue, bukan perbedaannya.',
+              ),
             },
             {
               id: 'gelap',
-              label: t('Lampu redup membuat tampilan terlihat makin gelap'),
-              explainWrong: t('Ini juga persamaan dengan Lightness.'),
+              label: t('HSL membuat tampilan gelap saat lampu diredupkan'),
+              explainWrong: t(
+                'Itu kesamaan dengan Lightness, bukan perbedaannya.',
+              ),
             },
           ],
           answer: 'pct',
-          explainCorrect: t('Tepat! Angka pasti pada HSL memudahkan tim desainer maupun programmer membuat skala warna yang konsisten.'),
+          explainCorrect: t(
+            'Sudut 0°–360° dan persentase 0%–100% selalu menghasilkan warna yang sama. Takaran sirup asli bisa meleset.',
+          ),
+          hints: [t('Cari bagian yang tidak ada pada sirup asli.')],
           tags: ['hsl'],
         }),
       ),
@@ -717,47 +1074,65 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l02-q5',
           type: 'scenario',
-          story: t('Nadia memakai warna tombol utama hsl(215, 80%, 50%). Ketika tombol diarahkan kursor (hover), ia ingin warnanya sedikit lebih gelap tetapi tetap warna biru yang sama.'),
+          modes: ['pro'],
+          story: t(
+            'Nadia memakai warna tombol hsl(215, 80%, 50%). Saat kursor di atas tombol (hover), warnanya harus sedikit lebih gelap tetapi tetap biru.',
+          ),
           prompt: t('Bagian mana pada hsl(215, 80%, 50%) yang sebaiknya diturunkan?'),
           difficulty: 2,
           choices: [
-            { id: 'lit', label: t('Angka ketiga (Lightness), misal dari 50% menjadi 40%') },
+            { id: 'lit', label: t('Angka ketiga, misalnya dari 50% ke 40%') },
             {
               id: 'hue',
-              label: t('Angka pertama (Hue), misal menjadi 0'),
-              explainWrong: t('Mengubah Hue dari 215 ke 0 akan mengganti warnanya dari biru menjadi merah!'),
+              label: t('Angka pertama, misalnya dari 215 ke 0'),
+              explainWrong: t(
+                'Hue 215 adalah biru. Hue 0 adalah merah, jadi warnanya berganti.',
+              ),
             },
             {
               id: 'up',
-              label: t('Naikkan Lightness menjadi 98%'),
-              explainWrong: t('98% akan membuat tombol menjadi hampir putih sangat pucat, bukan lebih gelap.'),
+              label: t('Angka kedua, misalnya dari 80% ke 30%'),
+              explainWrong: t(
+                'Angka kedua mengatur kepekatan. Menurunkannya membuat biru pudar, bukan gelap.',
+              ),
             },
           ],
           answer: 'lit',
-          explainCorrect: t('Benar! Menurunkan Lightness dari 50% ke 40% membuat biru tampak lebih gelap tanpa mengubah Hue-nya.'),
+          explainCorrect: t(
+            'Menurunkan Lightness dari 50% ke 40% menggelapkan biru tanpa mengubah Hue.',
+          ),
+          hints: [t('Angka mana yang mengatur terang-gelap?')],
           tags: ['hsl', 'ui'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'a08-l02-q6',
-          prompt: t('Dari angka-angka berikut, nilai sudut berapakah yang menjadi rentang lengkap properti Hue pada lingkaran roda warna HSL?'),
+          modes: ['pro'],
+          prompt: t('Berapa rentang sudut Hue pada roda warna HSL?'),
           difficulty: 1,
           choices: [
             { id: 'deg', label: t('0° sampai 360°') },
             {
               id: 'ten',
-              label: t('1 sampai 10'),
-              explainWrong: t('Roda warna berbentuk lingkaran penuh 360 derajat.'),
+              label: t('0° sampai 180°'),
+              explainWrong: t(
+                'Roda warna berbentuk lingkaran penuh. Satu putaran penuh adalah 360°.',
+              ),
             },
             {
               id: 'neg',
-              label: t('Hanya 0 atau 1 saja'),
-              explainWrong: t('0 dan 1 adalah tipe boolean/alpha, bukan derajat roda warna.'),
+              label: t('0° sampai 255°'),
+              explainWrong: t(
+                'Rentang 0 sampai 255 milik saluran warna RGB. Hue memakai sudut lingkaran.',
+              ),
             },
           ],
           answer: 'deg',
-          explainCorrect: t('Tepat! Satu putaran lingkaran penuh roda warna membentang dari 0° hingga 360°.'),
+          explainCorrect: t(
+            'Satu putaran penuh roda warna membentang dari 0° sampai 360°.',
+          ),
+          hints: [t('Roda warna berbentuk lingkaran penuh.')],
           tags: ['hsl', 'roda-warna'],
         }),
       ),
@@ -765,43 +1140,77 @@ export const lessons: Lesson[] = [
         id: 'a08-l02-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi kalimat pembentukan keluarga skala warna:'),
+        prompt: t('Apa nama campuran warna dengan hitam?'),
         difficulty: 2,
-        template: 'Mencampur suatu warna dengan warna hitam untuk menghasilkan versi lebih tua dan tegas disebut ___.',
+        template: 'Warna dasar ditambah hitam menghasilkan versi lebih tua dan tegas, disebut ___.',
         bank: ['shade', 'tint', 'tone'],
         answer: ['shade'],
-        explainCorrect: t('Benar! Tint (+ putih), Shade (+ hitam), dan Tone (+ abu-abu).'),
+        explainCorrect: t('Shade memakai hitam. Tint memakai putih, dan tone memakai abu-abu.'),
+        hints: [t('Hitam membuat warna lebih tua dan tegas.'), undefined],
         tags: ['hsl'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l02-r1',
-        prompt: t('Pada singkatan HSL, huruf "L" adalah kependekan dari…'),
+        prompt: t(
+          'Sifat warna mana yang mengatur terang atau gelapnya?',
+          'Sifat HSL mana yang mengatur warna dari hitam sampai putih?',
+        ),
         choices: [
-          { id: 'l', label: t('Lightness (terang-gelap warna)') },
-          { id: 'w', label: t('Length (panjang huruf)'), explainWrong: t('HSL terdiri dari Hue, Saturation, dan Lightness.') },
+          { id: 'l', label: t('Terang-gelap', 'Lightness') },
+          {
+            id: 'w',
+            label: t('Jenis warna', 'Hue'),
+            explainWrong: t(
+              'Jenis warna itu seperti merah stroberi atau hijau melon. Terang lampu itu hal lain.',
+              'Hue mengatur posisi di roda, bukan hitam sampai putih.',
+            ),
+          },
+          {
+            id: 'k',
+            label: t('Kepekatan', 'Saturation'),
+            explainWrong: t(
+              'Kepekatan itu kentalnya sirup. Terang lampu itu hal lain.',
+              'Saturation mengatur abu-abu sampai murni, bukan hitam sampai putih.',
+            ),
+          },
         ],
         answer: 'l',
-        explainCorrect: t('Lightness mengatur kecerahan dari 0% hitam ke 100% putih.'),
+        explainCorrect: t(
+          'Terang-gelap diatur seperti lampu ruangan. Dari gelap sampai terang.',
+          'Lightness mengatur kecerahan dari 0% hitam ke 100% putih.',
+        ),
+        hints: [t('Ingat lampu ruangan.')],
         tags: ['hsl'],
       }),
       makeTf({
         id: 'a08-l02-r2',
-        prompt: t('Menambahkan warna putih ke suatu warna dasar menghasilkan Tint yang lebih muda dan lembut.'),
+        prompt: t(
+          'Putih dicampur ke satu warna membuat warna itu lebih muda dan lembut.',
+          'Menambahkan putih ke warna dasar menghasilkan tint yang lebih muda dan lembut.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! Tint sering dipakai untuk warna latar kartu lembut seperti biru muda (#EAF0FE).'),
-        explainWrong: t('Warna dasar ditambah putih menghasilkan Tint.'),
+        explainCorrect: t(
+          'Putih membuat warna lebih muda. Seperti cat biru yang diberi susu putih.',
+          'Tint sering dipakai untuk latar kartu yang lembut, misalnya biru muda.',
+        ),
+        explainWrong: t(
+          'Pernyataan itu benar. Putih membuat warna lebih muda dan lembut.',
+          'Pernyataan itu benar: warna dasar ditambah putih menghasilkan tint.',
+        ),
+        hints: [t('Ingat cat yang diberi susu putih.')],
         tags: ['hsl'],
       }),
     ],
     recap: t(
-      'HSL membagi warna menjadi jenis (Hue), kepekatan (Saturation), dan terang-gelap (Lightness).',
-      'Atur warna secara presisi lewat HSL serta ciptakan color scale menggunakan Tint (+putih), Shade (+hitam), dan Tone (+abu-abu).',
+      'Kamu bisa memilih jenis warna, kepekatan, dan terangnya.',
+      'HSL mengatur warna lewat Hue, Saturation, dan Lightness. Tint, shade, dan tone membuat skala dari satu warna.',
     ),
     companion: {
-      talkPrompts: ['Kalau membuat sirup stroberi terlalu encer atau terlalu kental, itu mirip mengatur apa di HSL?'],
-      offlineActivity: 'Amati warna kemeja atau cat dinding di ruangan saat lampu terang vs saat gorden ditutup (itulah perubahan Lightness!).',
+      talkPrompts: ['Sirup terlalu encer itu mirip mengubah sifat warna yang mana?'],
+      offlineActivity:
+        'Lihat warna kemeja atau cat dinding saat lampu terang dan saat gorden ditutup. Itu perubahan terang-gelap.',
     },
   }),
 
@@ -811,9 +1220,10 @@ export const lessons: Lesson[] = [
     title: 'Skema warna',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa memilih resep skema warna yang serasi seperti monokromatik, analog, dan komplementer.',
-      'Aku bisa membedakan skema monokromatik, analog, komplementer, split-komplementer, triadik, dan tetradik.',
+      'Aku bisa memilih resep warna: satu warna, bertetangga, atau berseberangan.',
+      'Kamu bisa membedakan skema monokromatik, analog, komplementer, split-komplementer, triadik, dan tetradik.',
     ),
+    atWork: 'Kamu memilih warna tombol ajakan yang menonjol dari latar halaman tanpa membuat tampilan ramai.',
     estMinutes: 5,
     introducesTerms: ['skema-warna'],
     usesTerms: ['ui', 'roda-warna', 'hsl'],
@@ -821,122 +1231,231 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('a08/resep-seragam.svg', [
         rText(
-          'Memilih warna website itu seperti memilih baju serasi dari lemari. Ada resep pasangan warna agar mata nyaman melihatnya!',
-          'Seperti memadukan pakaian memakai rumus warna agar tidak saling bertabrakan, skema warna adalah resep memilih beberapa warna dari roda agar hasilnya harmonis.',
+          'Kamu memilih baju untuk hari pertama sekolah. Ada resep supaya warna baju terlihat serasi. Resep apa saja yang ada?',
+          'Kamu menyusun palet untuk sebuah situs, tetapi warnanya saling bertabrakan. Kamu butuh resep yang menjaga warna tetap harmonis.',
         ),
       ]),
       conceptStep({
-        title: t('Satu Warna & Tetangga Dekat', 'Monokromatik & Analog'),
+        title: t('Satu warna dan tetangga dekat', 'Monokromatik dan analog'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'skema-mono-analog' },
-        alt: t('Skema monokromatik biru tua sampai muda dan skema analog biru-toska-hijau.'),
+        alt: t('Biru tua sampai muda, dan biru, toska, hijau yang bertetangga.'),
         body: [
-          rTerm('skema-warna', 'Skema warna', 'Skema warna'),
-          rText(' ', ' '),
-          rBold('Monokromatik', 'Monokromatik'),
-          rText(
-            ' memakai satu warna beda terang-gelap (paling aman). ',
-            ' memakai satu hue beragam terang-gelap (paling rapi). ',
+          rJTerm('skema-warna', 'Skema warna'),
+          rJunior(
+            ' adalah resep memilih warna yang serasi. Satu warna dengan terang-gelap berbeda terasa aman dan rapi. Dua warna bertetangga terasa lembut.',
           ),
-          rBold('Analog', 'Analog'),
-          rText(' memadukan tetangga bersebelahan seperti alam.', ' memakai 2–3 warna bersebelahan (lembut harmonis).'),
+          rProTerm('skema-warna', 'Skema warna'),
+          rPro(' adalah resep memilih beberapa warna dari roda. '),
+          rProBold('Monokromatik'),
+          rPro(' memakai satu hue dengan variasi terang-gelap, paling aman dan rapi. '),
+          rProBold('Analog'),
+          rPro(' memakai 2–3 warna yang bersebelahan, lembut dan harmonis.'),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'a08-l03-q8',
+          prompt: t(
+            'Biru, toska, dan hijau saling bertetangga di roda. Resep warna apa itu?',
+            'Biru, toska, dan hijau bersebelahan pada roda warna. Skema apa itu?',
+          ),
+          choices: [
+            { id: 'an', label: t('Warna yang bertetangga', 'Analog') },
+            {
+              id: 'mo',
+              label: t('Satu warna saja', 'Monokromatik'),
+              explainWrong: t(
+                'Satu warna hanya memakai biru yang terang-gelap. Di sini ada tiga warna.',
+                'Monokromatik memakai satu hue. Di sini ada tiga hue yang berdekatan.',
+              ),
+            },
+            {
+              id: 'rnd',
+              label: t('Warna yang dipilih acak', 'Komplementer'),
+              explainWrong: t(
+                'Ketiga warna itu berdekatan, bukan acak. Letak berdekatan itulah resepnya.',
+                'Komplementer memadukan dua warna yang berseberangan, bukan tiga warna yang bersebelahan.',
+              ),
+            },
+          ],
+          answer: 'an',
+          explainCorrect: t(
+            'Warna bertetangga terasa lembut dan menyatu. Seperti pelangi yang warnanya berurutan.',
+            'Skema analog memakai 2–3 warna yang bersebelahan. Hasilnya lembut dan harmonis, seperti warna alam.',
+          ),
+          hints: [t('Lihat letak ketiga warna di roda.')],
+          tags: ['skema-warna'],
+        }),
+      ),
       conceptStep({
-        title: t('Berseberangan untuk Tombol Menonjol', 'Komplementer & Split-Komplementer'),
+        title: t('Berseberangan agar tombol menonjol', 'Komplementer dan split-komplementer'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'skema-komplementer' },
         alt: t('Biru berseberangan dengan jingga pada roda warna menghasilkan kontras tajam.'),
         body: [
-          rBold('Komplementer', 'Komplementer'),
-          rText(
-            ' memilih dua warna berseberangan. Kontrasnya paling kuat untuk menonjolkan tombol!',
-            ' memadukan 2 warna berseberangan (kontras terkuat untuk tombol). ',
+          rJunior(
+            'Dua warna berseberangan membuat tombol langsung menonjol. Tiga warna berjarak sama terasa ceria.',
           ),
-          rBold('Split-komplementer', 'Split-komplementer'),
-          rText(' memadukan dua tetangga seberangnya agar lembut.', ' memakai 1 warna plus 2 tetangga seberangnya agar lebih lembut.'),
+          rProBold('Komplementer'),
+          rPro(' memadukan 2 warna berseberangan dan menghasilkan kontras terkuat untuk tombol. '),
+          rProBold('Split-komplementer'),
+          rPro(' memakai 1 warna dan 2 tetangga dari seberangnya agar lebih lembut.'),
         ],
       }),
       conceptStep({
-        title: t('Tiga, Empat, dan Rumus Pemula', 'Triadik, Tetradik, & Rumus Aman'),
+        title: t('Triadik, tetradik, dan rumus aman'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'triadik-rumus-pemula' },
-        alt: t('Tiga warna triadik ceria dan rumus praktis 1 utama + abu-abu + 1 aksen.'),
+        alt: t('Tiga warna berjarak sama dan rumus satu utama, abu-abu, satu aksen.'),
+        modes: ['pro'],
         body: [
-          rBold('Triadik', 'Triadik'),
-          rText(
-            ' memakai 3 warna berjarak sama untuk kesan ceria. Resep pemula paling aman: 1 warna utama, abu-abu, dan 1 aksen!',
-            ' memakai 3 warna segitiga (ceria untuk anak), sedangkan tetradik 4 warna paling sulit seimbang. Rumus aman: 1 utama + abu-abu + 1 aksen.',
+          rProBold('Triadik'),
+          rPro(' memakai 3 warna berjarak sama, kesannya ceria. '),
+          rProBold('Tetradik'),
+          rPro(
+            ' memakai 4 warna dan paling sulit diseimbangkan. Rumus aman untuk pemula: 1 warna utama, abu-abu, dan 1 aksen.',
           ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Resep memilih pasangan warna pakaian'),
-        same: [
-          t('Warna tetangga terasa tenang menyatu; warna berseberangan membuat satu hal langsung mencuri pandangan.'),
-        ],
-        different: [
-          t('Pada skema komplementer di UI, kamu tidak boleh membagi biru 50% dan oranye 50% sama banyak—jadikan satu warna utama dan pasangannya cukup sedikit untuk tombol!'),
         ],
       }),
       simStep(
         'roda-warna',
         t(
-          'Klik Monokromatik, Analog, lalu Komplementer di simulator roda warna dan perhatikan bedanya!',
-          'Bandingkan palet Monokromatik, Analog, dan Komplementer langsung pada simulator Pembuat Skema Roda Warna.',
+          'Ketuk tiga pilihan skema di simulator, lalu lihat bedanya.',
+          'Bandingkan palet Monokromatik, Analog, dan Komplementer di simulator Pembuat Skema Roda Warna.',
         ),
       ),
+      limitStep({
+        analogy: t('Resep memilih pasangan warna pakaian'),
+        same: [
+          t(
+            'Warna tetangga terasa tenang. Warna berseberangan langsung mencuri pandangan.',
+            'Warna tetangga terasa tenang menyatu, dan warna berseberangan langsung mencuri pandangan.',
+          ),
+        ],
+        different: [
+          t(
+            'Di halaman, jangan bagi dua warna sama banyak. Pakai satu utama, pasangannya sedikit.',
+            'Pada skema komplementer, jangan bagi biru dan jingga sama banyak. Jadikan satu warna utama dan pasangannya sedikit untuk tombol.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
       qStep({
         id: 'a08-l03-q1',
         type: 'match',
-        prompt: t('Pasangkan jenis skema warna dengan ciri khasnya di roda warna:'),
+        prompt: t(
+          'Pasangkan resep warna dengan kesannya.',
+          'Pasangkan jenis skema warna dengan ciri khasnya di roda warna.',
+        ),
         difficulty: 2,
         left: [
-          { id: 'mo', label: t('Monokromatik') },
-          { id: 'an', label: t('Analog') },
-          { id: 'co', label: t('Komplementer') },
-          { id: 'tr', label: t('Triadik') },
+          { id: 'mo', label: t('Satu warna saja', 'Monokromatik') },
+          { id: 'an', label: t('Warna bertetangga', 'Analog') },
+          { id: 'co', label: t('Warna berseberangan', 'Komplementer') },
+          { id: 'tr', label: t('Tiga warna berjarak sama', 'Triadik') },
         ],
         right: [
-          { id: 'rmo', label: t('Satu hue dengan variasi terang dan gelap saja') },
-          { id: 'ran', label: t('Dua hingga tiga warna yang bersebelahan di roda') },
-          { id: 'rco', label: t('Dua warna yang saling berseberangan untuk kontras kuat') },
-          { id: 'rtr', label: t('Tiga warna berjarak sama membentuk segitiga ceria') },
+          { id: 'rmo', label: t('Aman dan rapi', 'Satu hue dengan variasi terang-gelap') },
+          { id: 'ran', label: t('Lembut dan tenang', '2–3 warna yang bersebelahan') },
+          { id: 'rco', label: t('Tombol menonjol', '2 warna berseberangan untuk kontras kuat') },
+          { id: 'rtr', label: t('Ceria dan seru', '3 warna berjarak sama membentuk segitiga') },
         ],
         answer: { mo: 'rmo', an: 'ran', co: 'rco', tr: 'rtr' },
-        explainCorrect: t('Hebat! Kamu sudah menguasai empat skema warna yang paling sering dipakai desainer.'),
+        explainCorrect: t(
+          'Setiap resep punya kesan sendiri: aman, lembut, menonjol, atau ceria. Pilih sesuai tujuanmu.',
+          'Keempat skema ini paling sering dipakai desainer. Masing-masing punya kesan dan fungsi sendiri.',
+        ),
+        hints: [t('Ingat resep baju: satu warna, tetangga, seberang.'), undefined],
         tags: ['skema-warna'],
       }),
       qStep(
         makeMcq({
           id: 'a08-l03-q2',
           type: 'analogy',
-          prompt: t('Jika halaman websitemu banyak memakai biru yang tenang lalu tombol "Beli" diberi warna jingga seberangnya agar langsung terlihat, skema apa itu?'),
+          prompt: t(
+            'Halaman berwarna biru, lalu tombol "Beli" diberi jingga. Resep warna apa itu?',
+            'Halaman banyak memakai biru yang tenang, lalu tombol "Beli" diberi jingga dari seberangnya. Skema apa itu?',
+          ),
           choices: [
-            { id: 'co', label: t('Skema komplementer') },
+            { id: 'co', label: t('Warna berseberangan', 'Skema komplementer') },
             {
               id: 'mo',
-              label: t('Skema monokromatik'),
-              explainWrong: t('Monokromatik hanya memakai variasi warna biru saja tanpa jingga.'),
+              label: t('Satu warna saja', 'Skema monokromatik'),
+              explainWrong: t(
+                'Satu warna saja tidak punya jingga. Di sini ada biru dan jingga.',
+                'Monokromatik hanya memakai variasi biru, tanpa jingga.',
+              ),
             },
             {
               id: 'an',
-              label: t('Skema analog'),
-              explainWrong: t('Biru dan jingga berseberangan di roda warna, bukan bersebelahan.'),
+              label: t('Warna bertetangga dekat', 'Skema analog'),
+              explainWrong: t(
+                'Biru dan jingga berdiri berjauhan di roda. Warna bertetangga lebih mirip satu sama lain.',
+                'Biru dan jingga berseberangan di roda warna, bukan bersebelahan.',
+              ),
             },
           ],
           answer: 'co',
-          explainCorrect: t('Tepat! Pasangan berseberangan seperti biru dan jingga menciptakan kontras tinggi untuk tombol ajakan.'),
+          explainCorrect: t(
+            'Dua warna berseberangan membuat tombol langsung terlihat. Seperti spidol jingga di kertas biru.',
+            'Pasangan berseberangan seperti biru dan jingga menciptakan kontras tinggi untuk tombol ajakan.',
+          ),
+          hints: [t('Biru dan jingga berdiri berjauhan di roda.')],
           tags: ['skema-warna', 'ui'],
+        }),
+      ),
+      qStep(
+        makeMcq({
+          id: 'a08-l03-q5',
+          type: 'scenario',
+          story: t(
+            'Bito membuat situs permainan untuk anak SD. Situsnya harus ceria, penuh warna, dan tetap rapi.',
+            'Bito membuat situs permainan anak SD yang ceria dan penuh warna. Palet harus tetap teratur.',
+          ),
+          prompt: t('Resep warna mana yang paling cocok?', 'Skema warna mana yang paling cocok?'),
+          difficulty: 2,
+          choices: [
+            { id: 'tri', label: t('Tiga warna berjarak sama', 'Triadik: 3 warna berjarak sama') },
+            {
+              id: 'bw',
+              label: t('Satu warna biru saja', 'Monokromatik: satu hue saja'),
+              explainWrong: t(
+                'Satu warna terasa aman, tetapi kurang ceria untuk anak.',
+                'Monokromatik terasa aman tetapi kurang ceria untuk produk anak.',
+              ),
+            },
+            {
+              id: 'ten',
+              label: t('Dua warna bertetangga', 'Analog: 2–3 warna bersebelahan'),
+              explainWrong: t(
+                'Warna bertetangga terasa lembut. Situs anak butuh rasa yang lebih ramai.',
+                'Analog terasa lembut dan tenang, kurang energik untuk produk anak.',
+              ),
+            },
+          ],
+          answer: 'tri',
+          explainCorrect: t(
+            'Tiga warna berjarak sama terasa ceria. Seperti pelangi kecil di kelas.',
+            'Skema triadik memberi nuansa ceria dan berenergi yang cocok untuk aplikasi anak.',
+          ),
+          hints: [t('Ingat: ceria dan tetap rapi.', 'Cari skema yang ceria tetapi seimbang.')],
+          tags: ['skema-warna'],
         }),
       ),
       qStep(
         makeTf({
           id: 'a08-l03-q3',
-          prompt: t('Skema tetradik (4 warna sekaligus) adalah skema paling mudah diseimbangkan untuk pemula.'),
+          modes: ['pro'],
+          prompt: t('Skema tetradik (4 warna sekaligus) paling mudah diseimbangkan untuk pemula.'),
           answer: false,
-          explainCorrect: t('Benar, itu keliru! Tetradik paling sulit diseimbangkan; skema paling aman untuk pemula adalah monokromatik.'),
-          explainWrong: t('Hampir! Semakin banyak warna berbeda dipakai bersamaan, semakin sulit menjaga keseimbangan mata.'),
+          explainCorrect: t(
+            'Pernyataan itu keliru: tetradik paling sulit diseimbangkan. Skema paling aman untuk pemula adalah monokromatik.',
+          ),
+          explainWrong: t(
+            'Makin banyak warna berbeda, makin sulit menjaga keseimbangan. Tetradik memakai 4 warna.',
+          ),
+          hints: [t('Hitung berapa warna yang harus diseimbangkan.')],
           tags: ['skema-warna'],
         }),
       ),
@@ -944,72 +1463,63 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l03-q4',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('Memadukan warna berseberangan'),
-          prompt: t('Aturan apa yang wajib dijaga saat memakai skema komplementer (misal biru + jingga) agar layar tidak terasa menyilaukan mata?'),
+          prompt: t('Aturan apa yang perlu dijaga saat memakai skema komplementer, misalnya biru dan jingga?'),
           difficulty: 2,
           choices: [
-            { id: 'dom', label: t('Jangan bagi 50%-50% merata; jadikan satu warna dominan atau netral dan pakai pasangannya sebagai aksen tombol') },
+            { id: 'dom', label: t('Satu warna dominan, pasangannya sebagai aksen kecil') },
             {
               id: 'max',
-              label: t('Taruh teks jingga menyala di atas latar biru menyala di seluruh paragraf'),
-              explainWrong: t('Dua warna cerah bertabrakan penuh di teks panjang sangat melelahkan mata.'),
+              label: t('Teks jingga di atas latar biru untuk seluruh paragraf'),
+              explainWrong: t(
+                'Dua warna cerah yang berseberangan saling menabrak. Di teks panjang, itu melelahkan mata.',
+              ),
             },
             {
               id: 'gray',
-              label: t('Dilarang memakai warna abu-abu atau putih sama sekali'),
-              explainWrong: t('Warna netral putih dan abu-abu justru sangat dibutuhkan untuk meredam palet.'),
+              label: t('Hindari warna putih dan abu-abu sama sekali'),
+              explainWrong: t(
+                'Putih dan abu-abu justru dibutuhkan untuk meredam palet.',
+              ),
             },
           ],
           answer: 'dom',
-          explainCorrect: t('Benar! Satu warna utama + latar netral + aksen komplementer kecil adalah resep yang jauh lebih nyaman.'),
-          tags: ['skema-warna'],
-        }),
-      ),
-      qStep(
-        makeMcq({
-          id: 'a08-l03-q5',
-          type: 'scenario',
-          story: t('Bito diminta membuat situs belajar permainan anak SD yang suasananya ceria, penuh warna, namun tetap teratur dari 3 warna berjarak sama.'),
-          prompt: t('Skema warna manakah yang paling cocok dicoba Bito?'),
-          difficulty: 2,
-          choices: [
-            { id: 'tri', label: t('Skema Triadik') },
-            {
-              id: 'bw',
-              label: t('Hitam pekat dan abu gelap semua'),
-              explainWrong: t('Warna gelap seragam terkesan kaku dan kurang ceria untuk produk anak.'),
-            },
-            {
-              id: 'ten',
-              label: t('Sepuluh warna neon acak tanpa aturan'),
-              explainWrong: t('Sepuluh warna acak membuat halaman berantakan.'),
-            },
-          ],
-          answer: 'tri',
-          explainCorrect: t('Tepat! Skema triadik memberi nuansa ceria dan berenergi yang cocok untuk aplikasi anak.'),
+          explainCorrect: t(
+            'Satu warna utama, latar netral, dan aksen komplementer yang kecil membuat layar nyaman.',
+          ),
+          hints: [t('Pikirkan porsi: warna mana yang dipakai paling sedikit?')],
           tags: ['skema-warna'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'a08-l03-q6',
-          prompt: t('Untuk pemula yang ingin paletnya langsung rapi di hampir semua produk digital, kombinasi paling praktis terdiri atas…'),
+          modes: ['pro'],
+          prompt: t('Kombinasi apa yang paling praktis agar palet pemula rapi di hampir semua produk digital?'),
           difficulty: 1,
           choices: [
-            { id: 'safe', label: t('1 warna utama + keluarga abu-abu netral + 1 warna aksen kontras') },
+            { id: 'safe', label: t('1 warna utama, abu-abu netral, 1 aksen kontras') },
             {
               id: 'four',
-              label: t('4 warna cerah sama besar tanpa warna abu-abu'),
-              explainWrong: t('Tanpa abu-abu untuk teks dan latar, halaman terasa sangat ramai.'),
+              label: t('4 warna cerah sama besar, tanpa abu-abu'),
+              explainWrong: t(
+                'Tanpa abu-abu untuk teks dan latar, halaman terasa sangat ramai.',
+              ),
             },
             {
               id: 'rain',
-              label: t('Seluruh 12 warna di roda warna dipakai menjadi latar kotak'),
-              explainWrong: t('Terlalu banyak warna merusak hierarki visual.'),
+              label: t('12 warna di roda dipakai sebagai latar kotak'),
+              explainWrong: t(
+                'Terlalu banyak warna merusak hierarki visual.',
+              ),
             },
           ],
           answer: 'safe',
-          explainCorrect: t('Benar! Tiga kelompok warna itu sudah cukup untuk membuat antarmuka yang rapi dan fokus.'),
+          explainCorrect: t(
+            'Tiga kelompok itu cukup untuk tampilan yang rapi dan fokus.',
+          ),
+          hints: [t('Ingat rumus aman: utama, netral, aksen.')],
           tags: ['skema-warna', 'ui'],
         }),
       ),
@@ -1017,41 +1527,75 @@ export const lessons: Lesson[] = [
         id: 'a08-l03-q7',
         type: 'type',
         modes: ['pro'],
-        prompt: t('Apa nama skema warna yang hanya menggunakan satu hue tunggal dengan berbagai variasi terang-gelapnya?'),
+        prompt: t('Apa nama skema warna yang hanya memakai satu hue dengan variasi terang-gelap?'),
         difficulty: 1,
         accept: ['monokromatik', 'monochromatic'],
-        explainCorrect: t('Tepat! Skema monokromatik paling aman dan rapi bagi pemula.'),
+        explainCorrect: t('Skema monokromatik paling aman dan rapi bagi pemula.'),
+        hints: [t('Awalan "mono" berarti satu.'), undefined],
         tags: ['skema-warna'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l03-r1',
-        prompt: t('Skema warna yang memadukan dua atau tiga warna yang bersebelahan pada roda warna seperti biru–toska–hijau disebut…'),
+        prompt: t(
+          'Warna yang bertetangga di roda terasa seperti apa?',
+          'Skema yang memadukan 2–3 warna bersebelahan, misalnya biru, toska, dan hijau, disebut apa?',
+        ),
         choices: [
-          { id: 'an', label: t('Analog') },
-          { id: 'co', label: t('Komplementer'), explainWrong: t('Komplementer adalah dua warna yang berseberangan.') },
+          { id: 'an', label: t('Lembut dan menyatu', 'Analog') },
+          {
+            id: 'co',
+            label: t('Tegas dan berlawanan', 'Komplementer'),
+            explainWrong: t(
+              'Tegas dan berlawanan itu warna berseberangan. Warna bertetangga lebih lembut.',
+              'Komplementer memadukan dua warna yang berseberangan.',
+            ),
+          },
+          {
+            id: 'mo',
+            label: t('Ramai dan acak', 'Monokromatik'),
+            explainWrong: t(
+              'Warna bertetangga tertata dan tidak acak. Mereka berdekatan di roda.',
+              'Monokromatik memakai satu hue, bukan beberapa warna bersebelahan.',
+            ),
+          },
         ],
         answer: 'an',
-        explainCorrect: t('Skema analog menghasilkan suasana lembut dan harmonis seperti warna alam.'),
+        explainCorrect: t(
+          'Warna bertetangga terasa lembut dan menyatu. Seperti warna daun dan langit.',
+          'Skema analog menghasilkan suasana lembut dan harmonis, seperti warna alam.',
+        ),
+        hints: [t('Ingat pelangi yang warnanya berurutan.')],
         tags: ['skema-warna'],
       }),
       makeTf({
         id: 'a08-l03-r2',
-        prompt: t('Split-komplementer memadukan satu warna utama dengan dua warna tetangga dari seberangnya sehingga kontrasnya tetap kuat namun lebih lembut.'),
+        prompt: t(
+          'Dua warna berseberangan di roda membuat tombol menonjol.',
+          'Split-komplementer memadukan satu warna dengan dua tetangga dari seberangnya, jadi kontrasnya lebih lembut.',
+        ),
         answer: true,
-        explainCorrect: t('Betul!'),
-        explainWrong: t('Split-komplementer memberi variasi kontras tanpa terasa terlalu keras.'),
+        explainCorrect: t(
+          'Dua warna berseberangan saling menonjolkan. Seperti spidol jingga di kertas biru.',
+          'Kontrasnya tetap kuat, tetapi tidak sekeras skema komplementer biasa.',
+        ),
+        explainWrong: t(
+          'Pernyataan itu benar. Warna berseberangan membuat satu hal mencuri pandangan.',
+          'Pernyataan itu benar: split-komplementer memberi kontras tanpa terasa terlalu keras.',
+        ),
+        hints: [t('Ingat spidol jingga di kertas biru.')],
         tags: ['skema-warna'],
       }),
     ],
     recap: t(
-      'Pilih skema monokromatik untuk rapi aman, analog untuk lembut, atau komplementer agar tombol menonjol.',
-      'Gunakan skema monokromatik, analog, komplementer, split-komplementer, atau triadik bersama rumus 1 utama + abu-abu + 1 aksen.',
+      'Satu warna itu aman, bertetangga itu lembut, berseberangan membuat tombol menonjol.',
+      'Pilih monokromatik, analog, komplementer, split-komplementer, atau triadik. Rumus aman: 1 utama, abu-abu, 1 aksen.',
     ),
     companion: {
-      talkPrompts: ['Lihat daun hijau dan langit biru-toska di luar rumah: warna yang berdekatan itu contoh skema Analog!'],
-      offlineActivity: 'Buka lemari pakaian dan coba pasangkan satu set baju memakai pola Monokromatik (biru muda + biru tua) lalu bandingkan dengan Komplementer.',
+      talkPrompts: ['Resep warna apa yang kamu pakai di bajumu hari ini?'],
+      offlineActivity:
+        'Buka lemari baju. Pasangkan satu set baju serba biru, lalu bandingkan dengan biru dan jingga.',
     },
   }),
 
@@ -1061,366 +1605,547 @@ export const lessons: Lesson[] = [
     title: 'Aturan 60-30-10',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa membagi takaran warna halaman menjadi 60% dominan, 30% sekunder, dan 10% aksen.',
-      'Aku bisa menyusun struktur palet produk (Primary, Accent, Neutral, Semantic) dan merancang Dark mode yang nyaman.',
+      'Aku bisa membagi warna latar, kartu, dan tombol.',
+      'Kamu bisa menyusun palet produk (Primary, Accent, Neutral, Semantic) dan merancang dark mode yang nyaman.',
     ),
-    estMinutes: 5,
+    atWork: 'Kamu menentukan warna tombol utama supaya menonjol di halaman yang latarnya sudah dipilih tim desain.',
+    estMinutes: 6,
     introducesTerms: ['aturan-60-30-10'],
     usesTerms: ['ui', 'roda-warna', 'skema-warna'],
     warmupFrom: 'a08-l03',
     steps: [
       storyStep('a08/berpakaian-60-30-10.svg', [
         rText(
-          'Saat berpakaian rapi: kemeja dan celana netral paling banyak (60%), jaket (30%), lalu satu syal mencolok (10%). Kalau semuanya menyala terang, mata langsung capek!',
-          'Seperti berpakaian dengan setelan netral 60%, jaket 30%, dan satu aksesori mencolok 10%, takaran warna yang seimbang mencegah layar terasa ramai dan melelahkan mata.',
+          'Baju yang rapi punya warna netral paling banyak. Jaketnya sedang, dan syalnya mencolok sedikit. Apa jadinya kalau semuanya menyala?',
+          'Halaman memakai warna yang serasi, tetapi terasa ramai dan melelahkan mata. Kamu perlu takaran yang seimbang.',
         ),
       ]),
       conceptStep({
-        title: t('Resep Takaran 60 – 30 – 10', 'Aturan 60-30-10'),
+        title: t('Resep takaran 60-30-10', 'Aturan 60-30-10'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'diagram-60-30-10' },
-        alt: t('Batang proporsi 60% warna latar netral, 30% kartu dan teks, 10% tombol aksen.'),
+        alt: t('Batang takaran: latar netral paling luas, kartu dan teks sedang, tombol kecil.'),
         body: [
-          rTerm('aturan-60-30-10', 'Aturan 60-30-10', 'Aturan 60-30-10'),
-          rText(
-            ': 60% warna latar netral. 30% warna kartu, header, dan teks. 10% warna mencolok khusus tombol penting!',
-            ' membagi tampilan: 60% dominan (umumnya latar netral), 30% sekunder (teks, kartu, header), dan 10% aksen (tombol aksi utama).',
+          rJTerm('aturan-60-30-10', 'Aturan 60-30-10'),
+          rJunior(
+            ' adalah contoh pembagian warna. Bayangkan sepuluh kotak. Enam untuk latar, tiga untuk kartu, satu untuk tombol.',
+          ),
+          rProTerm('aturan-60-30-10', 'Aturan 60-30-10'),
+          rPro(
+            ' adalah takaran tampilan: 60% dominan (latar netral), 30% sekunder (teks, kartu), dan 10% aksen (tombol utama).',
           ),
         ],
       }),
+      qStep({
+        id: 'a08-l04-q1',
+        type: 'match',
+        prompt: t(
+          'Pasangkan takaran warna dengan tugasnya di halaman.',
+          'Pasangkan takaran aturan 60-30-10 dengan perannya di halaman web.',
+        ),
+        difficulty: 1,
+        left: [
+          { id: 'p60', label: t('60 bagian', '60% dominan') },
+          { id: 'p30', label: t('30 bagian', '30% sekunder') },
+          { id: 'p10', label: t('10 bagian', '10% aksen') },
+        ],
+        right: [
+          { id: 'r60', label: t('Latar netral yang lapang', 'Latar belakang netral yang lapang dan tenang') },
+          { id: 'r30', label: t('Kartu, garis, dan tulisan', 'Kartu, garis pembatas, dan teks') },
+          { id: 'r10', label: t('Tombol penting seperti "Beli"', 'Tombol utama "Beli" dan sorotan terpenting') },
+        ],
+        answer: { p60: 'r60', p30: 'r30', p10: 'r10' },
+        explainCorrect: t(
+          'Latar netral paling luas, kartu sedang, tombol paling kecil. Seperti baju, jaket, dan syal.',
+          'Takaran ini memberi keseimbangan warna yang profesional. Aksen yang kecil menjadi pusat perhatian.',
+        ),
+        hints: [t('Ingat baju netral paling banyak.'), undefined],
+        tags: ['aturan-60-30-10'],
+      }),
       conceptStep({
-        title: t('Susunan Palet Aplikasi Lengkap', 'Empat Bagian Palet Produk'),
+        title: t('Empat bagian palet produk'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'empat-kelompok-palet' },
         alt: t('Empat kelompok palet: Primary, Accent, Neutral abu-abu, dan Semantic.'),
+        modes: ['pro'],
         body: [
-          rText(
-            'Aplikasi butuh empat kelompok warna. Warna merek, sorotan tombol, abu netral, dan status.',
-            'Hampir semua sistem desain membagi palet menjadi 4 kelompok: Primary (merek), Accent (sorotan), Neutral (skala abu-abu teks/latar), dan Semantic (status).',
+          rPro(
+            'Palet produk biasanya punya 4 kelompok. Primary adalah warna merek, Accent adalah sorotan, Neutral adalah skala abu-abu, dan Semantic adalah warna status.',
           ),
         ],
       }),
       conceptStep({
-        title: t('Aturan Aman Mode Gelap', 'Light Mode vs Dark Mode'),
+        title: t('Aturan aman mode gelap', 'Light mode dan dark mode'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'dark-mode-nyaman' },
-        alt: t('Dark mode memakai abu sangat gelap #121212 bukan hitam pekat #000000 dengan putih redup.'),
+        alt: t(
+          'Mode gelap memakai abu sangat gelap, bukan hitam pekat.',
+          'Dark mode memakai abu sangat gelap #121212, bukan hitam pekat #000000.',
+        ),
         body: [
           rText(
-            'Mode gelap bukan sekadar membalik putih jadi hitam pekat! Pakai abu sangat gelap agar mata tidak silau.',
-            'Dark mode nyaman di tempat redup dan hemat baterai OLED, tapi hindari #000 murni dengan #FFF murni karena silau. Gunakan abu gelap (#121212) dan aksen agak kalem.',
+            'Mode gelap bukan sekadar membalik putih menjadi hitam pekat. Pakai abu sangat gelap supaya mata tidak silau. Di banyak HP, mode gelap juga menghemat baterai.',
+            'Dark mode nyaman di tempat redup dan menghemat baterai layar OLED. Hindari #000 murni dengan #FFF murni karena terlalu silau. Pakai abu gelap (#121212) dan aksen yang sedikit lebih kalem.',
           ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Berpakaian 60% dasar, 30% jaket, 10% aksesori'),
-        same: [
-          t('Menjaga warna mencolok hanya di bagian kecil supaya menjadi pusat perhatian tanpa membuat mata lelah.'),
-        ],
-        different: [
-          t('Dalam aplikasi nyata, porsi 60% dan 30% juga diisi bermacam tingkat warna netral (putih, abu muda, abu gelap) serta warna status khusus saat sukses atau error.'),
         ],
       }),
       simStep(
         'roda-warna',
         t(
-          'Lihat palet di simulator: warna paling gelap dan terang jadi ruang netral, warna cerah dipakai hemat untuk tombol!',
-          'Amati perbandingan warna dominan lembut dan aksen kuat pada simulator Roda Warna.',
+          'Lihat palet di simulator: warna cerah dipakai sedikit untuk tombol.',
+          'Amati perbandingan warna dominan yang lembut dan aksen yang kuat di simulator Roda Warna.',
         ),
       ),
-      qStep({
-        id: 'a08-l04-q1',
-        type: 'match',
-        prompt: t('Pasangkan takaran aturan 60-30-10 dengan perannya pada halaman web:'),
-        difficulty: 1,
-        left: [
-          { id: 'p60', label: t('60% Dominan') },
-          { id: 'p30', label: t('30% Sekunder') },
-          { id: 'p10', label: t('10% Aksen') },
+      limitStep({
+        analogy: t('Berpakaian 60% dasar, 30% jaket, 10% aksesori'),
+        same: [
+          t(
+            'Warna mencolok hanya sedikit, jadi menjadi pusat perhatian tanpa melelahkan mata.',
+            'Warna mencolok hanya di bagian kecil, jadi menjadi pusat perhatian tanpa melelahkan mata.',
+          ),
         ],
-        right: [
-          { id: 'r60', label: t('Latar belakang netral yang lapang dan tenang') },
-          { id: 'r30', label: t('Kartu, header, garis pembatas, dan teks') },
-          { id: 'r10', label: t('Tombol utama "Beli" dan sorotan terpenting') },
+        different: [
+          t(
+            'Aplikasi butuh tanda saat sesuatu berhasil atau gagal.',
+            'Aplikasi juga butuh deretan abu-abu netral dan warna status untuk sukses atau error.',
+          ),
         ],
-        answer: { p60: 'r60', p30: 'r30', p10: 'r10' },
-        explainCorrect: t('Mantap! Proporsi 60-30-10 langsung memberi keseimbangan warna yang profesional.'),
-        tags: ['aturan-60-30-10'],
+        riskyAnalogy: false,
       }),
       qStep(
         makeMcq({
           id: 'a08-l04-q2',
           type: 'analogy',
-          prompt: t('Jika sebuah halaman memakai warna latar oranye menyala 60%, tombol biru neon 30%, dan teks kuning terang 10%, kesalahan apa yang terjadi seperti cara berpakaian?'),
+          prompt: t(
+            'Latar halaman oranye menyala, tombol biru neon, tulisan kuning terang. Apa yang salah?',
+            'Latar oranye menyala, kartu biru neon, tombol kuning terang. Mengapa tombol sulit ditemukan?',
+          ),
           choices: [
-            { id: 'loud', label: t('Semuanya mencolok sekaligus sehingga ramai dan melelahkan mata') },
+            {
+              id: 'loud',
+              label: t('Semua warnanya mencolok sekaligus', 'Semua warna mencolok sekaligus dan melelahkan'),
+            },
             {
               id: 'calm',
-              label: t('Terlalu netral sehingga tidak ada tombol yang bisa diklik'),
-              explainWrong: t('Justru warnanya terlalu mencolok dan saling berebut perhatian.'),
+              label: t('Warnanya terlalu sedikit', 'Terlalu netral, tidak ada tombol yang menonjol'),
+              explainWrong: t(
+                'Justru terlalu banyak warna yang menyala. Mata tidak tahu harus melihat ke mana.',
+                'Masalahnya justru semua warna berebut perhatian.',
+              ),
             },
             {
               id: 'dark',
-              label: t('Halaman menjadi mode gelap OLED hemat baterai'),
-              explainWrong: t('Warna cerah menyala memenuhi layar bukanlah dark mode.'),
+              label: t('Warnanya terlalu gelap', 'Terlalu gelap, mirip mode gelap OLED'),
+              explainWrong: t(
+                'Warna cerah yang menyala bukan warna gelap.',
+                'Warna cerah menyala yang memenuhi layar bukanlah dark mode.',
+              ),
             },
           ],
           answer: 'loud',
-          explainCorrect: t('Benar! Latar dominan 60% sebaiknya netral agar warna aksen 10% benar-benar bersinar.'),
+          explainCorrect: t(
+            'Kalau semuanya menyala, mata lelah. Latar netral membuat satu aksen bersinar.',
+            'Latar dominan 60% sebaiknya netral agar aksen 10% benar-benar bersinar.',
+          ),
+          hints: [t('Ingat baju yang semuanya menyala.', 'Hitung berapa warna yang saling berebut perhatian.')],
           tags: ['aturan-60-30-10'],
         }),
       ),
       qStep(
         makeTf({
           id: 'a08-l04-q3',
-          prompt: t('Membuat Dark mode terbaik dilakukan dengan memakai hitam pekat murni #000000 dan teks putih paling terang #FFFFFF di seluruh layar.'),
+          prompt: t(
+            'Mode gelap terbaik memakai hitam pekat dan putih paling terang.',
+            'Dark mode terbaik memakai hitam murni #000000 dan teks putih murni #FFFFFF di seluruh layar.',
+          ),
           answer: false,
-          explainCorrect: t('Betul, itu keliru! Hitam pekat dan putih pekat terlalu kontras menyilaukan mata; lebih nyaman memakai abu sangat gelap seperti #121212 dan putih agak diredupkan.'),
-          explainWrong: t('Hampir! Dark mode bukan sekadar membalik #FFF menjadi #000.'),
+          explainCorrect: t(
+            'Pernyataan itu keliru. Abu sangat gelap lebih nyaman di mata.',
+            'Pernyataan itu keliru: hitam #000000 dengan putih #FFFFFF terlalu silau. Abu sangat gelap (#121212) dengan putih yang diredupkan lebih nyaman.',
+          ),
+          explainWrong: t(
+            'Hitam dan putih pekat membuat mata silau. Mode gelap butuh abu yang lembut.',
+            'Dark mode bukan sekadar membalik #FFF menjadi #000.',
+          ),
+          hints: [t('Ingat lampu kamar yang terlalu terang.')],
           tags: ['aturan-60-30-10', 'ui'],
-        }),
-      ),
-      qStep(
-        makeMcq({
-          id: 'a08-l04-q4',
-          type: 'limit',
-          analogy: t('Berpakaian dengan aturan 60-30-10'),
-          prompt: t('Apa tambahan yang dibutuhkan saat menyusun palet aplikasi web nyata dibanding memilih baju harian?'),
-          difficulty: 2,
-          choices: [
-            { id: 'pal', label: t('Aplikasi juga butuh deretan warna Neutral abu-abu serta warna Semantic untuk pesan sukses, error, dan peringatan') },
-            {
-              id: 'ten',
-              label: t('Aksen mencolok tetap dijaga sekitar 10% agar menonjol'),
-              explainWrong: t('Itu memang persamaan yang tetap dipakai.'),
-            },
-            {
-              id: 'bal',
-              label: t('Warna latar utama tetap mendominasi ruang terbesar'),
-              explainWrong: t('Ini juga persamaan keduanya.'),
-            },
-          ],
-          answer: 'pal',
-          explainCorrect: t('Tepat! Skala abu-abu netral dan warna status semantik melengkapi aturan 60-30-10 di produk digital.'),
-          tags: ['aturan-60-30-10'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'a08-l04-q5',
           type: 'scenario',
-          story: t('Di aplikasi belajar Pak Udin, seluruh latar halaman diberi warna biru terang mencolok sehingga tombol aksi "Mulai Kuis" yang juga biru terang tenggelam tak terlihat.'),
-          prompt: t('Perbaikan terbaik memakai aturan 60-30-10 adalah…'),
+          story: t(
+            'Di aplikasi belajar Pak Udin, seluruh latar berwarna biru terang. Tombol "Mulai Kuis" juga biru terang, jadi tenggelam.',
+            'Di aplikasi belajar Pak Udin, seluruh latar berwarna biru terang mencolok. Tombol "Mulai Kuis" yang juga biru terang jadi tenggelam.',
+          ),
+          prompt: t('Apa perbaikan terbaiknya?', 'Perbaikan terbaik dengan aturan 60-30-10 adalah apa?'),
           difficulty: 2,
           choices: [
-            { id: 'fix', label: t('Jadikan latar 60% warna netral terang (putih/abu sangat muda), 30% biru gelap/abu untuk kartu & teks, dan 10% warna aksen cerah hanya untuk tombol utama') },
+            {
+              id: 'fix',
+              label: t('Latar netral, hanya tombol yang cerah', 'Latar netral, aksen cerah khusus tombol utama'),
+            },
             {
               id: 'same',
-              label: t('Ganti semua teks menjadi warna biru terang juga'),
-              explainWrong: t('Teks biru terang di latar biru terang tidak akan terbaca sama sekali.'),
+              label: t('Semua tulisan dibuat biru terang juga', 'Ganti semua teks menjadi biru terang juga'),
+              explainWrong: t(
+                'Tulisan biru terang di latar biru terang tidak terbaca. Semuanya menyatu.',
+                'Teks biru terang di latar biru terang hampir tidak terbaca.',
+              ),
             },
             {
               id: 'more',
-              label: t('Tambahkan latar kuning terang di separuh bagian lain'),
-              explainWrong: t('Menambah warna cerah di area dominan makin membingungkan fokus.'),
+              label: t('Setengah latar dibuat kuning terang', 'Tambahkan latar kuning terang di sebagian halaman'),
+              explainWrong: t(
+                'Warna cerah tambahan membuat mata makin bingung. Tombol tetap tenggelam.',
+                'Menambah warna cerah di area dominan makin membingungkan fokus.',
+              ),
             },
           ],
           answer: 'fix',
-          explainCorrect: t('Benar! Begitu latar 60% dibuat netral tenang, tombol aksen 10% langsung terlihat jelas.'),
+          explainCorrect: t(
+            'Latar netral memberi ruang. Tombol cerah yang kecil langsung terlihat.',
+            'Begitu latar 60% dibuat netral, tombol aksen 10% langsung terlihat.',
+          ),
+          hints: [t('Ingat syal kecil di baju netral.', 'Pisahkan peran latar, kartu, dan tombol.')],
           tags: ['aturan-60-30-10', 'ui'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'a08-l04-q6',
-          prompt: t('Di layar ponsel OLED, selain nyaman di ruangan redup, apa keuntungan lain penggunaan Dark mode yang dirancang dengan baik?'),
+          prompt: t(
+            'Apa untung lain mode gelap di banyak HP?',
+            'Selain nyaman di ruangan redup, apa keuntungan lain dark mode yang dirancang baik di layar OLED?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'bat', label: t('Menghemat pemakaian baterai pada layar OLED') },
+            { id: 'bat', label: t('Baterai lebih hemat', 'Menghemat baterai layar OLED') },
             {
               id: 'wifi',
-              label: t('Menggandakan kecepatan internet Wi-Fi secara otomatis'),
-              explainWrong: t('Dark mode memengaruhi tampilan dan konsumsi daya piksel layar, bukan kecepatan Wi-Fi.'),
+              label: t('Internet jadi lebih cepat', 'Menambah kepekatan warna merek'),
+              explainWrong: t(
+                'Mode gelap mengubah tampilan, bukan kecepatan internet.',
+                'Kepekatan warna merek ditentukan oleh warna yang dipilih.',
+              ),
             },
             {
               id: 'html',
-              label: t('Menghapus kebutuhan kode HTML di browser'),
-              explainWrong: t('Struktur HTML tetap sama di light mode maupun dark mode.'),
+              label: t('Gambar jadi lebih tajam', 'Menjamin kontras setiap tulisan'),
+              explainWrong: t(
+                'Gambar tetap sama tajam. Hanya warnanya yang berbeda.',
+                'Teks gelap pada latar gelap tetap sulit dibaca.',
+              ),
             },
           ],
           answer: 'bat',
-          explainCorrect: t('Tepat! Piksel gelap di panel OLED menyedot daya jauh lebih sedikit dibanding layar putih terang.'),
+          explainCorrect: t(
+            'Titik layar yang gelap memakai sedikit tenaga. Jadi baterai tahan lebih lama.',
+            'Piksel gelap di panel OLED memakai daya jauh lebih sedikit daripada layar putih terang.',
+          ),
+          hints: [t('Ingat titik layar yang mati.')],
           tags: ['ui'],
+        }),
+      ),
+      qStep(
+        makeMcq({
+          id: 'a08-l04-q4',
+          type: 'limit',
+          modes: ['pro'],
+          analogy: t('Berpakaian dengan aturan 60-30-10'),
+          prompt: t('Apa tambahan yang dibutuhkan palet aplikasi dibanding memilih baju harian?'),
+          difficulty: 2,
+          choices: [
+            { id: 'pal', label: t('Deretan abu-abu netral dan warna status') },
+            {
+              id: 'ten',
+              label: t('Aksen mencolok tetap dijaga sekitar 10%'),
+              explainWrong: t('Itu kesamaan yang tetap berlaku, bukan tambahan.'),
+            },
+            {
+              id: 'bal',
+              label: t('Warna latar utama tetap memakai ruang terbesar'),
+              explainWrong: t('Itu juga kesamaan keduanya, bukan tambahan.'),
+            },
+          ],
+          answer: 'pal',
+          explainCorrect: t('Skala abu-abu netral dan warna status melengkapi aturan 60-30-10 di produk digital.'),
+          hints: [t('Cari bagian yang tidak dimiliki baju.')],
+          tags: ['aturan-60-30-10'],
         }),
       ),
       qStep({
         id: 'a08-l04-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi empat kelompok struktur palet sistem desain:'),
+        prompt: t('Kelompok apa yang melengkapi struktur palet sistem desain?'),
         difficulty: 2,
         template: 'Palet produk umumnya terbagi atas Primary, Accent, ___, dan Semantic.',
-        bank: ['Neutral', 'Random', 'Viewport'],
+        bank: ['Neutral', 'Contrast', 'Gradient'],
         answer: ['Neutral'],
-        explainCorrect: t('Benar! Keluarga warna Neutral (skala abu-abu) menopang teks, garis pemisah, dan latar halaman.'),
+        explainCorrect: t('Neutral adalah skala abu-abu untuk teks, garis pemisah, dan latar halaman.'),
+        hints: [t('Skala abu-abu menopang teks dan latar.'), undefined],
         tags: ['aturan-60-30-10'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l04-r1',
-        prompt: t('Dalam aturan 60-30-10, bagian 60% paling besar sebaiknya diisi dengan warna…'),
+        prompt: t(
+          'Bagian 60 yang paling besar diisi warna apa?',
+          'Dalam aturan 60-30-10, bagian 60% sebaiknya diisi warna apa?',
+        ),
         choices: [
-          { id: 'neu', label: t('Warna latar yang tenang dan netral') },
-          { id: 'neon', label: t('Warna aksen menyala paling mencolok'), explainWrong: t('Warna aksen mencolok cukup 10% saja agar tidak melelahkan mata.') },
+          { id: 'neu', label: t('Latar yang tenang dan netral') },
+          {
+            id: 'neon',
+            label: t('Warna menyala yang paling mencolok'),
+            explainWrong: t(
+              'Warna menyala cukup 10 bagian saja. Kalau lebih, mata cepat lelah.',
+              'Warna aksen yang mencolok cukup 10% agar tidak melelahkan mata.',
+            ),
+          },
+          {
+            id: 'btn',
+            label: t('Warna tombol yang penting'),
+            explainWrong: t(
+              'Tombol penting memakai bagian 10, yaitu bagian terkecil.',
+              'Tombol utama memakai porsi aksen 10%, bukan 60%.',
+            ),
+          },
         ],
         answer: 'neu',
-        explainCorrect: t('Latar netral 60% memberi ruang lapang agar konten dan tombol aksen terbaca nyaman.'),
+        explainCorrect: t(
+          'Latar netral memberi ruang lapang. Tombol dan tulisan terbaca nyaman.',
+          'Latar netral 60% memberi ruang agar konten dan tombol aksen terbaca nyaman.',
+        ),
+        hints: [t('Ingat baju yang paling banyak terlihat.')],
         tags: ['aturan-60-30-10'],
       }),
       makeTf({
         id: 'a08-l04-r2',
-        prompt: t('Pada Dark mode, warna mencolok sebaiknya sedikit diturunkan kepekatannya agar tidak menyilaukan mata di atas latar gelap.'),
+        prompt: t(
+          'Di mode gelap, warna mencolok sebaiknya sedikit diredupkan.',
+          'Pada dark mode, warna mencolok sebaiknya diturunkan sedikit kepekatannya agar tidak menyilaukan.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! Warna jenuh penuh bisa terasa berpendar terlalu silau di atas abu gelap.'),
-        explainWrong: t('Menurunkan sedikit kepekatan aksen membuat dark mode jauh lebih lembut dan elegan.'),
+        explainCorrect: t(
+          'Warna yang terlalu terang terasa menyilaukan di latar gelap. Diredupkan sedikit, mata lebih nyaman.',
+          'Warna yang sangat pekat terasa berpendar silau di atas abu gelap.',
+        ),
+        explainWrong: t(
+          'Pernyataan itu benar. Warna yang diredupkan sedikit terasa lebih lembut.',
+          'Pernyataan itu benar: aksen yang sedikit lebih kalem membuat dark mode lebih lembut.',
+        ),
+        hints: [t('Ingat senter di kamar yang gelap.')],
         tags: ['aturan-60-30-10'],
       }),
     ],
     recap: t(
-      'Pakai takaran 60% latar netral, 30% kartu/teks, dan 10% aksen tombol supaya tampilan seimbang.',
-      'Terapkan proporsi 60-30-10, lengkapi 4 laci palet (Primary, Accent, Neutral, Semantic), dan jaga kenyamanan Dark mode tanpa #000/#FFF ekstrem.',
+      'Latar netral 60 bagian, kartu dan tulisan 30, tombol penting 10.',
+      'Terapkan 60-30-10 dengan palet Primary, Accent, Neutral, dan Semantic. Di mode gelap, hindari #000 dan #FFF murni.',
     ),
     companion: {
-      talkPrompts: ['Lihat pakaian yang kita pakai hari ini: warna apa yang paling banyak (60%) dan apa yang jadi aksen kecilnya (10%)?'],
-      offlineActivity: 'Buka satu aplikasi rapi di HP dan perkirakan persentase warna latarnya, warna kartunya, dan warna tombol utamanya.',
+      talkPrompts: ['Warna apa yang paling banyak di bajumu hari ini?'],
+      offlineActivity:
+        'Buka satu aplikasi yang rapi di HP. Perkirakan berapa bagian untuk latar, kartu, dan tombol utamanya.',
     },
   }),
 
   makeLesson({
     id: 'a08-l05',
     worldId: 'a08',
-    title: 'Arti warna dan warna semantik',
+    title: 'Warna yang membawa pesan',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku mengerti arti warna pesan seperti hijau berhasil atau merah bahaya, serta wajib disertai ikon atau teks.',
-      'Aku bisa memilih psikologi warna merek dan menerapkan warna semantik yang aksesibel bersama ikon serta konteks budaya.',
+      'Aku bisa menyebutkan arti warna status dan menambahkan ikon atau tulisan.',
+      'Kamu bisa memilih warna merek sesuai kesannya dan memakai warna semantik bersama ikon.',
     ),
-    estMinutes: 5,
+    atWork: 'Kamu menandai kolom form yang salah dengan warna, ikon, dan pesan, bukan warna saja.',
+    estMinutes: 6,
     introducesTerms: ['warna-semantik'],
     usesTerms: ['ui', 'ux', 'skema-warna'],
     warmupFrom: 'a08-l04',
     steps: [
       storyStep('a08/lampu-lalu-lintas.svg', [
         rText(
-          'Lampu lalu lintas memakai warna hijau untuk jalan dan merah untuk berhenti agar pengemudi langsung mengerti pesannya dalam sekejap!',
-          'Seperti lampu lalu lintas yang memberi sinyal seketika tanpa paragraf panjang, warna pada UI membawa makna psikologis dan status tetap bagi pengguna.',
+          'Lampu lalu lintas hijau berarti jalan. Merah berarti berhenti. Mengapa pengemudi langsung mengerti?',
+          'Form pesanan di aplikasi Toko Rani harus menunjukkan statusnya secepat lampu lalu lintas. Warna pada tampilan membawa pesan itu.',
         ),
       ]),
       conceptStep({
-        title: t('Kesan dan Arti Warna', 'Psikologi Warna Merek'),
+        title: t('Kesan dan arti warna', 'Psikologi warna merek'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'psikologi-warna' },
-        alt: t('Biru untuk kepercayaan, hijau alami aman, merah berani mendesak, ungu kreatif.'),
+        alt: t('Biru untuk kepercayaan, hijau alami, merah mendesak, ungu kreatif.'),
+        modes: ['pro'],
         body: [
-          rText(
-            'Biru terasa tenang dan dipercaya. Hijau terasa aman dan alami. Merah terasa mendesak. Ungu terasa kreatif.',
-            'Warna membawa kesan umum: Biru (tepercaya: bank/teknologi), Hijau (alami/sukses), Merah (mendesak/bahaya), Jingga (ramah/e-commerce), Ungu (kreatif/mewah), Hitam (premium).',
+          rPro(
+            'Sejumlah merek memakai biru untuk memberi kesan tepercaya atau ungu untuk kesan kreatif. Kesan ini dapat berbeda antarbudaya. Periksa pilihan warna bersama calon pemakai.',
           ),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'a08-l05-q6',
+          modes: ['pro'],
+          prompt: t('Kesan apa yang umumnya dibawa warna ungu pada identitas produk?'),
+          difficulty: 2,
+          choices: [
+            { id: 'cre', label: t('Mewah, kreatif, dan imajinatif') },
+            {
+              id: 'err',
+              label: t('Kesalahan sistem atau larangan masuk'),
+              explainWrong: t('Banyak aplikasi memakai merah untuk menandai kesalahan.'),
+            },
+            {
+              id: 'agr',
+              label: t('Segar dan alami seperti sayur organik'),
+              explainWrong: t('Banyak merek memilih hijau untuk memberi kesan segar.'),
+            },
+          ],
+          answer: 'cre',
+          explainCorrect: t('Ungu sering dipilih untuk produk kreatif, desain, atau kecantikan.'),
+          hints: [t('Pikirkan merek kecantikan atau desain.')],
+          tags: ['ui'],
+        }),
+      ),
       conceptStep({
-        title: t('Empat Warna Status: Semantik', 'Warna Semantik Tetap'),
+        title: t('Empat warna status', 'Warna semantik tetap'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'empat-warna-semantik' },
-        alt: t('Hijau Success, Merah Error, Kuning Warning, dan Biru Info.'),
+        alt: t('Hijau berhasil, merah gagal, kuning hati-hati, dan biru keterangan.'),
         body: [
-          rTerm('warna-semantik', 'Warna semantik', 'Warna semantik'),
-          rText(
-            ' punya arti tetap. Hijau berhasil, kuning hati-hati, merah gagal, dan biru info.',
-            ' punya makna tetap di antarmuka: Success (hijau: berhasil), Error/Danger (merah: gagal/bahaya), Warning (kuning/jingga: hati-hati), Info (biru: keterangan).',
+          rJTerm('warna-semantik', 'Warna semantik'),
+          rJunior(
+            ' artinya warna yang punya arti tetap. Hijau berarti berhasil, kuning berarti hati-hati. Merah berarti gagal, biru berarti keterangan.',
+          ),
+          rProTerm('warna-semantik', 'Warna semantik'),
+          rPro(
+            ' adalah warna dengan makna tetap pada tampilan. Success (hijau) berarti berhasil, Error (merah) gagal atau bahaya, Warning (kuning atau jingga) hati-hati, dan Info (biru) keterangan.',
           ),
         ],
       }),
+      qStep({
+        id: 'a08-l05-q1',
+        type: 'match',
+        prompt: t(
+          'Pasangkan warna dengan artinya di aplikasi.',
+          'Pasangkan warna semantik dengan arti statusnya di aplikasi.',
+        ),
+        difficulty: 1,
+        left: [
+          { id: 'ok', label: t('Hijau') },
+          { id: 'err', label: t('Merah') },
+          { id: 'wrn', label: t('Kuning atau oranye') },
+          { id: 'inf', label: t('Biru') },
+        ],
+        right: [
+          { id: 'rok', label: t('Berhasil', 'Pesanan atau simpan data berhasil') },
+          { id: 'rerr', label: t('Gagal atau bahaya', 'Gagal atau aksi berbahaya seperti hapus data') },
+          { id: 'rwrn', label: t('Hati-hati', 'Peringatan untuk berhati-hati') },
+          { id: 'rinf', label: t('Keterangan', 'Pesan keterangan yang netral') },
+        ],
+        answer: { ok: 'rok', err: 'rerr', wrn: 'rwrn', inf: 'rinf' },
+        explainCorrect: t(
+          'Hijau berhasil, kuning hati-hati, merah gagal, biru keterangan. Artinya sama di hampir semua aplikasi.',
+          'Keempat warna status ini dipakai di hampir semua aplikasi. Orang langsung mengenal artinya tanpa membaca.',
+        ),
+        hints: [t('Ingat lampu lalu lintas.'), undefined],
+        tags: ['warna-semantik'],
+      }),
       conceptStep({
-        title: t('Jangan Andalkan Warna Saja!', 'Aksesibilitas & Budaya Warna'),
+        title: t('Jangan hanya andalkan warna', 'Aksesibilitas dan budaya warna'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'warna-plus-ikon-buta-warna' },
-        alt: t('Kotak pesan disertai ikon centang dan teks jelas, bukan warna saja.'),
+        alt: t('Kotak pesan dengan ikon centang dan tulisan, bukan warna saja.'),
         body: [
           rText(
-            'Sebagian orang buta warna! Selalu tambahkan ikon dan tulisan agar semua orang paham. Ingat juga arti warna bisa beda antarbudaya.',
-            'Jangan pernah mengandalkan warna saja karena penyandang buta warna tidak bisa membedakannya—selalu sertakan ikon dan teks. Perhatikan pula perbedaan makna warna antarbudaya.',
+            'Sebagian orang buta warna. Selalu tambahkan ikon dan tulisan. Arti warna juga bisa berbeda di setiap budaya.',
+            'Jangan mengandalkan warna saja, karena orang yang buta warna sulit membedakannya. Selalu sertakan ikon dan teks. Arti warna juga berbeda antarbudaya.',
           ),
         ],
       }),
       limitStep({
-        analogy: t('Lampu lalu lintas untuk warna semantik'),
+        analogy: t('Lampu lalu lintas untuk warna status'),
         same: [
-          t('Warna hijau, kuning, dan merah langsung menyampaikan arti aman, hati-hati, dan berhenti/bahaya.'),
+          t(
+            'Hijau, kuning, dan merah langsung memberi arti aman, hati-hati, dan berhenti.',
+            'Hijau, kuning, dan merah langsung menyampaikan arti aman, hati-hati, dan berhenti atau bahaya.',
+          ),
         ],
         different: [
-          t('Pengendara yang buta warna masih terbantu POSISI lampu atas-tengah-bawah yang selalu tetap, sedangkan pesan di web wajib disertai IKON dan TEKS yang jelas!'),
+          t(
+            'Lampu lalu lintas punya urutan tetap. Pesan di layar butuh ikon dan tulisan.',
+            'Pengendara buta warna masih terbantu posisi lampu yang tetap. Pesan di layar butuh ikon dan teks yang jelas.',
+          ),
         ],
+        riskyAnalogy: true,
       }),
       simStep(
         'detektif-kontras',
         t(
-          'Lihat pada simulator tanda centang ✓ dan silang ✗ yang menemani status warna supaya jelas bagi siapa saja!',
-          'Amati bagaimana tanda ✓ dan ✗ bersama teks mendampingi indikator warna pada simulator Detektif Kontras.',
+          'Lihat di simulator: tanda centang dan silang menemani warna.',
+          'Amati bagaimana tanda centang, tanda silang, dan teks mendampingi indikator warna di simulator Detektif Kontras.',
         ),
       ),
-      qStep({
-        id: 'a08-l05-q1',
-        type: 'match',
-        prompt: t('Pasangkan warna semantik dengan arti statusnya di aplikasi:'),
-        difficulty: 1,
-        left: [
-          { id: 'ok', label: t('Hijau (Success)') },
-          { id: 'err', label: t('Merah (Error / Danger)') },
-          { id: 'wrn', label: t('Kuning / Oranye (Warning)') },
-          { id: 'inf', label: t('Biru (Info)') },
-        ],
-        right: [
-          { id: 'rok', label: t('Pesanan atau simpan data berhasil ✓') },
-          { id: 'rerr', label: t('Gagal atau aksi berbahaya hapus data ✕') },
-          { id: 'rwrn', label: t('Peringatan untuk berhati-hati !') },
-          { id: 'rinf', label: t('Pesan keterangan netral ℹ') },
-        ],
-        answer: { ok: 'rok', err: 'rerr', wrn: 'rwrn', inf: 'rinf' },
-        explainCorrect: t('Hebat! Keempat warna status ini menjadi bahasa universal di hampir semua aplikasi.'),
-        tags: ['warna-semantik'],
-      }),
       qStep(
         makeMcq({
           id: 'a08-l05-q2',
           type: 'analogy',
-          prompt: t('Jika sebuah kotak formulir yang salah ketik hanya mengubah garis tepinya menjadi merah tanpa ikon dan tanpa tulisan error, apa masalahnya?'),
+          prompt: t(
+            'Kotak isian yang salah hanya bergaris merah, tanpa ikon atau tulisan. Apa masalahnya?',
+            'Kolom form yang salah hanya berubah garis tepinya menjadi merah, tanpa ikon dan tanpa pesan. Apa masalahnya?',
+          ),
           choices: [
-            { id: 'cb', label: t('Pengguna buta warna merah-hijau tidak tahu bagian mana yang salah dan bagaimana memperbaikinya') },
+            {
+              id: 'cb',
+              label: t('Sebagian orang sulit membedakan warnanya', 'Orang buta warna tidak tahu yang salah'),
+            },
             {
               id: 'fast',
-              label: t('Halaman menjadi lebih cepat mengirim pesan ke server'),
-              explainWrong: t('Garis merah polos justru menyulitkan pemulihan kesalahan.'),
+              label: t('Halaman jadi lambat dibuka', 'Halaman jadi lebih lambat mengirim data'),
+              explainWrong: t(
+                'Mengganti warna garis tidak memperlambat halaman. Tambahkan tulisan yang menjelaskan masalahnya.',
+                'Garis merah tidak memengaruhi kecepatan. Masalahnya ada pada keterbacaan status.',
+              ),
             },
             {
               id: 'pretty',
-              label: t('Tampilan menjadi terlalu banyak kata'),
-              explainWrong: t('Pesan singkat dan ikon justru membantu kejelasan, bukan mengganggu.'),
+              label: t('Warna merah terlalu menakutkan', 'Garis merah membuat tampilan terlalu ramai'),
+              explainWrong: t(
+                'Garisnya terlihat, tetapi warnanya bisa sulit dibedakan.',
+                'Garis merah polos tidak membuat tampilan ramai. Masalahnya, statusnya tidak terbaca semua orang.',
+              ),
             },
           ],
           answer: 'cb',
-          explainCorrect: t('Benar! Warna semantik wajib ditemani ikon dan teks singkat agar aksesibel bagi semua.'),
+          explainCorrect: t(
+            'Warna saja tidak cukup. Ikon dan tulisan membantu semua orang.',
+            'Warna semantik perlu ikon dan teks singkat agar aksesibel bagi semua orang.',
+          ),
+          hints: [t('Ingat teman yang sulit membedakan warna.', 'Siapa yang tidak bisa membedakan merah dan hijau?')],
           tags: ['warna-semantik', 'ux'],
         }),
       ),
       qStep(
         makeTf({
           id: 'a08-l05-q3',
-          prompt: t('Makna setiap warna selalu sama persis di seluruh budaya dan negara di dunia tanpa pengecualian.'),
+          prompt: t(
+            'Arti satu warna selalu sama di semua negara.',
+            'Makna setiap warna selalu sama di seluruh budaya, tanpa pengecualian.',
+          ),
           answer: false,
-          explainCorrect: t('Betul, pernyataan itu salah! Misalnya putih melambangkan kesucian di banyak tempat, namun dipakai berkabung di sebagian budaya.'),
-          explainWrong: t('Hampir! Selalu pertimbangkan siapa pengguna dan konteks budayanya.'),
+          explainCorrect: t(
+            'Pernyataan itu keliru. Putih berarti suci di satu tempat, tetapi duka di tempat lain.',
+            'Pernyataan itu keliru: putih berarti kesucian di banyak tempat, tetapi dipakai untuk berkabung di sebagian budaya.',
+          ),
+          explainWrong: t(
+            'Arti warna bisa berbeda antarbudaya. Tanyakan dulu siapa yang akan melihatnya.',
+            'Pertimbangkan siapa pembacanya dan konteks budayanya.',
+          ),
+          hints: [t('Ingat: tempat berbeda, kebiasaan berbeda.')],
           tags: ['warna-semantik'],
         }),
       ),
@@ -1429,23 +2154,39 @@ export const lessons: Lesson[] = [
           id: 'a08-l05-q4',
           type: 'limit',
           analogy: t('Lampu lalu lintas'),
-          prompt: t('Mengapa aturan "warna saja sudah cukup" pada aplikasi digital BERBEDA dengan lampu lalu lintas?'),
+          prompt: t(
+            'Apa yang perlu ditambah di layar, tetapi tidak di lampu lalu lintas?',
+            'Mengapa warna saja belum cukup untuk status di layar, padahal cukup untuk lampu lalu lintas?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'pos', label: t('Lampu lalu lintas punya urutan posisi tetap atas-bawah, sedangkan di layar pesan error harus ditemani ikon dan teks') },
+            {
+              id: 'pos',
+              label: t('Ikon dan tulisan', 'Lampu punya posisi tetap, layar butuh ikon dan teks'),
+            },
             {
               id: 'mean',
-              label: t('Hijau sering dipakai tanda aman sedangkan merah tanda berhenti atau bahaya'),
-              explainWrong: t('Itu kesamaan antara lampu lalu lintas dan warna semantik UI.'),
+              label: t('Hijau sebagai tanda aman', 'Hijau umumnya berarti aman dan merah berarti bahaya'),
+              explainWrong: t(
+                'Lampu lalu lintas juga memakai hijau sebagai tanda aman. Yang perlu ditambah hal lain.',
+                'Itu kesamaan antara lampu lalu lintas dan warna semantik, bukan perbedaannya.',
+              ),
             },
             {
               id: 'fast',
-              label: t('Warna membantu pengguna menangkap status dengan cepat'),
-              explainWrong: t('Ini juga kesamaannya.'),
+              label: t('Warna yang cepat dikenali', 'Warna membantu orang menangkap status dengan cepat'),
+              explainWrong: t(
+                'Lampu lalu lintas juga memakai warna yang cepat dikenali. Yang perlu ditambah hal lain.',
+                'Itu juga kesamaannya, bukan perbedaannya.',
+              ),
             },
           ],
           answer: 'pos',
-          explainCorrect: t('Tepat! Tanpa ikon atau teks, pengguna buta warna tidak memiliki petunjuk pengganti di formulir web.'),
+          explainCorrect: t(
+            'Lampu punya posisi atas, tengah, bawah. Layar tidak punya, jadi butuh ikon dan tulisan.',
+            'Tanpa ikon atau teks, orang yang buta warna tidak punya petunjuk pengganti di form web.',
+          ),
+          hints: [t('Pengemudi buta warna masih melihat posisi lampu.')],
           tags: ['warna-semantik'],
         }),
       ),
@@ -1453,91 +2194,118 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l05-q5',
           type: 'scenario',
-          story: t('Rani sedang merancang aplikasi dompet tabungan sekolah. Ia bingung memilih antara warna utama merah menyala atau biru tenang, lalu ia juga ingin menandai tombol "Bayar Berhasil" berwarna merah supaya serasi.'),
-          prompt: t('Saran paling tepat untuk Rani adalah…'),
-          difficulty: 3,
+          story: t(
+            'Rani membuat aplikasi tabungan. Ia mau pesan "Berhasil" berwarna merah supaya serasi.',
+            'Rani merancang aplikasi tabungan sekolah. Ia mempertimbangkan merah menyala atau biru tenang sebagai warna utama, dan ingin pesan "Berhasil" berwarna merah agar serasi.',
+          ),
+          prompt: t('Apa saran yang tepat untuk Rani?', 'Saran mana yang paling tepat untuk Rani?'),
+          difficulty: 2,
           choices: [
-            { id: 'fix', label: t('Pakai biru untuk kesan aman tepercaya pada aplikasi tabungan, dan tetap gunakan hijau + ikon ✓ untuk status berhasil') },
+            {
+              id: 'fix',
+              label: t('Hijau dan ikon centang', 'Utama biru, tanda berhasil hijau dengan centang'),
+            },
             {
               id: 'red',
-              label: t('Pakai merah untuk pesan "Berhasil" supaya seragam dengan merah'),
-              explainWrong: t('Memakai merah untuk pesan sukses bertentangan dengan kebiasaan warna semantik dan membingungkan pengguna!'),
+              label: t('Merah dan ikon centang', 'Merah untuk pesan "Berhasil" supaya serasi dengan warna utama'),
+              explainWrong: t(
+                'Merah berarti gagal atau bahaya. Pesan berhasil jadi membingungkan.',
+                'Merah untuk pesan sukses bertentangan dengan kebiasaan warna semantik dan membingungkan.',
+              ),
             },
             {
               id: 'none',
-              label: t('Hilangkan semua ikon centang agar lebih polos'),
-              explainWrong: t('Menghilangkan ikon merugikan pengguna buta warna.'),
+              label: t('Hijau tanpa ikon apa pun', 'Hapus ikon centang supaya tampilan lebih polos'),
+              explainWrong: t(
+                'Tambahkan centang agar artinya terbaca saat warna sulit dibedakan.',
+                'Menghapus ikon merugikan orang yang buta warna.',
+              ),
             },
           ],
           answer: 'fix',
-          explainCorrect: t('Benar! Jangan pernah menukar arti warna semantik—merah untuk bahaya/gagal, hijau + ikon untuk sukses.'),
+          explainCorrect: t(
+            'Hijau berarti berhasil, dan ikon centang membantu semua orang. Jangan menukar arti warna.',
+            'Jangan menukar arti warna semantik: merah untuk gagal atau bahaya, hijau dengan ikon untuk berhasil.',
+          ),
+          hints: [t('Ingat lampu lalu lintas: hijau berarti jalan.', 'Pisahkan dua keputusan: warna utama dan warna status.')],
           tags: ['warna-semantik', 'ui'],
-        }),
-      ),
-      qStep(
-        makeMcq({
-          id: 'a08-l05-q6',
-          prompt: t('Kesan psikologis apakah yang umumnya dibawa warna Ungu ketika dipakai pada identitas visual produk?'),
-          difficulty: 2,
-          choices: [
-            { id: 'cre', label: t('Mewah, kreatif, dan imajinatif') },
-            {
-              id: 'err',
-              label: t('Kesalahan sistem kritis atau tanda dilarang masuk'),
-              explainWrong: t('Kesalahan dan larangan identik dengan warna merah.'),
-            },
-            {
-              id: 'agr',
-              label: t('Kesegaran sayur organik di kebun'),
-              explainWrong: t('Alami dan segar identik dengan warna hijau.'),
-            },
-          ],
-          answer: 'cre',
-          explainCorrect: t('Tepat! Ungu sering dipilih untuk produk kreatif, desain, atau kecantikan.'),
-          tags: ['ui'],
         }),
       ),
       qStep({
         id: 'a08-l05-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi aturan aksesibilitas warna semantik:'),
+        prompt: t('Apa yang wajib menemani warna status?'),
         difficulty: 1,
-        template: 'Jangan pernah mengandalkan warna saja untuk status; selalu sertakan ___ atau teks penjelasan.',
+        template: 'Jangan mengandalkan warna saja untuk status; selalu sertakan ___ atau teks penjelasan.',
         bank: ['ikon', 'animasi', 'garis putus'],
         answer: ['ikon'],
-        explainCorrect: t('Benar! Ikon dan teks membuat indikator status tetap jelas terbaca bahkan dalam tampilan hitam-putih.'),
+        explainCorrect: t('Ikon dan teks menjaga status tetap terbaca, bahkan di tampilan hitam-putih.'),
+        hints: [t('Tanda kecil yang menemani teks di samping warna.'), undefined],
         tags: ['warna-semantik', 'ux'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l05-r1',
-        prompt: t('Warna semantik yang dipakai untuk peringatan "hati-hati" (Warning) biasanya adalah…'),
+        prompt: t(
+          'Warna apa yang biasa dipakai untuk "hati-hati"?',
+          'Warna semantik apa yang biasa dipakai untuk status Warning?',
+        ),
         choices: [
-          { id: 'y', label: t('Kuning atau oranye disertai ikon !') },
-          { id: 'g', label: t('Hijau muda'), explainWrong: t('Hijau dipakai untuk status sukses (Success).') },
+          { id: 'y', label: t('Kuning atau oranye') },
+          {
+            id: 'g',
+            label: t('Hijau muda'),
+            explainWrong: t(
+              'Hijau berarti berhasil. Hati-hati memakai kuning atau oranye.',
+              'Hijau dipakai untuk status sukses (Success).',
+            ),
+          },
+          {
+            id: 'b',
+            label: t('Biru tua'),
+            explainWrong: t(
+              'Biru memberi keterangan. Hati-hati memakai kuning atau oranye.',
+              'Biru dipakai untuk status Info, bukan Warning.',
+            ),
+          },
         ],
         answer: 'y',
-        explainCorrect: t('Kuning atau oranye menandakan peringatan hati-hati.'),
+        explainCorrect: t(
+          'Kuning atau oranye berarti hati-hati, seperti lampu kuning di jalan.',
+          'Kuning atau oranye menandai peringatan agar berhati-hati.',
+        ),
+        hints: [t('Ingat lampu kuning di jalan.')],
         tags: ['warna-semantik'],
       }),
       makeTf({
         id: 'a08-l05-r2',
-        prompt: t('Warna hijau saja tanpa teks atau ikon centang sudah cukup jelas bagi seluruh pengguna termasuk penyandang buta warna.'),
+        prompt: t(
+          'Warna hijau saja sudah cukup jelas untuk semua orang.',
+          'Warna hijau tanpa teks atau ikon centang sudah cukup jelas bagi semua orang, termasuk yang buta warna.',
+        ),
         answer: false,
-        explainCorrect: t('Betul, itu salah! Wajib tambahkan ikon dan teks agar dapat dipahami oleh penyandang buta warna.'),
-        explainWrong: t('Hampir! Sebagian orang mengalami buta warna merah-hijau.'),
+        explainCorrect: t(
+          'Pernyataan itu keliru. Teman yang buta warna butuh ikon atau tulisan.',
+          'Pernyataan itu keliru: ikon dan teks wajib ada agar status terbaca oleh orang yang buta warna.',
+        ),
+        explainWrong: t(
+          'Sebagian orang buta warna merah-hijau. Mereka butuh ikon dan tulisan.',
+          'Sebagian orang mengalami buta warna merah-hijau.',
+        ),
+        hints: [t('Ingat teman yang sulit membedakan hijau dan merah.')],
         tags: ['warna-semantik'],
       }),
     ],
     recap: t(
-      'Warna semantik (hijau berhasil, merah gagal, kuning hati-hati, biru info) wajib selalu ditemani ikon dan teks.',
-      'Pilih warna merek sesuai psikologi audiens serta budaya, dan padukan warna semantik dengan ikon serta teks agar aksesibel.',
+      'Hijau berhasil, merah gagal, kuning hati-hati, biru keterangan, selalu dengan ikon.',
+      'Pilih warna merek sesuai kesan yang dicari. Padukan warna semantik dengan ikon dan teks.',
     ),
     companion: {
-      talkPrompts: ['Kalau warna merah dan hijau di lampu jalan tertukar di tempat yang sama, apakah orang buta warna masih bisa membedakannya?'],
-      offlineActivity: 'Cari 3 tombol atau pesan status di aplikasi HP dan cek apakah warna merah/hijaunya sudah ditemani ikon tanda seru atau centang.',
+      talkPrompts: ['Apa yang membantu teman buta warna membedakan lampu lalu lintas?'],
+      offlineActivity:
+        'Cari 3 tombol atau pesan status di aplikasi HP. Cek apakah warnanya sudah ditemani ikon centang atau tanda seru.',
     },
   }),
 
@@ -1547,9 +2315,10 @@ export const lessons: Lesson[] = [
     title: 'Kontras agar terbaca',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa membedakan tulisan yang mudah dibaca dan yang terlalu pudar di atas latarnya.',
-      'Aku bisa menerapkan standar rasio kontras WCAG (4,5:1 teks normal dan 3:1 teks besar) serta memeriksanya dengan alat uji.',
+      'Aku bisa membedakan tulisan yang jelas dan yang terlalu pudar.',
+      'Kamu bisa menerapkan standar kontras WCAG (4,5 : 1 untuk teks biasa, 3 : 1 untuk teks besar) dan mengujinya.',
     ),
+    atWork: 'Kamu mengecek warna teks di tab DevTools sebelum rilis, supaya tombol tetap terbaca di bawah matahari.',
     estMinutes: 5,
     introducesTerms: ['kontras'],
     usesTerms: ['ui', 'ux', 'warna-semantik'],
@@ -1557,185 +2326,253 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('a08/kapur-papan.svg', [
         rText(
-          'Menulis dengan kapur putih di papan tulis hitam sangat jelas dilihat dari bangku belakang. Tapi menulis dengan kapur kuning pucat di kertas putih nyaris tak terlihat!',
-          'Sebagaimana kapur putih di papan hitam mudah dibaca dari jauh dibanding kapur kuning di kertas putih, kontras warna menentukan apakah teks di layarmu terbaca atau menyiksa mata.',
+          'Kapur putih di papan tulis hitam terlihat jelas dari bangku belakang. Kapur kuning pucat di kertas putih hampir tak terlihat. Apa bedanya?',
+          'Teks abu muda di latar putih tampak rapi di monitormu, tetapi sulit dibaca di bawah matahari. Kontras menentukan teks terbaca atau tidak.',
         ),
       ]),
       conceptStep({
-        title: t('Beda Terang dan Gelap: Kontras', 'Apa Itu Rasio Kontras?'),
+        title: t('Beda terang dan gelap: kontras', 'Apa itu rasio kontras?'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'rasio-kontras-wcag' },
-        alt: t('Perbandingan rasio kontras buruk 1.3:1 vs kontras baik 6:1 dan 15:1.'),
+        alt: t(
+          'Tulisan terbaca di latar berbeda, dan pudar di latar yang mirip.',
+          'Perbandingan rasio kontras buruk 1,3 : 1 dengan kontras baik 6 : 1 dan 15 : 1.',
+        ),
         body: [
-          rTerm('kontras', 'Kontras', 'Kontras'),
-          rText(
-            ' mengukur seberapa beda warna huruf dan latarnya. Makin besar bedanya, makin jelas terbaca.',
-            ' mengukur perbedaan kecerahan teks terhadap latarnya dari 1:1 (sama persis) hingga 21:1 (hitam di atas putih).',
+          rJTerm('kontras', 'Kontras'),
+          rJunior(
+            ' mengukur seberapa beda warna huruf dan latarnya. Makin besar bedanya, makin jelas tulisannya.',
+          ),
+          rProTerm('kontras', 'Kontras'),
+          rPro(
+            ' mengukur selisih kecerahan teks dan latarnya, dari 1 : 1 (sama persis) sampai 21 : 1 (hitam di atas putih).',
           ),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'a08-l06-q1',
+          type: 'analogy',
+          prompt: t(
+            'Tulisan kuning cerah di tombol putih mirip apa?',
+            'Teks kuning cerah di atas tombol putih mirip dengan situasi mana?',
+          ),
+          choices: [
+            { id: 'bad', label: t('Kapur kuning di kertas putih', 'Kapur kuning muda di kertas putih') },
+            {
+              id: 'good',
+              label: t('Kapur putih di papan hitam', 'Kapur putih di papan tulis hitam'),
+              explainWrong: t(
+                'Kapur putih di papan hitam sangat mudah dilihat. Itu contoh kontras yang kuat.',
+                'Kapur putih di papan hitam punya kontras sangat tinggi, sekitar 21 : 1.',
+              ),
+            },
+            {
+              id: 'bold',
+              label: t('Spidol hitam di kertas putih', 'Spidol hitam pekat di kertas putih'),
+              explainWrong: t(
+                'Hitam di atas putih mudah dibaca. Itu juga kontras yang kuat.',
+                'Hitam di atas putih sangat mudah dibaca.',
+              ),
+            },
+          ],
+          answer: 'bad',
+          explainCorrect: t(
+            'Kuning cerah dan putih sama-sama terang. Jadi tulisannya hampir menghilang.',
+            'Kuning cerah dan putih sama-sama terang, jadi rasionya rendah dan teks sulit dibaca.',
+          ),
+          hints: [t('Ingat kapur kuning pucat di kertas putih.')],
+          tags: ['kontras'],
+        }),
+      ),
       conceptStep({
-        title: t('Angka Patokan Aman: 4,5 : 1', 'Standar WCAG: 4,5 : 1 dan 3 : 1'),
+        title: t('Standar WCAG: 4,5 : 1 dan 3 : 1'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'standar-wcag-aa' },
-        alt: t('Standar WCAG minimal 4,5:1 untuk teks biasa dan 3:1 untuk teks besar.'),
+        alt: t('Standar WCAG minimal 4,5 : 1 untuk teks biasa dan 3 : 1 untuk teks besar.'),
+        modes: ['pro'],
         body: [
-          rText(
-            'Aturan aman: beda warna teks dan latarnya minimal 4,5 banding 1!',
-            'Standar aksesibilitas WCAG AA menetapkan rasio kontras minimal 4,5 : 1 untuk teks ukuran biasa dan 3 : 1 untuk teks besar.',
+          rPro(
+            'WCAG AA adalah pedoman aksesibilitas web. Rasio kontras minimal 4,5 : 1 untuk teks biasa dan 3 : 1 untuk teks besar.',
           ),
         ],
       }),
       conceptStep({
-        title: t('Jangan Tebak dengan Mata Saja', 'Menguji Kontras Sebelum Rilis'),
+        title: t('Jangan tebak dengan mata saja', 'Menguji kontras sebelum rilis'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'alat-cek-kontras' },
-        alt: t('Pemeriksa kontras DevTools dan WebAIM Contrast Checker untuk mengecek rasio teks.'),
+        alt: t('Alat cek kontras yang menghitung seberapa jelas teks terbaca.'),
         body: [
           rText(
-            'Selalu periksa warna tulisan dengan alat cek kontras. Jangan pakai tulisan putih di latar kuning cerah!',
-            'Gunakan alat pemeriksa seperti WebAIM Contrast Checker atau DevTools browser untuk memastikan teks aman dibaca di luar ruangan sekalipun.',
+            'Periksa warna tulisan dengan alat cek kontras. Jangan memakai tulisan putih di latar kuning cerah.',
+            'Alat seperti WebAIM Contrast Checker atau DevTools browser memastikan teks aman dibaca. Cek rasionya sebelum halaman rilis.',
           ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Kapur di papan tulis untuk rasio kontras'),
-        same: [
-          t('Tulisan dan papan belakangnya butuh perbedaan terang–gelap yang tegas supaya terbaca jelas.'),
-        ],
-        different: [
-          t('Di layar HP, kita memakai angka hitung pasti (4,5 : 1) karena layar bisa meredup di bawah terik matahari dan dilihat oleh pengguna dengan mata lelah maupun rabun.'),
         ],
       }),
       simStep(
         'detektif-kontras',
         t(
-          'Klik ketiga kartu "Teks Contoh" pada simulator Detektif Kontras dan temukan mana yang lolos 4,5:1!',
-          'Uji ketiga pasangan warna teks dan latar pada simulator Detektif Kontras untuk menemukan mana yang lolos WCAG AA.',
+          'Ketuk tiga kartu contoh dan cari yang mudah dibaca.',
+          'Uji tiga pasangan warna teks dan latar di simulator Detektif Kontras, lalu cari yang lolos WCAG AA.',
         ),
       ),
-      qStep(
-        makeMcq({
-          id: 'a08-l06-q1',
-          type: 'analogy',
-          prompt: t('Menulis teks warna kuning cerah di atas tombol berwarna putih bersih mirip dengan…'),
-          choices: [
-            { id: 'bad', label: t('Kapur kuning muda di kertas putih yang hampir menghilang saat dilihat') },
-            {
-              id: 'good',
-              label: t('Kapur putih di atas papan tulis hitam yang tajam'),
-              explainWrong: t('Kapur putih di papan hitam justru kontrasnya sangat tinggi (21:1).'),
-            },
-            {
-              id: 'bold',
-              label: t('Spidol hitam pekat di atas kertas putih bersih'),
-              explainWrong: t('Hitam di atas putih sangat mudah dibaca.'),
-            },
-          ],
-          answer: 'bad',
-          explainCorrect: t('Benar! Kuning cerah dan putih sama-sama sangat terang, sehingga rasionya rendah dan gagal terbaca.'),
-          tags: ['kontras'],
-        }),
-      ),
+      limitStep({
+        analogy: t('Kapur di papan tulis untuk rasio kontras'),
+        same: [
+          t(
+            'Tulisan dan papan butuh beda terang-gelap yang tegas.',
+            'Tulisan dan papan belakangnya butuh beda terang-gelap yang tegas agar terbaca.',
+          ),
+        ],
+        different: [
+          t(
+            'Layar HP bisa redup di bawah matahari. Tulisan pudar jadi hilang.',
+            'Di layar HP, rasio 4,5 : 1 dipakai karena layar bisa redup di bawah matahari dan dibaca mata yang lelah.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
       qStep(
         makeTf({
           id: 'a08-l06-q2',
-          prompt: t('Rasio kontras 1 : 1 berarti warna teks dan warna latar persis sama sehingga tulisan tidak terlihat sama sekali.'),
+          prompt: t(
+            'Tulisan dan latar yang warnanya sama persis membuat tulisan tidak terlihat.',
+            'Rasio kontras 1 : 1 berarti warna teks dan latar persis sama, jadi teks tidak terlihat.',
+          ),
           answer: true,
-          explainCorrect: t('Betul! 1 : 1 adalah tidak ada perbedaan sama sekali, sedangkan 21 : 1 adalah hitam di atas putih.'),
-          explainWrong: t('Hampir! Rasio kontras berjalan mulai dari 1 : 1 (identik) hingga 21 : 1 (maksimal).'),
+          explainCorrect: t(
+            'Warna yang sama persis saling menyatu. Seperti kapur putih di papan putih.',
+            'Rasio 1 : 1 berarti tanpa perbedaan, dan 21 : 1 berarti hitam di atas putih.',
+          ),
+          explainWrong: t(
+            'Pernyataan itu benar. Tulisan yang warnanya sama dengan latar menghilang.',
+            'Pernyataan itu benar: rasio kontras berjalan dari 1 : 1 (identik) sampai 21 : 1 (maksimal).',
+          ),
+          hints: [t('Ingat kapur putih di papan putih.')],
           tags: ['kontras'],
         }),
       ),
       qStep({
         id: 'a08-l06-q3',
         type: 'sort',
-        prompt: t('Kelompokkan pasangan teks dan latar berikut ke "Jelas Terbaca (Lolos)" atau "Terlalu Pudar (Gagal)":'),
+        prompt: t(
+          'Kelompokkan tulisan ini: jelas atau pudar?',
+          'Kelompokkan pasangan teks dan latar ini sebagai lolos atau gagal kontras.',
+        ),
         difficulty: 2,
         items: [
-          { id: 'c1', label: t('Teks putih (#FFFFFF) di atas latar biru gelap (#1F2340)') },
-          { id: 'c2', label: t('Teks abu muda di atas latar abu pucat') },
-          { id: 'c3', label: t('Teks biru tua di atas latar putih bersih') },
-          { id: 'c4', label: t('Teks putih di atas latar kuning cerah') },
+          {
+            id: 'c1',
+            label: t('Tulisan putih di latar biru gelap', 'Teks putih (#FFFFFF) di latar biru gelap (#1F2340)'),
+          },
+          { id: 'c2', label: t('Tulisan abu muda di latar abu pucat', 'Teks abu muda di latar abu pucat') },
+          { id: 'c3', label: t('Tulisan biru tua di latar putih', 'Teks biru tua di latar putih') },
+          { id: 'c4', label: t('Tulisan putih di latar kuning cerah', 'Teks putih di latar kuning cerah') },
         ],
         bins: [
-          { id: 'pass', label: t('Lolos Kontras ✓') },
-          { id: 'fail', label: t('Gagal Pudar ✗') },
+          { id: 'pass', label: t('Jelas dibaca', 'Lolos kontras'), icon: 'search' },
+          { id: 'fail', label: t('Terlalu pudar', 'Gagal kontras'), icon: 'bug' },
         ],
         answer: { c1: 'pass', c2: 'fail', c3: 'pass', c4: 'fail' },
-        explainCorrect: t('Hebat! Matamu sudah jeli membedakan pasangan terang–gelap yang aman dan yang pudar.'),
+        explainCorrect: t(
+          'Tulisan gelap di latar terang mudah terbaca. Tulisan terang di latar terang pudar.',
+          'Pasangan dengan selisih terang-gelap besar lolos. Pasangan yang sama-sama terang atau sama-sama gelap gagal.',
+        ),
+        hints: [t('Bandingkan terang tulisan dan terang latarnya.'), undefined],
         tags: ['kontras', 'ui'],
       }),
       qStep(
         makeMcq({
-          id: 'a08-l06-q4',
-          type: 'limit',
-          analogy: t('Membaca papan tulis di ruang kelas'),
-          prompt: t('Mengapa mengira-ngira keterbacaan di laptop dalam kamar gelap saja sering menipu dibanding memakai penguji rasio WCAG?'),
-          difficulty: 2,
-          choices: [
-            { id: 'sun', label: t('Di bawah matahari luar ruangan atau bagi pengguna berpenglihatan rendah, teks agak pudar langsung hilang jika di bawah 4,5:1') },
-            {
-              id: 'diff',
-              label: t('Perbedaan terang dan gelap membantu mata membaca lebih cepat'),
-              explainWrong: t('Itu memang persamaan dasar di kelas maupun di layar.'),
-            },
-            {
-              id: 'big',
-              label: t('Tulisan yang terlalu kecil sulit dibaca dari jarak jauh'),
-              explainWrong: t('Itu juga persamaan di dunia nyata dan layar.'),
-            },
-          ],
-          answer: 'sun',
-          explainCorrect: t('Tepat! Standar angka 4,5 : 1 melindungi pembacaan di berbagai kondisi pencahayaan dan penglihatan.'),
-          tags: ['kontras', 'ux'],
-        }),
-      ),
-      qStep(
-        makeMcq({
           id: 'a08-l06-q5',
           type: 'scenario',
-          story: t('Sari membuat tombol "Daftar Sekarang" berwarna oranye terang (#FFB400) dengan tulisan putih (#FFFFFF). Saat dicek dengan Contrast Checker, rasionya hanya 1,8 : 1.'),
-          prompt: t('Perubahan tercepat agar tombol tetap bernuansa hangat tetapi lolos standar 4,5 : 1 adalah…'),
+          story: t(
+            'Sari membuat tombol "Daftar" berwarna oranye terang. Tulisannya putih, dan tulisan itu sulit dibaca.',
+            'Sari membuat tombol "Daftar Sekarang" oranye terang (#FFB400) dengan teks putih. Contrast checker menunjukkan rasio 1,8 : 1.',
+          ),
+          prompt: t(
+            'Apa cara tercepat supaya tulisannya terbaca?',
+            'Perubahan tercepat mana yang membuat tombol tetap hangat dan lolos rasio 4,5 : 1?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'dark', label: t('Ubah tulisan tombol menjadi gelap pekat (#1F2340) atau gelapkan warna latar oranyenya menjadi cokelat-oranye tua') },
+            { id: 'dark', label: t('Ganti tulisan menjadi warna gelap', 'Ganti teks menjadi warna gelap') },
             {
               id: 'thin',
-              label: t('Kecilkan ukuran tulisan menjadi 9px tipis'),
-              explainWrong: t('Mengecilkan huruf pada kontras 1,8 : 1 justru membuatnya makin tak terbaca!'),
+              label: t('Besarkan ukuran tulisannya saja', 'Besarkan teks menjadi 24 px'),
+              explainWrong: t(
+                'Tulisan yang lebih besar tetap pudar di latar terang. Warnanya yang perlu berubah.',
+                'Ukuran lebih besar tidak mengubah rasio kontras. Warna teks atau latarnya yang harus berubah.',
+              ),
             },
             {
               id: 'same',
-              label: t('Biarkan saja karena warna kuning oranye sedang tren'),
-              explainWrong: t('Tren visual tidak boleh mengorbankan keterbacaan tombol utama.'),
+              label: t('Ganti tombol menjadi kuning muda', 'Ganti latar menjadi kuning muda'),
+              explainWrong: t(
+                'Kuning muda sama terangnya dengan putih. Tulisan putih tetap pudar.',
+                'Latar kuning muda hampir sama terangnya dengan teks putih, jadi rasionya tetap rendah.',
+              ),
             },
           ],
           answer: 'dark',
-          explainCorrect: t('Benar! Teks gelap di atas kuning/oranye terang langsung menaikkan kontras secara drastis.'),
+          explainCorrect: t(
+            'Tulisan gelap di warna terang mudah dibaca. Seperti spidol hitam di kertas kuning.',
+            'Teks gelap di atas oranye terang menaikkan rasio kontras jauh di atas 4,5 : 1 tanpa mengubah warna tombol.',
+          ),
+          hints: [
+            t('Ingat: tulisan harus beda jelas dari latarnya.', 'Yang diubah cukup satu: warna teks atau warna latar.'),
+          ],
           tags: ['kontras', 'ui'],
         }),
       ),
       qStep(
         makeMcq({
-          id: 'a08-l06-q6',
-          prompt: t('Berapa rasio kontras minimal WCAG AA untuk teks berukuran biasa vs teks berukuran besar?'),
+          id: 'a08-l06-q4',
+          type: 'limit',
+          modes: ['pro'],
+          analogy: t('Membaca papan tulis di ruang kelas'),
+          prompt: t('Mengapa melihat tulisan di monitor kantor saja belum cukup untuk menilai keterbacaan?'),
           difficulty: 2,
           choices: [
-            { id: 'w', label: t('Minimal 4,5 : 1 untuk teks biasa dan 3 : 1 untuk teks besar') },
+            { id: 'sun', label: t('Teks kurang kontras sulit dibaca di luar') },
+            {
+              id: 'diff',
+              label: t('Beda terang dan gelap membantu mata membaca lebih cepat'),
+              explainWrong: t('Itu kesamaan dasar di kelas maupun di layar, bukan alasannya.'),
+            },
+            {
+              id: 'big',
+              label: t('Tulisan terlalu kecil sulit dibaca dari jauh'),
+              explainWrong: t('Itu juga kesamaan di papan tulis dan layar, bukan alasannya.'),
+            },
+          ],
+          answer: 'sun',
+          explainCorrect: t('Rasio kontras mengukur beda terang teks dan latar. Cahaya sekitar juga memengaruhi keterbacaan.'),
+          hints: [t('Pikirkan layar HP yang dibaca di luar ruangan.')],
+          tags: ['kontras', 'ux'],
+        }),
+      ),
+      qStep(
+        makeMcq({
+          id: 'a08-l06-q6',
+          modes: ['pro'],
+          prompt: t('Berapa rasio kontras minimal WCAG AA untuk teks biasa dan teks besar?'),
+          difficulty: 2,
+          choices: [
+            { id: 'w', label: t('Teks biasa 4,5 : 1, teks besar 3 : 1') },
             {
               id: 'w2',
-              label: t('Minimal 1,2 : 1 untuk teks biasa dan 21 : 1 untuk teks besar'),
-              explainWrong: t('1,2 : 1 sangat pudar dan tidak lolos standar aksesibilitas apa pun.'),
+              label: t('Teks biasa 3 : 1, teks besar 4,5 : 1'),
+              explainWrong: t('Urutannya terbalik. Teks besar lebih mudah dibaca, jadi syaratnya lebih longgar.'),
             },
             {
               id: 'w3',
-              label: t('Cukup 1 : 1 asalkan hurufnya ditebalkan'),
-              explainWrong: t('1 : 1 berarti tulisan sama persis warnanya dengan latar.'),
+              label: t('Teks biasa 7 : 1, teks besar 4,5 : 1'),
+              explainWrong: t('Rasio 7 : 1 adalah level AAA yang lebih ketat. AA cukup 4,5 : 1.'),
             },
           ],
           answer: 'w',
-          explainCorrect: t('Tepat! 4,5 : 1 adalah angka patokan emas untuk teks normal dan 3 : 1 untuk judul besar.'),
+          explainCorrect: t('Rasio 4,5 : 1 untuk teks biasa dan 3 : 1 untuk judul atau teks besar.'),
+          hints: [t('Teks besar lebih mudah dibaca, jadi syaratnya lebih longgar.')],
           tags: ['kontras'],
         }),
       ),
@@ -1743,41 +2580,75 @@ export const lessons: Lesson[] = [
         id: 'a08-l06-q7',
         type: 'type',
         modes: ['pro'],
-        prompt: t('Apa nama standar aksesibilitas web internasional yang menetapkan batas minimal kontras 4,5 : 1? (tulis 4 huruf singkatannya)'),
+        prompt: t('Apa nama pedoman aksesibilitas web yang menetapkan kontras minimal 4,5 : 1? Tulis dengan 4 huruf.'),
         difficulty: 2,
         accept: ['wcag', 'wcag aa'],
-        explainCorrect: t('Benar! WCAG (Web Content Accessibility Guidelines) menjadi acuan global aksesibilitas web.'),
+        explainCorrect: t('WCAG menjadi acuan global aksesibilitas web.'),
+        hints: [t('Namanya diawali huruf W.'), undefined],
         tags: ['kontras'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l06-r1',
-        prompt: t('Berapa rasio kontras maksimal (hitam di atas putih bersih)?'),
+        prompt: t(
+          'Mana pasangan yang paling mudah dibaca?',
+          'Berapa rasio kontras maksimal, yaitu hitam di atas putih bersih?',
+        ),
         choices: [
-          { id: '21', label: t('21 : 1') },
-          { id: '1', label: t('1 : 1'), explainWrong: t('1 : 1 adalah saat warna teks dan latar sama persis.') },
+          { id: '21', label: t('Hitam di atas putih', '21 : 1') },
+          {
+            id: '1',
+            label: t('Putih di atas putih', '1 : 1'),
+            explainWrong: t(
+              'Putih di atas putih tidak terlihat. Warnanya sama persis.',
+              'Rasio 1 : 1 terjadi saat warna teks dan latar sama persis.',
+            ),
+          },
+          {
+            id: 'n',
+            label: t('Kuning muda di atas putih', '10 : 1'),
+            explainWrong: t(
+              'Kuning muda dan putih sama-sama terang. Tulisannya pudar.',
+              'Rasio tertinggi adalah 21 : 1, bukan 10 : 1.',
+            ),
+          },
         ],
         answer: '21',
-        explainCorrect: t('Rentang rasio kontras berjalan dari 1 : 1 hingga 21 : 1.'),
+        explainCorrect: t(
+          'Hitam di atas putih sangat mudah dibaca. Seperti tulisan spidol di kertas.',
+          'Rentang rasio kontras berjalan dari 1 : 1 sampai 21 : 1.',
+        ),
+        hints: [t('Ingat spidol hitam di kertas putih.')],
         tags: ['kontras'],
       }),
       makeTf({
         id: 'a08-l06-r2',
-        prompt: t('Untuk teks ukuran biasa, standar WCAG menetapkan rasio kontras minimal 4,5 : 1.'),
+        prompt: t(
+          'Tulisan perlu cukup beda dari latarnya supaya mudah dibaca.',
+          'Untuk teks ukuran biasa, standar WCAG menetapkan rasio kontras minimal 4,5 : 1.',
+        ),
         answer: true,
-        explainCorrect: t('Betul!'),
-        explainWrong: t('4,5 : 1 adalah batas minimal agar teks normal terbaca nyaman.'),
+        explainCorrect: t(
+          'Beda terang yang besar membuat tulisan mudah dilihat. Seperti kapur putih di papan hitam.',
+          'Rasio 4,5 : 1 adalah batas minimal agar teks biasa terbaca nyaman.',
+        ),
+        explainWrong: t(
+          'Pernyataan itu benar. Tulisan yang mirip warna latarnya sulit dibaca.',
+          'Pernyataan itu benar: 4,5 : 1 adalah batas minimal untuk teks biasa.',
+        ),
+        hints: [t('Ingat kapur putih di papan hitam.')],
         tags: ['kontras'],
       }),
     ],
     recap: t(
-      'Pastikan beda terang-gelap teks dan latar selalu tajam (minimal 4,5 : 1) dan cek dengan alat kontras.',
-      'Jaga rasio kontras WCAG minimal 4,5:1 (teks biasa) dan 3:1 (teks besar), serta verifikasi lewat DevTools atau Contrast Checker.',
+      'Tulisan harus beda jelas dari latarnya, dan cek dengan alat kontras.',
+      'Jaga rasio kontras minimal 4,5 : 1 (teks biasa) dan 3 : 1 (teks besar). Cek lewat DevTools.',
     ),
     companion: {
-      talkPrompts: ['Pernahkah melihat tulisan di poster atau HP yang warnanya hampir sama dengan latar sehingga susah dibaca?'],
-      offlineActivity: 'Tulis kalimat dengan pensil kuning di kertas putih, lalu dengan spidol hitam di kertas putih. Bandingkan mana yang terbaca dari seberang ruangan!',
+      talkPrompts: ['Pernahkah kamu melihat tulisan yang warnanya hampir sama dengan latar?'],
+      offlineActivity:
+        'Tulis satu kalimat dengan pensil kuning di kertas putih, lalu dengan spidol hitam. Bandingkan mana yang terbaca dari seberang ruangan.',
     },
   }),
 
@@ -1786,35 +2657,48 @@ export const lessons: Lesson[] = [
     worldId: 'a08',
     title: 'Menulis warna dalam kode',
     modes: ['pro'],
-    objective: t('Aku bisa membaca dan menulis warna digital dalam format HEX, RGB, RGBA, serta HSL di CSS.'),
+    objective: t('Kamu bisa membaca dan menulis warna di CSS dengan format HEX, RGB, RGBA, dan HSL.'),
+    atWork: 'Kamu menyalin kode HEX dari file desain ke CSS dan membuat overlay semi-transparan dengan RGBA.',
     estMinutes: 5,
     introducesTerms: ['hex-rgb'],
     usesTerms: ['ui', 'css', 'hsl', 'kontras'],
     warmupFrom: 'a08-l06',
     steps: [
       storyStep('a08/mesin-cat.svg', [
-        rText('Di toko cat modern, kamu tidak bilang "minta warna biru agak ceria dikit". Mesin pencampur memakai resep angka pasti per tetes pigmen agar warnanya persis sama di toko mana pun!'),
+        rText(
+          'Toko cat tidak menerima pesanan "biru yang agak ceria". Mesin pencampur memakai resep angka pasti per tetes, jadi warnanya sama di toko mana pun.',
+        ),
       ]),
       conceptStep({
-        title: t('HEX & RGB'),
+        title: t('HEX dan RGB'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'format-hex-dan-rgb' },
-        alt: t('Anatomi kode HEX #E4572E (R=E4, G=57, B=2E) dan rgb(228, 87, 46).'),
+        alt: t('Kode HEX #E4572E dengan R=E4, G=57, B=2E, dan rgb(228, 87, 46).'),
         code: {
           lang: 'css',
-          code: 'color: #E4572E;          /* Merah=E4, Hijau=57, Biru=2E */\ncolor: rgb(228, 87, 46); /* Tiap saluran 0–255 */',
+          code: 'color: #E4572E;          /* Merah=E4, Hijau=57, Biru=2E */\ncolor: rgb(228, 87, 46); /* Tiap warna dasar 0–255 */',
         },
         body: [
-          rTerm('hex-rgb', 'HEX & RGB'),
-          rText(' sama-sama menakar kadar Merah, Hijau, Biru. '),
+          rTerm('hex-rgb', 'HEX dan RGB'),
+          rText(' adalah dua cara menulis kadar merah, hijau, dan biru. '),
           rBold('HEX'),
-          rText(' paling umum dipakai (6 digit: 2 merah, 2 hijau, 2 biru). '),
+          rText(' paling umum: 6 digit, 2 untuk merah, 2 untuk hijau, 2 untuk biru. '),
           rBold('RGB'),
-          rText(' memakai angka desimal 0–255 per saluran.'),
+          rText(' memakai angka 0–255 untuk tiap warna dasar.'),
         ],
       }),
+      qStep({
+        id: 'a08-l07-q6',
+        type: 'type',
+        prompt: t('Berapa angka maksimal tiap warna dasar dalam format rgb(r, g, b)?'),
+        difficulty: 1,
+        accept: ['255'],
+        explainCorrect: t('Rentang tiap warna dasar di RGB adalah 0 sampai 255.'),
+        hints: [t('Baca komentar di blok kode tadi.'), undefined],
+        tags: ['hex-rgb'],
+      }),
       conceptStep({
-        title: t('RGBA (Transparansi) & HSL'),
+        title: t('RGBA dan HSL'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'format-rgba-dan-hsl' },
         alt: t('Contoh rgba(228, 87, 46, 0.5) dengan alpha 0.5 dan hsl(14, 77%, 54%).'),
@@ -1824,43 +2708,44 @@ export const lessons: Lesson[] = [
         },
         body: [
           rBold('RGBA'),
-          rText(' menambahkan alpha (tingkat tembus pandang 0 sampai 1). Sementara '),
+          rText(' menambahkan alpha, yaitu tingkat tembus pandang dari 0 sampai 1. '),
           rTerm('hsl', 'HSL'),
-          rText(' paling mudah dibaca manusia saat ingin membuat versi warna lebih terang atau lebih gelap.'),
+          rText(' paling mudah dibaca manusia untuk membuat warna lebih terang atau lebih gelap.'),
         ],
       }),
       conceptStep({
-        title: t('Memilih Format yang Tepat'),
+        title: t('Memilih format yang tepat'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'kapan-hex-rgba-hsl' },
-        alt: t('Panduan memilih HEX untuk palet statis, RGBA untuk overlay transparan, HSL untuk varian dinamis.'),
+        alt: t('Pakai HEX untuk palet statis, RGBA untuk overlay transparan, HSL untuk varian dinamis.'),
         body: [
-          rText('Gunakan '),
+          rText('Pakai '),
           rBold('HEX'),
-          rText(' saat menyalin kode palet ringkas dari Figma/design system, '),
+          rText(' untuk menyalin kode palet dari file desain. Pakai '),
           rBold('RGBA'),
-          rText(' atau alpha untuk bayangan dan overlay semi-transparan, serta '),
+          rText(' untuk bayangan dan overlay semi-transparan. Pakai '),
           rBold('HSL'),
-          rText(' saat menyusun skala terang-gelap warna secara terstruktur.'),
-        ],
-      }),
-      limitStep({
-        analogy: t('Resep tetes cat di mesin pencampur'),
-        same: [
-          t('Memakai angka terukur untuk menjamin warna yang sama persis dapat direproduksi ulang.'),
-        ],
-        different: [
-          t('Cat fisik bekerja secara subtraktif (campur semua warna menjadi gelap), sedangkan rgb(255, 255, 255) di layar adalah aditif cahaya yang menghasilkan warna putih penuh!'),
+          rText(' untuk menyusun skala terang-gelap warna.'),
         ],
       }),
       simStep(
         'detektif-kontras',
-        t('Amati kode HEX yang dipakai tiap kartu pada simulator Detektif Kontras.'),
+        t('Amati kode HEX yang dipakai tiap kartu di simulator Detektif Kontras.'),
       ),
+      limitStep({
+        analogy: t('Resep tetes cat di mesin pencampur'),
+        same: [t('Angka terukur membuat warna yang sama bisa dibuat ulang.')],
+        different: [
+          t(
+            'Cat fisik makin gelap saat dicampur. Di layar, rgb(255, 255, 255) menyalakan semua cahaya dan menghasilkan putih.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
       qStep({
         id: 'a08-l07-q1',
         type: 'match',
-        prompt: t('Pasangkan contoh kode warna CSS dengan jenis format dan fungsinya:'),
+        prompt: t('Pasangkan contoh kode warna CSS dengan format dan fungsinya.'),
         difficulty: 2,
         left: [
           { id: 'hx', label: t('#E4572E') },
@@ -1869,19 +2754,20 @@ export const lessons: Lesson[] = [
           { id: 'hs', label: t('hsl(14, 77%, 54%)') },
         ],
         right: [
-          { id: 'rhx', label: t('HEX — 6 digit paling ringkas dan umum dipakai') },
-          { id: 'rrg', label: t('RGB — kadar merah, hijau, biru masing-masing 0–255') },
-          { id: 'rra', label: t('RGBA — RGB ditambah tingkat transparansi alpha 0–1') },
-          { id: 'rhs', label: t('HSL — paling mudah digeser terang-gelapnya oleh manusia') },
+          { id: 'rhx', label: t('HEX: 6 digit, paling ringkas dan umum') },
+          { id: 'rrg', label: t('RGB: merah, hijau, biru masing-masing 0–255') },
+          { id: 'rra', label: t('RGBA: RGB ditambah transparansi alpha 0–1') },
+          { id: 'rhs', label: t('HSL: paling mudah diubah terang-gelapnya') },
         ],
         answer: { hx: 'rhx', rg: 'rrg', ra: 'rra', hs: 'rhs' },
-        explainCorrect: t('Mantap! Keempat format ini sangat sering ditemui di Figma dan file CSS.'),
+        explainCorrect: t('Keempat format ini sering ditemui di file desain dan file CSS.'),
+        hints: [t('Cari format yang punya angka keempat.'), undefined],
         tags: ['hex-rgb', 'hsl'],
       }),
       qStep({
         id: 'a08-l07-q2',
         type: 'spotbug',
-        prompt: t('Ketuk baris kode warna CSS yang memiliki nilai saluran warna TIDAK valid:'),
+        prompt: t('Ketuk baris CSS yang memuat nilai warna tidak valid.'),
         difficulty: 2,
         lines: [
           '.kartu { color: #1F2340; }',
@@ -1889,31 +2775,35 @@ export const lessons: Lesson[] = [
           '.tombol { background: rgb(350, 90, 40); }',
         ],
         answer: [3],
-        explainCorrect: t('Jeli! Baris 3 menulis 350 pada saluran Merah, padahal rentang nilai setiap saluran RGB hanya 0 sampai 255.'),
+        explainCorrect: t('Baris 3 menulis 350 untuk merah, padahal tiap warna dasar RGB hanya 0 sampai 255.'),
+        hints: [t('Periksa angka yang melebihi 255.'), undefined],
         tags: ['hex-rgb', 'css'],
       }),
       qStep(
         makeMcq({
           id: 'a08-l07-q3',
           type: 'limit',
-          analogy: t('Mesin pencampur cat fisik vs RGB layar'),
-          prompt: t('Jika kamu menulis rgb(255, 255, 255) di CSS, warna apakah yang muncul di layar?'),
+          analogy: t('Mesin pencampur cat fisik dan RGB layar'),
+          prompt: t('Warna apa yang muncul di layar untuk rgb(255, 255, 255)?'),
           difficulty: 2,
           choices: [
-            { id: 'wht', label: t('Putih terang — berbeda dari pigmen cat yang justru menjadi gelap bila dicampur semua') },
+            { id: 'wht', label: t('Putih terang, karena semua cahaya menyala penuh') },
             {
               id: 'blk',
-              label: t('Hitam pekat karena semua warna bercampur'),
-              explainWrong: t('Hitam di layar adalah rgb(0, 0, 0) saat semua cahaya dimatikan.'),
+              label: t('Hitam pekat, karena semua warna bercampur'),
+              explainWrong: t('Hitam adalah rgb(0, 0, 0), saat semua cahaya mati.'),
             },
             {
               id: 'red',
-              label: t('Merah menyala saja'),
-              explainWrong: t('Merah menyala adalah rgb(255, 0, 0).'),
+              label: t('Abu-abu terang, karena warnanya saling mencampur'),
+              explainWrong: t('Abu-abu muncul bila ketiga angka sama tetapi lebih kecil, misalnya 128.'),
             },
           ],
           answer: 'wht',
-          explainCorrect: t('Benar! RGB adalah model cahaya aditif: saat merah, hijau, dan biru menyala maksimal (255), hasilnya putih.'),
+          explainCorrect: t(
+            'RGB mencampur cahaya. Saat merah, hijau, dan biru menyala maksimal (255), hasilnya putih.',
+          ),
+          hints: [t('Cahaya yang ditambah makin terang.')],
           tags: ['hex-rgb'],
         }),
       ),
@@ -1921,202 +2811,231 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l07-q4',
           type: 'scenario',
-          story: t('Dimas ingin membuat lapisan latar di belakang jendela modal agar tampak setengah transparan (50% tembus pandang) di atas halaman utama.'),
-          prompt: t('Kode warna manakah yang paling tepat untuk lapisan overlay tersebut?'),
+          story: t(
+            'Dimas membuat lapisan di belakang jendela modal agar setengah tembus pandang di atas halaman utama.',
+          ),
+          prompt: t('Kode warna mana yang paling tepat untuk lapisan overlay itu?'),
           difficulty: 2,
           choices: [
             { id: 'rgba', label: t('rgba(31, 35, 64, 0.5)') },
             {
               id: 'rgb',
               label: t('rgb(31, 35, 64)'),
-              explainWrong: t('rgb tanpa saluran alpha tampil padat 100%, tidak tembus pandang.'),
+              explainWrong: t('Tanpa alpha, warna tampil padat 100% dan tidak tembus pandang.'),
             },
             {
               id: 'a5',
               label: t('rgba(31, 35, 64, 255)'),
-              explainWrong: t('Nilai alpha pada rgba hanya berada di rentang 0 hingga 1, jadi 50% adalah 0.5.'),
+              explainWrong: t('Alpha hanya berada di rentang 0 sampai 1. Untuk 50%, tulis 0.5.'),
             },
           ],
           answer: 'rgba',
-          explainCorrect: t('Tepat! Saluran keempat (0.5) pada rgba mengatur kepekatan 50% sehingga isi di belakang masih membayang.'),
+          explainCorrect: t('Nilai keempat (0.5) mengatur kepekatan 50%, jadi isi di belakang masih terlihat.'),
+          hints: [t('Nilai keempat mengatur tembus pandang.')],
           tags: ['hex-rgb', 'css'],
         }),
       ),
       qStep({
         id: 'a08-l07-q5',
         type: 'fill',
-        prompt: t('Lengkapi bagian nilai warna pada kode HEX #E4572E:'),
+        prompt: t('Dua digit tengah pada #E4572E mengatur warna dasar yang mana?'),
         difficulty: 2,
-        template: 'Pada kode HEX #E4572E, dua digit E4 mewakili merah, 57 mewakili ___, dan 2E mewakili biru.',
+        template: 'Pada kode #E4572E, E4 untuk merah, 57 untuk ___, dan 2E untuk biru.',
         bank: ['hijau', 'kuning', 'hitam'],
         answer: ['hijau'],
-        explainCorrect: t('Benar! Urutan dua-dua digit HEX selalu R (merah), G (hijau), B (biru).'),
-        tags: ['hex-rgb'],
-      }),
-      qStep({
-        id: 'a08-l07-q6',
-        type: 'type',
-        prompt: t('Berapakah angka maksimal tiap saluran Merah, Hijau, atau Biru dalam format rgb(r, g, b)?'),
-        difficulty: 1,
-        accept: ['255'],
-        explainCorrect: t('Tepat! Rentang setiap saluran warna di RGB adalah 0 hingga 255.'),
+        explainCorrect: t('Urutan pasangan digit HEX selalu merah, hijau, biru (RGB).'),
+        hints: [t('Urutannya sama dengan huruf R, G, B.'), undefined],
         tags: ['hex-rgb'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l07-r1',
-        prompt: t('Pada rgba(0, 0, 0, 0.2), angka 0.2 di paling belakang menunjukkan nilai…'),
+        prompt: t('Pada rgba(0, 0, 0, 0.2), angka 0.2 menunjukkan apa?'),
         choices: [
-          { id: 'al', label: t('Alpha (tingkat tembus pandang 0–1)') },
-          { id: 'hue', label: t('Sudut warna merah'), explainWrong: t('Angka keempat di rgba adalah alpha untuk transparansi.') },
+          { id: 'al', label: t('Alpha, tingkat tembus pandang') },
+          {
+            id: 'hue',
+            label: t('Sudut warna merah'),
+            explainWrong: t('Angka keempat di rgba adalah alpha untuk transparansi.'),
+          },
         ],
         answer: 'al',
-        explainCorrect: t('Alpha 0 berarti bening tak terlihat, 1 berarti pekat penuh.'),
+        explainCorrect: t('Alpha 0 berarti bening, dan 1 berarti pekat penuh.'),
+        hints: [t('Angka keempat mengatur tembus pandang.')],
         tags: ['hex-rgb'],
       }),
       makeTf({
         id: 'a08-l07-r2',
-        prompt: t('Kode warna #E4572E terdiri atas enam digit: dua untuk merah, dua untuk hijau, dan dua untuk biru.'),
+        prompt: t('Kode #E4572E terdiri atas enam digit: dua untuk merah, dua untuk hijau, dan dua untuk biru.'),
         answer: true,
-        explainCorrect: t('Betul!'),
-        explainWrong: t('Format HEX #RRGGBB membagi pasangan digitnya sesuai urutan R, G, B.'),
+        explainCorrect: t('Format #RRGGBB membagi pasangan digit sesuai urutan merah, hijau, biru.'),
+        explainWrong: t('Pernyataan itu benar: HEX memakai enam digit dalam tiga pasangan.'),
+        hints: [t('Hitung pasangan digit setelah tanda #.')],
         tags: ['hex-rgb'],
       }),
     ],
-    recap: t('Pahami cara membaca #RRGGBB pada HEX, 0–255 pada RGB, transparansi alpha pada RGBA, serta kemudahan modifikasi lewat HSL.'),
+    recap: t(
+      'Baca #RRGGBB pada HEX dan 0–255 pada RGB. Pakai alpha di RGBA untuk transparansi dan HSL untuk varian terang-gelap.',
+    ),
   }),
 
   makeLesson({
     id: 'a08-l08',
     worldId: 'a08',
-    title: 'Jenis huruf dan cara menatanya',
+    title: 'Huruf yang enak dibaca',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa memilih jenis huruf yang tepat dan menata jarak baris supaya bacaan nyaman di mata.',
-      'Aku bisa membedakan 4 keluarga huruf, menerapkan aturan keterbacaan paragraf (16px, line-height, 45–75ch), dan memasangkan huruf.',
+      'Aku bisa memilih jenis huruf dan jarak baris yang nyaman di mata.',
+      'Kamu bisa membedakan 4 jenis huruf dan menerapkan aturan baca nyaman: 16px, line-height 1.5–1.7, 45–75 karakter.',
     ),
-    estMinutes: 5,
+    atWork: 'Kamu menentukan font, ukuran, dan lebar baris artikel blog supaya nyaman dibaca di HP.',
+    estMinutes: 6,
     introducesTerms: ['tipografi'],
     usesTerms: ['ui', 'ux', 'hierarki', 'kontras'],
     warmupFrom: 'a08-l07',
     steps: [
       storyStep('a08/buku-nyaman.svg', [
         rText(
-          'Tulisan buku yang barisnya mepet dan hurufnya penuh lekuk hias bikin mata cepat pusing. Kalau ukuran pas dan barisnya lega, membaca terasa ringan!',
-          'Sebagian besar isi website adalah teks. Seperti halaman buku yang barisnya lega jauh lebih nikmat dibaca daripada cetakan rapat sesak, menata huruf berarti membereskan separuh desain.',
+          'Buku yang barisnya mepet dan hurufnya penuh hiasan membuat mata pusing. Buku yang barisnya lega terasa ringan. Apa rahasianya?',
+          'Sebagian besar isi halaman web adalah teks. Menata huruf berarti membereskan separuh desain.',
         ),
       ]),
       conceptStep({
-        title: t('Empat Keluarga Huruf', 'Jenis-Jenis Huruf'),
+        title: t('Lihat bentuk huruf', 'Jenis-jenis huruf'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'empat-jenis-huruf' },
-        alt: t('Contoh Serif berkaki, Sans-serif bersih, Monospace sama lebar, dan Display hias.'),
+        alt: t('Huruf n berkaki kecil dan huruf n berujung polos.'),
         body: [
-          rTerm('tipografi', 'Tipografi', 'Tipografi'),
-          rText(' punya 4 huruf. ', ' membagi 4 jenis: '),
-          rBold('Serif', 'Serif'),
-          rText(' klasik. ', ' (berkaki klasik), '),
-          rBold('Sans-serif', 'Sans-serif'),
-          rText(' bersih. ', ' (bersih di layar), '),
-          rBold('Monospace', 'Monospace'),
-          rText(' buat kode. ', ' (lebar sama untuk kode), dan '),
-          rBold('Display', 'Display'),
-          rText(' buat judul.', ' (judul besar saja).'),
+          rJTerm('tipografi', 'Tipografi'),
+          rJunior(
+            ' adalah cara memilih dan menata huruf. Lihat kaki kecil di ujung huruf. Ada juga ujung yang polos. Huruf sama lebar merapikan angka. Huruf hias cocok untuk judul.',
+          ),
+          rProTerm('tipografi', 'Tipografi'),
+          rPro(' adalah seni menata huruf. Ada 4 jenis huruf. '),
+          rProBold('Serif'),
+          rPro(' (berkaki, klasik), '),
+          rProBold('Sans-serif'),
+          rPro(' (bersih di layar), '),
+          rProBold('Monospace'),
+          rPro(' (lebar sama, untuk kode), dan '),
+          rProBold('Display'),
+          rPro(' (hias, untuk judul besar).'),
         ],
       }),
+      qStep({
+        id: 'a08-l08-q1',
+        type: 'match',
+        prompt: t(
+          'Pasangkan jenis huruf dengan kegunaannya.',
+          'Pasangkan keempat jenis huruf dengan kegunaan terbaiknya di web.',
+        ),
+        difficulty: 2,
+        left: [
+          { id: 'se', label: t('Huruf berkaki', 'Serif (kaki kecil di ujung)') },
+          { id: 'sa', label: t('Huruf tanpa kaki', 'Sans-serif (tanpa kaki, bersih)') },
+          { id: 'mo', label: t('Huruf sama lebar', 'Monospace (semua huruf selebar sama)') },
+          { id: 'di', label: t('Huruf hias', 'Display (huruf hias penuh karakter)') },
+        ],
+        right: [
+          { id: 'rse', label: t('Kesan klasik dan resmi', 'Kesan klasik dan resmi, cocok untuk judul atau majalah') },
+          { id: 'rsa', label: t('Tulisan paragraf di layar', 'Teks paragraf dan tampilan layar agar mudah dibaca') },
+          { id: 'rmo', label: t('Angka pada struk', 'Potongan kode dan angka sejajar pada tabel') },
+          { id: 'rdi', label: t('Judul besar atau poster', 'Judul besar atau poster, bukan paragraf panjang') },
+        ],
+        answer: { se: 'rse', sa: 'rsa', mo: 'rmo', di: 'rdi' },
+        explainCorrect: t(
+          'Setiap jenis huruf punya tugas sendiri. Pilih yang cocok untuk tulisanmu.',
+          'Keluarga huruf yang tepat menentukan suasana dan kenyamanan baca.',
+        ),
+        hints: [t('Ingat huruf mana yang cocok untuk judul poster.'), undefined],
+        tags: ['tipografi'],
+      }),
       conceptStep({
-        title: t('Aturan Nyaman Membaca', 'Pegangan Ukuran, Baris, dan Panjang'),
+        title: t('Aturan nyaman membaca', 'Ukuran, jarak baris, dan panjang baris'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'aturan-baca-nyaman' },
-        alt: t('Teks minimal 16px, jarak baris 1.5-1.7, dan panjang 45-75 karakter.'),
+        code: { lang: 'css', code: 'article { max-width: 65ch; line-height: 1.5; }' },
+        alt: t('Huruf cukup besar, jarak baris lega, dan baris tidak terlalu panjang.'),
         body: [
           rText(
-            'Teks isi minimal 16px. Beri jarak baris 1,5×. Jangan kepanjangan. Ratakan kiri paragraf!',
-            'Jaga teks isi ≥ 16px (1rem), line-height 1,5–1,7 (paragraf) atau 1,1–1,3 (judul), panjang 45–75 karakter, rata kiri, dan warna abu sangat gelap.',
+            'Huruf isi harus cukup besar. Jarak antarbaris dibuat lega. Baris jangan terlalu panjang.',
+            'Jaga teks isi minimal 16px (1rem) dengan line-height 1.5–1.7. Panjang baris 45–75 karakter dan rata kiri membuat paragraf nyaman. Judul memakai line-height 1.1–1.3.',
           ),
         ],
       }),
       conceptStep({
-        title: t('Jangan Pakai Banyak Jenis Huruf', 'Memasangkan Huruf dengan Aman'),
+        title: t('Memasangkan huruf dengan aman'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'memasangkan-huruf' },
-        alt: t('Maksimal 2 keluarga huruf: satu keluarga saja atau judul Serif dengan isi Sans-serif.'),
+        alt: t('Maksimal 2 keluarga huruf: satu keluarga, atau judul serif dengan isi sans-serif.'),
+        modes: ['pro'],
         body: [
-          rText(
-            'Maksimal 2 jenis huruf dalam satu web! Paling aman pakai 1 jenis saja, bedakan tebal dan besarnya.',
-            'Batasi maksimal 2 keluarga huruf: pakai 1 keluarga saja (bedakan ketebalan Bold/Regular), atau padukan judul Serif/Display dengan isi Sans-serif bersih.',
+          rPro(
+            'Batasi maksimal 2 keluarga huruf. Pakai 1 keluarga dan bedakan ketebalannya, atau padukan judul Serif atau Display dengan isi Sans-serif.',
           ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Cetakan buku kertas untuk tipografi layar'),
-        same: [
-          t('Ukuran huruf cukup besar, jarak antarbaris lega, dan panjang baris sedang sama-sama menjaga mata tidak lelah.'),
-        ],
-        different: [
-          t('Di buku cetak, paragraf sering memakai rata kanan-kiri (justify) dan huruf Serif; di layar web, rata kiri lebih aman agar spasi tidak bolong dan file font (woff2) perlu dijaga ringan!'),
         ],
       }),
       simStep(
         'detektif-kontras',
         t(
-          'Lihat tulisan pada simulator: warna gelap lembut dan ukuran huruf jelas membuat kalimat terbaca seketika!',
-          'Amati bagaimana kombinasi kontras tinggi dan warna abu gelap nyaman dibaca tanpa membuat mata silau.',
+          'Lihat tulisan di simulator: warna gelap lembut dan huruf jelas mudah dibaca.',
+          'Amati bagaimana kontras tinggi dan abu gelap membuat teks nyaman dibaca di simulator.',
         ),
       ),
-      qStep({
-        id: 'a08-l08-q1',
-        type: 'match',
-        prompt: t('Pasangkan keempat jenis huruf dengan kegunaan terbaiknya di website:'),
-        difficulty: 2,
-        left: [
-          { id: 'se', label: t('Serif (punya kaki kecil di ujung)') },
-          { id: 'sa', label: t('Sans-serif (tanpa kaki, bersih)') },
-          { id: 'mo', label: t('Monospace (semua huruf sama lebar)') },
-          { id: 'di', label: t('Display (huruf hias penuh karakter)') },
+      limitStep({
+        analogy: t('Buku cetak dan huruf di layar'),
+        same: [
+          t(
+            'Buku dan layar sama-sama butuh huruf besar dan baris lega.',
+            'Ukuran huruf, jarak baris, dan panjang baris yang pas menjaga mata tidak lelah.',
+          ),
         ],
-        right: [
-          { id: 'rse', label: t('Kesan klasik, resmi, cocok untuk judul atau majalah') },
-          { id: 'rsa', label: t('Teks paragraf dan antarmuka layar agar mudah dibaca') },
-          { id: 'rmo', label: t('Potongan kode program dan angka sejajar pada tabel') },
-          { id: 'rdi', label: t('Hanya untuk judul besar atau poster, bukan paragraf panjang') },
+        different: [
+          t(
+            'Di layar kecil, baris rata kiri lebih nyaman dibaca.',
+            'Buku cetak sering memakai rata kanan-kiri (justify). Di layar web, rata kiri lebih aman agar spasi tidak bolong.',
+          ),
         ],
-        answer: { se: 'rse', sa: 'rsa', mo: 'rmo', di: 'rdi' },
-        explainCorrect: t('Keren! Memilih keluarga huruf yang pas langsung menentukan suasana dan kenyamanan web.'),
-        tags: ['tipografi'],
+        riskyAnalogy: true,
       }),
       qStep(
         makeMcq({
           id: 'a08-l08-q2',
           type: 'analogy',
-          prompt: t('Mengapa memasang huruf Display yang meliuk-liuk pada seluruh paragraf cerita panjang 500 kata adalah kesalahan besar?'),
+          prompt: t(
+            'Mengapa huruf hias sulit dibaca dalam cerita panjang?',
+            'Mengapa huruf Display tidak cocok untuk paragraf cerita 500 kata?',
+          ),
           choices: [
-            { id: 'hard', label: t('Mata cepat lelah karena bentuk hiasannya rumit bila dibaca terus-menerus') },
+            {
+              id: 'hard',
+              label: t('Hiasannya membuat mata cepat lelah', 'Hiasannya melelahkan mata kalau dibaca terus-menerus'),
+            },
             {
               id: 'size',
-              label: t('Huruf Display dilarang dipakai untuk judul besar poster'),
-              explainWrong: t('Huruf Display justru paling pas untuk judul besar yang singkat.'),
+              label: t('Huruf hias hanya boleh dipakai sekali', 'Huruf Display dilarang dipakai untuk judul poster besar'),
+              explainWrong: t(
+                'Huruf hias bisa dipakai untuk judul pendek.',
+                'Huruf Display justru paling pas untuk judul besar yang singkat.',
+              ),
             },
             {
               id: 'css',
-              label: t('Browser hanya bisa menampilkan huruf Display dengan warna merah'),
-              explainWrong: t('Semua jenis huruf bisa diberi warna apa saja.'),
+              label: t('Huruf hias terlalu kecil untuk dibaca', 'Huruf Display membuat halaman terlalu berat dimuat'),
+              explainWrong: t(
+                'Ukuran huruf bisa diubah. Perhatikan bentuknya.',
+                'Berat file memang perlu dijaga, tetapi masalah utamanya keterbacaan paragraf panjang.',
+              ),
             },
           ],
           answer: 'hard',
-          explainCorrect: t('Benar! Huruf hias Display cukup untuk judul besar; serahkan paragraf panjang kepada Sans-serif yang bersih.'),
+          explainCorrect: t(
+            'Huruf hias cukup untuk judul besar. Cerita panjang butuh huruf yang bersih.',
+            'Hiasan huruf bisa memperlambat pembaca. Pilih bentuk sederhana untuk cerita panjang.',
+          ),
+          hints: [t('Ingat buku yang hurufnya penuh hiasan.', 'Bayangkan membaca 500 kata dengan huruf hias.')],
           tags: ['tipografi', 'ux'],
-        }),
-      ),
-      qStep(
-        makeTf({
-          id: 'a08-l08-q3',
-          prompt: t('Menggunakan lima jenis huruf berbeda-beda di satu halaman web membuat tampilan terlihat lebih rapi dan terpercaya.'),
-          answer: false,
-          explainCorrect: t('Betul, itu salah! Maksimal 2 keluarga huruf saja; terlalu banyak jenis huruf tampak berantakan.'),
-          explainWrong: t('Hampir! Batasi maksimal 1 sampai 2 keluarga huruf agar halaman tetap konsisten.'),
-          tags: ['tipografi', 'ui'],
         }),
       ),
       qStep(
@@ -2124,23 +3043,39 @@ export const lessons: Lesson[] = [
           id: 'a08-l08-q4',
           type: 'limit',
           analogy: t('Tata letak buku dan majalah kertas'),
-          prompt: t('Mengapa aturan rata kanan-kiri (justify) dari buku cetak sebaiknya dihindari pada paragraf website di layar sempit?'),
+          prompt: t(
+            'Mengapa paragraf di layar HP sebaiknya rata kiri?',
+            'Mengapa rata kanan-kiri (justify) dari buku cetak sebaiknya dihindari pada paragraf web di layar sempit?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'gap', label: t('Rata kanan-kiri di layar sempit sering menimbulkan spasi bolong-bolong yang memutus aliran baca; rata kiri lebih nyaman') },
+            {
+              id: 'gap',
+              label: t('Jarak antarkata tetap rapi', 'Spasi bolong-bolong di tengah baris memutus ritme baca'),
+            },
             {
               id: 'lh',
-              label: t('Jarak antarbaris tetap perlu lega sekitar 1,5 kali ukuran huruf'),
-              explainWrong: t('Kebutuhan jarak baris yang lega sama-sama berlaku di buku maupun di web.'),
+              label: t('Jarak antarbaris perlu lega', 'Jarak antarbaris perlu lega, sekitar 1,5 kali ukuran huruf'),
+              explainWrong: t(
+                'Jarak baris lega berlaku di buku dan di layar. Itu bukan alasan rata kiri.',
+                'Jarak antarbaris yang lega berlaku di buku dan web, jadi itu kesamaan.',
+              ),
             },
             {
               id: 'dark',
-              label: t('Huruf gelap di latar terang tetap lebih mudah dibaca'),
-              explainWrong: t('Ini juga kesamaan prinsip keterbacaan.'),
+              label: t('Huruf gelap lebih mudah dibaca', 'Huruf gelap di latar terang tetap mudah dibaca'),
+              explainWrong: t(
+                'Huruf gelap di latar terang berlaku di buku dan di layar. Itu bukan alasan rata kiri.',
+                'Itu juga kesamaan prinsip keterbacaan.',
+              ),
             },
           ],
           answer: 'gap',
-          explainCorrect: t('Tepat! Rata kiri membuat jarak antar kata selalu seragam dan alami di layar HP maupun laptop.'),
+          explainCorrect: t(
+            'Rata kiri membuat jarak antarkata sama. Bacaan jadi mengalir.',
+            'Rata kiri menjaga jarak antarkata tetap seragam di layar HP maupun laptop.',
+          ),
+          hints: [t('Bayangkan baris yang spasinya bolong-bolong.')],
           tags: ['tipografi'],
         }),
       ),
@@ -2148,47 +3083,81 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l08-q5',
           type: 'scenario',
-          story: t('Pada blog catatan harian Raka, teks artikelnya memakai ukuran 12px dengan line-height: 1.0, warna hitam pekat #000, dan membentang penuh 140 karakter selebar layar monitor.'),
-          prompt: t('Paket perbaikan tipografi yang paling tepat untuk artikel Raka adalah…'),
-          difficulty: 3,
+          story: t(
+            'Blog Raka memakai huruf sangat kecil. Barisnya mepet dan membentang selebar layar.',
+            'Teks artikel blog Raka memakai ukuran 12px dengan line-height 1.0 dan warna hitam #000. Barisnya membentang 140 karakter selebar monitor.',
+          ),
+          prompt: t('Perbaikan apa yang paling tepat?', 'Paket perbaikan tipografi mana yang paling tepat?'),
+          difficulty: 2,
           choices: [
-            { id: 'fix', label: t('Ubah ukuran isi minimal 16px, line-height 1.5–1.7, pakai abu sangat gelap, dan batasi lebar baris 45–75 karakter') },
+            {
+              id: 'fix',
+              label: t('Huruf besar, baris lega, dan baris pendek', 'Isi 16px, line-height 1.5, baris 65 karakter'),
+            },
             {
               id: 'disp',
-              label: t('Ganti semua huruf artikel menjadi jenis huruf Display berkaki melingkar'),
-              explainWrong: t('Huruf hias Display di paragraf panjang justru makin melelahkan mata.'),
+              label: t('Pakai huruf hias untuk seluruh cerita', 'Ganti semua huruf artikel dengan huruf Display berkaki melingkar'),
+              explainWrong: t(
+                'Huruf hias di cerita panjang melelahkan mata. Blog butuh huruf yang bersih.',
+                'Huruf hias Display di paragraf panjang justru makin melelahkan mata.',
+              ),
             },
             {
               id: 'tight',
-              label: t('Turunkan line-height menjadi 0.8 agar lebih banyak kalimat muat satu layar'),
-              explainWrong: t('Jarak baris yang terlalu rapat membuat pembaca sering salah pindah baris.'),
+              label: t('Rapatkan baris supaya muat lebih banyak', 'Turunkan line-height ke 0.8 agar lebih banyak baris muat satu layar'),
+              explainWrong: t(
+                'Baris yang terlalu rapat membuat mata salah pindah baris. Baris perlu lega.',
+                'Jarak baris yang terlalu rapat membuat pembaca sering salah pindah baris.',
+              ),
             },
           ],
           answer: 'fix',
-          explainCorrect: t('Benar! Ukuran 16px, line-height 1,6, warna abu gelap lembut, dan lebar 65ch langsung membuat blog Raka nyaman dibaca.'),
+          explainCorrect: t(
+            'Huruf besar, baris lega, dan baris pendek membuat blog nyaman dibaca.',
+            'Ukuran 16px, line-height 1.6, abu gelap lembut, dan lebar 65ch membuat blog Raka nyaman dibaca.',
+          ),
+          hints: [t('Ingat buku yang nyaman dibaca.', 'Perbaiki tiga hal: ukuran, jarak baris, panjang baris.')],
           tags: ['tipografi', 'ux'],
+        }),
+      ),
+      qStep(
+        makeTf({
+          id: 'a08-l08-q3',
+          modes: ['pro'],
+          prompt: t('Memakai lima jenis huruf berbeda di satu halaman membuat tampilan lebih rapi dan tepercaya.'),
+          answer: false,
+          explainCorrect: t(
+            'Pernyataan itu keliru: batasnya maksimal 2 keluarga huruf. Terlalu banyak jenis huruf tampak berantakan.',
+          ),
+          explainWrong: t('Batasi 1 sampai 2 keluarga huruf agar halaman tetap konsisten.'),
+          hints: [t('Ingat batas maksimal keluarga huruf.')],
+          tags: ['tipografi', 'ui'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'a08-l08-q6',
-          prompt: t('Berapakah batas maksimal jumlah keluarga huruf yang dianjurkan dalam satu desain website agar tetap harmonis?'),
+          modes: ['pro'],
+          prompt: t('Berapa jumlah keluarga huruf maksimal yang dianjurkan dalam satu desain web?'),
           difficulty: 1,
           choices: [
-            { id: 'two', label: t('Maksimal 2 keluarga huruf (atau cukup 1 keluarga saja)') },
+            { id: 'two', label: t('Maksimal 2 keluarga huruf, atau cukup 1') },
             {
               id: 'six',
-              label: t('Minimal 6 keluarga huruf berbeda per halaman'),
-              explainWrong: t('Enam keluarga huruf membuat tampilan tampak kacau dan memperlambat muat halaman.'),
+              label: t('Maksimal 4 keluarga huruf, satu untuk tiap jenis'),
+              explainWrong: t('Empat keluarga masih terlalu banyak dan membuat halaman terlihat kacau.'),
             },
             {
               id: 'ten',
-              label: t('Setiap paragraf wajib memakai font baru'),
-              explainWrong: t('Konsistensi huruf adalah kunci keterbacaan.'),
+              label: t('Sebanyak yang dibutuhkan setiap bagian halaman'),
+              explainWrong: t('Huruf yang konsisten adalah kunci keterbacaan.'),
             },
           ],
           answer: 'two',
-          explainCorrect: t('Tepat! Satu keluarga huruf saja (bedakan Bold/Regular) atau maksimal dua (judul + isi) sudah sangat cukup.'),
+          explainCorrect: t(
+            'Satu keluarga (bedakan bold dan regular) atau paling banyak dua (judul dan isi) sudah cukup.',
+          ),
+          hints: [t('Satu keluarga bisa dibedakan lewat ketebalan.')],
           tags: ['tipografi'],
         }),
       ),
@@ -2196,43 +3165,77 @@ export const lessons: Lesson[] = [
         id: 'a08-l08-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi pengaturan jarak antarbaris paragraf yang nyaman di CSS:'),
+        prompt: t('Berapa batas bawah line-height untuk paragraf yang nyaman?'),
         difficulty: 2,
-        template: 'Untuk paragraf bacaan panjang, atur line-height di kisaran ___ sampai 1.7.',
+        template: 'Untuk paragraf bacaan panjang, atur line-height antara ___ sampai 1.7.',
         bank: ['1.5', '0.9', '4.0'],
         answer: ['1.5'],
-        explainCorrect: t('Benar! Rentang line-height 1.5 hingga 1.7 memberi celah antarbaris yang pas bagi mata.'),
+        explainCorrect: t('Rentang 1.5 sampai 1.7 memberi celah antarbaris yang pas bagi mata.'),
+        hints: [t('Baris perlu lebih lega dari 1 kali ukuran huruf.'), undefined],
         tags: ['tipografi', 'css'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l08-r1',
-        prompt: t('Keluarga huruf di mana seluruh karakter memiliki lebar yang persis sama untuk kode program atau angka tabel adalah…'),
+        prompt: t(
+          'Pada struk, angka harus berjajar rapi. Huruf mana yang cocok?',
+          'Keluarga huruf mana yang semua karakternya selebar sama, cocok untuk kode dan angka tabel?',
+        ),
         choices: [
-          { id: 'mo', label: t('Monospace') },
-          { id: 'se', label: t('Serif'), explainWrong: t('Serif memiliki kaki hias di ujung huruf dengan lebar berbeda-beda.') },
+          { id: 'mo', label: t('Huruf sama lebar', 'Monospace') },
+          {
+            id: 'se',
+            label: t('Huruf berkaki', 'Serif'),
+            explainWrong: t(
+              'Kaki huruf menunjukkan bentuk ujungnya. Lihat juga lebar tiap angka.',
+              'Serif punya kaki hias di ujung huruf dengan lebar yang berbeda-beda.',
+            ),
+          },
+          {
+            id: 'di',
+            label: t('Huruf hias', 'Display'),
+            explainWrong: t(
+              'Huruf hias cocok untuk judul. Lebar tiap angka bisa berbeda.',
+              'Display adalah huruf hias untuk judul besar, bukan untuk kode.',
+            ),
+          },
         ],
         answer: 'mo',
-        explainCorrect: t('Monospace seperti JetBrains Mono atau Fira Code membuat kode dan kolom angka sejajar rapi.'),
+        explainCorrect: t(
+          'Huruf sama lebar memberi tempat yang sama untuk setiap angka.',
+          'Monospace, misalnya JetBrains Mono atau Fira Code, membuat kode dan kolom angka sejajar rapi.',
+        ),
+        hints: [t('Ingat angka di struk belanja.')],
         tags: ['tipografi'],
       }),
       makeTf({
         id: 'a08-l08-r2',
-        prompt: t('Paragraf panjang di website lebih nyaman memakai perataan rata kiri daripada rata kanan-kiri (justify).'),
+        prompt: t(
+          'Paragraf di layar HP lebih nyaman rata kiri.',
+          'Paragraf panjang di web lebih nyaman rata kiri daripada rata kanan-kiri (justify).',
+        ),
         answer: true,
-        explainCorrect: t('Betul! Rata kiri menghindari celah spasi bolong di tengah baris.'),
-        explainWrong: t('Rata kanan-kiri kerap memutus ritme baca karena jarak antar kata menjadi tidak rata.'),
+        explainCorrect: t(
+          'Rata kiri menjaga jarak antarkata tetap rapi. Tidak ada celah yang bolong.',
+          'Rata kiri menghindari celah spasi bolong di tengah baris.',
+        ),
+        explainWrong: t(
+          'Pernyataan itu benar. Rata kiri membuat bacaan mengalir.',
+          'Pernyataan itu benar: rata kanan-kiri kerap memutus ritme baca karena jarak antarkata tidak rata.',
+        ),
+        hints: [t('Bayangkan baris dengan celah kosong di tengah.')],
         tags: ['tipografi'],
       }),
     ],
     recap: t(
-      'Pilih huruf yang jernih seperti Sans-serif, atur ukuran minimal 16px, dan beri jarak baris lega.',
-      'Terapkan aturan baca nyaman (≥16px, line-height 1,5–1,7, 45–75ch, rata kiri, maks 2 keluarga huruf) dan pilih jenis huruf sesuai fungsi.',
+      'Pilih huruf yang bersih, buat cukup besar, dan beri jarak baris lega.',
+      'Pakai teks isi minimal 16px, line-height 1.5–1.7, baris 45–75 karakter, rata kiri, maksimal 2 keluarga huruf.',
     ),
     companion: {
-      talkPrompts: ['Bandingkan tulisan buku cerita dengan tulisan kode angka di struk belanja: mana yang semua huruf dan angkanya selebar sama persis?'],
-      offlineActivity: 'Hitung jumlah huruf dalam satu baris pada halaman buku favoritmu—biasanya berkisar 45–75 karakter agar nyaman diikuti mata!',
+      talkPrompts: ['Mana yang semua hurufnya selebar sama: buku cerita atau struk belanja?'],
+      offlineActivity:
+        'Hitung jumlah huruf dalam satu baris di buku favoritmu. Biasanya sekitar 45 sampai 75 karakter.',
     },
   }),
 
@@ -2241,34 +3244,58 @@ export const lessons: Lesson[] = [
     worldId: 'a08',
     title: 'Type scale',
     modes: ['pro'],
-    objective: t('Aku bisa menyusun tangga ukuran huruf (type scale), membedakan typeface dan font, serta mengoptimalkan font web.'),
+    objective: t(
+      'Kamu bisa menyusun type scale (tangga ukuran huruf), membedakan typeface dan font, dan memuat web font dengan ringan.',
+    ),
+    atWork: 'Kamu menetapkan ukuran judul dan teks isi satu kali, lalu memakainya di seluruh halaman produk.',
     estMinutes: 5,
     introducesTerms: ['type-scale'],
     usesTerms: ['ui', 'hierarki', 'tipografi', 'rem-unit'],
     warmupFrom: 'a08-l08',
     steps: [
       storyStep('a08/tangga-nada-huruf.svg', [
-        rText('Seperti tangga nada musik punya tingkatan nada teratur agar lagu tidak sumbang, tangga ukuran huruf menjaga judul besar, subjudul, dan paragraf selalu serasi dan jelas bedanya.'),
+        rText(
+          'Tangga nada musik punya tingkatan teratur agar lagu tidak sumbang. Tangga ukuran huruf menjaga judul, subjudul, dan paragraf tetap serasi dan jelas bedanya.',
+        ),
       ]),
       conceptStep({
-        title: t('Type Scale: Tangga Ukuran Huruf'),
+        title: t('Type scale: tangga ukuran huruf'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'tangga-type-scale' },
-        alt: t('Tangga ukuran huruf bertingkat: H1 40px, H2 30px, H3 22px, Body 16px, Small 14px, Caption 12px.'),
+        alt: t('Tangga ukuran huruf: H1 40px, H2 30px, H3 22px, Body 16px, Small 14px, Caption 12px.'),
         body: [
           rTerm('type-scale', 'Type scale'),
-          rText(' adalah daftar beberapa ukuran tetap yang dipakai konsisten di seluruh produk—misalnya H1 (40px), H2 (30px), H3 (22px), Body (16px), Small (14px), Caption (12px)—agar tiap tingkat '),
+          rText(
+            ' adalah daftar ukuran tetap yang dipakai konsisten di seluruh produk. Contohnya H1 (40px), H2 (30px), H3 (22px), Body (16px), Small (14px), dan Caption (12px). Dengan begitu, setiap tingkat ',
+          ),
           rTerm('hierarki', 'hierarki'),
-          rText(' langsung tampak berbeda.'),
+          rText(' langsung terlihat.'),
         ],
       }),
+      qStep({
+        id: 'a08-l09-q1',
+        type: 'order',
+        prompt: t('Urutkan tangga type scale dari ukuran paling besar ke paling kecil.'),
+        difficulty: 1,
+        items: [
+          { id: 'b', label: t('Body (16px), teks isi paragraf') },
+          { id: 'h1', label: t('H1 (40px), judul halaman') },
+          { id: 'cap', label: t('Caption (12px), label kecil') },
+          { id: 'h2', label: t('H2 (30px), judul bagian') },
+          { id: 'h3', label: t('H3 (22px), subjudul') },
+        ],
+        answer: ['h1', 'h2', 'h3', 'b', 'cap'],
+        explainCorrect: t('Tangga dengan jarak yang lebar membuat hierarki langsung terbaca.'),
+        hints: [t('Mulai dari judul halaman, akhiri dengan label kecil.'), undefined],
+        tags: ['type-scale', 'hierarki'],
+      }),
       conceptStep({
-        title: t('Anatomi Pengaturan Teks & Typeface vs Font'),
+        title: t('Pengaturan teks, typeface, dan font'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'anatomi-pengaturan-teks' },
         alt: t('Empat properti: font-size, line-height, letter-spacing, dan font-weight 100-900.'),
         body: [
-          rText('Empat pengaturan teks utama di CSS: '),
+          rText('Ada empat pengaturan teks utama di CSS: '),
           rCode('font-size'),
           rText(', '),
           rCode('line-height'),
@@ -2276,18 +3303,31 @@ export const lessons: Lesson[] = [
           rCode('letter-spacing'),
           rText(', dan '),
           rCode('font-weight'),
-          rText(' (100–900). Catatan istilah: '),
+          rText(' (100–900). '),
           rBold('Typeface'),
-          rText(' adalah keluarganya (mis. Inter), sedangkan '),
-          rBold('Font'),
-          rText(' adalah satu anggotanya (Inter Bold 16px).'),
+          rText(' adalah keluarga huruf (misalnya Inter), dan '),
+          rBold('font'),
+          rText(' adalah satu anggotanya (misalnya Inter Bold 16px).'),
         ],
       }),
+      qStep({
+        id: 'a08-l09-q6',
+        type: 'fill',
+        prompt: t('Istilah apa yang menamai keluarga huruf?'),
+        difficulty: 2,
+        template:
+          '___ adalah nama keluarga hurufnya (misalnya Inter), dan font adalah satu anggota spesifiknya (misalnya Inter Bold 16px).',
+        bank: ['Typeface', 'Contrast', 'Viewport'],
+        answer: ['Typeface'],
+        explainCorrect: t('Typeface adalah keluarga huruf. Font adalah satu anggota dengan ketebalan dan ukuran tertentu.'),
+        hints: [t('Ingat contoh Inter: satu keluarga, banyak anggota.'), undefined],
+        tags: ['tipografi', 'type-scale'],
+      }),
       conceptStep({
-        title: t('Menulis di CSS & Optimasi Web Font'),
+        title: t('Menulis di CSS dan memuat web font'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a08', topic: 'css-ch-dan-woff2' },
-        alt: t('Aturan CSS body font-size 16px, line-height 1.6, max-width 65ch, dan format woff2.'),
+        alt: t('Aturan font-size 16px, line-height 1.6, max-width 65ch, dan format woff2.'),
         code: {
           lang: 'css',
           code: 'body {\n  font-size: 16px; /* atau 1rem */\n  line-height: 1.6;\n  max-width: 65ch;\n}',
@@ -2295,48 +3335,33 @@ export const lessons: Lesson[] = [
         body: [
           rText('Satuan '),
           rCode('ch'),
-          rText(' kira-kira selebar satu karakter ('),
+          rText(' kira-kira selebar satu karakter, jadi '),
           rCode('65ch'),
-          rText(' pas di tengah rentang 45–75 karakter), bersama '),
+          rText(' pas di tengah rentang 45–75 karakter. Pakai '),
           rTerm('rem-unit', 'rem'),
-          rText(' agar skalabel. Untuk Google Fonts di web, pilih format '),
+          rText(' agar ukuran bisa menyesuaikan. Untuk web font, pilih format '),
           rCode('woff2'),
-          rText(' dan muat ketebalan yang benar-benar dipakai saja.'),
-        ],
-      }),
-      limitStep({
-        analogy: t('Tangga nada musik untuk type scale'),
-        same: [
-          t('Tingkatan ditentukan teratur lebih dulu alih-alih mengarang ukuran angka acak di setiap kartu.'),
-        ],
-        different: [
-          t('Tangga nada bebas naik-turun di oktaf mana saja, sedangkan tangga ukuran teks di web tidak boleh mengecilkan teks isi di bawah 16px dan tetap harus menyusut rapi di viewport HP!'),
+          rText(' dan muat hanya ketebalan yang dipakai.'),
         ],
       }),
       simStep(
         'detektif-kontras',
-        t('Amati perbedaan ukuran dan ketebalan antara judul kartu dan label keterangannya pada simulator.'),
+        t('Amati perbedaan ukuran dan ketebalan antara judul kartu dan label keterangannya di simulator.'),
       ),
-      qStep({
-        id: 'a08-l09-q1',
-        type: 'order',
-        prompt: t('Urutkan tangga Type Scale berikut dari tingkat ukuran PALING BESAR ke PALING KECIL:'),
-        difficulty: 1,
-        items: [
-          { id: 'b', label: t('Body (16px) — Teks isi paragraf') },
-          { id: 'h1', label: t('H1 (40px) — Judul Halaman') },
-          { id: 'cap', label: t('Caption (12px) — Label kecil') },
-          { id: 'h2', label: t('H2 (30px) — Judul Bagian') },
-          { id: 'h3', label: t('H3 (22px) — Subjudul') },
+      limitStep({
+        analogy: t('Tangga nada musik untuk type scale'),
+        same: [t('Tingkatan ukuran ditetapkan lebih dulu, bukan angka acak di tiap kartu.')],
+        different: [
+          t(
+            'Tangga nada bebas naik-turun. Tangga ukuran web tidak boleh mengecilkan teks isi di bawah 16px dan harus tetap rapi di HP.',
+          ),
         ],
-        answer: ['h1', 'h2', 'h3', 'b', 'cap'],
-        explainCorrect: t('Tepat! Tangga yang berjarak jelas memastikan hierarki langsung terbaca.'),
-        tags: ['type-scale', 'hierarki'],
+        riskyAnalogy: false,
       }),
       qStep({
         id: 'a08-l09-q2',
         type: 'match',
-        prompt: t('Pasangkan properti dan istilah tipografi CSS dengan fungsinya:'),
+        prompt: t('Pasangkan properti tipografi CSS dengan fungsinya.'),
         difficulty: 2,
         left: [
           { id: 'lh', label: t('line-height') },
@@ -2345,19 +3370,20 @@ export const lessons: Lesson[] = [
           { id: 'ch', label: t('max-width: 65ch') },
         ],
         right: [
-          { id: 'rlh', label: t('Mengatur jarak vertikal antarbaris teks') },
-          { id: 'rls', label: t('Mengatur jarak horizontal antarhuruf') },
-          { id: 'rfw', label: t('Mengatur tingkat ketebalan huruf (regular hingga bold)') },
-          { id: 'rch', label: t('Membatasi panjang baris sekitar 65 karakter per baris') },
+          { id: 'rlh', label: t('Jarak vertikal antarbaris teks') },
+          { id: 'rls', label: t('Jarak horizontal antarhuruf') },
+          { id: 'rfw', label: t('Tingkat ketebalan huruf, dari regular sampai bold') },
+          { id: 'rch', label: t('Batas panjang baris sekitar 65 karakter') },
         ],
         answer: { lh: 'rlh', ls: 'rls', fw: 'rfw', ch: 'rch' },
-        explainCorrect: t('Hebat! Empat properti plus satuan ch ini menjadi kendali penuh tipografi CSS.'),
+        explainCorrect: t('Empat pengaturan ini dan satuan ch memberi kendali penuh atas teks.'),
+        hints: [t('Vertikal berarti antarbaris, horizontal berarti antarhuruf.'), undefined],
         tags: ['type-scale', 'tipografi'],
       }),
       qStep({
         id: 'a08-l09-q3',
         type: 'spotbug',
-        prompt: t('Ketuk baris CSS yang melanggar prinsip Type Scale dengan memberi perbedaan ukuran yang hampir tidak terlihat antara judul H2 dan teks isi Body:'),
+        prompt: t('Ketuk baris CSS yang membuat H2 hampir tidak berbeda dari teks isi.'),
         difficulty: 2,
         lines: [
           'h1 { font-size: 40px; line-height: 1.2; }',
@@ -2365,7 +3391,10 @@ export const lessons: Lesson[] = [
           'body { font-size: 16px; line-height: 1.6; max-width: 65ch; }',
         ],
         answer: [2],
-        explainCorrect: t('Jeli! H2 sebesar 17px nyaris tidak bisa dibedakan dari teks Body 16px; setiap tingkat type scale harus terlihat jelas bedanya (misal 28–30px).'),
+        explainCorrect: t(
+          'H2 sebesar 17px hampir sama dengan teks isi 16px. Setiap tingkat harus tampak berbeda, misalnya 28–30px.',
+        ),
+        hints: [t('Bandingkan ukuran H2 dengan teks isi.'), undefined],
         tags: ['type-scale', 'hierarki'],
       }),
       qStep(
@@ -2373,23 +3402,24 @@ export const lessons: Lesson[] = [
           id: 'a08-l09-q4',
           type: 'limit',
           analogy: t('Tangga nada musik untuk type scale'),
-          prompt: t('Manakah aturan yang wajib dijaga pada type scale website agar tidak seperti tangga nada bebas?'),
+          prompt: t('Aturan apa yang perlu dijaga pada type scale web, selain memilih ukuran tetap?'),
           difficulty: 2,
           choices: [
-            { id: 'min', label: t('Teks isi (Body) tidak boleh ikut turun di bawah 16px, dan judul raksasa harus disesuaikan agar tidak sesak di HP') },
+            { id: 'min', label: t('Teks isi tidak turun di bawah 16px, judul disesuaikan untuk HP') },
             {
               id: 'step',
-              label: t('Memilih beberapa ukuran baku tetap daripada menebak angka baru di setiap komponen'),
-              explainWrong: t('Ini memang kesamaan dan tujuan utama type scale.'),
+              label: t('Memilih beberapa ukuran baku, bukan menebak angka baru di tiap komponen'),
+              explainWrong: t('Itu kesamaan dan tujuan utama type scale, bukan aturan tambahan.'),
             },
             {
               id: 'hier',
-              label: t('Memberi lompatan ukuran yang jelas antara tiap tingkat'),
-              explainWrong: t('Ini juga persamaan manfaat tangga ukuran.'),
+              label: t('Memberi lompatan ukuran yang jelas di setiap tingkat'),
+              explainWrong: t('Itu juga manfaat tangga ukuran, bukan aturan tambahan.'),
             },
           ],
           answer: 'min',
-          explainCorrect: t('Benar! Batas keterbacaan mata manusia (Body ≥ 16px) tidak boleh dikorbankan demi skala matematis semata.'),
+          explainCorrect: t('Batas keterbacaan teks isi (minimal 16px) tidak boleh dikorbankan demi skala matematis.'),
+          hints: [t('Pikirkan ukuran terkecil yang masih nyaman dibaca.')],
           tags: ['type-scale', 'tipografi'],
         }),
       ),
@@ -2397,60 +3427,60 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a08-l09-q5',
           type: 'scenario',
-          story: t('Situs portofolio Nadia mendadak berat dan lambat dimuat karena ia mengimpor 9 tingkat ketebalan font (100 hingga 900) dalam format lama padahal hanya memakai Regular (400) dan Bold (700).'),
-          prompt: t('Cara mengoptimalkan pemuatan web font pada proyek Nadia adalah…'),
+          story: t(
+            'Situs portofolio Nadia lambat dimuat. Ia memuat 9 ketebalan font (100 sampai 900), padahal hanya memakai Regular (400) dan Bold (700).',
+          ),
+          prompt: t('Bagaimana cara mengoptimalkan pemuatan web font Nadia?'),
           difficulty: 2,
           choices: [
-            { id: 'woff', label: t('Muat hanya ketebalan 400 dan 700 yang benar-benar dipakai dalam format modern woff2') },
+            { id: 'woff', label: t('Muat hanya ketebalan 400 dan 700 dalam format woff2') },
             {
               id: 'all',
-              label: t('Tambahkan lagi ketebalan Italic dan Oblique semua angka agar lengkap'),
-              explainWrong: t('Menambah file font yang tidak dipakai hanya makin memperlambat waktu muat halaman.'),
+              label: t('Tambahkan juga ketebalan Italic dan Oblique agar lengkap'),
+              explainWrong: t('Font tambahan yang tidak dipakai memperlambat waktu muat.'),
             },
             {
               id: 'img',
-              label: t('Ubah seluruh paragraf teks menjadi file gambar PNG'),
-              explainWrong: t('Teks dalam bentuk gambar berat, buram saat diperbesar, dan merusak aksesibilitas serta SEO.'),
+              label: t('Ubah semua paragraf menjadi gambar PNG'),
+              explainWrong: t('Teks berupa gambar berat, buram saat diperbesar, dan merugikan aksesibilitas.'),
             },
           ],
           answer: 'woff',
-          explainCorrect: t('Tepat! Format woff2 berukuran jauh lebih ringan dan memuat bobot secukupnya menjaga performa web tetap gesit.'),
+          explainCorrect: t('Format woff2 lebih ringan, dan memuat ketebalan secukupnya menjaga performa halaman.'),
+          hints: [t('Muat hanya yang benar-benar dipakai.')],
           tags: ['tipografi'],
         }),
       ),
-      qStep({
-        id: 'a08-l09-q6',
-        type: 'fill',
-        prompt: t('Lengkapi perbedaan istilah teknis berikut:'),
-        difficulty: 2,
-        template: '___ adalah nama keluarga hurufnya (misalnya Inter), sedangkan font adalah satu anggota spesifiknya (misalnya Inter Bold 16px).',
-        bank: ['Typeface', 'Contrast', 'Viewport'],
-        answer: ['Typeface'],
-        explainCorrect: t('Benar! Typeface = keluarga huruf; Font = satu anggota ukuran/ketebalan spesifik.'),
-        tags: ['tipografi', 'type-scale'],
-      }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a08-l09-r1',
-        prompt: t('Tujuan utama menyusun Type Scale tetap di sebuah proyek desain adalah…'),
+        prompt: t('Apa tujuan utama menyusun type scale tetap di sebuah proyek?'),
         choices: [
-          { id: 'ok', label: t('Menjaga hierarki ukuran huruf tetap jelas dan konsisten di seluruh halaman') },
-          { id: 'no', label: t('Supaya setiap kata di dalam satu kalimat memakai ukuran acak berbeda'), explainWrong: t('Type scale justru membatasi pilihan ukuran agar konsisten.') },
+          { id: 'ok', label: t('Menjaga hierarki ukuran huruf tetap jelas dan konsisten') },
+          {
+            id: 'no',
+            label: t('Memberi tiap halaman ukuran huruf yang berbeda'),
+            explainWrong: t('Type scale justru membatasi pilihan ukuran agar konsisten.'),
+          },
         ],
         answer: 'ok',
-        explainCorrect: t('Tangga ukuran baku mencegah munculnya puluhan ukuran acak seperti 15px, 16px, 17px, 19px yang tidak rapi.'),
+        explainCorrect: t('Tangga ukuran baku mencegah puluhan ukuran acak seperti 15px, 16px, dan 17px.'),
+        hints: [t('Ingat tangga nada yang teratur.')],
         tags: ['type-scale'],
       }),
       makeTf({
         id: 'a08-l09-r2',
-        prompt: t('Pada CSS, satuan ch kira-kira selebar satu karakter sehingga max-width: 65ch efektif menjaga panjang baris nyaman dibaca.'),
+        prompt: t('Satuan ch kira-kira selebar satu karakter, jadi max-width: 65ch menjaga panjang baris tetap nyaman.'),
         answer: true,
-        explainCorrect: t('Betul!'),
-        explainWrong: t('65ch menempatkan panjang baris tepat di tengah rentang ideal 45–75 karakter.'),
+        explainCorrect: t('Nilai 65ch berada tepat di tengah rentang ideal 45–75 karakter.'),
+        explainWrong: t('Pernyataan itu benar: 65ch menempatkan panjang baris di tengah rentang ideal.'),
+        hints: [t('Hitung 65 di antara 45 dan 75.')],
         tags: ['type-scale', 'tipografi'],
       }),
     ],
-    recap: t('Susun tangga type scale yang konsisten dan jelas bedanya, atur max-width: 65ch serta line-height lega, dan muat font woff2 secukupnya.'),
+    recap: t(
+      'Susun type scale yang konsisten dan jelas bedanya. Pakai max-width 65ch, line-height lega, dan font woff2 secukupnya.',
+    ),
   }),
 ];

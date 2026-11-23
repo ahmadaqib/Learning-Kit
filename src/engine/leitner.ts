@@ -57,13 +57,23 @@ export function getDueLeitnerCards(
   leitner: Record<string, LeitnerCardState>,
   todayStr: string,
   mode: Mode,
+  lessonByCard?: ReadonlyMap<string, string>,
 ): { cardId: string; state: LeitnerCardState }[] {
   const limit = mode === 'junior' ? 5 : 10;
-  return Object.entries(leitner)
-    .filter(([, state]) => state.due <= todayStr)
-    .sort(([, a], [, b]) => a.due.localeCompare(b.due))
-    .slice(0, limit)
-    .map(([cardId, state]) => ({ cardId, state }));
+  const due = Object.entries(leitner)
+    .filter(([id, state]) => state.due <= todayStr && (!lessonByCard || lessonByCard.has(id)))
+    .sort(([, a], [, b]) => a.due.localeCompare(b.due));
+  const result = [];
+  let previousLesson: string | undefined;
+  while (due.length && result.length < limit) {
+    const alternative = lessonByCard && previousLesson
+      ? due.findIndex(([id]) => lessonByCard.get(id) !== previousLesson)
+      : 0;
+    const [[cardId, state]] = due.splice(Math.max(0, alternative), 1);
+    result.push({ cardId, state });
+    previousLesson = lessonByCard?.get(cardId);
+  }
+  return result;
 }
 
 export function countAllDueCards(

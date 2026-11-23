@@ -1,0 +1,270 @@
+{
+ "world": "b05",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "codex",
+  "accepted": 17,
+  "adapted": 1,
+  "rejected": 0,
+  "deferred": 0,
+  "done": true,
+  "instructions": "Applied in src/content/worlds/b05-menara-realtime/index.ts.\n\n1. b05-l02 (card 'Telepon yang ditahan petugas') vs b05-l04 (card 'Telepon dua arah tanpa ditutup'), b05-l02-q3\nMove long polling to a package pickup counter. Align lesson title, glossary and the false statement about receiving another answer without making a new request. Replace the shared stream illustration because it repeats multiple responses after one request.\n\n2. b05-l02 offlineActivity and b05-l04 offlineActivity\nReplace the handset activity with a counter and a paper number. Use a toy phone with a plain greeting in the WebSocket activity.\n\n3. b05 challenge question 'Aplikasi chat butuh kabar cepat dari dua arah'\nAsk about Rani exchanging quick replies. Drop direction phrases from the WebSocket and SSE answer labels.\n\n4. b05-l04-q1 (junior)\nAsk which channel supports two people exchanging messages. Keep the WebSocket label without repeating its words in the prompt.\n\n5. b05 challenge 'Kamu menelepon kantor kurir dan terus menunggu' / b05-l02-q1 junior\nSet the anchor and application question at the counter. Keep the wait-for-a-reply answer and use plausible early-reply or repeat-visit distractors.\n\n6. b05 challenge 'Aplikasi terus bertanya apakah ada kabar baru. Mengapa itu boros?'\nAsk which phone resources repeated requests use. Answer with battery and mobile data and give two device-resource distractors.\n\n7. b05-l02-q5 (junior)\nAt the deadline, have the attendant give a no-news reply before Bito asks again. Explain the application-level deadline in Pro.\n\n8. b05-l03 card 'Untung dan batas SSE' (junior) / b05-l03-q2\nTeach automatic reconnection and make replay conditional on the server retaining messages. Apply the distinction in q2 and q5.\n\n9. b05-l01 junior text: 'Banyak tanya yang kosong', 'berapa banyak tanya yang sia-sia', 'Bertanya tiap detik'\nUse pertanyaan without changing grammatical uses of bertanya.\n\n10. b05-l03-q6 (junior chatbot story)\nUse a live football scoreboard and distinguish who sends or receives the score.\n\n11. b05-l04-q2 (junior classify)\nUse a bus schedule and live scoreboard as the one-way classification examples.\n\n12. b05-l04-q8j (junior)\nAsk whether a multiplayer race can work with server-to-player updates alone. Keep the false answer.\n\n13. b05-l04-q3 (pro wss)\nUse wss://, ws:// and https://. Hint at the HTTP/HTTPS comparison.\n\n14. b05-l04-r2 (pro)\nUse two plausible myths: WebSocket is always preferable, and SSE streams binary messages directly.\n\n15. b05-l02-q6 (pro)\nAvoid both untaught gRPC and not-yet-taught WebSocket in l02. Use frequent polling as the tempting option that still wastes requests.\n\n16. b05-l01-q4 (pro)\nKeep the Pro answer and feedback on the increased server workload.\n\n17. b05-l04-q7 (pro full-duplex)\nCompare Full-duplex with SSE and HTTP request/response in the WebSocket recall item.\n\n18. b05-l03-q6 (pro story)\nRemove the Network reveal. Compare one ongoing response with needing to submit input or request each text fragment.",
+  "verdicts": [
+   {
+    "number": 1,
+    "source": "naya-8",
+    "issue": "b05-l02 (card 'Telepon yang ditahan petugas') vs b05-l04 (card 'Telepon dua arah tanpa ditutup'), b05-l02-q3",
+    "verdict": "accept",
+    "reason": "Move long polling to a package pickup counter. Align lesson title, glossary and the false statement about receiving another answer without making a new request. Replace the shared stream illustration because it repeats multiple responses after one request."
+   },
+   {
+    "number": 2,
+    "source": "wulan-38",
+    "issue": "b05-l02 offlineActivity and b05-l04 offlineActivity",
+    "verdict": "accept",
+    "reason": "Replace the handset activity with a counter and a paper number. Use a toy phone with a plain greeting in the WebSocket activity."
+   },
+   {
+    "number": 3,
+    "source": "raka-11",
+    "issue": "b05 challenge question 'Aplikasi chat butuh kabar cepat dari dua arah'",
+    "verdict": "accept",
+    "reason": "Ask about Rani exchanging quick replies. Drop direction phrases from the WebSocket and SSE answer labels."
+   },
+   {
+    "number": 4,
+    "source": "raka-11",
+    "issue": "b05-l04-q1 (junior)",
+    "verdict": "accept",
+    "reason": "Ask which channel supports two people exchanging messages. Keep the WebSocket label without repeating its words in the prompt."
+   },
+   {
+    "number": 5,
+    "source": "raka-11",
+    "issue": "b05 challenge 'Kamu menelepon kantor kurir dan terus menunggu' / b05-l02-q1 junior",
+    "verdict": "accept",
+    "reason": "Set the anchor and application question at the counter. Keep the wait-for-a-reply answer and use plausible early-reply or repeat-visit distractors."
+   },
+   {
+    "number": 6,
+    "source": "raka-11",
+    "issue": "b05 challenge 'Aplikasi terus bertanya apakah ada kabar baru. Mengapa itu boros?'",
+    "verdict": "accept",
+    "reason": "Ask which phone resources repeated requests use. Answer with battery and mobile data and give two device-resource distractors."
+   },
+   {
+    "number": 7,
+    "source": "naya-8",
+    "issue": "b05-l02-q5 (junior)",
+    "verdict": "accept",
+    "reason": "At the deadline, have the attendant give a no-news reply before Bito asks again. Explain the application-level deadline in Pro."
+   },
+   {
+    "number": 8,
+    "source": "naya-8",
+    "issue": "b05-l03 card 'Untung dan batas SSE' (junior) / b05-l03-q2",
+    "verdict": "accept",
+    "reason": "Teach automatic reconnection and make replay conditional on the server retaining messages. Apply the distinction in q2 and q5."
+   },
+   {
+    "number": 9,
+    "source": "wulan-38",
+    "issue": "b05-l01 junior text: 'Banyak tanya yang kosong', 'berapa banyak tanya yang sia-sia', 'Bertanya tiap detik'",
+    "verdict": "accept",
+    "reason": "Use pertanyaan without changing grammatical uses of bertanya."
+   },
+   {
+    "number": 10,
+    "source": "naya-8",
+    "issue": "b05-l03-q6 (junior chatbot story)",
+    "verdict": "accept",
+    "reason": "Use a live football scoreboard and distinguish who sends or receives the score."
+   },
+   {
+    "number": 11,
+    "source": "raka-11",
+    "issue": "b05-l04-q2 (junior classify)",
+    "verdict": "accept",
+    "reason": "Use a bus schedule and live scoreboard as the one-way classification examples."
+   },
+   {
+    "number": 12,
+    "source": "raka-11",
+    "issue": "b05-l04-q8j (junior)",
+    "verdict": "accept",
+    "reason": "Ask whether a multiplayer race can work with server-to-player updates alone. Keep the false answer."
+   },
+   {
+    "number": 13,
+    "source": "dimas-14",
+    "issue": "b05-l04-q3 (pro wss)",
+    "verdict": "accept",
+    "reason": "Use wss://, ws:// and https://. Hint at the HTTP/HTTPS comparison."
+   },
+   {
+    "number": 14,
+    "source": "dimas-14",
+    "issue": "b05-l04-r2 (pro)",
+    "verdict": "accept",
+    "reason": "Use two plausible myths: WebSocket is always preferable, and SSE streams binary messages directly."
+   },
+   {
+    "number": 15,
+    "source": "sari-27",
+    "issue": "b05-l02-q6 (pro)",
+    "verdict": "adapt",
+    "reason": "Avoid both untaught gRPC and not-yet-taught WebSocket in l02. Use frequent polling as the tempting option that still wastes requests."
+   },
+   {
+    "number": 16,
+    "source": "sari-27",
+    "issue": "b05-l01-q4 (pro)",
+    "verdict": "accept",
+    "reason": "Keep the Pro answer and feedback on the increased server workload."
+   },
+   {
+    "number": 17,
+    "source": "sari-27",
+    "issue": "b05-l04-q7 (pro full-duplex)",
+    "verdict": "accept",
+    "reason": "Compare Full-duplex with SSE and HTTP request/response in the WebSocket recall item."
+   },
+   {
+    "number": 18,
+    "source": "dimas-14",
+    "issue": "b05-l03-q6 (pro story)",
+    "verdict": "accept",
+    "reason": "Remove the Network reveal. Compare one ongoing response with needing to submit input or request each text fragment."
+   }
+  ],
+  "verification": "node --import tsx scripts/validate-content.ts --world=b05 passed with zero errors."
+ },
+ "judgeIssues": [
+  {
+   "persona": "naya-8",
+   "where": "b05-l02 (card 'Telepon yang ditahan petugas') vs b05-l04 (card 'Telepon dua arah tanpa ditutup'), b05-l02-q3",
+   "problem": "The same picture, a phone call, stands for two different techniques. Long polling is \"Telepon yang ditahan petugas\" and WebSocket is \"telepon yang terus tersambung\". Then b05-l02-q3 says \"Satu telepon yang ditahan bisa membawa banyak kabar.\" is FALSE, while Lesson 4 teaches that a phone that stays connected carries many messages. An 8-year-old cannot tell the two phones apart, so the T/F answer feels contradictory.",
+   "suggestion": "Give Junior long polling its own analogy, e.g. 'antre di loket, petugas baru memanggil saat paketmu datang, lalu kamu antre lagi'. Keep 'telepon' only for WebSocket. Reword q3 to match.",
+   "severity": "blocker"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b05-l02 offlineActivity and b05-l04 offlineActivity",
+   "problem": "Both activities use a toy phone: \"memegang kaleng telepon mainan\" for long polling and \"telepon mainan ... (handshake 101)\" for WebSocket. This repeats the analogy clash. The l04 activity also uses the Pro-only term \"handshake 101\" in text a Junior learner sees.",
+   "suggestion": "Change the l02 activity to a waiting-in-line game. Remove \"(handshake 101)\" from l04 or split the string by mode with t().",
+   "severity": "major"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b05 challenge question 'Aplikasi chat butuh kabar cepat dari dua arah'",
+   "problem": "The answer can be found by matching words. The prompt says \"dari dua arah\", the correct option is \"Telepon WebSocket, dua arah\", and the distractor says \"Radio SSE, satu arah\". No thinking is needed.",
+   "suggestion": "Remove the direction words from the labels (just 'Telepon WebSocket' / 'Radio SSE'), or describe the situation ('Kamu dan teman saling balas cepat') without saying 'dua arah'.",
+   "severity": "major"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b05-l04-q1 (junior)",
+   "problem": "Prompt \"Apa yang seperti telepon dua arah?\" and correct label \"WebSocket, telepon yang tersambung\". The word 'telepon' appears in both, so the answer is given away.",
+   "suggestion": "Ask from the other direction: 'Kamu dan server mau saling mengobrol. Alat apa yang dipakai?', with labels that do not repeat the prompt's words.",
+   "severity": "major"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b05 challenge 'Kamu menelepon kantor kurir dan terus menunggu' / b05-l02-q1 junior",
+   "problem": "The prompt already says the answer (\"terus menunggu\", \"jangan tutup sampai paket keluar\"), and the correct option just repeats it: \"Menahan telepon sampai ada kabar\" / \"Menahan jawaban sampai ada kabar\".",
+   "suggestion": "Make the prompt neutral ('Kamu menelepon kantor kurir. Paket belum keluar. Apa yang terjadi?') and make the distractors equally believable.",
+   "severity": "major"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b05 challenge 'Aplikasi terus bertanya apakah ada kabar baru. Mengapa itu boros?'",
+   "problem": "The correct choice \"Sering bertanya, tetapi belum ada kabar\" just restates the prompt. The distractors \"Setiap jawaban berisi file yang besar\" and \"Aplikasi menyimpan semua kabar lama\" are not believable.",
+   "suggestion": "Ask about a result instead of restating the setup, e.g. 'Apa yang paling cepat habis?' with options baterai/kuota vs layar vs memori foto.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b05-l02-q5 (junior)",
+   "problem": "\"Bito menutup telepon, lalu bertanya lagi\" and \"Bito menutup sambungan\". In long polling it is the server that answers empty when time runs out. The earlier analogy also says the petugas (the server) holds the phone. Moving who hangs up to the asker introduces a small factual error and confuses the analogy.",
+   "suggestion": "'Petugas bilang \"belum ada, telepon lagi ya\", lalu Bito langsung menelepon lagi.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b05-l03 card 'Untung dan batas SSE' (junior) / b05-l03-q2",
+   "problem": "\"Kabar yang terlewat dikirim lagi\" and \"mengambil kabar yang terlewat\" present this as always true. It only works if the server keeps message ids and supports resuming. This is a small overclaim.",
+   "suggestion": "Soften it: 'Server bisa melanjutkan dari kabar terakhir yang kamu dengar.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b05-l01 junior text: 'Banyak tanya yang kosong', 'berapa banyak tanya yang sia-sia', 'Bertanya tiap detik'",
+   "problem": "'tanya' is used as a noun ('tanya yang kosong'), which is not standard Indonesian. A teacher would correct it to 'pertanyaan'.",
+   "suggestion": "Replace with 'pertanyaan yang kosong' and 'pertanyaan yang sia-sia'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b05-l03-q6 (junior chatbot story)",
+   "problem": "An 8-year-old may not know \"chatbot\". The distractors \"Layar harus mengirim kabar balik tiap kata\" and \"Jawaban chatbot berupa video langsung\" are not believable, so the item checks nothing.",
+   "suggestion": "Use a familiar example (papan skor sepak bola, pengumuman sekolah) and give believable wrong options.",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b05-l04-q2 (junior classify)",
+   "problem": "The label \"Kabar berita yang hanya didengar\" contains 'didengar', which matches the radio bucket directly. The item becomes word matching.",
+   "suggestion": "Use concrete features without the cue words: 'Pengumuman jadwal bus', 'Skor bola langsung'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b05-l04-q8j (junior)",
+   "problem": "\"Di telepon yang tersambung, kamu harus menelepon ulang tiap kalimat.\" is obviously false. A gamer gets no feeling of being good at this.",
+   "suggestion": "Swap in a scenario T/F, e.g. 'Game balapan bersama cukup memakai radio satu arah.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b05-l04-q3 (pro wss)",
+   "problem": "The hint \"Huruf s berarti secure.\" plus the distractor \"ws:// tanpa huruf s\" give the answer away immediately.",
+   "suggestion": "Make the hint about the parallel without naming the letter: 'Ingat beda http:// dan https://.' Use believable distractors (wss vs ws vs https).",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b05-l04-r2 (pro)",
+   "problem": "The distractors \"WebSocket untuk halaman profil yang statis\" and \"SSE untuk chat dua arah yang cepat\" are strawmen. The correct rule is the only sensible option, so the item is trivial for Pro.",
+   "suggestion": "Use nuanced distractors, e.g. 'WebSocket selalu lebih baik karena lebih cepat' or 'SSE bila butuh biner'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b05-l02-q6 (pro)",
+   "problem": "The distractor \"gRPC biner langsung dari browser\" uses a term never taught in this world. A career switcher cannot judge it, and the explainWrong (\"Browser tidak bisa memakai gRPC mentah secara langsung\") does not say what gRPC is.",
+   "suggestion": "Replace it with a taught option (WebSocket on a server that cannot be upgraded), or add a short gloss.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b05-l01-q4 (pro)",
+   "problem": "The prompt asks \"Apa yang terjadi di server\", but the correct answer adds \"baterai HP cepat habis\". It does not match the question, and it is the longest option, which gives a length cue.",
+   "suggestion": "Keep the answer about the server only: 'Server dibanjiri request kosong'. Keep option lengths similar.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b05-l04-q7 (pro full-duplex)",
+   "problem": "The distractor \"Stateless\" is never introduced in this world, and \"Half-duplex\" is only explained in the feedback. This is pure vocabulary recall of unlearned terms.",
+   "suggestion": "Use taught contrasts instead: 'Satu arah (seperti SSE)', 'Tanya-jawab bergiliran (HTTP)'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b05-l03-q6 (pro story)",
+   "problem": "The story already says \"tab Network menampilkan tipe permintaan eventsource\", then asks why SSE was chosen. The setup gives the context away, and the distractor \"SSE bertanya ulang tiap 5 detik lewat setInterval\" is a strawman.",
+   "suggestion": "Remove the eventsource reveal, or turn it into 'apa yang kamu lihat di Network' as a separate question.",
+   "severity": "minor"
+  }
+ ]
+}

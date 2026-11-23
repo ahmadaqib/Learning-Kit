@@ -1,0 +1,54 @@
+{
+ "/": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/beranda": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": [
+   "http://localhost:5199/src/styles/global.css?t=1795437730082 net::ERR_ABORTED"
+  ]
+ },
+ "/peta/a": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/dunia/a01": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/belajar/a01-l02": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/penjaga/a01": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/stiker": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/profil": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/pengaturan": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ },
+ "/mulai": {
+  "console": [],
+  "pageErrors": [],
+  "failedRequests": []
+ }
+}

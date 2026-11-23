@@ -1,0 +1,161 @@
+{
+ "world": "a09",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "fable",
+  "accepted": 18,
+  "rejected": 2,
+  "instructions": "FILE (only file to edit): src/content/worlds/a09-toko-komponen/index.ts\nRules for the executor: change only the strings named below. Keep every question id, choice id, `answer`, `tags`, `difficulty`, `modes` and step order unchanged. `t(a, b)` = (junior, pro); `t(a)` = same text in both modes. Do not touch any other file. No title changes (worldMeta.ts untouched).\n\n=== ANCHORS ===\n\n[1] a09-anc-j1\n- prompt → t('Lingkaran kecil di daftar pilihan hanya boleh dipilih satu. Apa namanya?')\n(leave choices and explanations as they are)\n\n[2] a09-anc-j3\n- prompt → t(\n  'Kamu memencet tombol, lalu ikon di tombol berputar. Itu wajah tombol yang mana?',\n  'Ikon di tombol berputar selama data dikirim. Tombol ada di state apa?',\n)\n\n[3] a09-anc-j4 (keep choice ids clay / dark / retro, answer 'clay')\n- prompt → t(\n  'Aplikasi belajar untuk anak TK ingin terasa empuk dan ramah. Gaya apa yang cocok?',\n  'Aplikasi belajar untuk anak TK perlu terasa empuk dan ramah. Gaya UI mana yang cocok?',\n)\n- choice clay label → t('Gaya tanah liat', 'Claymorphism')\n- choice dark label → t('Gaya kaca', 'Glassmorphism')\n- choice dark explainWrong → t(\n  'Gaya kaca terasa halus dan dingin. Ia tidak terasa empuk.',\n  'Glassmorphism memakai panel buram yang tembus pandang. Kesannya halus, bukan empuk.',\n)\n- choice retro label → t('Gaya garis tebal', 'Neo-brutalism')\n- choice retro explainWrong → t(\n  'Gaya garis tebal terasa keras dan tegas. Ia tidak terasa empuk.',\n  'Neo-brutalism bergaris tebal dan berkesan keras. Claymorphism terasa empuk dan ramah anak.',\n)\n- explainCorrect → t(\n  'Gaya tanah liat berbentuk gembung seperti mainan empuk. Warnanya cerah dan ramah.',\n  'Claymorphism berbentuk gembung seperti tanah liat, dengan warna pastel yang ramah anak.',\n)\n\n[4] a09-anc-p1\n- explainCorrect → t('12 bisa dibagi rata menjadi 2, 3, 4, atau 6 bagian, misalnya 6+6 atau 4+4+4. Kombinasi 3+9 cocok untuk sidebar dan isi.')\n\n[5] a09-anc-p2 (keep choice ids acc / tab / toast, answer 'acc')\n- choice acc label → t('Untuk 10 pertanyaan FAQ yang dibaca satu per satu')\n- choice tab label → t('Untuk 3 tampilan setara yang sering diganti bolak-balik')\n- choice tab explainWrong → t('Sedikit panel setara yang sering diganti lebih cocok memakai Tabs. Semua judulnya terlihat sejajar.')\n- choice toast label → t('Untuk isi penting yang harus selalu terlihat')\n- choice toast explainWrong → t('Accordion menyembunyikan isi sampai diklik. Isi yang harus selalu terlihat ditulis langsung di halaman.')\n- explainCorrect → t('Accordion cocok untuk banyak bagian yang dibaca satu per satu, dan tetap rapi di layar HP. Pembaca hanya membuka bagian yang ia perlukan.')\n\n=== a09-l01 ===\n\n[6] objective → t('Kamu bisa membagi halaman dengan grid 12 kolom dan jarak kelipatan 4 atau 8.')\n\n[7] storyStep text → rText('Tukang kayu memotong papan rak dengan ukuran acak, dan raknya miring. Desainer menghindari masalah ini dengan grid 12 kolom dan jarak kelipatan 4 atau 8 (skala 8pt).')\n\n[8] conceptStep 'Skala jarak kelipatan 8pt' — replace the `body` array with:\nbody: [\n  rText('Pakai skala jarak kelipatan 4 atau 8, bukan angka acak seperti 13 px. Skalanya: '),\n  rCode('4, 8, 12, 16, 24, 32, 48, 64'),\n  rText('. Dengan skala ini, halaman terasa konsisten tanpa menebak-nebak. Di CSS, 8pt pada skala ini ditulis '),\n  rCode('8px'),\n  rText('.'),\n],\n(Do NOT change the rTerm('grid-8pt', 'Grid 12 kolom') link in 'Sistem grid 12 kolom'.)\n\n=== a09-l02 ===\n\n[9] conceptStep 'Tombol dan kotak pilihan' / 'Komponen aksi dan masukan' — replace only the first rPro(...) string with:\nrPro(' adalah bagian tampilan yang dipakai ulang di banyak halaman. Contoh dasarnya Button (primary, secondary, atau ghost yang transparan bergaris tepi), Input dengan placeholder, dan Dropdown. '),\n\n[10] a09-l02-q8j\n- explainCorrect → t('Radio hanya memilih satu. Seperti memilih satu ketua kelas.')\n\n[11] a09-l02-q5 (pro labels become bare names)\n- choice toast label → t('Toast')\n- choice badge label → t('Alert')\n(explanations unchanged)\n\n[12] a09-l02-r1\n- choice rd explainWrong → t(\n  'Radio hanya boleh satu. Rani boleh memilih banyak hobi.',\n  'Radio hanya mengizinkan satu pilihan.',\n)\n- explainCorrect → t(\n  'Checkbox boleh dicentang banyak. Seperti memilih beberapa lauk di kantin.',\n  'Checkbox memilih banyak opsi sekaligus.',\n)\n\n=== a09-l03 ===\n\n[13] conceptStep 'Tiga wajah sebelum diklik' — the last junior part\nrJunior(' saat dipilih keyboard.') → rJunior(' saat dipilih dengan tombol Tab di keyboard.')\n\n[14] conceptStep 'Tiga wajah saat bekerja' / 'Active, Loading, Disabled'\n- junior part after rBoldJ('Loading'): rJunior(' berputar saat tombol bekerja. ') → rJunior(' menampilkan ikon berputar saat tombol bekerja. ')\n- pro part after rBoldP('Loading'): rPro(' berputar selama data diproses, jadi kamu tidak mengetuk dua kali. ') → rPro(' menampilkan putaran dan mengunci tombol selama data diproses, jadi klik ganda tercegah. ')\n\n[15] a09-l03-q5\n- story → t(\n  'Di komputer, tombol Tab memindahkan pilihan. Dimas menekan Tab, tetapi tidak ada garis penanda. Ia bingung tombol mana yang terpilih.',\n  'Dimas memakai Tab di keyboard untuk berpindah antartombol. Tidak ada garis penanda, jadi ia tidak tahu tombol mana yang terpilih.',\n)\n\n[16] a09-l03-r4\n- prompt → t('Kamu memencet Kirim, lalu ikon di tombol berputar. Itu wajah apa?')\n\n=== a09-l04 ===\n\n[17] conceptStep 'Gaya polos, bertumpuk, dan mirip benda' / 'Flat, Material, Skeuomorphism' — replace the `body` array with (junior path uses friendly Indonesian labels, no English style names):\nbody: [\n  rTermJ('gaya-ui', 'Gaya UI'),\n  rJunior(' adalah pakaian tampilan sebuah aplikasi. '),\n  rBoldJ('Gaya polos'),\n  rJunior(' itu rata dan rapi, '),\n  rBoldJ('gaya bertumpuk'),\n  rJunior(' seperti tumpukan kertas. '),\n  rBoldJ('Gaya mirip benda'),\n  rJunior(' meniru benda sungguhan.'),\n  rTermP('gaya-ui', 'Gaya visual UI'),\n  rPro(' adalah cara tampilan diberi kesan tertentu. '),\n  rBoldP('Flat 2.0'),\n  rPro(' adalah gaya polos dengan sedikit bayangan, agar tombol tetap dikenali. '),\n  rBoldP('Material Design'),\n  rPro(' meniru kertas bertumpuk dengan bayangan. '),\n  rBoldP('Skeuomorphism'),\n  rPro(' meniru tekstur kulit atau logam dari benda sungguhan.'),\n],\n\n[18] a09-l04-q6\n- choice load explainWrong → t(\n  'Gaya polos justru ringan dan cepat. Masalahnya ada pada tombol yang sulit dikenali.',\n  'Flat Design justru ringan dan cepat dimuat. Masalahnya ada pada petunjuk elemen yang bisa diklik.',\n)\n\n[19] conceptStep 'Gaya kaca, tanah liat, dan garis tebal' / 'Glass, Clay, Neumorphism, Neo-brutalism' — replace only the six junior parts (the three rBoldJ + three rJunior) with:\n  rBoldJ('Gaya kaca'),\n  rJunior(' tampak seperti kaca buram. '),\n  rBoldJ('Gaya tanah liat'),\n  rJunior(' gembung dan lembut. '),\n  rBoldJ('Gaya garis tebal'),\n  rJunior(' tampak berani, seperti gambar spidol.'),\n(the rBoldP / rPro parts stay exactly as they are)\n\n[20] a09-l04-q2 (match; keep ids and answer map g1:r2, g2:r4, g3:r1, g4:r3)\n- left g1 label → t('Gaya kaca', 'Glassmorphism')\n- left g2 label → t('Gaya tanah liat', 'Claymorphism')\n- left g3 label → t('Gaya garis tebal', 'Neo-brutalism')\n- left g4 label → t('Gaya mirip benda', 'Skeuomorphism')\n- right r1 label → t('Tepinya seperti dicoret spidol hitam', 'Garis tepi hitam tebal, bayangan keras tanpa blur')\n- right r2 label → t('Latar di belakangnya terlihat samar', 'Panel seperti kaca buram yang tembus pandang')\n- right r3 label → t('Tombolnya seperti kayu atau logam', 'Meniru benda sungguhan, misalnya tombol kayu atau logam')\n- right r4 label → t('Bentuknya gembung seperti mainan empuk', 'Bentuk gembung pastel seperti tanah liat empuk')\n(prompt, explainCorrect, hints unchanged)\n\n[21] a09-l04-q3 (keep ids flat / clay / neu, answer 'flat')\n- prompt → t('Gaya apa yang paling tepat?', 'Gaya UI mana yang paling tepat?')\n- choice flat label → t('Gaya polos yang rapi', 'Flat 2.0')\n- choice clay label → t('Gaya tanah liat yang gembung', 'Claymorphism')\n- choice clay explainWrong → t(\n  'Gaya tanah liat terasa main-main. Aplikasi bank perlu terasa serius.',\n  'Claymorphism terasa main-main untuk aplikasi bank yang butuh kesan serius.',\n)\n- choice neu label → t('Gaya kaca yang buram', 'Neumorphism')\n- choice neu explainWrong: unchanged\n- explainCorrect → t(\n  'Gaya polos mudah dibaca dan terasa aman. Seperti seragam rapi di kantor bank.',\n  'Flat 2.0 polos, kontrasnya mudah dijaga, dan terasa serius. Aplikasi bank dan kesehatan mengutamakan keterbacaan dan rasa percaya.',\n)\n(story and hints unchanged)\n\n[22] a09-l04-q8j (keep ids cocok / sama / besar, answer 'cocok')\n- prompt → t('Gaya tampilan seperti pakaian. Mengapa aplikasi anak dan aplikasi bank memakai gaya berbeda?')\n- choice cocok label → t('Supaya pas untuk orang yang membukanya')\n- choice sama label → t('Supaya kedua aplikasi mudah dibedakan')\n- choice sama explainWrong → t('Nama dan isi sudah membedakan aplikasi. Gaya dipilih untuk orang yang memakainya.')\n- choice besar: unchanged (label and explainWrong)\n- explainCorrect → t('Anak suka tampilan yang ceria, bank perlu tampilan yang serius. Seperti memilih baju sesuai acara.')\n(hint unchanged)\n\n[23] a09-l04-q4 (keep ids base / nohtml / only, answer 'base')\n- prompt → t('Gaya UI berganti seperti pakaian. Apa yang tidak ikut berganti?')\n- choice base label → t('Aturan kontras dan kemudahan pakai')\n- choice nohtml label → t('Radius sudut dan bentuk bayangan')\n- choice nohtml explainWrong → t('Radius dan bayangan justru bagian dari gaya, jadi ikut berganti. Yang tetap adalah kontras dan kemudahan pakai.')\n- choice only label → t('Palet warna dan jenis huruf')\n- choice only explainWrong → t('Warna dan huruf boleh ikut berganti bersama gaya. Yang tetap adalah kontras dan kemudahan pakai.')\n(explainCorrect and hint unchanged)\n\n[24] a09-l04-q7\n- prompt → t('Tulis nama gaya UI yang meniru tata letak majalah dengan judul besar dan banyak foto.')\n- accept → ['Editorial', 'editorial', 'Editorial Design', 'editorial design', 'Gaya Editorial', 'gaya editorial']\n\n[25] a09-l04-r1 (keep ids nb / clay / gl, answer 'nb')\n- prompt → t(\n  'Bito ingin situsnya tampak berani dan tegas. Gaya apa yang cocok?',\n  'Gaya UI mana yang cocok untuk portofolio agensi kreatif yang ingin tampil berani dengan garis tepi hitam tebal?',\n)\n- choice nb label → t('Gaya garis tebal', 'Neo-brutalism')\n- choice clay label → t('Gaya tanah liat', 'Claymorphism')\n- choice clay explainWrong → t(\n  'Gaya tanah liat gembung dan lembut. Ia tidak tampak tegas.',\n  'Claymorphism berkesan lembut dan pastel seperti tanah liat.',\n)\n- choice gl label → t('Gaya kaca', 'Glassmorphism')\n- choice gl explainWrong → t(\n  'Gaya kaca tembus pandang dan halus. Ia tidak tampak tegas.',\n  'Glassmorphism berkesan ringan dan tembus pandang, bukan tegas dan berani.',\n)\n- explainCorrect → t(\n  'Gaya garis tebal tampak berani. Seperti gambar kartun dengan garis spidol tebal.',\n  'Neo-brutalism menonjolkan garis hitam tebal, bayangan keras, dan warna kontras berani.',\n)\n(hint unchanged)\n\n=== a09-l05 ===\n\n[26] a09-l05-q5 (keep ids mini / big / none, answer 'mini')\n- story → t('Dimas membuat aplikasi catatan sendirian. Ia ragu harus membangun design system sebesar Material Design lebih dulu.')\n- choice mini label → t('Buat satu halaman aturan warna, huruf, jarak, dan komponen dasar')\n- choice big label → t('Tiru seluruh Material Design sebelum menulis fitur pertama')\n- choice big explainWrong → t('Itu terlalu besar untuk proyek satu orang. Fitur pertamanya tidak kunjung selesai.')\n- choice none label → t('Tentukan warna dan jarak saat membuat tiap halaman')\n- choice none explainWrong → t('Tanpa aturan bersama, tiap halaman memakai nilai berbeda. Satu halaman aturan sudah cukup untuk menjaganya konsisten.')\n(prompt, explainCorrect, hint unchanged)\n(Do NOT change rTerm('design-token', 'Design system') in 'Tiga pilar design system'.)\n\n=== a09-l06 ===\n\n[27] atWork → 'Kamu akan menemukan folder atoms, molecules, dan organisms di sebagian proyek React dan pustaka komponen.'\n\nAfter editing: run the content validator and typecheck (e.g. the validate-content script in package.json and tsc). No new imports are needed (rCode, rText, rJunior, rPro, rBoldJ, rBoldP, rTermJ, rTermP are already available in the file).",
+  "rationale": "20 judge issues: 18 accepted (several adapted), 2 rejected.\n\nREJECTED (factually wrong premise):\n- Issue 1 (l05 'Design system' → design-token): glossary entry `design-token` has term \"Design System & Token\" and its shortDef defines BOTH design system and token. The tooltip is correct; no separate design-system id exists. Keep.\n- Issue 2 (l01 'Grid 12 kolom' → grid-8pt): glossary entry `grid-8pt` is \"Grid 12 Kolom & 8pt\" and defines the 12-column grid first. The suggested `grid-css` (CSS Grid, the CSS layout feature) would be the wrong definition. Keep.\n\nACCEPTED / ADAPTED:\n- Issue 6 (junior l04 style names) is the key decision: junior had 6 English style names in two cards plus the gaya-ui term, breaking copydeck 3.2 rule 3 (max 2 new terms) and section 8 rule 5 (answers that are pattern names). Junior now uses the friendly labels already in the card titles (gaya polos / bertumpuk / mirip benda / kaca / tanah liat / garis tebal); Pro keeps the English names. I kept \"mirip benda\" rather than cutting Skeuomorphism so the card title, alt text, visual and match item stay consistent. This forced consistent junior relabeling in anc-j4, l04-q2 (right-side junior labels rewritten so the friendly names do not leak the pairing), l04-q3, l04-q6 explainWrong and l04-r1 (junior prompt changed to \"berani dan tegas\", otherwise \"garis tebal\" would repeat the prompt).\n- Issue 3 (anc-j4): three parallel style names per mode; definition removed from the prompt, replaced by a scenario.\n- Issue 4 (l02-q5): bare Toast/Alert labels in Pro.\n- Issue 5 (l04-q3): leak words removed; Pro choices are now three bare names (Flat 2.0 / Claymorphism / Neumorphism) so distractors carry no negative attribute; contrast reasoning moved into explainCorrect; prompt asks one thing.\n- Issue 7 (l04-q8j): scenario-style prompt, correct label no longer echoes prompt; the \"tampil sama persis\" distractor replaced with a plausible one.\n- Issue 8 (anc-j3, l03-r4) and 18 (l03 pro concept): spinner signals work in progress; the lock, not the spinner, prevents double clicks; \"ikon berputar\" not \"tombol berputar\". Also fixed the junior concept sentence and the anc-j3 Pro prompt, which had the same causal error.\n- Issue 9 (anc-p2): distractors are now real Accordion-vs-Tabs/always-visible cases, with the reason in explainCorrect.\n- Issue 10 (anc-j1): \"Kotak bulat ini\" → \"Lingkaran kecil di daftar pilihan\" (no dependence on an image).\n- Issue 11 (Focus/keyboard): explained Tab in the q5 junior story and in the concept, within the 3-sentence limits.\n- Issue 12: varied the repeated es-krim / daftar-belanja analogies (kept one use each).\n- Issue 13 (l04-q4): plausible noun-parallel distractors; prompt reworded so the correct label does not repeat it.\n- Issue 14 (l05-q5): equal-length realistic choices; Dimas instead of Bito for the Pro story (still a copydeck-approved name).\n- Issue 15 (l04-q7): prompt matches the concept card (banyak foto); more accepted spellings.\n- Issue 16 (l01): objective and story say \"kelipatan 4 atau 8\"; one sentence added that 8pt is written 8px in CSS. Title left unchanged to avoid a worldMeta.ts change.\n- Issue 17 (anc-p1): removed duplicate 3x4/4x3.\n- Issue 19: in-place gloss for ghost and Flat 2.0 (the Flat 2.0 gloss also makes the following quick-check l04-q6 answerable from the card, per copydeck 6.7 rule 3).\n- Issue 20 (l06 atWork): softened to \"sebagian proyek React dan pustaka komponen\", kept to one sentence under 20 words per copydeck 4.1.\n\nNEEDED ELSEWHERE (not my file, optional): none required. src/content/glossary.ts `gaya-ui` junior shortDef already uses friendly wording (\"datar dan rapi\", \"gembung seperti tanah liat\") and is consistent with the new junior labels. No lesson titles changed, so src/content/worldMeta.ts needs no update.\n\nNot verified: I did not run the validator; word counts were checked by hand against copydeck limits (junior sentence <= 12 words, labels <= 8; pro sentence <= 20, labels <= 12). I did not confirm whether the `type` question matcher is case-insensitive, so both cases are listed in `accept`.",
+  "done": true,
+  "applicationNotes": [
+   "Synchronized the reading estimates for a09-l03 and a09-l04 to six minutes in the bundle and navigation metadata because the revised text triggered C34.",
+   "Described a ghost button by its transparent background. Button outlines depend on the design system.",
+   "Clarified that flat styling alone does not determine load speed and aligned the Junior glass-style explanation with its label.",
+   "Used a definition in the opening grid story and supplied separate Pro fallback phrasing in the Junior style scenario to satisfy copydeck C22 and C05."
+  ],
+  "verification": "node --import tsx scripts/validate-content.ts --world=a09 passed with zero findings for a09."
+ },
+ "judgeIssues": [
+  {
+   "persona": "sari-27",
+   "where": "a09-l05 concept 'Tiga pilar design system'",
+   "problem": "rTerm('design-token', 'Design system') links the words 'Design system' to the design-token glossary entry. The tooltip defines a token, not a design system, which teaches the two terms as one thing. This is a meaning error.",
+   "suggestion": "Use the correct term id for design system (add one to glossary.ts if it is missing), or use rBold('Design system') here.",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a09-l01 concept 'Sistem grid 12 kolom'",
+   "problem": "rTerm('grid-8pt', 'Grid 12 kolom') links the 12-column grid label to the 8pt spacing term. The learner taps 'Grid 12 kolom' and reads about the 8pt scale.",
+   "suggestion": "Link 'Grid 12 kolom' to 'grid-css' (or a 12-column term). Put rTerm('grid-8pt', ...) on the 'Skala jarak kelipatan 8pt' card instead.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a09-anc-j4 (junior)",
+   "problem": "The prompt 'berbentuk gembung dan berwarna pastel' contains the whole definition. The correct choice is the only jargon word ('Claymorphism'), and the other two are plain descriptions ('Serba hitam dan tajam', 'Kotak kaku bergaris tebal'). Naya can pick it by format alone, without knowing what it means, and 'Claymorphism' is hard to read at age 8.",
+   "suggestion": "Make all three choices the same kind: either three style names (Claymorphism / Neo-brutalism / Glassmorphism) or three plain descriptions such as 'Gaya tanah liat'. Do not put the definition in the prompt; use a picture or a scenario ('aplikasi untuk anak TK').",
+   "severity": "major"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a09-l02-q5 (pro)",
+   "problem": "The wrong choices carry wording that marks them as wrong: 'Toast yang hilang dalam 2 detik' and 'Alert di atas halaman', while the correct choice is just 'Modal'. The lengths are unequal, and '2 detik' gives the answer away.",
+   "suggestion": "Use bare names of equal weight for all three ('Modal', 'Toast', 'Alert'), or give all three a qualifier of similar length.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-l04-q3 (pro)",
+   "problem": "The correct choice 'Flat 2.0 atau Material dengan kontras tinggi' contains the deciding phrase 'kontras tinggi', and the distractor says 'tombol sewarna latar'. The answer reads off the label, so the question tests nothing. The junior version has the same problem: 'Gaya polos dan terbaca' sits next to the hint 'mata kakek dan nenek saat membaca'.",
+   "suggestion": "Drop 'kontras tinggi' / 'terbaca' from the correct label (e.g. 'Flat 2.0 atau Material', junior: 'Gaya polos dan rapi'). Keep the contrast reasoning in explainCorrect.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a09-l04 concepts (junior), Glass/Clay/Neo-brutalism/Skeuomorphism",
+   "problem": "In two cards Naya meets five long English style names: 'Skeuomorphism', 'Glassmorphism', 'Claymorphism', 'Neo-brutalism', 'Material'. She is just learning to read and cannot sound them out. Too many new words at once.",
+   "suggestion": "Junior: teach two or three styles under friendly labels ('gaya kaca', 'gaya tanah liat', 'gaya spidol tebal') and keep the English name optional or Pro-only. Cut Skeuomorphism from junior.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a09-l04-q8j (junior)",
+   "problem": "The prompt asks 'Mengapa gaya perlu dipilih sesuai pemakainya?' and the correct choice repeats it: 'Supaya cocok untuk yang memakainya'. She can answer by matching words.",
+   "suggestion": "Rephrase the correct choice without the prompt's words, e.g. 'Supaya anak suka, dan kakek mudah membaca'. Or make it a scenario (aplikasi TK vs aplikasi bank).",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a09-anc-j3 (junior) and a09-l03-r4",
+   "problem": "'Tombol memutar ikon supaya kamu menunggu' and 'Tombol berputar saat kamu menunggu' get the cause wrong. The spinner shows that work is in progress; its purpose is not to make the child wait. Also, the icon spins, not the button. The pro version gives the right reason (preventing a double tap).",
+   "suggestion": "Junior: 'Ikon di tombol berputar karena tombol sedang bekerja. Itu wajah apa?'",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-anc-p2",
+   "problem": "The question asks when an Accordion fits better than Tabs, but no choice is about Tabs: the distractors describe page navigation and Toast. The explanation does not say WHY Accordion beats Tabs (many sections, vertical, works on phones, reader opens only what they need).",
+   "suggestion": "Make the distractors real Tabs-versus-Accordion cases (e.g. 'Untuk 3 panel setara yang sering dibandingkan' → Tabs). Add the reason to explainCorrect: 'Accordion cocok untuk banyak bagian yang dibaca satu-satu dan tetap enak di HP.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a09-anc-j1 (junior)",
+   "problem": "'Kotak bulat ini' contradicts itself: is it a box or a circle? 'ini' also refers to an image that may not be there. Naya will be confused.",
+   "suggestion": "'Lingkaran kecil ini hanya boleh dipilih satu. Apa namanya?' Or say 'Tombol bulat pilihan', matching the l02 alt text.",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a09-l03 concept 'Tiga wajah sebelum diklik' (junior) and a09-l03-q5",
+   "problem": "'Focus saat dipilih keyboard' and 'Dimas menekan tombol Tab' assume a keyboard. Third graders mostly use a tablet or phone, where neither hover nor Tab exists. The concept stays abstract and the hint cannot help.",
+   "suggestion": "Add one plain sentence: 'Di komputer, tombol Tab memindahkan pilihan. Garis Focus menunjukkan tombol yang sedang dipilih.' Keep Focus in junior only if a picture shows it.",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a09-anc-j1, a09-l02-q8j, a09-l02-r1 (junior)",
+   "problem": "The same analogy, 'Seperti memilih satu rasa es krim', appears word for word in three explanations, and 'daftar belanja yang dicentang semuanya' appears twice. Repeating it adds nothing and reads like a template.",
+   "suggestion": "Use a different everyday example in each item (memilih satu kelas, memilih banyak topping, etc.).",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a09-l04-q4 (pro)",
+   "problem": "The distractors are obviously wrong ('Gaya Minimalism tidak perlu memikirkan kontras', 'Gaya yang populer lebih penting daripada tujuan produk'). Nobody would pick them, so the question feels patronising.",
+   "suggestion": "Use plausible wrong answers, e.g. 'Radius sudut harus sama di semua gaya' or 'Warna merek harus diganti mengikuti gaya'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-l05-q5",
+   "problem": "The distractor 'Tunda proyek 6 bulan untuk menulis 200 halaman dokumentasi desain' is much longer and plainly absurd, so it is easy to rule out. The mascot 'Bito' as a solo developer also reads as childish for Pro.",
+   "suggestion": "Shorten all three choices to similar length with realistic options (e.g. 'Langsung pakai seluruh Material Design', 'Tulis token lengkap untuk 3 tema'). Use a human name in the Pro story.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-l04-q7",
+   "problem": "The prompt says 'judul besar dan huruf serif', but the concept card describes Editorial as 'judul besar dan banyak foto'; serif was never taught. accept only takes 'Editorial'/'editorial', so 'Editorial Design' is rejected.",
+   "suggestion": "Match the prompt to the concept ('judul besar dan banyak foto'), and add 'Editorial Design' / 'gaya editorial' to accept.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-l01 objective / story vs concept 'Skala jarak kelipatan 8pt'",
+   "problem": "The objective and story say 'jarak kelipatan 8', the concept says 'kelipatan 4 atau 8', and the code uses gap: 12px. The text never explains that '8pt' here means 8 px on screen. A beginner will not know whether 12 is allowed, or what pt versus px means.",
+   "suggestion": "In the objective and the story say 'kelipatan 4 atau 8'. Add once: 'Di web, 8pt ditulis 8px.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a09-anc-p1 explainCorrect",
+   "problem": "'12 mudah dibagi menjadi 2×6, 3×4, atau 4×3' lists the same split twice (3×4 and 4×3). Looks careless.",
+   "suggestion": "'12 bisa dibagi rata jadi 2, 3, 4, atau 6 bagian (6+6, 4+4+4, 3+3+3+3). Kombinasi 3+9 cocok untuk sidebar dan isi.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-l03 concept 'Active, Loading, Disabled' (pro)",
+   "problem": "'Loading berputar selama data diproses, jadi kamu tidak mengetuk dua kali' says the spinner itself prevents a double tap. In practice the button is disabled while loading; the spinner only gives feedback. a09-l03-q3 gets this right ('Tombol juga terkunci').",
+   "suggestion": "'Loading menampilkan putaran dan mengunci tombol selama data diproses, jadi klik ganda tercegah.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-l02 concept 'Komponen aksi dan masukan' (pro) and a09-l04 concept (pro)",
+   "problem": "New terms are used without explanation: 'ghost' (button variant) and 'Flat 2.0'. Flat 2.0 is only explained later, in an l04-q6 feedback ('menambahkan sedikit bayangan'). On a phone during a commute, Sari cannot look these up.",
+   "suggestion": "Add a short gloss in place: 'ghost (tombol transparan bergaris tepi)' and 'Flat 2.0 (flat dengan sedikit bayangan agar tombol tetap dikenali)'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a09-l06 atWork",
+   "problem": "'Kamu akan menemukan folder atoms, molecules, dan organisms di banyak proyek React' overstates it; many teams use feature or domain folders. A career switcher could expect this structure everywhere.",
+   "suggestion": "'Sebagian proyek React menamai foldernya atoms, molecules, dan organisms. Pola berpikirnya tetap berguna meski nama foldernya berbeda.'",
+   "severity": "minor"
+  }
+ ]
+}

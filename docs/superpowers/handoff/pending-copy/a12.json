@@ -1,0 +1,161 @@
+{
+ "world": "a12",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "opus",
+  "accepted": 17,
+  "rejected": 3,
+  "instructions": "FILE (only one): src/content/worlds/a12-benteng-keamanan/index.ts. Do not edit any other file. Keep every id, answer key, icon and step order. Each fix below names the current text exactly and gives the new text. Where t(junior, pro) has two arguments, change only the argument named.\n\nA. FACT FIXES (Pro)\nA1. a12-anc-p4, choice 'offline' explainWrong:\n old: 'HttpOnly justru diatur oleh server dan dikirim lewat HTTPS.'\n new: 'HttpOnly justru dipasang server lewat header Set-Cookie. Pengiriman hanya lewat HTTPS diatur tanda Secure, bukan HttpOnly.'\nA2. a12-l03-q4, choice 'stop' explainWrong:\n old: 'POST tetap membawa cookie sesi kalau situs tujuan sama. Perlindungannya datang dari token CSRF dan SameSite.'\n new: 'Tanpa SameSite, POST dari form tersembunyi di situs jebakan tetap membawa cookie sesi. Karena itu POST perlu ditemani token CSRF dan SameSite.'\nA3. a12-l01-q5, choice 'color' explainWrong:\n old: 'Browser sering tetap memuat file HTTP, tetapi menandainya tidak aman.'\n new: 'Browser modern justru memblokir skrip HTTP di halaman HTTPS dan mencoba memuat gambarnya lewat HTTPS. Masalah utamanya tetap jalur tanpa enkripsi.'\nA4. a12-l03-q3 explainCorrect:\n old: 'Baris 2 memakai target=\"_blank\" tanpa rel=\"noopener noreferrer\". Halaman tujuan bisa mengambil kendali tab asal.'\n new: 'Baris 2 memakai target=\"_blank\" tanpa rel=\"noopener noreferrer\". Halaman tujuan bisa memakai window.opener untuk mengganti tab asal ke situs tiruan (tabnabbing). Browser baru sudah memasangnya otomatis, tetapi menulisnya tetap aman untuk browser lama.'\nA5. a12-l03 conceptStep 'CSRF: Permintaan Palsu Lintas Situs', body:\n old rText: ' sekali pakai di setiap form. Beri atribut '\n new rText: ' acak yang dicek server di setiap form. Beri atribut '\nA6. a12-l03-q2, right item r4 label:\n old: 'CSRF token sekali pakai, SameSite, dan method POST'\n new: 'CSRF token acak, SameSite, dan method POST'\nA7. a12-l02-q7 explainCorrect:\n old: 'Mengganti innerHTML dengan textContent menutup celah DOM-based XSS.'\n new: 'location.hash bisa diisi siapa pun yang membuat tautan. textContent menampilkannya sebagai teks, jadi tag di dalamnya tidak dijalankan. Ini menutup celah DOM-based XSS.'\nA8. a12-l03 storyStep rText (single text):\n old: 'Kamu masih login di toko-rani.example, lalu membuka halaman lain yang diam-diam mengirim perintah \"ubah email\". Resepsionis yang melihat gelang aksesmu akan memprosesnya, padahal itu bukan keinginanmu.'\n new: 'Kamu masih login di toko-rani.example, lalu membuka halaman lain yang diam-diam mengirim perintah \"ubah email\". Cookie sesi itu seperti gelang akses gedung: resepsionis memproses permintaan siapa pun yang memakainya. Perintah itu pun diproses, padahal bukan keinginanmu.'\nA9. a12-l03 simStep('benteng-xss', ...) instructions:\n old: 'Di Benteng Uji, lihat bagaimana celah XSS membuat skrip bisa membaca token di halaman.'\n new: 'Di Benteng Uji, lihat XSS mencuri token dari dalam halaman. Bandingkan dengan CSRF, yang menumpang cookie dari luar tanpa membaca apa pun.'\nA10. a12-l04 limitStep (analogy 'Kunci rumah di ruang tamu terbuka', riskyAnalogy: false; keep that):\n same: [ t('Barang di ruang tamu bisa dilihat semua tamu, begitu juga kode frontend.') ]\n different: [ t('Di rumah, kamu bisa mengunci laci. Di browser tidak ada laci: semua kode frontend terkirim utuh ke pengunjung.') ]\n (Replace both arrays fully; the old 'different' had 2 items, the new one has 1.)\nA11. a12-anc-p1, choice 'dev' label:\n old: 'Karena orang bisa melewati validasi lewat DevTools atau request langsung ke API'\n new: 'Karena validasi frontend bisa dilewati lewat DevTools atau request langsung'\nA12. a12-l04-q5, choice 'phish' label, PRO argument only:\n old: 'Jangan masukkan kata sandi, periksa alamat resmi, aktifkan 2FA'\n new: 'Jangan masukkan kata sandi, buka situs resmi lewat alamat aslinya'\n\nB. JUNIOR: one verb for running code, \"bekerja\" (replaces \"berjalan\")\nB1. a12-anc-j2:\n choice 'ih' label: 'Tampilkan sebagai kode yang berjalan' -> 'Tampilkan sebagai perintah yang bekerja'\n choice 'ih' explainWrong: 'Tulisan yang dianggap kode bisa ikut berjalan. Itu berbahaya.' -> 'Tulisan yang dianggap perintah bisa ikut bekerja. Itu berbahaya.'\n choice 'ev' label: 'Jalankan dulu isinya sebelum tampil' -> 'Biarkan isinya bekerja dulu sebelum tampil'\n choice 'ev' explainWrong: 'Isi komentar jadi dijalankan seperti perintah. Itu membuka pintu orang jahat.' -> 'Isi komentar jadi bekerja seperti perintah. Itu membuka pintu orang jahat.'\n explainCorrect: 'Tulisan biasa hanya dibaca. Tulisan itu tidak ikut berjalan.' -> 'Tulisan biasa hanya dibaca. Tulisan itu tidak ikut bekerja.'\nB2. a12-anc-j5:\n choice 'run' label: 'Kertas di web bisa berjalan seperti perintah' -> 'Tulisan di web bisa bekerja seperti perintah'\n explainCorrect: 'Kertas di papan hanya dibaca. Kertas jahat di web bisa berjalan.' -> 'Kertas di papan hanya dibaca. Tulisan jahat di web bisa bekerja seperti perintah.'\nB3. a12-l02 conceptStep 'Apa Itu XSS?':\n alt JUNIOR arg: 'Penyerang menyelipkan skrip di komentar. Skrip itu berjalan di layar pembaca.' -> 'Orang jahat menyelipkan perintah di komentar. Perintah itu bekerja di layar pembaca.'\n body rText JUNIOR arg: ' adalah celah saat tulisan nakal dari tamu ikut berjalan di halaman. Seperti kertas jebakan di papan sekolah. Orang yang membacanya ikut terkena.' -> ' adalah celah saat tulisan nakal tamu ikut bekerja di halaman. Seperti kertas jebakan di papan sekolah. Orang yang membacanya ikut terkena.'\nB4. a12-l02 limitStep (Papan pengumuman), different[0] JUNIOR arg: 'Kertas hanya dibaca. Tulisan jahat di web bisa berjalan.' -> 'Kertas hanya dibaca. Tulisan jahat di web bisa bekerja.'\nB5. a12-l02-q4 (JUNIOR args only):\n choice 'exec' label: 'Tulisan itu bisa berjalan seperti perintah' -> 'Tulisan itu bisa bekerja seperti perintah'\n explainCorrect: 'Kertas di papan hanya dibaca mata. Tulisan jahat di web bisa langsung berjalan.' -> 'Kertas di papan hanya dibaca mata. Tulisan jahat di web bisa langsung bekerja.'\n hints[0]: 'Ingat: kertas hanya dibaca, tidak berjalan.' -> 'Ingat: kertas di papan hanya dibaca.'\nB6. a12-l02-r1 (JUNIOR args only):\n choice 'ih' label: 'Menampilkannya sebagai kode yang berjalan' -> 'Menampilkannya sebagai perintah yang bekerja'\n choice 'ih' explainWrong: 'Tulisan yang dianggap perintah bisa ikut berjalan. Itu berbahaya.' -> 'Tulisan yang dianggap perintah bisa ikut bekerja. Itu berbahaya.'\n choice 'ev' label: 'Menampilkannya setelah dijalankan dulu' -> 'Membiarkan isinya bekerja dulu'\n choice 'ev' explainWrong: 'Tulisan yang dijalankan dulu bisa membahayakan halaman. Tampilkan saja apa adanya.' -> 'Tulisan yang dibiarkan bekerja bisa membahayakan halaman. Tampilkan saja apa adanya.'\n explainCorrect: 'Tulisan biasa hanya dibaca, tidak dijalankan. Itu cara paling aman.' -> 'Tulisan biasa hanya dibaca, tidak ikut bekerja. Itu cara paling aman.'\nB7. a12-l02-r2 (JUNIOR args only):\n prompt: 'Tulisan tamu yang tampil sebagai tulisan biasa tidak ikut berjalan.' -> 'Tulisan tamu yang tampil sebagai tulisan biasa tidak ikut bekerja.'\n explainWrong: 'Tulisan biasa tidak berjalan. Yang berbahaya adalah tulisan yang dianggap perintah.' -> 'Tulisan biasa tidak ikut bekerja. Yang berbahaya adalah tulisan yang dianggap perintah.'\nB8. a12-l02 recap JUNIOR arg: 'Tampilkan tulisan tamu sebagai tulisan biasa agar tidak ikut berjalan.' -> 'Tampilkan tulisan tamu sebagai tulisan biasa agar tidak ikut bekerja.'\nB9. a12-l01-q2, choice 'run' explainWrong JUNIOR arg: 'Escaping tidak merapikan tampilan. Tugasnya membuat tanda berbahaya tidak berjalan.' -> 'Escaping tidak merapikan tampilan. Tugasnya membuat tanda berbahaya tidak ikut bekerja.'\n\nC. JUNIOR: rebuild the sort, fix giveaways, and add safety\nC1. a12-l02-q3j (sort, modes ['junior']). Keep id, type, modes, difficulty, tags, bin ids/icons and the answer map { s1:'ok', s2:'bad', s3:'ok', s4:'bad' }. Replace:\n prompt: t('Kelompokkan cara ini: aman atau berbahaya.')\n items: s1 t('Kertas diperiksa dulu, lalu ditempel'); s2 t('Kertas ditempel tanpa ada yang memeriksa'); s3 t('Tulisan tamu tampil apa adanya untuk dibaca'); s4 t('Tulisan tamu ikut menyuruh halaman bekerja')\n bins: ok label t('Aman') (icon 'file-text'); bad label t('Berbahaya') (icon 'bug')\n explainCorrect: t('Kertas yang diperiksa dan tampil sebagai tulisan biasa itu aman. Bahaya datang kalau tulisan tamu bisa menyuruh halaman bekerja.')\n hints[0]: t('Ingat Pak Udin yang memeriksa setiap kertas.') (keep second hint undefined)\nC2. a12-l02-q2j: keep choice ids and answer 'cek'.\n choice 'tempel' label: 'Menempel kertas tanpa memeriksa' -> 'Merapikan kertas agar tetap lurus'\n choice 'copot' label: 'Mencopot papan dari kelas' -> 'Menaruh kertas berwarna di depan'\n explainIncorrect.tempel: -> t('Kertas yang rapi belum tentu aman. Isinya perlu diperiksa dulu.')\n explainIncorrect.copot: -> t('Warna kertas tidak penting. Yang perlu dijaga adalah isinya.')\nC3. a12-anc-j4, choice 'show': label '\"Kata sandi yang benar adalah 123456\"' -> '\"Email ini belum terdaftar\"'; explainWrong 'Kata sandi asli tidak boleh dibocorkan.' -> 'Pesan ini memberi tahu email mana yang terdaftar. Orang jahat jadi tahu.'\nC4. a12-l04-r1, choice 'k3' (JUNIOR args only): label 'Di kertas di bawah keset' -> 'Di catatan kecil di pojok halaman'; explainWrong 'Kunci di bawah keset mudah ditemukan. Rahasia tidak boleh disimpan di tempat terbuka.' -> 'Pojok halaman tetap bagian dari halaman. Semua tamu bisa membacanya.' (keep pro 'README.md' texts).\nC5. a12-l01-q6 (tf, answer stays true), JUNIOR args only:\n prompt 'Tulisan dari tamu harus diperiksa dulu.' -> 'Tulisan tamu yang pendek juga harus diperiksa dulu.'\n explainCorrect 'Tulisan tamu bisa berisi tanda berbahaya. Periksa dulu, seperti petugas bank memeriksa formulir.' -> 'Tulisan pendek pun bisa berisi tanda berbahaya. Periksa semua, seperti petugas bank memeriksa formulir.'\n explainWrong 'Tulisan tamu tidak boleh langsung dipercaya. Petugas bank selalu memeriksa formulir dulu.' -> 'Pendek tidak berarti aman. Petugas bank memeriksa setiap formulir.'\nC6. a12-l04 conceptStep 'Daftar Periksa Keamanan', rText JUNIOR arg:\n old: 'Jangan taruh kata sandi di alamat situs. Periksa alamat situs sebelum mengisi kata sandi. Situs tiruan bisa terlihat sangat mirip.'\n new: 'Jangan taruh kata sandi di alamat situs. Situs tiruan bisa terlihat sangat mirip. Kalau ada halaman meminta kata sandi, panggil orang dewasa dulu.'\nC7. a12-l04-q5 (JUNIOR args only; answer stays 'phish'):\n story JUNIOR: 'Sari menerima pesan berisi tautan halaman login. Tampilannya mirip situs sekolahnya, tetapi alamat situsnya sedikit berbeda.' -> 'Sari menerima pesan berisi tautan. Halamannya meminta kata sandi dan mirip situs sekolahnya. Tetapi alamat situsnya sedikit berbeda.'\n choice 'phish' label JUNIOR: 'Tidak mengisi kata sandi, periksa alamat resmi' -> 'Tidak mengisi, lalu tunjukkan ke orang tua'\n explainCorrect JUNIOR: 'Situs tiruan sengaja dibuat mirip. Periksa alamat situs, jangan hanya tampilannya.' -> 'Situs tiruan sengaja dibuat mirip aslinya. Orang dewasa bisa membantu memeriksa alamatnya.'\nC8. a12-l04 conceptStep 'Apa yang Tidak Boleh di Halaman?', rJunior: 'Contohnya kata sandi dan kunci pembayaran.' -> 'Contohnya kata sandi dan kode rahasia untuk membayar.' (rest of that rJunior string unchanged)\nC9. a12-l04-q2, item s1 JUNIOR arg: 'Kata sandi gudang data' -> 'Kata sandi lemari data toko'\nC10. a12-l02 companion.offlineActivity:\n new: 'Buat \"Filter Papan Pengumuman\" di kertas: siapkan 4 kartu tulisan (2 aman seperti \"Besok libur\", 2 bertanda gambar petir sebagai tulisan nakal) lalu pisahkan mana yang boleh langsung tempel dan mana yang harus dinetralkan.'\nC11. a12-l04 companion.offlineActivity:\n new: 'Latihan detektif alamat situs: tulis 4 kartu alamat (1 resmi toko-rani.example, 3 tiruan seperti t0k0-rani.example), lalu cari bersama huruf mana yang berbeda.'\n\nD. AFTER EDITING: run `npm run validate:content` and `npx tsc --noEmit`. Report any C-warnings for a12 (especially C26 choice length, C29 sort bins, C18 question marks).\n\nNO CHANGE (rejected): code blocks in l01/l02 concepts; rCode('<') and the junior term 'Escaping' in l01; rCode('textContent',['junior']) in l02; 'backend' in the junior text of the l01 concept.\n\nOUT OF SCOPE NOTE for the orchestrator (not part of this batch): the a12-l02 limitStep different[1] ('Browser tidak bisa membedakan skrip asli developer...') also shows in Junior. That breaks copydeck §5, which allows 1 point of ≤10 words per column for Junior, and it uses 'skrip' and 'developer'. Fixing it needs either a per-item mode field in limitStep (schema change, deferred) or turning it into a single point. No judge raised it.",
+  "rationale": "Verdicts for a12, following the decision guide (correctness > hard rules > copydeck/§15-17 > persona taste). Counts: accepted 11, adapted 6 (the accepted field holds 17 = accepted + adapted), rejected 3, deferred 0.\n\n# | source | issue | verdict | reason\n1 | sari-27 | anc-p4 confuses HttpOnly with Secure | Adapt | The fact error is real. The new text names Set-Cookie and also separates HttpOnly from Secure.\n2 | naya-8 | l01 concept code block, '<', 'Escaping', q2 | Reject | LessonPlayerPage.tsx:210 already shows concept code blocks only in Pro. One short snippet explained in the same sentence and an rTerm with its meaning are both allowed by copydeck §3.4 and §3.2 rule 3.\n3 | naya-8 | l02 concept textContent and code block | Reject | The code block is already hidden from Junior. 'textContent' has 11 characters and is explained in its own sentence, which §3.4 allows. It also links to the optional Junior code challenge (spotbug q2).\n4 | wulan-38 | l02-q3j giveaway and wrong idea of XSS | Accept | Correctness: it taught that bossy words are the danger. Rebuilt around checked versus unchecked and read versus acting. Ids and answer map are kept.\n5 | naya-8 | 'berjalan' read as walking | Accept | Junior now uses one verb throughout ('bekerja'), in 9 items. Junior sentences stay at 12 words or fewer.\n6 | sari-27 | l03-q4 'kalau situs tujuan sama' | Adapt | Accurate now: with default SameSite=Lax, the cross-site cookie depends on SameSite, so the text says 'Tanpa SameSite'.\n7 | wulan-38 | l04 limit same/different not comparing | Accept | The new points compare with the analogy. The card is Pro-only (riskyAnalogy false), and the .env facts are still in the concept card.\n8 | naya-8 | 'backend' in junior l01 concept | Reject | Copydeck §3.2 rule 7: backend is introduced in a01 and has a Junior glossary entry.\n9 | sari-27 | l01-q5 mixed content outdated | Adapt | Accurate: scripts are blocked and images are upgraded to HTTPS. The suggested text did not mention images.\n10 | dimas-14 | l03-q3 no why, outdated | Accept | Adds window.opener and tabnabbing with a meaning, and the note about browser defaults.\n11 | raka-11 | l02-q2j giveaway | Accept | Wrong options now tempt. Lengths stay within 3 words.\n12 | raka-11 | j4, l04-r1, l01-q6 giveaways | Adapt | j4 now uses a real enumeration leak and r1 a tempting distractor. For the TF, a 'false' rewrite would flip the answer, so the answer stays true and the statement is less obvious.\n13 | wulan-38 | junior phishing: involve an adult | Accept | Child-safety behavior, and it removes 'halaman login' from the Junior story.\n14 | sari-27 | Pro choice length, 2FA undefined | Adapt | Shortened anc-p1 and removed '2FA' from l04-q5. The l02-q4 part is a false positive because the correct answer is not the longest.\n15 | dimas-14 | l03 XSS sim off-topic | Adapt | Kept the sim so the card rhythm (§6.7) still holds, and reworded it as an XSS-versus-CSRF contrast.\n16 | sari-27 | CSRF token 'sekali pakai' | Accept | Most frameworks use per-session tokens. Fixed in the concept and in q2 r4.\n17 | sari-27 | l03 story analogy not set up | Accept | Added a bridge sentence of 20 words or fewer.\n18 | dimas-14 | l02-q7 explainCorrect | Accept | Explains why: the attacker controls location.hash through the link.\n19 | wulan-38 | 5-second timer in companion | Accept | No clocks in Junior (decision guide §3).\n20 | naya-8 | '<script>', 'kunci pembayaran', 'gudang data' | Accept | Concrete wording for Junior. Pro text unchanged.\n\nEvery change stays in the one owned file. done: true is fine once the executor applies the edits and the validator passes. One copydeck gap is out of scope (the second 'different' point on the l02 limit card shows in Junior) and is in the instructions for the orchestrator."
+ },
+ "judgeIssues": [
+  {
+   "persona": "sari-27",
+   "where": "a12-anc-p4 (choice 'offline' explainWrong)",
+   "problem": "Factual error: \"HttpOnly justru diatur oleh server dan dikirim lewat HTTPS.\" HttpOnly only blocks JavaScript access. Sending only over HTTPS is the Secure flag. The lesson itself separates the two, so this teaches a contradiction.",
+   "suggestion": "\"Cookie HttpOnly justru diatur oleh server lewat header Set-Cookie. Server-lah yang memasangnya, bukan cookie yang berjalan sendiri.\"",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a12-l01 conceptStep 'Periksa di Dua Tempat' (code block + body) and a12-l01-q2",
+   "problem": "Code is left in junior. The `code` field ('Masukan: <script>\\nEscaped: &lt;script&gt;') has no mode gate, rCode('<') shows to junior, and the junior term is rTerm('sanitasi','Escaping','Escaping'). The junior quiz then asks \"Apa tugas escaping pada tulisan dari tamu?\" Naya does not know the word 'escaping' and cannot read &lt;.",
+   "suggestion": "Gate the code block and rCode('<') to pro. Use 'Penyaring' or 'mengubah tanda aneh' as the junior term label, and reword the q2 junior prompt to \"Apa gunanya mengubah tanda aneh di tulisan tamu?\"",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a12-l02 conceptStep 'Tampilkan Sebagai Tulisan Biasa'",
+   "problem": "Code is left in junior. The text says \"Pembuat situs memakai \" + rCode('textContent', ['junior']), and the code block '// BERBAHAYA:\\nkotak.innerHTML = komentar;' has no mode gate, so junior sees JavaScript.",
+   "suggestion": "Remove rCode('textContent',['junior']) and the junior sentence that goes with it, and make the code block pro-only. For junior, keep only \"Tampilkan komentar tamu sebagai tulisan biasa, bukan perintah.\"",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a12-l02-q3j",
+   "problem": "Giveaway and wrong idea. The labels start with 'Pengumuman:' / 'Pertanyaan:' / 'Perintah:', and the bin is called 'Perintah jahat', so the prefix gives the answer. It also teaches that bossy words are the danger. In XSS, a comment like \"kirim kata sandi ke aku\" shown as plain text is harmless. The danger is text that the page runs. This goes against the lesson's own rule to show it as plain text.",
+   "suggestion": "Remove the prefixes. Sort 'hanya dibaca' vs 'bisa membuat halaman bertindak sendiri', or rebuild the task around Pak Udin checking papers before he pins them, without judging what the words mean.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a12-anc-j2, a12-anc-j5, a12-l02 concept, a12-l02-q4, a12-l02-r1/r2 (junior)",
+   "problem": "'Berjalan' is used for code running: \"Tulisan itu bisa berjalan seperti perintah\", \"Kertas di web bisa berjalan\", \"Tulisan biasa ... tidak ikut berjalan\". An 8-year-old reads 'berjalan' as walking, so the key idea gets lost.",
+   "suggestion": "Use one concrete verb all through junior, e.g. \"bisa menyuruh halaman melakukan sesuatu\" / \"ikut bekerja seperti perintah\", and keep it the same in every item.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a12-l03-q4 (choice 'stop' explainWrong)",
+   "problem": "Misleading statement: \"POST tetap membawa cookie sesi kalau situs tujuan sama.\" Cross-site POSTs also carry cookies unless SameSite stops them. That is exactly why POST alone does not stop CSRF. The phrase 'kalau situs tujuan sama' confuses this.",
+   "suggestion": "\"POST tetap membawa cookie sesi, bahkan dari situs jebakan lewat form tersembunyi. Karena itu POST perlu ditemani token CSRF dan SameSite.\"",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a12-l04 limitStep ('Kunci rumah di ruang tamu terbuka')",
+   "problem": "The same/different slots do not compare anything with the analogy. same: \"Menyembunyikan tombol dengan CSS tidak benar-benar menyembunyikan isinya\". different: \"File .env aman dipakai untuk rahasia backend...\" and \"Pastikan juga file itu tidak diunggah ke Git.\" These are separate facts, not ways the analogy holds or breaks, which raises cognitive load.",
+   "suggestion": "same: \"Barang di ruang tamu bisa dilihat semua tamu, begitu juga kode frontend.\" different: \"Di rumah, kamu bisa mengunci laci. Di browser, tidak ada laci: semua kode frontend terkirim utuh ke pengunjung.\"",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a12-l01 conceptStep 'Tiga Aturan Emas' (junior body)",
+   "problem": "Junior text ends with \"pengaman utama ada di ruang dalam, yaitu \" + rTerm('backend','backend','backend'), which shows the English jargon 'backend' to an 8-year-old with no explanation.",
+   "suggestion": "End the junior text with \"ruang dalam.\" and make rTerm backend pro-only (rPro / modes ['pro']).",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a12-l01-q5 (choice 'color' explainWrong)",
+   "problem": "Factually outdated: \"Browser sering tetap memuat file HTTP, tetapi menandainya tidak aman.\" Modern browsers block HTTP scripts (active mixed content) on HTTPS pages and upgrade images on their own. The story is about images and scripts.",
+   "suggestion": "\"Browser modern justru memblokir skrip HTTP di halaman HTTPS dan menandai halaman tidak aman. Masalah utamanya tetap jalur tanpa enkripsi.\"",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a12-l03-q3 explainCorrect",
+   "problem": "Does not explain WHY and is partly outdated: \"Halaman tujuan bisa mengambil kendali tab asal.\" It does not say how (window.opener / tabnabbing). Modern browsers also apply noopener by default to target=_blank, so Dimas may feel lectured with old information.",
+   "suggestion": "\"Tanpa noopener, halaman tujuan bisa memakai window.opener untuk mengganti tab asal ke situs tiruan (tabnabbing). Browser baru sudah memasangnya otomatis, tetapi menulisnya tetap aman untuk browser lama.\"",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a12-l02-q2j",
+   "problem": "Giveaway: the story says \"Pak Udin menjaganya\", the prompt asks \"Apa tugas Pak Udin?\", and the choices are 'Memeriksa setiap kertas dulu' vs 'Menempel kertas tanpa memeriksa' vs 'Mencopot papan dari kelas'. Raka gets it right without thinking and does not feel smart.",
+   "suggestion": "Make the wrong options plausible, e.g. 'Merapikan kertas agar lurus' or 'Menempel kertas yang paling berwarna di depan', so the child has to recall why kertas is checked.",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a12-anc-j4, a12-l04-r1 (junior), a12-l01-q6 (junior)",
+   "problem": "Giveaway choices: \"Kata sandi yang benar adalah 123456\", \"Di kertas di bawah keset\", and the TF \"Tulisan dari tamu harus diperiksa dulu.\" are obviously silly or obviously true, so they test nothing.",
+   "suggestion": "Replace them with wrong options that tempt, e.g. j4: '\"Email ini belum terdaftar\"'; l04-r1: 'Di catatan kecil di pojok halaman'; and rewrite the TF as a false statement a child might believe ('Tulisan tamu yang pendek pasti aman').",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a12-l04-q5 (junior), a12-l04 conceptStep 'Daftar Periksa Keamanan' (junior)",
+   "problem": "The junior text tells children to judge login pages and type passwords on their own: \"Periksa alamat situs sebelum mengisi kata sandi\", answer \"Tidak mengisi kata sandi, periksa alamat resmi\". For age 8 the safe behavior is to ask an adult. 'Halaman login' is also jargon for Naya.",
+   "suggestion": "Junior answer: \"Jangan isi apa pun, tunjukkan ke orang tua atau guru\". Text: \"Kalau ada halaman yang meminta kata sandi, panggil orang dewasa dulu.\"",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a12-anc-p1, a12-l04-q5 (pro), a12-l02-q4 (pro)",
+   "problem": "Choices differ in length, so the correct one stands out: \"Karena orang bisa melewati validasi lewat DevTools atau request langsung ke API\" and \"Jangan masukkan kata sandi, periksa alamat resmi, aktifkan 2FA\" are much longer and more specific than the wrong ones. '2FA' is also never defined; the concept says 'verifikasi 2 langkah'.",
+   "suggestion": "Make the choices about the same length (shorten the correct one, e.g. 'Validasi frontend bisa dilewati lewat DevTools'), and use 'verifikasi 2 langkah' in place of '2FA'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a12-l03 simStep",
+   "problem": "Off-topic sim inside the CSRF/clickjacking lesson: \"Di Benteng Uji, lihat bagaimana celah XSS membuat skrip bisa membaca token di halaman.\" This feels like filler and breaks the lesson's flow.",
+   "suggestion": "Remove this sim from l03, or frame it as a contrast: \"Bandingkan: XSS mencuri dari dalam halaman, CSRF menumpang cookie dari luar.\"",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a12-l03 conceptStep 'CSRF: Permintaan Palsu Lintas Situs' and a12-l03-q2 r4",
+   "problem": "\"CSRF token sekali pakai di setiap form\" overstates the requirement. Most frameworks use per-session tokens, so a career-switcher will be confused at work.",
+   "suggestion": "\"CSRF token acak yang dicek server di setiap form\" (drop 'sekali pakai').",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a12-l03 storyStep",
+   "problem": "The analogy appears before it is set up: \"Resepsionis yang melihat gelang aksesmu akan memprosesnya\". The gelang akses / resepsionis has not been introduced, so on a phone during a commute the sentence is confusing.",
+   "suggestion": "Add one bridge sentence: \"Cookie sesi itu seperti gelang akses gedung: resepsionis memproses permintaan siapa pun yang memakainya.\"",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a12-l02-q7 explainCorrect",
+   "problem": "\"Mengganti innerHTML dengan textContent menutup celah DOM-based XSS.\" The template never showed innerHTML, and it does not explain WHY location.hash is dangerous (an attacker controls it through the link).",
+   "suggestion": "\"location.hash dikendalikan siapa pun yang membuat tautan. textContent menampilkannya sebagai teks, jadi tag di dalamnya tidak dijalankan (DOM-based XSS tertutup).\"",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a12-l04 companion.offlineActivity",
+   "problem": "\"minta menebak mana yang asli dalam 5 detik\" adds time pressure. Spotting a fake URL should be a slow, careful habit, not a fast game.",
+   "suggestion": "Remove the 5-second limit: \"...lalu cari bersama huruf mana yang berbeda.\"",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a12-l02 companion.offlineActivity, a12-l04 junior concept/q2",
+   "problem": "Code and jargon reach junior through side text: \"2 bertanda \\\"<script>\\\"\", \"kunci pembayaran\", \"Kata sandi gudang data\". Naya cannot picture what these are.",
+   "suggestion": "Junior cards: '2 kartu bertanda gambar petir (tulisan nakal)'. Replace 'kunci pembayaran' with 'kode rahasia untuk membayar' and 'gudang data' with 'kata sandi lemari data toko'.",
+   "severity": "minor"
+  }
+ ],
+ "implementation": {
+  "result": "Applied to the world bundle and validated with zero a12 findings. All question IDs and answer keys are retained.",
+  "adaptations": [
+   "The POST feedback now describes checking intent and the CSRF token without assuming a universal browser cookie default.",
+   "The new-tab prompt distinguishes explicit protection for older browsers from the implicit behavior of current browsers.",
+   "The mixed-content, text rendering and simulation feedback use defensive language. Junior exercises use plain, short Indonesian and an adult companion."
+  ]
+ }
+}

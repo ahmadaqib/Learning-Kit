@@ -19,8 +19,8 @@ export const CompanionGate: React.FC<CompanionGateProps> = ({
   open,
   onClose,
   onUnlock,
-  title = 'Area Pendamping / Orang Tua',
-  description = 'Jawab hitungan singkat ini untuk memastikan kamu pendamping atau sudah dewasa.',
+  title = 'Area pendamping',
+  description = 'Jawab hitungan singkat ini. Area ini untuk pendamping atau orang dewasa.',
 }) => {
   const challenge = useMemo(() => {
     const a = Math.floor(Math.random() * 5) + 4; // 4..8
@@ -39,21 +39,21 @@ export const CompanionGate: React.FC<CompanionGateProps> = ({
       setErrorMsg('');
       onUnlock();
     } else {
-      setErrorMsg('Belum pas. Coba hitung lagi pelan-pelan.');
+      setErrorMsg('Belum pas. Coba hitung lagi.');
     }
   };
 
   return (
     <DialogModal open={open} onClose={onClose} title={title} lightDismiss>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-start gap-3 rounded-[var(--radius-md)] bg-[var(--cream)] p-3">
+        <div className="flex items-start gap-3 rounded-[var(--radius-md)] bg-[var(--paper-2)] p-3">
           <ShieldCheck className="mt-0.5 h-6 w-6 flex-shrink-0 text-[var(--world-700)]" aria-hidden="true" />
           <p className="pw-small text-[var(--ink-2)]">{description}</p>
         </div>
 
         <div className="space-y-2">
           <label htmlFor="companion-gate-input" className="block font-bold">
-            Berapa hasil dari {challenge.a} × {challenge.b} ?
+            Berapa {challenge.a} × {challenge.b}?
           </label>
           <input
             id="companion-gate-input"
@@ -64,13 +64,16 @@ export const CompanionGate: React.FC<CompanionGateProps> = ({
               setInputVal(e.target.value);
               setErrorMsg('');
             }}
-            placeholder="Tulis angka jawaban"
+            placeholder="Tulis jawabanmu"
+            autoComplete="off"
             autoFocus
             required
-            className="w-full rounded-[var(--radius-md)] border-2 border-[var(--line)] bg-[var(--paper)] px-4 py-3 text-[var(--ink)]"
+            aria-invalid={errorMsg ? true : undefined}
+            aria-describedby={errorMsg ? 'companion-gate-error' : undefined}
+            className="pw-t-colors min-h-[var(--touch-min)] w-full rounded-[var(--radius-md)] border-2 border-[var(--line-strong)] bg-[var(--paper)] px-4 py-3 text-[var(--ink)]"
           />
           {errorMsg && (
-            <p role="alert" className="pw-small font-semibold text-[var(--warn-700)]">
+            <p id="companion-gate-error" role="alert" className="pw-small font-semibold text-[var(--warn-700)]">
               {errorMsg}
             </p>
           )}

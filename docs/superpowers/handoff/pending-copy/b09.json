@@ -1,0 +1,242 @@
+{
+ "world": "b09",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "codex",
+  "accepted": 14,
+  "adapted": 2,
+  "rejected": 0,
+  "deferred": 0,
+  "done": true,
+  "instructions": "Applied in src/content/worlds/b09-dapur-frontend/index.ts.\n\n1. b09-l03-q3 (spotbug) + b09-l03-q2 (order)\nUse a new controller after aborting the old one. Keep spotbug line 3 at the fetch missing signal and use the caller signal. Let the fill exercise combine that signal with its timeout.\n\n2. b09-l03 race-condition scenario ('Dimas mengetik \"baju\"...')\nSpace the inputs 3 seconds apart and explain why both requests leave even with a 2-second debounce.\n\n3. b09-l04 concept card 'Cache client dan stale-while-revalidate'\nDefine client cache as a plain-text concept without an unrelated glossary link.\n\n4. b09-l06 concept card 'Mock API: dapur pura-pura'\nDefine Mock API in text and attach the OpenAPI link to OpenAPI itself.\n\n5. b09-l02 card '2. Gagal' + error analogy question + l02 recall true/false\nUse a dropped cake that the server can send again. Align the concept, application quiz and review hint.\n\n6. b09-l04 card 'Cache client dan stale-while-revalidate' + l04 recall staleTime\nDefine queryKey as a cache key, staleTime as the fresh interval and stale-while-revalidate as showing a stale copy while checking for updated data. Keep the library API specific to TanStack Query.\n\n7. b09-l02-q4 (hotspot) regions\nThe renderer shows region labels as buttons. Use appearance and control labels in each button to preserve accessible choices without naming the state.\n\n8. b09-l01 rich card 'Mengirim JSON, cookie, dan file' + FormData question\nDefine boundary as the separator between form parts and explain that the browser supplies it.\n\n9. b09-l05 CORS true/false\nTeach origin and CORS before the quiz. Qualify the true statement with the same protocol, host and port.\n\n10. Junior question 'Mana keadaan layar yang paling sering terlupa dirancang?'\nGive all choices three states and ask what remains after success is already designed.\n\n11. Junior question 'Daftar keranjang berhasil diambil, tetapi isinya 0 barang...'\nUse a shopping basket with nothing inside as the Junior prompt.\n\n12. Junior option 'Deretan huruf dan angka yang rumit'\nDescribe raw characters with no message and explain the value of a plain next step.\n\n13. Junior closing activity 'Gambar 4 kartu wajah HP di kertas: 1) mengantuk menunggu...'\nAsk learners to remember a past outage and draw four screens in separate short sentences.\n\n14. b09-l05 BFF recall question\nUse a browser library that unlocks a key as the plausible distractor and contrast where the credential is used.\n\n15. b09-l04 recall 'Apa arti optimistic update'\nUse updating after server confirmation as a plausible contrast and balance answer lengths.\n\n16. b09-l03 race-condition story\nKeep one connection and have the second result return first after the 3-second interval.",
+  "verdicts": [
+   {
+    "number": 1,
+    "source": "sari-27",
+    "issue": "b09-l03-q3 (spotbug) + b09-l03-q2 (order)",
+    "verdict": "accept",
+    "reason": "Use a new controller after aborting the old one. Keep spotbug line 3 at the fetch missing signal and use the caller signal. Let the fill exercise combine that signal with its timeout."
+   },
+   {
+    "number": 2,
+    "source": "sari-27",
+    "issue": "b09-l03 race-condition scenario ('Dimas mengetik \"baju\"...')",
+    "verdict": "accept",
+    "reason": "Space the inputs 3 seconds apart and explain why both requests leave even with a 2-second debounce."
+   },
+   {
+    "number": 3,
+    "source": "wulan-38",
+    "issue": "b09-l04 concept card 'Cache client dan stale-while-revalidate'",
+    "verdict": "accept",
+    "reason": "Define client cache as a plain-text concept without an unrelated glossary link."
+   },
+   {
+    "number": 4,
+    "source": "wulan-38",
+    "issue": "b09-l06 concept card 'Mock API: dapur pura-pura'",
+    "verdict": "accept",
+    "reason": "Define Mock API in text and attach the OpenAPI link to OpenAPI itself."
+   },
+   {
+    "number": 5,
+    "source": "naya-8",
+    "issue": "b09-l02 card '2. Gagal' + error analogy question + l02 recall true/false",
+    "verdict": "accept",
+    "reason": "Use a dropped cake that the server can send again. Align the concept, application quiz and review hint."
+   },
+   {
+    "number": 6,
+    "source": "sari-27",
+    "issue": "b09-l04 card 'Cache client dan stale-while-revalidate' + l04 recall staleTime",
+    "verdict": "accept",
+    "reason": "Define queryKey as a cache key, staleTime as the fresh interval and stale-while-revalidate as showing a stale copy while checking for updated data. Keep the library API specific to TanStack Query."
+   },
+   {
+    "number": 7,
+    "source": "wulan-38",
+    "issue": "b09-l02-q4 (hotspot) regions",
+    "verdict": "adapt",
+    "reason": "The renderer shows region labels as buttons. Use appearance and control labels in each button to preserve accessible choices without naming the state."
+   },
+   {
+    "number": 8,
+    "source": "dimas-14",
+    "issue": "b09-l01 rich card 'Mengirim JSON, cookie, dan file' + FormData question",
+    "verdict": "accept",
+    "reason": "Define boundary as the separator between form parts and explain that the browser supplies it."
+   },
+   {
+    "number": 9,
+    "source": "sari-27",
+    "issue": "b09-l05 CORS true/false",
+    "verdict": "accept",
+    "reason": "Teach origin and CORS before the quiz. Qualify the true statement with the same protocol, host and port."
+   },
+   {
+    "number": 10,
+    "source": "raka-11",
+    "issue": "Junior question 'Mana keadaan layar yang paling sering terlupa dirancang?'",
+    "verdict": "adapt",
+    "reason": "Give all choices three states and ask what remains after success is already designed."
+   },
+   {
+    "number": 11,
+    "source": "naya-8",
+    "issue": "Junior question 'Daftar keranjang berhasil diambil, tetapi isinya 0 barang...'",
+    "verdict": "accept",
+    "reason": "Use a shopping basket with nothing inside as the Junior prompt."
+   },
+   {
+    "number": 12,
+    "source": "naya-8",
+    "issue": "Junior option 'Deretan huruf dan angka yang rumit'",
+    "verdict": "accept",
+    "reason": "Describe raw characters with no message and explain the value of a plain next step."
+   },
+   {
+    "number": 13,
+    "source": "wulan-38",
+    "issue": "Junior closing activity 'Gambar 4 kartu wajah HP di kertas: 1) mengantuk menunggu...'",
+    "verdict": "accept",
+    "reason": "Ask learners to remember a past outage and draw four screens in separate short sentences."
+   },
+   {
+    "number": 14,
+    "source": "dimas-14",
+    "issue": "b09-l05 BFF recall question",
+    "verdict": "accept",
+    "reason": "Use a browser library that unlocks a key as the plausible distractor and contrast where the credential is used."
+   },
+   {
+    "number": 15,
+    "source": "sari-27",
+    "issue": "b09-l04 recall 'Apa arti optimistic update'",
+    "verdict": "accept",
+    "reason": "Use updating after server confirmation as a plausible contrast and balance answer lengths."
+   },
+   {
+    "number": 16,
+    "source": "dimas-14",
+    "issue": "b09-l03 race-condition story",
+    "verdict": "accept",
+    "reason": "Keep one connection and have the second result return first after the 3-second interval."
+   }
+  ],
+  "verification": "node --import tsx scripts/validate-content.ts --world=b09 passed with zero errors. Existing C32 guidance remains for the three concept cards in b09-l02."
+ },
+ "judgeIssues": [
+  {
+   "persona": "sari-27",
+   "where": "b09-l03-q3 (spotbug) + b09-l03-q2 (order)",
+   "problem": "The code puts one AbortController at module level: 'const pengendali = new AbortController();'. The order quiz then says 'Batalkan request sebelumnya dengan pengendali.abort()' and 'Kirim fetch untuk \"tas\" dengan { signal: pengendali.signal }'. A signal that has been aborted stays aborted. Reusing it makes the new 'tas' fetch fail straight away with AbortError. This is a factual mistake that will break real code at work.",
+   "suggestion": "Say a new controller is needed for every request. For example: 'Batalkan pengendali lama, lalu buat new AbortController() untuk request baru'. Move the creation inside cari() in the spotbug code, or add an explanation that mentions it.",
+   "severity": "blocker"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b09-l03 race-condition scenario ('Dimas mengetik \"baju\"...')",
+   "problem": "The wrong option 'Perpanjang jeda debounce menjadi 2 detik' is rejected with 'Kedua request tetap berangkat karena jeda 1 detik sudah terlewati.' With a 2-second debounce, typing 'sepatu' 1 second later resets the timer, so the 'baju' request is never sent. The 'wrong' option would actually fix this case, so the explanation is logically wrong.",
+   "suggestion": "Change the story so the debounce cannot help, for example 'Dimas berhenti 3 detik setelah \"baju\"...'. Or reword explainWrong: a longer pause only lowers the chance, and on a slow connection the old request can still arrive late.",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b09-l04 concept card 'Cache client dan stale-while-revalidate'",
+   "problem": "The text rTerm('optimistic-ui', 'Cache client') links the words 'Cache client' to the optimistic UI glossary entry. A learner who taps it gets a definition of a different concept, which causes confusion.",
+   "suggestion": "Link it to a cache term (cookie-cache or a new 'cache-client' entry), or turn it into plain text.",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b09-l06 concept card 'Mock API: dapur pura-pura'",
+   "problem": "The text rTerm('openapi', 'mock') links the word 'mock' to the OpenAPI glossary entry, so the definition does not match the word.",
+   "suggestion": "Make a glossary entry 'mock-api', or remove the term link from 'mock'.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b09-l02 card '2. Gagal' + error analogy question + l02 recall true/false",
+   "problem": "The analogy mixes two different things. The card says 'Wajah kedua muncul saat dapur kehabisan bahan... lalu memberi tombol \"Coba lagi\"'. The question says 'Pelayan bilang bahan kue habis, lalu menawarkan menu lain', and the explanation says 'Pelayan memberi jalan keluar: coba menu lain.' If the ingredients have run out, trying again does not help. A child will be confused about whether the answer is 'coba lagi' or 'pilih menu lain'. Wulan would see the concept being blurred.",
+   "suggestion": "Use a failure that can be retried, for example 'Pelayan tersandung, pesanan jatuh. \"Mau aku ambilkan lagi?\"'. Then the analogy matches the 'Coba lagi' button.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b09-l04 card 'Cache client dan stale-while-revalidate' + l04 recall staleTime",
+   "problem": "'TanStack Query atau SWR', 'queryKey', 'staleTime' and 'stale-while-revalidate' arrive together in one card with no plain definition. Only the drawer-label analogy is given. A beginner switching careers will not know what 'stale' or 'revalidate' means.",
+   "suggestion": "Add one sentence: 'stale = sudah agak lama; revalidate = cek ulang ke server. Jadi: tampilkan yang ada, sambil ambil versi baru.'",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b09-l02-q4 (hotspot) regions",
+   "problem": "The region labels '1. Memuat (kotak bayangan)', '3. Kosong (Mulai belanja)' and so on name every state directly. If these labels appear in the image or on the hover target, the question becomes a reading task, not a recognition task.",
+   "suggestion": "Make sure the labels are only accessibility text (aria) and do not appear visually, or show only the visual content without the state names.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b09-l01 rich card 'Mengirim JSON, cookie, dan file' + FormData question",
+   "problem": "'biarkan browser mengisi Content-Type sendiri' and the follow-up question about 'kode boundary multipart' assume you already know what multipart/boundary is. 'Boundary' is never explained, so the question feels like a trap.",
+   "suggestion": "Add a short phrase: 'boundary = penanda acak yang memisahkan tiap bagian file dan isian form'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b09-l05 CORS true/false",
+   "problem": "'BFF juga bisa menghindari masalah CORS. Alasannya, halaman web hanya memanggil BFF di origin yang sama.' 'origin' and 'CORS' are not defined anywhere in this lesson, so the statement cannot be judged without prior knowledge.",
+   "suggestion": "Add a definition: 'origin = gabungan domain, port, dan protokol; CORS = aturan browser yang membatasi panggilan ke origin lain'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "Junior question 'Mana keadaan layar yang paling sering terlupa dirancang?'",
+   "problem": "The correct answer is the only option that lists three states: 'Memuat, gagal, dan kosong'. The pattern of 'the most complete answer is right' is easy to guess without understanding.",
+   "suggestion": "Make the wrong options also list two states, for example 'Memuat dan berhasil' or 'Gagal dan berhasil'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "Junior question 'Daftar keranjang berhasil diambil, tetapi isinya 0 barang...'",
+   "problem": "'berhasil diambil' and 'isinya 0 barang' are abstract for an 8-year-old. The word 'Daftar keranjang' is also unclear: is it a basket or a list?",
+   "suggestion": "Make it concrete: 'Keranjang belanjamu dibuka. Isinya belum ada apa-apa. Layar ada di wajah apa?'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "Junior option 'Deretan huruf dan angka yang rumit'",
+   "problem": "Its explanation, 'Huruf dan angka rumit sulit dibaca. Orang butuh kalimat biasa dan jalan keluar.', is good. But 'jalan keluar' can be read literally as a door. The word 'rumit' may also be unfamiliar to a Grade 3 child.",
+   "suggestion": "Use 'cara memperbaikinya' instead of 'jalan keluar', and 'aneh' instead of 'rumit'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "Junior closing activity 'Gambar 4 kartu wajah HP di kertas: 1) mengantuk menunggu...'",
+   "problem": "The instruction is one long sentence with four numbered sub-items in parentheses. That is a heavy cognitive load for a new reader. The first activity, 'Apa yang muncul di aplikasi favoritmu saat internet mati?', also invites the child to go and open an app.",
+   "suggestion": "Split it into short sentences or a bullet list of four cards. Replace the first activity with one that does not need a device, for example 'Ingat-ingat, apa yang muncul...'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b09-l05 BFF recall question",
+   "problem": "The wrong option 'Format font untuk memperbesar huruf di browser' is absurd, so the question gives itself away. To a teenager it feels condescending.",
+   "suggestion": "Use a plausible decoy, for example 'Library di browser yang mengenkripsi kunci sebelum dikirim'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b09-l04 recall 'Apa arti optimistic update'",
+   "problem": "The wrong option 'Menunggu 30 detik sebelum mengubah tombol apa pun' is too obviously wrong. It is also much shorter than the correct answer, 'Mengubah tampilan dulu sebelum server menjawab, lalu rollback kalau gagal'.",
+   "suggestion": "Replace it with a plausible decoy of similar length, for example 'Menyimpan perubahan di cache lalu mengirimnya ke server saat aplikasi ditutup'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b09-l03 race-condition story",
+   "problem": "'Dimas mengetik \"baju\" di koneksi lambat, lalu 1 detik kemudian \"sepatu\" di koneksi cepat' is odd. One device does not switch connections within a second, and the oddness weakens the scenario.",
+   "suggestion": "Change it to 'server lambat menjawab pencarian \"baju\", tetapi cepat menjawab \"sepatu\"'.",
+   "severity": "minor"
+  }
+ ]
+}

@@ -1,0 +1,298 @@
+{
+ "world": "b02",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "codex",
+  "accepted": 15,
+  "adapted": 4,
+  "rejected": 1,
+  "deferred": 0,
+  "done": true,
+  "instructions": "Applied in src/content/worlds/b02-kantor-pos-http/index.ts.\n\n2. b02-l04-r1 (junior explainWrong for choice 200)\nExplain 200 as success and 201 as confirmation that the new order was recorded.\n\n3. b02-l04 card 'Kode 4xx dan 5xx yang perlu dikenal' vs b02-l04-q6\nTeach 400 as a request problem and 422 as readable content that fails a rule. Use an email without @.\n\n4. b02-l05-q4 (analogy)\nDescribe the URL as the address on the outside of the envelope that the post office records.\n\n5. b02-l04 hands-on activity\nUse 500 (dapur rusak) on the offline card.\n\n6. b02-l04 card 'Tiga angka penting' (junior)\nMove 201 to the Junior status overview because the 2xx/3xx concept is Pro-only. Keep the three 4xx codes in this card.\n\n7. b02-l06 sim 'penyortir-status'\nRemove the repeated status sorter in l06. Keep the cache question before the analogy limit so readers do not face three cards in a row.\n\n8. b02-anc-j5 explainCorrect, b02-l06-q6j explainCorrect\nIn anc-j5, explain that a copy on the phone lets the browser display the image immediately. In q6j, explain why the browser needs the new image.\n\n9. b02-anc-j5 and b02-l06-q6j\nKeep anc-j5 about the benefit of a local copy. Use q6j to predict what happens when the browser learns that the logo changed.\n\n10. b02-l02-q6j story\nIdentify the guest book, the old page and the replacement page. Keep the lost seat number as the answer.\n\n11. b02-l02 card 'Kata kerja web' alt\nSet the Junior alt to 4 kata kerja web dan tugas masing-masing. Keep five in Pro.\n\n12. b02-l01 hands-on activity\nUse a destination address and a Jangan dilipat note on the envelope. Put the order inside.\n\n13. b02-l04-q3 (junior story)\nUse ruang khusus penjaga toko in Junior.\n\n14. b02-l02-q4 (junior TF)\nUse a true scenario about correcting an address without changing the guest name; preserve the original true answer.\n\n15. b02-l04 card junior body & recap\nUse kendala di pihak peminta in the overview and recap, and Permintaan terhalang in the two-word sort bin.\n\n16. b02-l04-q2 (pro prompt and labels)\nUse resource creation, identity required, permission denied and internal server error as the four Pro labels.\n\n17. b02-l04-q4 (pro TF)\nAdd 409 to the status concept and describe a conflict with the current state.\n\n18. b02-l01-q4 explainIncorrect r3\nDistinguish the JSON data in region r3 from the result in the status line.\n\n19. b02-l03-q5 choice 'same'\nShorten the distractor to Keadaan akhir data berubah setiap kali DELETE diulang.\n\n20. b02-l06 compare 'different'\nExplain Secure and HttpOnly as two distinct cookie controls.",
+  "verdicts": [
+   {
+    "number": 1,
+    "source": "naya-8",
+    "issue": "b02-l01 card 'Empat bagian surat pesanan' (code block) and b02-l02 card 'PUT dan PATCH' (code block)",
+    "verdict": "reject",
+    "reason": "ConceptCard already gates step.code to Pro. Junior retains both concept cards and their visuals."
+   },
+   {
+    "number": 2,
+    "source": "wulan-38",
+    "issue": "b02-l04-r1 (junior explainWrong for choice 200)",
+    "verdict": "accept",
+    "reason": "Explain 200 as success and 201 as confirmation that the new order was recorded."
+   },
+   {
+    "number": 3,
+    "source": "sari-27",
+    "issue": "b02-l04 card 'Kode 4xx dan 5xx yang perlu dikenal' vs b02-l04-q6",
+    "verdict": "accept",
+    "reason": "Teach 400 as a request problem and 422 as readable content that fails a rule. Use an email without @."
+   },
+   {
+    "number": 4,
+    "source": "sari-27",
+    "issue": "b02-l05-q4 (analogy)",
+    "verdict": "accept",
+    "reason": "Describe the URL as the address on the outside of the envelope that the post office records."
+   },
+   {
+    "number": 5,
+    "source": "wulan-38",
+    "issue": "b02-l04 hands-on activity",
+    "verdict": "accept",
+    "reason": "Use 500 (dapur rusak) on the offline card."
+   },
+   {
+    "number": 6,
+    "source": "naya-8",
+    "issue": "b02-l04 card 'Tiga angka penting' (junior)",
+    "verdict": "adapt",
+    "reason": "Move 201 to the Junior status overview because the 2xx/3xx concept is Pro-only. Keep the three 4xx codes in this card."
+   },
+   {
+    "number": 7,
+    "source": "raka-11",
+    "issue": "b02-l06 sim 'penyortir-status'",
+    "verdict": "adapt",
+    "reason": "Remove the repeated status sorter in l06. Keep the cache question before the analogy limit so readers do not face three cards in a row."
+   },
+   {
+    "number": 8,
+    "source": "naya-8",
+    "issue": "b02-anc-j5 explainCorrect, b02-l06-q6j explainCorrect",
+    "verdict": "accept",
+    "reason": "In anc-j5, explain that a copy on the phone lets the browser display the image immediately. In q6j, explain why the browser needs the new image."
+   },
+   {
+    "number": 9,
+    "source": "wulan-38",
+    "issue": "b02-anc-j5 and b02-l06-q6j",
+    "verdict": "accept",
+    "reason": "Keep anc-j5 about the benefit of a local copy. Use q6j to predict what happens when the browser learns that the logo changed."
+   },
+   {
+    "number": 10,
+    "source": "naya-8",
+    "issue": "b02-l02-q6j story",
+    "verdict": "accept",
+    "reason": "Identify the guest book, the old page and the replacement page. Keep the lost seat number as the answer."
+   },
+   {
+    "number": 11,
+    "source": "naya-8",
+    "issue": "b02-l02 card 'Kata kerja web' alt",
+    "verdict": "accept",
+    "reason": "Set the Junior alt to 4 kata kerja web dan tugas masing-masing. Keep five in Pro."
+   },
+   {
+    "number": 12,
+    "source": "naya-8",
+    "issue": "b02-l01 hands-on activity",
+    "verdict": "accept",
+    "reason": "Use a destination address and a Jangan dilipat note on the envelope. Put the order inside."
+   },
+   {
+    "number": 13,
+    "source": "naya-8",
+    "issue": "b02-l04-q3 (junior story)",
+    "verdict": "accept",
+    "reason": "Use ruang khusus penjaga toko in Junior."
+   },
+   {
+    "number": 14,
+    "source": "raka-11",
+    "issue": "b02-l02-q4 (junior TF)",
+    "verdict": "adapt",
+    "reason": "Use a true scenario about correcting an address without changing the guest name; preserve the original true answer."
+   },
+   {
+    "number": 15,
+    "source": "raka-11",
+    "issue": "b02-l04 card junior body & recap",
+    "verdict": "adapt",
+    "reason": "Use kendala di pihak peminta in the overview and recap, and Permintaan terhalang in the two-word sort bin."
+   },
+   {
+    "number": 16,
+    "source": "dimas-14",
+    "issue": "b02-l04-q2 (pro prompt and labels)",
+    "verdict": "accept",
+    "reason": "Use resource creation, identity required, permission denied and internal server error as the four Pro labels."
+   },
+   {
+    "number": 17,
+    "source": "sari-27",
+    "issue": "b02-l04-q4 (pro TF)",
+    "verdict": "accept",
+    "reason": "Add 409 to the status concept and describe a conflict with the current state."
+   },
+   {
+    "number": 18,
+    "source": "sari-27",
+    "issue": "b02-l01-q4 explainIncorrect r3",
+    "verdict": "accept",
+    "reason": "Distinguish the JSON data in region r3 from the result in the status line."
+   },
+   {
+    "number": 19,
+    "source": "wulan-38",
+    "issue": "b02-l03-q5 choice 'same'",
+    "verdict": "accept",
+    "reason": "Shorten the distractor to Keadaan akhir data berubah setiap kali DELETE diulang."
+   },
+   {
+    "number": 20,
+    "source": "wulan-38",
+    "issue": "b02-l06 compare 'different'",
+    "verdict": "accept",
+    "reason": "Explain Secure and HttpOnly as two distinct cookie controls."
+   }
+  ],
+  "verification": "node --import tsx scripts/validate-content.ts --world=b02 passed with zero errors."
+ },
+ "judgeIssues": [
+  {
+   "persona": "naya-8",
+   "where": "b02-l01 card 'Empat bagian surat pesanan' (code block) and b02-l02 card 'PUT dan PATCH' (code block)",
+   "problem": "Code blocks have no modes, so Junior sees raw code: 'POST /api/pesanan HTTP/1.1\\nHost: api.toko-rani.example\\nContent-Type: application/json ...' and '// PUT   { \"nama\": \"Tas\", \"harga\": 85000 } -> stok hilang!'. An 8-year-old who has just learned to read cannot use either one.",
+   "suggestion": "Make both code blocks Pro-only. Junior already has the visual and the envelope/torn-page analogy.",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b02-l04-r1 (junior explainWrong for choice 200)",
+   "problem": "'200 dipakai untuk membaca. Menulis pesanan baru dibalas 201.' is a factual error: 200 OK is the general success code and is not limited to reading. Children will learn a wrong rule.",
+   "suggestion": "Change to: '200 berarti berhasil. Untuk pesanan baru yang dicatat, angkanya lebih tepat 201.'",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b02-l04 card 'Kode 4xx dan 5xx yang perlu dikenal' vs b02-l04-q6",
+   "problem": "The card groups them as '400 atau 422 berarti isi request salah format', but q6 explains '422 berarti struktur pesan terbaca, tetapi isinya gagal lolos aturan validasi'. The difference q6 tests is never taught, so the card and the question contradict each other.",
+   "suggestion": "In the card, split them: '400 berarti format request rusak. 422 berarti formatnya terbaca, tetapi isinya gagal validasi (misalnya email tanpa @).'",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b02-l05-q4 (analogy)",
+   "problem": "'URL seperti alamat depan amplop, header dan body seperti isi tersegel' contradicts the metaphor used across the world, where header is 'catatan di luar amplop' (l01, l05 compare). A beginner ends up confused about where a header goes.",
+   "suggestion": "Use one consistent metaphor, e.g. 'URL seperti alamat yang difotokopi kantor pos, header dan body tidak ikut difotokopi', or simply drop the envelope wording here.",
+   "severity": "major"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b02-l04 hands-on activity",
+   "problem": "'500 (dapur sibuk)' conflicts with the whole lesson, which says 5xx = 'dapur rusak'. 'Sibuk' matches 503 instead. This is a meaning error.",
+   "suggestion": "Change to '500 (dapur rusak)'.",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b02-l04 card 'Tiga angka penting' (junior)",
+   "problem": "The title and alt say 'Tiga angka penting: 401, 403, dan 404', but the body starts with '201 berarti pesanan baru dicatat...' and lists four codes. An 8-year-old who counts will get confused.",
+   "suggestion": "Remove 201 from this card (it is already covered in the 2xx card), or change the title to 'Empat angka penting'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b02-l06 sim 'penyortir-status'",
+   "problem": "The cookie & cache lesson reuses the status-code sorter: 'Ketuk keranjang yang tepat untuk tiap angka.' This is a repeat of l04 and has nothing to do with cookies or cache. Raka will be bored with the same game twice.",
+   "suggestion": "Replace it with a cookie/cache simulator, or remove it from l06. If no simulator fits, say so to the owner of the sims file.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b02-anc-j5 explainCorrect, b02-l06-q6j explainCorrect",
+   "problem": "'Gambar yang sama tidak perlu diunduh lagi. Seperti majalah lama.' and 'Logo tidak perlu diunduh lagi. Seperti majalah lama.' The 'majalah lama' analogy is never explained, so it says nothing about WHY. Naya does not understand 'diunduh' or 'kuota' either.",
+   "suggestion": "Explain the effect directly: 'Gambarnya sudah ada di HP, jadi tidak perlu diambil lagi dari jauh. Jadi lebih cepat muncul.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b02-anc-j5 and b02-l06-q6j",
+   "problem": "Two Junior questions are nearly identical (the benefit of saving a copy of an image or logo: 'Supaya hemat waktu dan kuota' / 'Logo cepat muncul dan hemat kuota'). The repetition adds nothing for learning.",
+   "suggestion": "Turn one of them into a different case, e.g. when the image changes, does the browser have to fetch it again?",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b02-l02-q6j story",
+   "problem": "'Halaman punya nama dan nomor kursi. Rani menyobeknya, lalu menulis nama baru.' 'Nomor kursi' appears out of nowhere in a guest book, and it is unclear whether a new page or the same page is written on. The PUT link is only revealed in explainCorrect.",
+   "suggestion": "'Di buku tamu ada halaman berisi nama dan nomor kursi. Rani menyobek halaman itu, lalu di halaman baru hanya menulis nama.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b02-l02 card 'Kata kerja web' alt",
+   "problem": "The alt says 'Lima kata kerja web' while the Junior body lists only four (GET, POST, PATCH, DELETE). It does not match.",
+   "suggestion": "Make the Junior alt 'Empat kata kerja web' or use t() so Junior and Pro get different text.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b02-l01 hands-on activity",
+   "problem": "'Tulis \"Tujuan\" (URL) dan \"Isi Mudah Pecah\" (header) di luarnya, lalu masukkan kertas pesanan sebagai body.' The term 'URL' was never introduced in Junior.",
+   "suggestion": "Replace '(URL)' with '(alamat)' for Junior, or separate the Junior and Pro text.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "b02-l04-q3 (junior story)",
+   "problem": "'Sari sudah masuk sebagai pembeli, lalu membuka ruang admin.' An 8-year-old does not know the word 'admin'.",
+   "suggestion": "'...lalu membuka ruang khusus penjaga toko.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b02-l02-q4 (junior TF)",
+   "problem": "'Untuk mengubah satu kata, PATCH cukup mencoret kata itu saja.' The statement repeats the card definition word for word, so it is obviously true. It is a giveaway and does not test anything.",
+   "suggestion": "Make it a case to judge: 'Untuk mengganti satu kata, kamu harus menyobek seluruh halaman.' (answer: salah)",
+   "severity": "minor"
+  },
+  {
+   "persona": "raka-11",
+   "where": "b02-l04 card junior body & recap",
+   "problem": "'4xx salah minta, 5xx dapur rusak' and '2xx berhasil, 4xx salah minta' use 'salah minta', which reads oddly. 401 'belum masuk' is not a wrong request, so the label is confusing.",
+   "suggestion": "Use 'salah di pihak tamu' or 'masalah dari peminta'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "b02-l04-q2 (pro prompt and labels)",
+   "problem": "'Pasangkan kode status dengan maknanya di restoran.' and 'Tunjukkan kartu login dulu' mix a restaurant analogy into a Pro match question. Dimas finds it childish when he just wants to match codes to their technical meaning.",
+   "suggestion": "For Pro, use technical meanings: '401: perlu autentikasi', '403: tidak punya izin', '500: error di server', '201: resource baru dibuat'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b02-l04-q4 (pro TF)",
+   "problem": "'Kode 409 Conflict dipakai saat data bentrok...' 409 is not in the card list or the lesson objective (200, 201, 204, 304, 400, 401, 403, 404, 422, 429, 5xx), so this tests an untaught code.",
+   "suggestion": "Add 409 to the 4xx card, or change the TF to a code that is taught.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "b02-l01-q4 explainIncorrect r3",
+   "problem": "'Kurung kurawal itu menandai isi balasan dalam format JSON.' It does not say why this is not the answer: the body holds data, not the result summary.",
+   "suggestion": "'Itu body berformat JSON. Hasil permintaan diringkas di baris status paling atas, bukan di body.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b02-l03-q5 choice 'same'",
+   "problem": "'Keadaan akhir data di server berbeda setiap kali DELETE dikirim ulang lagi': 'ulang lagi' is redundant (pleonasm), and it makes this choice longer than the others.",
+   "suggestion": "'Keadaan akhir data berubah setiap kali DELETE diulang.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "b02-l06 compare 'different'",
+   "problem": "'Cap tangan bisa luntur, tetapi cookie punya batas waktu dan aturan keamanan.' The contrast is weak because cookies also 'luntur' (expire). The real difference is not explained.",
+   "suggestion": "'Cap tangan bisa dilihat semua orang, tetapi cookie bisa diberi aturan agar hanya terkirim lewat HTTPS dan tidak dibaca skrip.'",
+   "severity": "minor"
+  }
+ ]
+}

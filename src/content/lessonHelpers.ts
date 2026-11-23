@@ -1,3 +1,4 @@
+import type { ContentIconName } from './icons';
 import type {
   Choice,
   CodeSnippet,
@@ -9,6 +10,20 @@ import type {
   Txt,
   Visual,
 } from './schema';
+
+/**
+ * Authoring slips that the helpers below fix or ignore silently. The helpers cannot throw (a throw would
+ * break the app at import time), so they leave a trace here and `scripts/validate-content.ts` reports it
+ * (copydeck C11 and C15). Nothing in the app reads this object.
+ */
+export const COPYDECK_TRACE = {
+  /** `explainWrong` was written on the correct choice of a makeMcq question. It never shows, so it is dropped. */
+  wrongOnCorrect: [] as { questionId: string; choiceId: string }[],
+  /** Wrong choices of a makeMcq question written without `explainWrong`. The safety-net text would show, so the validator reports X14 as an error. */
+  fallbackExplain: [] as { questionId: string; choiceId: string }[],
+  /** limit steps built without an explicit `riskyAnalogy` (the default is now false, copydeck 6.6). */
+  implicitRisky: new WeakSet<object>(),
+};
 
 export function t(junior: string, pro: string = junior): Txt {
   return { junior, pro };
@@ -26,8 +41,18 @@ export function rTerm(termId: string, junior: string, pro: string = junior): Ric
   return { t: 'term', termId, v: { junior, pro } };
 }
 
-export function rCode(v: string): Rich {
-  return { t: 'code', v };
+export function rCode(v: string, modes?: Mode[]): Rich {
+  return modes ? { t: 'code', v, modes } : { t: 'code', v };
+}
+
+/** A sentence part that only Petualang (Junior) learners see. Pro skips it. */
+export function rJunior(text: string): Rich {
+  return { t: 'text', v: { junior: text, pro: text }, modes: ['junior'] };
+}
+
+/** A sentence part that only Pro learners see. Junior skips it. */
+export function rPro(text: string): Rich {
+  return { t: 'text', v: { pro: text }, modes: ['pro'] };
 }
 
 export function storyStep(illustration: string, body: Rich[]): Step {
@@ -64,16 +89,23 @@ export function limitStep(params: {
   same: Txt[];
   different: Txt[];
   illustration?: string;
+  /**
+   * Write this on every limit card (copydeck 6.6). true: children easily carry a wrong trait of the analogy
+   * over to the real thing, so Junior sees the "Mirip, tetapi berbeda" card. When left out it is false, which
+   * hides the card from Junior, and the validator reports C15.
+   */
   riskyAnalogy?: boolean;
 }): Step {
-  return {
+  const step: Step = {
     kind: 'limit',
     analogy: params.analogy,
     same: params.same,
     different: params.different,
     illustration: params.illustration,
-    riskyAnalogy: params.riskyAnalogy ?? true,
+    riskyAnalogy: params.riskyAnalogy ?? false,
   };
+  if (params.riskyAnalogy === undefined) COPYDECK_TRACE.implicitRisky.add(step);
+  return step;
 }
 
 export function simStep(
@@ -92,7 +124,7 @@ export function simStep(
 export function makeMcq(params: {
   id: string;
   prompt: Txt;
-  choices: { id: string; label: Txt; explainWrong?: Txt; icon?: string }[];
+  choices: { id: string; label: Txt; explainWrong?: Txt; icon?: ContentIconName }[];
   answer: string;
   explainCorrect: Txt;
   hints?: [Txt, Txt?];
@@ -111,11 +143,17 @@ export function makeMcq(params: {
   }));
   const explainIncorrect: Record<string, Txt> = {};
   for (const c of params.choices) {
+    if (c.id === params.answer && c.explainWrong) {
+      // Never shown, so it is dropped (copydeck 6.3 rule 4). The validator reports it as C11.
+      COPYDECK_TRACE.wrongOnCorrect.push({ questionId: params.id, choiceId: c.id });
+    }
     if (c.id !== params.answer && c.id !== 'unknown') {
+      if (!c.explainWrong) COPYDECK_TRACE.fallbackExplain.push({ questionId: params.id, choiceId: c.id });
+      // The feedback panel already carries the verdict, so the safety-net text has no "Hampir!" prefix.
       explainIncorrect[c.id] =
         c.explainWrong ??
         t(
-          `Hampir! Pilihan itu belum pas. ${params.explainCorrect.junior ?? params.explainCorrect.pro}`,
+          `Pilihan itu belum pas. ${params.explainCorrect.junior ?? params.explainCorrect.pro}`,
           `Belum tepat. ${params.explainCorrect.pro}`,
         );
     }

@@ -70,22 +70,24 @@ export const GlossaryPage: React.FC = () => {
     <div className="mx-auto w-full max-w-[840px] px-4 py-6 sm:px-6 space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="pw-kicker">KAMUS PETUALANG</span>
+          <span className="pw-kicker">Kamus Petualang</span>
           <h1 className="pw-h1">Kamus Istilah ({GLOSSARY_TERMS.length})</h1>
           <p className="pw-small text-[var(--ink-2)]">
-            Cari istilah apa saja (contoh: FE, BE, API, CSS, DNS). Tidak perlu dihafal!
+            {profile.mode === 'junior'
+              ? 'Cari istilah apa saja (contoh: FE, BE, API, CSS, DNS). Tidak perlu dihafal!'
+              : 'Cari istilah apa saja (contoh: FE, BE, API, CSS, DNS).'}
           </p>
         </div>
 
         {/* Switch filter Semua vs Sudah Dipelajari */}
-        <div className="inline-flex rounded-full border-2 border-[var(--line)] bg-[var(--paper)] p-1 gap-1">
+        <div className="inline-flex gap-1 rounded-full border-2 border-[var(--line)] bg-[var(--paper)] p-1" role="group" aria-label="Tampilkan istilah">
           <button
             type="button"
             onClick={() => setScope('all')}
             aria-pressed={scope === 'all'}
-            className={`pw-pressable min-h-[40px] rounded-full px-3.5 text-xs font-extrabold cursor-pointer ${
+            className={`pw-pressable pw-t-colors min-h-[var(--touch-min)] cursor-pointer rounded-full px-3.5 text-xs font-extrabold ${
               scope === 'all'
-                ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)]'
+                ? 'bg-[var(--world-600)] text-[var(--world-btn-text)]'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
             }`}
           >
@@ -95,13 +97,13 @@ export const GlossaryPage: React.FC = () => {
             type="button"
             onClick={() => setScope('learned')}
             aria-pressed={scope === 'learned'}
-            className={`pw-pressable min-h-[40px] rounded-full px-3.5 text-xs font-extrabold cursor-pointer ${
+            className={`pw-pressable pw-t-colors min-h-[var(--touch-min)] cursor-pointer rounded-full px-3.5 text-xs font-extrabold ${
               scope === 'learned'
-                ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)]'
+                ? 'bg-[var(--world-600)] text-[var(--world-btn-text)]'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
             }`}
           >
-            Sudah Dipelajari
+            Sudah dipelajari
           </button>
         </div>
       </header>
@@ -117,12 +119,12 @@ export const GlossaryPage: React.FC = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Cari istilah (FE, BE, API, CSS, DNS, JWT)..."
-          className="w-full rounded-[var(--radius-md)] border-2 border-[var(--line)] bg-[var(--paper)] py-3 pl-11 pr-4 text-[var(--ink)] transition-colors focus:border-[var(--world-600)]"
+          className="pw-t-colors min-h-[var(--touch-min)] w-full rounded-[var(--radius-md)] border-2 border-[var(--line-strong)] bg-[var(--paper)] py-3 pl-11 pr-4 text-[var(--ink)] focus:border-[var(--world-600)]"
         />
       </div>
 
       {/* Cip cepat kategori */}
-      <div className="flex flex-wrap gap-2" aria-label="Filter cepat kategori istilah">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter cepat kategori istilah">
         {QUICK_CHIPS.map((chip) => {
           const active = query.toLowerCase() === chip.query;
           return (
@@ -130,9 +132,9 @@ export const GlossaryPage: React.FC = () => {
               key={chip.id}
               type="button"
               onClick={() => setQuery(chip.query)}
-              className={`pw-pressable min-h-[38px] rounded-full border-2 px-3.5 text-xs font-extrabold cursor-pointer ${
+              className={`pw-pressable pw-t-colors min-h-[var(--touch-min)] cursor-pointer rounded-full border-2 px-3.5 text-xs font-extrabold ${
                 active
-                  ? 'pw-squish-pop border-[var(--world-600)] bg-[var(--world-50)] text-[var(--world-700)]'
+                  ? 'border-[var(--world-600)] bg-[var(--world-50)] text-[var(--world-700)]'
                   : 'border-[var(--line)] bg-[var(--paper)] text-[var(--ink-2)] hover:border-[var(--world-600)]'
               }`}
             >
@@ -143,7 +145,7 @@ export const GlossaryPage: React.FC = () => {
       </div>
 
       {visibleTerms.length === 0 ? (
-        <div className="pw-card p-6 text-center space-y-2">
+        <div className="pw-card space-y-2 p-[var(--space-card)] text-center">
           <BookOpen className="mx-auto h-8 w-8 text-[var(--ink-3)]" aria-hidden="true" />
           <p className="pw-body font-bold">
             {scope === 'learned'
@@ -152,28 +154,28 @@ export const GlossaryPage: React.FC = () => {
           </p>
           <p className="pw-small text-[var(--ink-2)]">
             {scope === 'learned'
-              ? 'Tekan tombol "Semua" di atas untuk melihat seluruh 124 istilah, atau selesaikan pelajaran pertamamu!'
+              ? 'Tekan tombol "Semua" di atas untuk melihat seluruh {GLOSSARY_TERMS.length} istilah, atau selesaikan pelajaran pertamamu.'
               : 'Coba kata kunci lain seperti FE, BE, API, JSON, atau tekan chip "Semua".'}
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-[var(--gap-stack)]">
           {visibleTerms.map((item) => {
             const worldId = item.introducedIn.split('-')[0];
             const worldMeta = WORLD_META_BY_ID[worldId];
             const learned = learnedLessonIds.has(item.introducedIn);
             return (
-              <article key={item.id} className="pw-card p-4 sm:p-5 space-y-2">
+              <article key={item.id} className="pw-card space-y-2 p-[var(--space-card)]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="pw-h3">{item.term}</h2>
                     {worldMeta && (
-                      <span className="rounded-full bg-[var(--cream)] px-2.5 py-0.5 text-[11px] font-extrabold text-[var(--ink-2)]">
+                      <span className="rounded-full bg-[var(--cream)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--ink-2)]">
                         {worldMeta.id.toUpperCase()} · {worldMeta.title}
                       </span>
                     )}
                     {learned && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ok-50)] px-2.5 py-0.5 text-[11px] font-extrabold text-[var(--ok-600)]">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ok-50)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--ok-600)]">
                         <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                         Dipahami
                       </span>
@@ -190,7 +192,7 @@ export const GlossaryPage: React.FC = () => {
                 </p>
                 <Link
                   to={`/belajar/${item.introducedIn}`}
-                  className="pw-pressable inline-flex items-center gap-1 text-xs font-extrabold text-[var(--world-700)] underline underline-offset-4 pt-1"
+                  className="pw-pressable inline-flex min-h-[var(--touch-min)] items-center gap-1 pt-1 text-xs font-extrabold text-[var(--world-700)] underline underline-offset-4"
                 >
                   Buka pelajaran terkait →
                 </Link>

@@ -7,6 +7,7 @@ import {
   makeTf,
   qStep,
   rBold,
+  rJunior,
   rTerm,
   rText,
   simStep,
@@ -15,14 +16,25 @@ import {
 } from '@/content/lessonHelpers';
 import type { Lesson, World } from '@/content/schema';
 
+/**
+ * Soal jangkar = soal biasa ditambah pilihan "Belum tahu". Sama dengan `makeAnchorMcq`,
+ * tetapi menerima `hints` supaya soal jangkar Junior juga punya petunjuk (copydeck 6.4).
+ */
+function anchorMcq(params: Parameters<typeof makeMcq>[0]) {
+  return makeMcq({
+    ...params,
+    choices: [...params.choices, { id: 'unknown', label: t('Belum tahu') }],
+  });
+}
+
 export const world: World = {
   id: 'a06',
   track: 'A',
   order: 6,
   title: 'Desa UX',
   tagline: t(
-    'Mendengarkan pengguna sebelum menggambar dan menguji rancangan.',
-    'Memahami empati pengguna, Design Thinking, persona, user flow, wireframe–prototype, dan usability testing.',
+    'Dengarkan dulu orang yang akan memakai halamanmu. Lalu gambar dan coba rancanganmu.',
+    'Kamu bisa meneliti kebutuhan pemakai, membuat sketsa rancangan, dan mengujinya.',
   ),
   color: '#0E9AA7',
   illustration: 'a06-desa-ux',
@@ -33,8 +45,8 @@ export const world: World = {
   boss: {
     title: 'Tantangan Penjaga Desa UX',
     greeting: t(
-      'Selamat datang di Desa UX! Ayo buktikan kamu siap mendengarkan dan menguji demi pengguna!',
-      'Uji penguasaanmu tentang riset empati, Design Thinking, persona, user flow, prototype, dan usability testing.',
+      'Selamat datang di Desa UX. Ayo tunjukkan kamu pandai mendengarkan dan mencoba bersama pemakai!',
+      'Kamu sudah melewati Desa UX. Buktikan kamu bisa meneliti, merancang, dan menguji.',
     ),
     guardianName: 'Penjaga Desa UX',
     junior: { count: 8, pool: 'world' },
@@ -43,139 +55,161 @@ export const world: World = {
   },
   anchors: {
     junior: [
-      makeAnchorMcq({
+      anchorMcq({
         id: 'a06-anc-j1',
-        prompt: t('Apa maksud aturan utama UX "Kamu bukan penggunamu"?'),
+        prompt: t('Pembuat aplikasi sudah hafal letak tombol. Apa yang sebaiknya ia lakukan?'),
         choices: [
-          { id: 'ask', label: t('Hal yang jelas menurut pembuat belum tentu mudah bagi pemakai, jadi harus bertanya') },
+          { id: 'ask', label: t('Meminta orang lain mencoba') },
           {
             id: 'ban',
-            label: t('Pembuat website dilarang membuka aplikasinya sendiri'),
-            explainWrong: t('Pembuat tetap menguji aplikasinya, namun tidak boleh hanya menebak selera sendiri.'),
+            label: t('Menebak dari selera sendiri'),
+            explainWrong: t('Selera pembuat belum tentu sama dengan orang lain. Lebih baik bertanya.'),
           },
           {
             id: 'same',
-            label: t('Semua pengguna di dunia punya kesukaan yang persis sama'),
-            explainWrong: t('Kebiasaan dan kebutuhan pengguna sangat beragam.'),
+            label: t('Mengira semua orang sama sepertinya'),
+            explainWrong: t('Setiap orang punya kebiasaan sendiri. Dengarkan dulu kebiasaan mereka.'),
           },
         ],
         answer: 'ask',
-        explainCorrect: t('Tepat! Desainer harus mencari tahu kebutuhan pengguna nyata, bukan mengira-ngira.'),
+        explainCorrect: t(
+          'Orang lain melihat aplikasimu dengan mata baru. Seperti teman yang pertama kali memainkan permainan buatanmu.',
+          'Pemakai melihat aplikasi dengan mata baru, jadi hal yang jelas bagi pembuat belum tentu jelas bagi mereka.',
+        ),
+        hints: [t('Apakah orang lain sehafal kamu pada tombolnya?')],
         tags: ['ux'],
       }),
-      makeAnchorMcq({
+      anchorMcq({
         id: 'a06-anc-j2',
-        prompt: t('Pada Design Thinking seperti dokter, langkah pertama sebelum merumuskan masalah adalah…'),
+        prompt: t('Apa langkah pertama saat merancang aplikasi untuk pemakai?'),
         choices: [
-          { id: 'emp', label: t('Empathize (mendengarkan dan mengamati pengguna)') },
+          { id: 'emp', label: t('Mendengarkan dan mengamati pemakai') },
           {
             id: 'code',
-            label: t('Langsung menulis semua kode aplikasi'),
-            explainWrong: t('Menulis kode di awal tanpa memahami masalah berisiko membuat produk yang keliru.'),
+            label: t('Langsung membuat aplikasinya'),
+            explainWrong: t('Membuat sebelum paham masalah bisa salah sasaran. Dokter juga bertanya dulu.'),
           },
           {
             id: 'paint',
-            label: t('Memilih gambar hiasan paling mahal'),
-            explainWrong: t('Tampilan dipilih setelah masalah dan ide solusinya jelas.'),
+            label: t('Memilih warna dan gambar hiasan'),
+            explainWrong: t('Warna dan gambar dipilih sesudah masalahnya dipahami. Dokter tidak langsung memberi obat.'),
           },
         ],
         answer: 'emp',
-        explainCorrect: t('Benar! Seperti dokter menanyakan keluhan, desainer mendengarkan pengguna terlebih dahulu.'),
+        explainCorrect: t('Dokter menanyakan keluhan dulu. Pembuat aplikasi juga mendengarkan pemakai lebih dulu.'),
+        hints: [t('Ingat apa yang dokter lakukan sebelum memberi obat.')],
         tags: ['design-thinking'],
       }),
-      makeAnchorMcq({
+      anchorMcq({
         id: 'a06-anc-j3',
-        prompt: t('Sketsa hitam-putih polos seperti denah pensil yang fokus menata letak bagian halaman disebut…'),
+        prompt: t('Kamu mau merencanakan letak tombol dan gambar. Apa yang cocok dibuat dulu?'),
         choices: [
-          { id: 'wf', label: t('Wireframe') },
+          { id: 'wf', label: t('Sketsa kasar hitam-putih') },
           {
             id: 'pr',
-            label: t('Prototype berwarna'),
-            explainWrong: t('Prototype sudah menyerupai tampilan jadi dan dapat diklik.'),
+            label: t('Versi yang bisa diklik'),
+            explainWrong: t(
+              'Versi yang bisa diklik dibuat sesudah letaknya ditata. Itu langkah akhir.',
+              'Versi yang bisa diklik dibuat sesudah tata letak ditentukan. Itu langkah yang lebih akhir.',
+            ),
           },
           {
             id: 'ab',
-            label: t('Usability testing'),
-            explainWrong: t('Usability testing adalah kegiatan mengamati pengguna mencoba rancangan.'),
+            label: t('Gambar penuh warna'),
+            explainWrong: t('Warna dipilih belakangan. Letak tombol dan gambar ditata lebih dulu.'),
           },
         ],
         answer: 'wf',
-        explainCorrect: t('Tepat! Wireframe menjaga tim fokus pada tata letak sebelum sibuk mewarnai.'),
+        explainCorrect: t('Sketsa kasar hanya menata letak. Seperti denah pensil sebelum rumah dibangun.'),
+        hints: [t('Ingat denah pensil sebelum rumah dibangun.')],
         tags: ['wireframe'],
       }),
-      makeAnchorMcq({
+      anchorMcq({
         id: 'a06-anc-j4',
-        prompt: t('Sekitar berapa orang peserta yang umumnya sudah cukup untuk menemukan sebagian besar masalah saat usability testing?'),
+        prompt: t('Berapa orang yang cukup untuk menemukan banyak masalah saat menguji rancangan?'),
         choices: [
           { id: 'five', label: t('5 orang') },
           {
             id: 'one',
-            label: t('Cukup 0 orang, cukup ditebak saja'),
-            explainWrong: t('Menebak tanpa menguji membuat masalah tersembunyi tidak ketahuan.'),
+            label: t('1 orang saja'),
+            explainWrong: t('Satu orang belum cukup menunjukkan pola. Beberapa orang lebih meyakinkan.'),
           },
           {
             id: 'mill',
-            label: t('Minimal 10.000 orang'),
-            explainWrong: t('Lima pengguna nyata sudah menyingkap mayoritas hambatan utama.'),
+            label: t('500 orang'),
+            explainWrong: t(
+              'Ratusan orang memang boleh, tetapi tidak perlu. Lima orang sudah cukup.',
+              'Ratusan peserta memang boleh, tetapi tidak perlu. Lima orang sudah menunjukkan sebagian besar masalah.',
+            ),
           },
         ],
         answer: 'five',
-        explainCorrect: t('Benar! Mengamati 5 pengguna berbeda sudah sangat ampuh menemukan masalah alur.'),
+        explainCorrect: t(
+          'Lima orang sudah menunjukkan banyak masalah. Banyak yang bingung di tempat yang sama.',
+          'Lima pemakai sudah menunjukkan sebagian besar masalah. Pola kebingungan yang sama muncul berulang.',
+        ),
+        hints: [t('Bayangkan beberapa teman mencoba permainanmu.')],
         tags: ['usability-testing'],
       }),
-      makeAnchorMcq({
+      anchorMcq({
         id: 'a06-anc-j5',
         type: 'limit',
-        analogy: t('Design Thinking seperti dokter memeriksa pasien'),
-        prompt: t('Di mana batas kemiripan antara kerja dokter dan proses Design Thinking?'),
+        analogy: t('Mirip dokter yang memeriksa pasien'),
+        prompt: t('Gambar contoh aplikasi ternyata gagal saat dicoba. Apa yang terjadi?'),
         choices: [
-          { id: 'many', label: t('Desainer bebas menguji banyak contoh ide untuk banyak pengguna tanpa risiko bahaya fisik') },
+          { id: 'many', label: t('Pembuat menggambar contoh baru') },
           {
             id: 'ask',
-            label: t('Keduanya memulai dengan bertanya dan mendengarkan keluhan'),
-            explainWrong: t('Ini bagian yang memang mirip antara dokter dan UX designer.'),
+            label: t('Pemakai ikut jatuh sakit'),
+            explainWrong: t(
+              'Itu terjadi kalau dokter salah memberi obat. Gambar contoh yang gagal tidak menyakiti siapa pun.',
+              'Kegagalan sketsa tidak melukai pemakai. Itu risiko obat, bukan risiko prototype.',
+            ),
           },
           {
             id: 'check',
-            label: t('Keduanya mengevaluasi kembali kalau hasilnya belum berhasil'),
-            explainWrong: t('Ini juga persamaan proses berulangnya.'),
+            label: t('Aplikasi harus dibuat dari awal'),
+            explainWrong: t('Hanya gambarnya yang diganti. Aplikasinya belum dibuat.'),
           },
         ],
         answer: 'many',
-        explainCorrect: t('Tepat! Pada rancangan digital kita bisa membuat banyak prototype kasar untuk diuji sebelum rilis.'),
+        explainCorrect: t('Gambar contoh aman dan mudah diganti. Obat tidak boleh dicoba-coba seperti itu.'),
+        hints: [t('Bayangkan kamu salah menggambar di kertas.')],
         tags: ['design-thinking'],
       }),
     ],
     pro: [
       makeAnchorMcq({
         id: 'a06-anc-p1',
-        prompt: t('Apa perbedaan paling mendasar antara user flow dan user journey?'),
+        prompt: t('Apa beda paling mendasar antara user flow dan user journey?'),
         choices: [
-          { id: 'uj', label: t('User flow memetakan langkah di dalam layar aplikasi, sedangkan user journey mencakup emosi dan kejadian di luar aplikasi') },
+          { id: 'uj', label: t('Flow mencatat langkah di layar, journey juga mencatat perasaan pemakai') },
           {
             id: 'rev',
-            label: t('User flow berisi perasaan marah pengguna, sedangkan user journey berisi kode CSS'),
-            explainWrong: t('Justru user journey yang memuat emosi dan konteks sebelum/sesudah memakai aplikasi.'),
+            label: t('Flow memetakan perasaan pemakai, journey hanya memetakan langkah di layar'),
+            explainWrong: t('Terbalik. Journey yang memuat perasaan dan konteks sebelum serta sesudah memakai aplikasi.'),
           },
           {
             id: 'same',
-            label: t('Keduanya hanya istilah lain untuk database pengguna'),
-            explainWrong: t('Keduanya adalah alat pemetaan pengalaman UX, bukan database.'),
+            label: t('Keduanya sama saja, hanya beda nama istilah'),
+            explainWrong: t('Keduanya berbeda: flow hanya langkah di layar, journey mencakup yang lebih luas.'),
           },
         ],
         answer: 'uj',
-        explainCorrect: t('Benar. User journey melihat gambaran besar sebelum kenal produk hingga setelah selesai memakai.'),
+        explainCorrect: t(
+          'User journey mencakup perasaan dan kejadian sebelum dan sesudah memakai produk. User flow hanya langkah di dalam aplikasi.',
+        ),
         tags: ['user-flow'],
       }),
       makeAnchorMcq({
         id: 'a06-anc-p2',
-        prompt: t('Sifat UX yang memastikan produk dapat dipakai semua orang termasuk penyandang disabilitas disebut…'),
+        prompt: t('Sifat UX apa yang membuat produk bisa dipakai semua orang, termasuk penyandang disabilitas?'),
         choices: [
           { id: 'acc', label: t('Accessible') },
           {
             id: 'des',
             label: t('Desirable'),
-            explainWrong: t('Desirable berarti tampil menarik sehingga orang senang kembali.'),
+            explainWrong: t('Desirable berarti menarik, jadi orang senang kembali.'),
           },
           {
             id: 'cred',
@@ -184,89 +218,89 @@ export const world: World = {
           },
         ],
         answer: 'acc',
-        explainCorrect: t('Tepat. Accessible memastikan akses setara bagi pengguna dengan beragam kemampuan dan kondisi.'),
+        explainCorrect: t('Accessible berarti produk bisa dipakai orang dengan kemampuan dan kondisi yang berbeda.'),
         tags: ['ux'],
       }),
       makeAnchorMcq({
         id: 'a06-anc-p3',
-        prompt: t('Manakah contoh penerapan konsep Affordance yang baik pada antarmuka web?'),
+        prompt: t('Mana contoh affordance yang baik di halaman web?'),
         choices: [
-          { id: 'aff', label: t('Tombol aksi utama dibuat tampak timbul dan jelas bentuknya sehingga mengundang untuk ditekan') },
+          { id: 'aff', label: t('Tombol utama tampak timbul, jadi jelas bisa ditekan') },
           {
             id: 'hide',
-            label: t('Tautan penting dibuat persis sama warna dan bentuknya dengan teks biasa'),
-            explainWrong: t('Tautan yang disamarkan justru menghilangkan petunjuk bahwa ia bisa diklik.'),
+            label: t('Tautan penting dibuat sama persis dengan teks biasa'),
+            explainWrong: t('Tautan yang menyamar sebagai teks biasa menghilangkan petunjuk bahwa ia bisa diklik.'),
           },
           {
             id: 'slow',
-            label: t('Menghilangkan semua pesan balasan setelah pengguna menekan Kirim'),
-            explainWrong: t('Itu masalah ketiadaan Feedback, bukan affordance.'),
+            label: t('Pesan balasan setelah menekan Kirim dihilangkan'),
+            explainWrong: t('Itu masalah feedback, bukan affordance. Feedback adalah tanggapan sistem atas aksi.'),
           },
         ],
         answer: 'aff',
-        explainCorrect: t('Benar. Affordance adalah petunjuk visual dari bentuk elemen tentang cara menggunakannya.'),
+        explainCorrect: t('Affordance adalah petunjuk dari bentuk elemen tentang cara memakainya. Tombol yang tampak timbul mengajak ditekan.'),
         tags: ['ux', 'ui'],
       }),
       makeAnchorMcq({
         id: 'a06-anc-p4',
-        prompt: t('Mengapa tim produk membuat prototype sebelum menulis kode aplikasi penuh?'),
+        prompt: t('Mengapa tim membuat prototype sebelum menulis kode aplikasi lengkap?'),
         choices: [
-          { id: 'cost', label: t('Untuk menguji alur klik dan menemukan kesalahan lebih dini saat biaya perbaikannya masih murah') },
+          { id: 'cost', label: t('Kesalahan alur ketahuan lebih awal, saat perbaikannya masih murah') },
           {
             id: 'nohtml',
-            label: t('Karena prototype otomatis menggantikan HTML dan server di produksi'),
-            explainWrong: t('Aplikasi akhir tetap harus dibangun dengan kode frontend dan backend.'),
+            label: t('Prototype menggantikan HTML dan server di produk akhir'),
+            explainWrong: t('Produk akhir tetap perlu kode frontend dan backend.'),
           },
           {
             id: 'color',
-            label: t('Karena programmer tidak boleh melihat warna desain'),
-            explainWrong: t('Justru mockup dan prototype membantu programmer memahami rancangan dengan jelas.'),
+            label: t('Prototype membuat pemakai tidak perlu ikut menguji'),
+            explainWrong: t('Prototype justru dibuat supaya pemakai bisa mengujinya lebih awal.'),
           },
         ],
         answer: 'cost',
-        explainCorrect: t('Tepat. Makin awal hambatan alur ditemukan sebelum coding, makin hemat waktu dan biaya.'),
+        explainCorrect: t('Makin awal hambatan ketahuan, makin murah perbaikannya. Memindahkan kotak di prototype lebih cepat daripada menulis ulang kode.'),
         tags: ['prototype'],
       }),
       makeAnchorMcq({
         id: 'a06-anc-p5',
-        prompt: t('Sikap manakah yang menjadi kesalahan paling fatal saat memandu sesi usability testing?'),
+        prompt: t('Sikap mana yang paling merusak sesi usability testing?'),
         choices: [
-          { id: 'help', label: t('Langsung menunjuk tombol yang benar setiap kali peserta terlihat ragu') },
+          { id: 'help', label: t('Menunjuk tombol yang benar setiap kali peserta ragu') },
           {
             id: 'note',
-            label: t('Mencatat bagian mana peserta berhenti atau bertanya'),
+            label: t('Mencatat bagian saat peserta berhenti atau bertanya'),
             explainWrong: t('Mencatat titik bingung adalah tujuan utama sesi ini.'),
           },
           {
             id: 'silent',
-            label: t('Membiarkan peserta mencoba menyelesaikan tugasnya sendiri'),
-            explainWrong: t('Membiarkan peserta mencoba mandiri menunjukkan kenyataan sebenarnya.'),
+            label: t('Membiarkan peserta menyelesaikan tugas sendiri'),
+            explainWrong: t('Peserta yang mencoba sendiri menunjukkan kesulitan yang asli.'),
           },
         ],
         answer: 'help',
-        explainCorrect: t('Benar! Membantu peserta menyembunyikan masalah desain yang nanti akan membingungkan pengguna asli.'),
+        explainCorrect: t('Bantuan menutupi masalah desain. Pemakai asli nanti tidak punya penguji di sampingnya.'),
         tags: ['usability-testing'],
       }),
       makeAnchorMcq({
         id: 'a06-anc-p6',
         type: 'limit',
-        analogy: t('Wireframe–Mockup–Prototype seperti denah, gambar 3D, dan rumah contoh'),
-        prompt: t('Apa perbedaan penting antara rumah contoh fisik dan prototype digital?'),
+        analogy: t('Wireframe, mockup, dan prototype seperti denah, gambar 3D, dan rumah contoh'),
+        prompt: t('Apa beda penting prototype digital dengan rumah contoh fisik?'),
         choices: [
-          { id: 'iter', label: t('Prototype digital dapat diubah, digandakan, dan diuji ulang dalam hitungan menit tanpa membongkar bangunan') },
+          { id: 'iter', label: t('Prototype digital diubah dan diuji ulang dalam hitungan menit') },
           {
             id: 'early',
-            label: t('Kesalahan lebih murah diperbaiki pada tahap sketsa awal'),
-            explainWrong: t('Ini persamaan utama antara arsitektur rumah dan desain UX.'),
+            label: t('Kesalahan lebih murah dibetulkan di tahap sketsa awal'),
+            explainWrong: t('Itu persamaannya: denah dan wireframe sama-sama murah dibetulkan sebelum ada yang dibangun.'),
           },
           {
             id: 'enter',
             label: t('Keduanya dibuat agar calon pemakai bisa mencoba alurnya'),
-            explainWrong: t('Ini juga merupakan persamaan konsepnya.'),
+            explainWrong: t('Itu juga persamaan, bukan perbedaan.'),
           },
         ],
         answer: 'iter',
-        explainCorrect: t('Tepat! Kemudahan revisi di prototype digital mempercepat siklus belajar dan perbaikan UX.'),
+        explainCorrect: t('Prototype digital bisa direvisi dalam menit tanpa membongkar bangunan. Siklus belajarnya jadi lebih cepat.'),
         tags: ['prototype', 'wireframe'],
       }),
     ],
@@ -274,138 +308,173 @@ export const world: World = {
 };
 
 export const lessons: Lesson[] = [
+  // ---------------------------------------------------------------------------------------------
+  // a06-l01  Kamu bukan pemakainya
+  // ---------------------------------------------------------------------------------------------
   makeLesson({
     id: 'a06-l01',
     worldId: 'a06',
-    title: 'Kamu bukan penggunamu',
+    title: 'Kamu bukan pemakainya',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku paham bahwa aplikasi dibuat agar mudah bagi pemakainya, bukan cuma ikut seleraku.',
-      'Aku bisa menerapkan pola pikir user-centered dan menilai UX lewat enam sifat utamanya.',
+      'Aku bisa menyebutkan 4 hal yang membuat aplikasi enak dipakai.',
+      'Kamu bisa menilai UX sebuah aplikasi lewat enam sifatnya.',
     ),
-    estMinutes: 5,
+    estMinutes: 6,
     introducesTerms: [],
     usesTerms: ['ux', 'ui'],
     warmupFrom: 'a05-l04',
+    atWork: 'Di rapat desain, kamu bisa memakai enam sifat ini untuk menilai layar yang baru dibuat.',
     steps: [
       storyStep('a06/tukang-sepatu.svg', [
         rText(
-          'Tukang sepatu di desa membuat semua sepatu persis seukuran kakinya sendiri. Akibatnya, seluruh warga kesempitan atau kebesaran!',
-          'Jika pembuat sepatu hanya memakai ukuran kakinya untuk seluruh penduduk desa, hampir semua orang tersiksa. Hal yang jelas bagi pembuat sering membingungkan pemakai.',
+          'Tukang sepatu di desa memakai ukuran kakinya sendiri untuk semua sepatu. Banyak warga jadi kesempitan atau kebesaran. Bagaimana tukang sepatu bisa membuat sepatu yang pas?',
+          'Tim Toko Rani merasa tombol Simpan sudah jelas, tetapi Bu Laras tidak menemukannya. Seperti tukang sepatu yang memakai ukuran kakinya sendiri untuk seluruh desa.',
         ),
       ]),
       conceptStep({
-        title: t('Ingat: Kamu Bukan Penggunamu', 'Inti UX: Kamu Bukan Penggunamu'),
+        title: t('Kamu bukan pemakainya', 'Inti UX: kamu bukan pemakainya'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'empati-pengguna' },
-        alt: t('Pembuat dan pengguna melihat aplikasi yang sama dengan sudut pandang berbeda.'),
+        alt: t('Pembuat dan pemakai melihat aplikasi yang sama dengan sudut pandang berbeda.'),
         body: [
-          rText(
-            'Tugas ',
-            'Inti ',
-          ),
+          rText('Tugas ', 'Inti '),
           rTerm('ux', 'UX', 'UX'),
           rText(
-            ' adalah bertanya dan mencari tahu kebutuhan pemakai. Jangan hanya menebak sendiri.',
-            ' adalah mencari tahu lewat pengamatan nyata, bukan menebak dari asumsi kita sendiri.',
+            ' adalah bertanya kepada pemakai, bukan menebak. Pembuat sudah hafal letak tombol, tetapi orang lain belum.',
+            ' adalah mencari tahu lewat pengamatan sungguhan, bukan menebak. Pembuat sudah hafal letak tombol, tetapi pemakai baru belum.',
           ),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'a06-l01-q1',
+          type: 'analogy',
+          prompt: t(
+            'Pembuat aplikasi hanya memakai seleranya sendiri. Siapa yang mirip dengannya?',
+            'Apa yang paling mirip dengan membuat aplikasi hanya dari selera pembuatnya?',
+          ),
+          choices: [
+            { id: 'shoe', label: t('Tukang sepatu yang memakai ukuran kakinya sendiri') },
+            {
+              id: 'tailor',
+              label: t('Penjahit yang mengukur setiap pelanggan sebelum menjahit'),
+              explainWrong: t('Penjahit itu mengukur tiap pelanggan dulu. Itu justru cara yang baik.'),
+            },
+            {
+              id: 'chef',
+              label: t('Koki yang bertanya tingkat pedas kesukaan tamu'),
+              explainWrong: t('Koki itu bertanya kepada tamunya. Itu justru cara yang baik.'),
+            },
+          ],
+          answer: 'shoe',
+          explainCorrect: t(
+            'Selera pembuat belum tentu cocok untuk orang lain. Seperti sepatu pas di satu kaki, tetapi sempit di kaki lain.',
+            'Selera pembuat belum tentu cocok untuk orang lain. Ukuran yang pas di kakinya bisa sempit di kaki orang lain.',
+          ),
+          hints: [t('Ingat cerita desa tadi. Siapa yang memikirkan dirinya sendiri?')],
+          tags: ['ux'],
+        }),
+      ),
       conceptStep({
-        title: t('Tiga Syarat Dasar UX', 'Useful, Usable, dan Findable'),
+        title: t('Aplikasi yang Enak Dipakai', 'Useful, Usable, dan Findable'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'tiga-syarat-ux' },
-        alt: t('Tiga pilar UX: berguna, mudah dipakai tanpa diajari, dan cepat ditemukan.'),
+        alt: t(
+          'Empat gambar: berguna, mudah dipakai, mudah ditemukan, dan ramah semua orang.',
+          'Tiga pilar UX: berguna, mudah dipakai tanpa diajari, dan cepat ditemukan.',
+        ),
         body: [
-          rBold('Useful', 'Useful'),
-          rText(' artinya berguna. ', ' (berguna menyelesaikan masalah), '),
-          rBold('Usable', 'Usable'),
-          rText(' mudah dipakai tanpa diajari. ', ' (mudah dipakai tanpa diajari), dan '),
-          rBold('Findable', 'Findable'),
-          rText(' artinya tombol cepat ditemukan.', ' (menu dan info cepat ditemukan).'),
-        ],
-      }),
-      conceptStep({
-        title: t('Aman, Ramah, dan Disukai', 'Credible, Accessible, Desirable'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'a06', topic: 'enam-kualitas-ux' },
-        alt: t('Aplikasi tepercaya, ramah semua pengguna, dan menyenangkan dipakai kembali.'),
-        body: [
-          rBold('Credible', 'Credible'),
-          rText(' terasa aman. ', ' (terlihat tepercaya), '),
-          rBold('Accessible', 'Accessible'),
-          rText(' ramah untuk semua orang. ', ' (bisa diakses semua orang termasuk disabilitas), dan '),
-          rBold('Desirable', 'Desirable'),
-          rText(' bikin orang senang kembali.', ' (menyenangkan sehingga orang ingin kembali).'),
-        ],
-      }),
-      limitStep({
-        analogy: t('Tukang sepatu mengukur kaki sendiri untuk warga desa'),
-        same: [
-          t('Pembuat produk tidak boleh memakai ukuran dan kebiasaan dirinya sendiri sebagai patokan semua orang.'),
-        ],
-        different: [
-          t('Sepatu dibuat berbeda-beda ukuran fisiknya, sedangkan satu aplikasi harus langsung bisa menyesuaikan beragam pengguna lewat tampilan dan alur yang jelas.'),
+          rText('Aplikasi yang baik itu ', 'Syarat dasar UX: '),
+          rBold('berguna', 'Useful'),
+          rText(', ', ' (berguna menyelesaikan masalah), '),
+          rBold('mudah dipakai', 'Usable'),
+          rText(', dan ', ' (mudah dipakai tanpa diajari), dan '),
+          rBold('mudah ditemukan', 'Findable'),
+          rText('. Ia juga ', ' (menu dan info cepat ditemukan).'),
+          { t: 'bold', v: { junior: 'ramah semua orang', pro: 'ramah semua orang' }, modes: ['junior'] },
+          rJunior(', termasuk yang sulit melihat.'),
         ],
       }),
       simStep(
         'desa-ux',
         t(
-          'Lihat langkah kerja di Desa UX yang selalu dimulai dari mendengarkan pengguna!',
-          'Telusuri urutan kerja UX pada simulator agar solusi selalu berangkat dari kebutuhan pengguna.',
+          'Ketuk tiap langkah kerja di Desa UX dan lihat urutannya.',
+          'Telusuri urutan kerja UX di simulator: solusi selalu berangkat dari kebutuhan pemakai.',
         ),
       ),
-      qStep(
-        makeMcq({
-          id: 'a06-l01-q1',
-          type: 'analogy',
-          prompt: t('Membuat aplikasi hanya berdasarkan selera pembuatnya mirip dengan…'),
-          choices: [
-            { id: 'shoe', label: t('Tukang sepatu yang membuat seluruh sepatu memakai ukuran kakinya sendiri') },
-            {
-              id: 'tailor',
-              label: t('Penjahit yang mengukur baju setiap pelanggan sebelum menjahit'),
-              explainWrong: t('Justru mengukur pelanggan adalah sikap UX yang benar.'),
-            },
-            {
-              id: 'chef',
-              label: t('Koki yang bertanya tingkat kepedasan kesukaan tamu'),
-              explainWrong: t('Bertanya kepada tamu berarti mendengarkan pengguna.'),
-            },
-          ],
-          answer: 'shoe',
-          explainCorrect: t('Tepat! Apa yang pas di kaki kita belum tentu nyaman di kaki orang lain.'),
-          tags: ['ux'],
-        }),
-      ),
+      conceptStep({
+        title: t('Aman, Ramah, dan Disukai', 'Credible, Accessible, Desirable'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a06', topic: 'enam-kualitas-ux' },
+        alt: t('Aplikasi tepercaya, ramah semua pemakai, dan menyenangkan dipakai kembali.'),
+        modes: ['pro'],
+        body: [
+          rText('Tiga sifat lain: '),
+          rBold('Credible'),
+          rText(' (tepercaya), '),
+          rBold('Accessible'),
+          rText(' (bisa dipakai semua orang, termasuk penyandang disabilitas), dan '),
+          rBold('Desirable'),
+          rText(' (menyenangkan, orang ingin kembali).'),
+        ],
+      }),
+      limitStep({
+        riskyAnalogy: false,
+        analogy: t('Tukang sepatu mengukur kaki sendiri untuk warga desa'),
+        same: [t('Pembuat produk tidak boleh memakai kebiasaannya sendiri sebagai patokan semua orang.')],
+        different: [
+          t('Sepatu bisa dibuat satu per satu sesuai ukuran kaki. Satu aplikasi harus langsung cocok untuk banyak layar dan kebutuhan.'),
+        ],
+      }),
       qStep({
         id: 'a06-l01-q2',
         type: 'match',
-        prompt: t('Pasangkan sifat UX yang baik dengan artinya:'),
+        prompt: t('Pasangkan tiap sifat dengan artinya.', 'Pasangkan sifat UX dengan artinya:'),
         difficulty: 2,
         left: [
-          { id: 'u1', label: t('Useful') },
-          { id: 'u2', label: t('Usable') },
-          { id: 'u3', label: t('Findable') },
-          { id: 'u4', label: t('Accessible') },
+          { id: 'u1', label: t('Berguna', 'Useful') },
+          { id: 'u2', label: t('Mudah dipakai', 'Usable') },
+          { id: 'u3', label: t('Mudah ditemukan', 'Findable') },
+          { id: 'u4', label: t('Ramah semua orang', 'Accessible') },
         ],
         right: [
-          { id: 'r1', label: t('Menyelesaikan masalah nyata') },
+          { id: 'r1', label: t('Menyelesaikan masalah sungguhan') },
           { id: 'r2', label: t('Bisa dipakai tanpa diajari') },
-          { id: 'r3', label: t('Cepat menemukan yang dibutuhkan') },
-          { id: 'r4', label: t('Bisa dipakai semua orang termasuk penyandang disabilitas') },
+          { id: 'r3', label: t('Tombol cepat ditemukan', 'Cepat menemukan yang dibutuhkan') },
+          { id: 'r4', label: t('Bisa dipakai semua orang', 'Bisa dipakai semua orang, termasuk penyandang disabilitas') },
         ],
         answer: { u1: 'r1', u2: 'r2', u3: 'r3', u4: 'r4' },
-        explainCorrect: t('Mantap! Keenam sifat itu jadi pegangan penting saat menilai kualitas UX.'),
+        explainCorrect: t(
+          'Aplikasi yang baik berguna, mudah dipakai, mudah ditemukan, dan ramah. Seperti sepatu yang pas di kaki siapa saja.',
+          'Keempat sifat itu menjadi patokan menilai UX. Useful soal manfaat, Usable soal kemudahan, Findable soal letak, Accessible soal akses setara.',
+        ),
+        hints: [
+          t(
+            'Ingat kartu tentang 4 hal yang baik di aplikasi.',
+            'Useful soal manfaat, Usable soal cara pakai, Findable soal letak.',
+          ),
+          undefined,
+        ],
         tags: ['ux'],
       }),
       qStep(
         makeTf({
           id: 'a06-l01-q3',
-          prompt: t('Kalau tombol terasa jelas menurut pembuat aplikasinya, semua pengguna baru pasti langsung paham juga.'),
+          prompt: t(
+            'Tombol yang mudah bagi pembuat pasti mudah bagi semua orang.',
+            'Kalau tombol jelas bagi pembuatnya, semua pemakai baru pasti langsung paham juga.',
+          ),
           answer: false,
-          explainCorrect: t('Benar, itu keliru! Pembuat sudah hafal letaknya, sedangkan pengguna baru melihatnya pertama kali.'),
-          explainWrong: t('Hampir! Ingat aturan emas: kamu bukan penggunamu.'),
+          explainCorrect: t(
+            'Pernyataan itu keliru: pembuat sudah hafal letak tombol. Orang baru melihatnya untuk pertama kali.',
+            'Pernyataan itu keliru: pembuat sudah hafal letak tombol. Pemakai baru melihatnya untuk pertama kali.',
+          ),
+          explainWrong: t(
+            'Pembuat sudah terbiasa dengan tombolnya. Orang baru belum, jadi mereka bisa bingung.',
+            'Pembuat sudah terbiasa, jadi tombol terasa mudah baginya. Pemakai baru belum punya kebiasaan itu.',
+          ),
+          hints: [t('Siapa yang sudah hafal letak tombolnya?')],
           tags: ['ux'],
         }),
       ),
@@ -413,24 +482,26 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a06-l01-q4',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('Tukang sepatu desa'),
-          prompt: t('Apa batas dari perumpamaan sepatu ukuran tunggal bila dibandingkan dengan website?'),
+          prompt: t('Apa batas perumpamaan tukang sepatu untuk sebuah situs web?'),
           difficulty: 2,
           choices: [
-            { id: 'adapt', label: t('Satu website harus bisa melayani berbagai ukuran layar dan kebutuhan pengguna sekaligus') },
+            { id: 'adapt', label: t('Satu situs harus cocok untuk banyak layar dan kebutuhan') },
             {
               id: 'ask',
-              label: t('Pembuat perlu mengenal kebutuhan pemakainya lebih dulu'),
-              explainWrong: t('Itu memang persamaan utamanya.'),
+              label: t('Pembuat perlu mengenal kebutuhan pemakainya sebelum merancang'),
+              explainWrong: t('Itu persamaan utamanya, bukan batas perumpamaannya. Tukang sepatu juga perlu mengukur kaki.'),
             },
             {
               id: 'fit',
-              label: t('Produk yang tidak pas akan membuat pemakai kesulitan'),
-              explainWrong: t('Itu juga bagian yang serupa.'),
+              label: t('Produk yang tidak pas membuat pemakai kesulitan dan pergi'),
+              explainWrong: t('Itu juga bagian yang serupa dengan sepatu yang sempit.'),
             },
           ],
           answer: 'adapt',
-          explainCorrect: t('Benar! Web yang baik ramah di banyak perangkat dan kondisi pemakai dalam satu sistem.'),
+          explainCorrect: t('Sepatu bisa dibuat satu per satu. Satu situs harus langsung cocok untuk banyak layar dan kebutuhan.'),
+          hints: [t('Cari hal yang berbeda, bukan yang sama.')],
           tags: ['ux'],
         }),
       ),
@@ -438,24 +509,36 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a06-l01-q5',
           type: 'scenario',
-          story: t('Bito membuat website jadwal belajar yang fiturnya lengkap, tetapi tombol "Simpan" disembunyikan di dalam tiga menu kecil sehingga Bu Laras terus gagal menyimpan.'),
-          prompt: t('Sifat UX manakah yang paling perlu diperbaiki Bito?'),
+          story: t(
+            'Bito membuat aplikasi jadwal belajar. Bu Laras sudah mengisi jadwalnya. Ia membuka 3 menu, tetapi belum bisa menyimpan.',
+            'Tim Bito membuat aplikasi jadwal belajar dengan fitur lengkap. Tombol "Simpan" tersembunyi di tiga menu kecil, jadi Bu Laras terus gagal menyimpan.',
+          ),
+          prompt: t('Apa yang paling perlu Bito perbaiki?', 'Sifat UX mana yang paling perlu dibetulkan?'),
           difficulty: 2,
           choices: [
-            { id: 'uf', label: t('Usable dan Findable (mudah ditemukan dan mudah dipakai)') },
+            { id: 'uf', label: t('Membuat tombol Simpan mudah ditemukan', 'Findable dan Usable: tombol mudah ditemukan') },
             {
               id: 'be',
-              label: t('Menambah ratusan fitur baru lagi'),
-              explainWrong: t('Menambah fitur justru membuat tombol utama makin tenggelam.'),
+              label: t('Menambah banyak fitur baru ke aplikasi', 'Menambah lebih banyak fitur baru ke aplikasinya'),
+              explainWrong: t('Fitur baru membuat tombol Simpan makin sulit dicari.'),
             },
             {
               id: 'dark',
-              label: t('Mengubah nama domain situsnya'),
-              explainWrong: t('Nama domain tidak menyelesaikan tombol simpan yang tersembunyi.'),
+              label: t('Mengganti warna latar halaman', 'Mengganti warna latar halaman menjadi lebih cerah'),
+              explainWrong: t('Warna latar tidak membuat tombol Simpan lebih mudah ditemukan.'),
             },
           ],
           answer: 'uf',
-          explainCorrect: t('Tepat! Fitur berguna tidak ada artinya jika tombolnya susah dicari dan susah dipakai.'),
+          explainCorrect: t(
+            'Fitur sebaik apa pun percuma kalau tombolnya sulit dicari. Seperti pintu rumah yang tersembunyi di balik lemari.',
+            'Fitur lengkap tidak berguna kalau tombol utamanya sulit dicari dan dipakai. Itu masalah Findable dan Usable.',
+          ),
+          hints: [
+            t(
+              'Ingat apa yang dicari Bu Laras, tetapi tidak ditemukannya.',
+              'Cari sifat yang berkaitan dengan letak tombol.',
+            ),
+          ],
           tags: ['ux', 'ui'],
         }),
       ),
@@ -464,23 +547,44 @@ export const lessons: Lesson[] = [
           id: 'a06-l01-q6',
           type: 'why',
           base: 'ux-research',
-          prompt: t('Mengapa tugas utama desainer UX adalah mencari tahu, bukan menebak?'),
+          prompt: t(
+            'Mengapa pembuat aplikasi bertanya dulu, bukan menebak?',
+            'Mengapa tugas utama desainer UX adalah mencari tahu, bukan menebak?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'real', label: t('Karena tebakan pembuat sering meleset dari kebiasaan dan kesulitan asli pengguna') },
+            {
+              id: 'real',
+              label: t('Karena tebakan pembuat sering meleset', 'Tebakan pembuat sering meleset dari kebiasaan pemakai'),
+            },
             {
               id: 'slow',
-              label: t('Karena menebak membutuhkan listrik lebih besar'),
-              explainWrong: t('Alasannya adalah menghindari rancangan yang tidak sesuai kebutuhan pengguna.'),
+              label: t('Karena bertanya lebih cepat daripada membuat', 'Bertanya lebih cepat daripada membangun fitur'),
+              explainWrong: t(
+                'Bertanya memang cepat, tetapi itu bukan alasan utamanya. Alasannya: menghindari rancangan yang salah sasaran.',
+                'Kecepatan bukan alasan utamanya. Riset menghindarkan tim dari membangun hal yang tidak dibutuhkan.',
+              ),
             },
             {
               id: 'law',
-              label: t('Karena browser akan memblokir halaman yang tidak diwawancarai'),
-              explainWrong: t('Browser tidak memeriksa proses riset; manusia penggunanyalah yang merasakan dampaknya.'),
+              label: t('Karena selera orang lain mirip selera pembuat', 'Selera pemakai biasanya sama dengan selera pembuat aplikasi'),
+              explainWrong: t(
+                'Selera tiap orang berbeda. Karena itu pembuat perlu bertanya.',
+                'Selera dan kebiasaan pemakai sering berbeda dari pembuat. Karena itu tim perlu bertanya.',
+              ),
             },
           ],
           answer: 'real',
-          explainCorrect: t('Benar! Bertanya langsung menghindarkan tim membangun fitur yang salah sasaran.'),
+          explainCorrect: t(
+            'Dengan bertanya, pembuat tidak membuat hal yang tidak dibutuhkan. Seperti tukang sepatu yang mengukur kaki dulu.',
+            'Bertanya langsung menghindarkan tim membangun fitur yang tidak dibutuhkan. Satu wawancara bisa membatalkan asumsi yang salah.',
+          ),
+          hints: [
+            t(
+              'Ingat tukang sepatu yang menebak ukuran.',
+              'Bandingkan tebakan pembuat dengan kebiasaan pemakai asli.',
+            ),
+          ],
           tags: ['ux'],
         }),
       ),
@@ -488,206 +592,294 @@ export const lessons: Lesson[] = [
         id: 'a06-l01-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi sifat UX yang menunjukkan tampilan terasa aman, profesional, dan tepercaya:'),
+        prompt: t('Lengkapi sifat UX yang membuat pemakai merasa aman mengisi data:'),
         difficulty: 2,
         template: 'Enam sifat UX baik: Useful, Usable, Findable, ___, Accessible, dan Desirable.',
-        bank: ['Credible', 'Hidden', 'Random'],
+        bank: ['Responsive', 'Credible', 'Semantic'],
         answer: ['Credible'],
-        explainCorrect: t('Tepat! Credible membangun rasa percaya pengguna saat bertransaksi atau mengisi data.'),
+        explainCorrect: t('Credible membangun rasa percaya saat pemakai mengisi data atau membayar. Seperti toko yang terlihat rapi dan jujur.'),
+        hints: [t('Sifat ini ada di kartu bersama Accessible dan Desirable.'), undefined],
         tags: ['ux'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a06-l01-r1',
-        prompt: t('Jika pengguna bingung mencari letak tombol pencarian di aplikasi, sifat UX mana yang kurang?'),
+        prompt: t(
+          'Kamu bingung mencari tombol cari di sebuah aplikasi. Apa yang kurang?',
+          'Pemakai bingung mencari tombol pencarian. Sifat UX mana yang kurang?',
+        ),
         choices: [
-          { id: 'f', label: t('Findable (mudah dicari)') },
-          { id: 'c', label: t('Credible (dipercaya)'), explainWrong: t('Credible soal rasa aman dan profesional, sedangkan soal letak adalah Findable.') },
+          { id: 'f', label: t('Mudah ditemukan', 'Findable (mudah dicari)') },
+          {
+            id: 'c',
+            label: t('Terasa aman', 'Credible (tepercaya)'),
+            explainWrong: t(
+              'Terasa aman itu soal rasa percaya. Tombol yang sulit dicari itu soal letak.',
+              'Credible soal rasa aman dan profesional. Soal letak tombol adalah Findable.',
+            ),
+          },
+          {
+            id: 'u',
+            label: t('Berguna', 'Useful (berguna)'),
+            explainWrong: t(
+              'Berguna itu soal manfaat. Tombolnya ada, tetapi sulit ditemukan.',
+              'Useful soal manfaat. Tombolnya ada, tetapi letaknya sulit ditemukan.',
+            ),
+          },
         ],
         answer: 'f',
-        explainCorrect: t('Findable berarti pengguna cepat menemukan hal yang dibutuhkan.'),
+        explainCorrect: t(
+          'Pemakai harus cepat menemukan yang ia butuhkan. Seperti mencari buku di rak yang rapi.',
+          'Findable berarti pemakai cepat menemukan yang dibutuhkan. Letak tombol yang tersembunyi menurunkan sifat ini.',
+        ),
+        hints: [t('Apa yang kamu cari tetapi sulit ditemukan?')],
         tags: ['ux'],
       }),
       makeTf({
         id: 'a06-l01-r2',
-        prompt: t('Tugas UX adalah menebak keinginan pengguna di dalam ruangan tertutup tanpa bertanya.'),
+        prompt: t(
+          'UX berarti menebak apa yang diinginkan pemakai tanpa bertanya.',
+          'Tugas UX adalah menebak keinginan pemakai di ruang tertutup tanpa bertanya.',
+        ),
         answer: false,
-        explainCorrect: t('Betul, pernyataan itu salah! Tugas UX adalah mencari tahu langsung dari pengguna.'),
-        explainWrong: t('Hampir! Menebak tanpa bukti berisiko membuat aplikasi tidak terpakai.'),
+        explainCorrect: t(
+          'Pernyataan itu keliru: UX berarti bertanya dan mengamati pemakai. Seperti tukang sepatu yang mengukur kaki dulu.',
+          'Pernyataan itu keliru: tugas UX adalah mencari tahu langsung dari pemakai. Tebakan tanpa bukti sering salah.',
+        ),
+        explainWrong: t(
+          'Menebak tanpa bertanya bisa membuat aplikasi tidak dipakai. Orang lain punya kebiasaan sendiri.',
+          'Menebak tanpa bukti berisiko membuat aplikasi tidak terpakai. Pemakai punya kebiasaan yang belum tentu sama dengan pembuat.',
+        ),
+        hints: [t('Apa yang dilakukan tukang sepatu yang baik?')],
         tags: ['ux'],
       }),
     ],
     recap: t(
-      'Kamu bukan penggunamu. Dengarkan pemakai agar aplikasi berguna, mudah dipakai, aman, dan ramah semua orang.',
-      'Mulailah desain dari pengguna nyata (bukan asumsi pribadi) untuk memenuhi sifat Useful, Usable, Findable, Credible, Accessible, dan Desirable.',
+      'Kamu bukan pemakainya, jadi tanya dulu supaya aplikasi mudah dipakai.',
+      'Mulai dari pemakai sungguhan, bukan asumsi sendiri. Nilai hasilnya dengan enam sifat UX.',
     ),
     companion: {
-      talkPrompts: ['Pernahkah orang tua dan anak melihat satu tombol di aplikasi dengan cara berbeda? Tombol apa itu?'],
-      offlineActivity: 'Minta anggota keluarga mencoba membuka satu menu baru di perangkat rumah tanpa diberi tahu caranya, lalu amati bagian mana yang bikin ragu.',
+      talkPrompts: ['Tombol apa di aplikasi yang pernah membuatmu bingung?'],
+      offlineActivity:
+        'Minta anggota keluarga membuka satu menu baru di perangkat rumah tanpa diberi tahu caranya. Amati bagian mana yang membuatnya ragu.',
     },
   }),
 
+  // ---------------------------------------------------------------------------------------------
+  // a06-l02  Design thinking: seperti dokter
+  // ---------------------------------------------------------------------------------------------
   makeLesson({
     id: 'a06-l02',
     worldId: 'a06',
     title: 'Design thinking: seperti dokter',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa mengurutkan 5 langkah mencari solusi untuk pengguna seperti cara dokter.',
-      'Aku bisa menjelaskan lima tahap Design Thinking yang berulang (iteratif) beserta fungsi tiap tahapnya.',
+      'Aku bisa mengurutkan 5 langkah mencari solusi seperti dokter.',
+      'Kamu bisa menyebutkan lima tahap Design Thinking dan fungsi tiap tahap.',
     ),
-    estMinutes: 5,
+    estMinutes: 6,
     introducesTerms: ['design-thinking'],
     usesTerms: ['ux'],
     stickerId: 'dokter-ux',
     warmupFrom: 'a06-l01',
+    atWork: 'Di awal proyek, kamu akan ikut wawancara pemakai untuk menemukan masalah sebelum tim mulai menggambar layar.',
     steps: [
       storyStep('a06/dokter-ux.svg', [
         rText(
-          'Saat kamu sakit, dokter tidak langsung memberi obat! Dokter menanyakan keluhan, menentukan sakitnya, memilih cara sembuh, lalu mengecek apakah sudah membaik.',
-          'Dokter yang bijak tidak pernah langsung menulis resep sebelum bertanya keluhan, menegakkan diagnosis, mempertimbangkan terapi, mencoba resep, lalu memantau pemulihan pasien.',
+          'Kalau kamu sakit, dokter tidak langsung memberi obat. Dokter bertanya, memeriksa, lalu mengecek hasilnya. Apa saja langkah dokter?',
+          'Form pendaftaran di aplikasi Rani sepi peminat. Tim UX bekerja seperti dokter: bertanya keluhan dulu, lalu menguji obatnya.',
         ),
       ]),
       conceptStep({
-        title: t('Langkah 1 & 2: Pahami dan Rumuskan', 'Empathize dan Define'),
+        title: t('Langkah 1 dan 2: Pahami, Tentukan', 'Empathize dan Define'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'empathize-define' },
-        alt: t('Tahap Empathize bertanya ke pengguna dan tahap Define menentukan satu masalah utama.'),
+        alt: t('Tahap Empathize bertanya ke pemakai dan tahap Define menentukan satu masalah utama.'),
         body: [
-          rText('Dalam '),
+          rText('', 'Dalam '),
           rTerm('design-thinking', 'Design Thinking', 'Design Thinking'),
           rText(
-            ', tahap 1 ',
-            ', tahap 1 ',
+            ' adalah cara mencari solusi dalam 5 langkah. Langkah 1: ',
+            ' (proses lima tahap memecahkan masalah pemakai), tahap 1 ',
           ),
-          rBold('Empathize', 'Empathize'),
+          rBold('Pahami', 'Empathize'),
           rText(
-            ' itu bertanya ke pengguna. Tahap 2 ',
-            ' menggali masalah lewat wawancara/pengamatan, lalu ',
+            '. Dengarkan pemakai. Langkah 2: ',
+            ' menggali masalah lewat wawancara dan pengamatan. Tahap 2 ',
           ),
-          rBold('Define', 'Define'),
-          rText(' memilih satu masalah utama.', ' merumuskan satu masalah inti secara jelas.'),
+          rBold('Tentukan', 'Define'),
+          rText('. Pilih satu masalah utama.', ' merumuskan satu masalah inti.'),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'a06-l02-q2',
+          type: 'analogy',
+          prompt: t(
+            'Dokter mendengar semua keluhanmu sebelum memberi obat. Itu mirip langkah yang mana?',
+            'Dokter mendengarkan keluhan pasien sebelum memberi resep. Itu mirip tahap apa?',
+          ),
+          choices: [
+            { id: 'emp', label: t('Pahami pemakai', 'Empathize (mendengarkan pemakai)') },
+            {
+              id: 'tst',
+              label: t('Tentukan satu masalah', 'Define (memilih satu masalah inti)'),
+              explainWrong: t(
+                'Langkah Tentukan datang sesudah mendengar. Dokter memilih satu masalah setelah mendengar semua keluhan.',
+                'Define datang sesudah Empathize. Masalah inti baru dipilih setelah semua keluhan didengar.',
+              ),
+            },
+            {
+              id: 'pro',
+              label: t('Langsung membuat aplikasi', 'Langsung membangun fitur'),
+              explainWrong: t(
+                'Membuat aplikasi sebelum paham masalah bisa salah sasaran. Dokter juga tidak langsung memberi obat.',
+                'Membangun fitur sebelum paham masalah bisa salah sasaran. Dokter pun tidak langsung menulis resep.',
+              ),
+            },
+          ],
+          answer: 'emp',
+          explainCorrect: t(
+            'Dokter mendengar dulu sebelum bertindak. Pembuat aplikasi juga mendengarkan pemakai lebih dulu.',
+            'Empathize berarti mendengarkan dan mengamati situasi pemakai lebih dulu. Dokter menanyakan keluhan sebelum memberi resep.',
+          ),
+          hints: [t('Dokter melakukan apa sebelum memberi obat?')],
+          tags: ['design-thinking'],
+        }),
+      ),
       conceptStep({
         title: t('Langkah 3, 4, 5: Ide, Contoh, Uji', 'Ideate, Prototype, dan Test'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'ideate-prototype-test' },
-        alt: t('Tahap Ideate mengumpulkan ide, Prototype membuat contoh, dan Test menguji ke pengguna.'),
+        alt: t('Tahap Ideate mengumpulkan ide, Prototype membuat contoh, dan Test menguji ke pemakai.'),
         body: [
-          rBold('Ideate', 'Ideate'),
-          rText(' mengumpulkan banyak ide. ', ' menggali banyak ide tanpa langsung menghakimi, '),
-          rBold('Prototype', 'Prototype'),
-          rText(' membuat contoh kasar. ', ' membuat contoh kasar yang bisa dicoba, lalu '),
-          rBold('Test', 'Test'),
-          rText(' mengujinya ke pengguna asli.', ' mengujinya ke pengguna asli untuk diperbaiki.'),
+          rJunior('Langkah 3: '),
+          rBold('Ide', 'Ideate'),
+          rText(
+            '. Kumpulkan banyak ide. Langkah 4: ',
+            ' menggali banyak ide tanpa langsung menghakimi. ',
+          ),
+          rBold('Contoh', 'Prototype'),
+          rText(
+            '. Buat contoh sederhana. Langkah 5: ',
+            ' membuat contoh kasar yang bisa dicoba. ',
+          ),
+          rBold('Uji', 'Test'),
+          rText(
+            '. Coba ke pemakai asli, lalu ulangi kalau belum bagus.',
+            ' mengujinya ke pemakai asli, lalu hasilnya dipakai untuk membetulkan rancangan.',
+          ),
         ],
       }),
       conceptStep({
         title: t('Boleh Berputar Kembali', 'Proses Berulang (Iteratif)'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'siklus-berputar' },
-        alt: t('Panah melingkar dari Test kembali ke Define atau Prototype saat hasil perlu diperbaiki.'),
+        alt: t('Panah melingkar dari Test kembali ke Define atau Ideate saat hasil perlu dibetulkan.'),
+        modes: ['pro'],
         body: [
-          rText(
-            'Kalau hasil uji belum bagus, ulangi lagi seperti dokter mengganti resep. Proses ',
-            'Proses ',
-          ),
-          rTerm('ux', 'UX', 'UX'),
-          rText(
-            ' tidak lurus sekali jadi.',
-            ' bersifat iteratif: bila tahap Test menyingkap masalah baru, tim bisa kembali ke Ideate atau Define.',
-          ),
+          rText('Prosesnya bersifat iteratif, artinya berulang: kalau tahap Test menunjukkan masalah baru, tim kembali ke Ideate atau Define.'),
         ],
       }),
+      qStep(
+        makeTf({
+          id: 'a06-l02-q3',
+          prompt: t(
+            'Kamu hanya boleh menjalankan 5 langkah mencari solusi 1 kali.',
+            'Kalau Test menemukan masalah baru, tim sebaiknya tetap merilis sesuai jadwal.',
+          ),
+          answer: false,
+          explainCorrect: t(
+            'Pernyataan itu keliru: langkahnya boleh diulang kalau hasilnya belum bagus. Seperti dokter yang mengecek pasiennya lagi.',
+            'Pernyataan itu keliru: prosesnya iteratif (berulang). Kalau Test menemukan masalah baru, tim kembali ke Ideate atau Define.',
+          ),
+          explainWrong: t(
+            'Hasil uji yang belum bagus boleh dibetulkan. Dokter juga mengecek pasien lagi.',
+            'Merilis masalah yang sudah ketahuan hanya memindahkannya ke pemakai. Tim kembali ke Ideate atau Define lebih dulu.',
+          ),
+          hints: [t('Ingat dokter yang mengecek hasil obatnya.', 'Lihat arah panah sesudah tahap Test.')],
+          tags: ['design-thinking'],
+        }),
+      ),
       limitStep({
-        analogy: t('Design Thinking seperti dokter memeriksa pasien'),
+        riskyAnalogy: true,
+        analogy: t('Mirip dokter yang memeriksa pasien', 'Design Thinking seperti dokter memeriksa pasien'),
         same: [
-          t('Sama-sama mendengarkan dulu, menentukan inti masalah, mencoba solusi, lalu memantau hasilnya.'),
+          t(
+            'Dokter dan pembuat aplikasi sama-sama mendengar dulu, lalu mengecek hasilnya.',
+            'Sama-sama mendengarkan dulu, menentukan inti masalah, mencoba solusi, lalu memantau hasilnya.',
+          ),
         ],
         different: [
-          t('Dokter tidak boleh sembarangan bereksperimen obat ke tubuh manusia, sedangkan desainer UX sangat dianjurkan mencoba banyak sketsa ide kasar terlebih dahulu.'),
+          t(
+            'Dokter tidak boleh coba-coba obat. Contoh aplikasi boleh dicoba.',
+            'Dokter tidak boleh bereksperimen sembarangan pada tubuh pasien. Desainer justru dianjurkan mencoba banyak sketsa kasar lebih dulu.',
+          ),
         ],
       }),
       simStep(
         'desa-ux',
         t(
-          'Klik langkah 1 sampai 3 pada alur kerja UX untuk melihat perjalanannya!',
-          'Ikuti alur tahapan Design Thinking dari Empathize, Define, hingga Prototype dan Test pada simulator.',
+          'Ketuk 3 tombol di Desa UX dan lihat urutannya.',
+          'Ikuti tahap Empathize sampai Test di simulator dan lihat hasil tiap tahap.',
         ),
       ),
       qStep({
         id: 'a06-l02-q1',
         type: 'order',
-        prompt: t('Urutkan lima langkah Design Thinking dari awal sampai akhir:'),
+        prompt: t('Urutkan 5 langkah mencari solusi, dari awal sampai akhir.', 'Urutkan lima tahap Design Thinking dari awal sampai akhir:'),
         difficulty: 2,
         items: [
-          { id: 'ide', label: t('3. Ideate (Kumpulkan banyak ide)') },
-          { id: 'emp', label: t('1. Empathize (Pahami pengguna)') },
-          { id: 'tst', label: t('5. Test (Uji ke pengguna asli)') },
-          { id: 'def', label: t('2. Define (Rumuskan masalah utama)') },
-          { id: 'pro', label: t('4. Prototype (Buat contoh kasar)') },
+          { id: 'ide', label: t('Ide: kumpulkan banyak ide', 'Ideate (kumpulkan banyak ide)') },
+          { id: 'emp', label: t('Pahami: dengarkan pemakai', 'Empathize (pahami pemakai)') },
+          { id: 'tst', label: t('Uji: coba ke pemakai asli', 'Test (uji ke pemakai asli)') },
+          { id: 'def', label: t('Tentukan: pilih satu masalah', 'Define (rumuskan masalah utama)') },
+          { id: 'pro', label: t('Contoh: buat contoh sederhana', 'Prototype (buat contoh kasar)') },
         ],
         answer: ['emp', 'def', 'ide', 'pro', 'tst'],
-        explainCorrect: t('Hebat! Empathize → Define → Ideate → Prototype → Test.'),
+        explainCorrect: t(
+          'Urutannya: Pahami, Tentukan, Ide, Contoh, Uji. Seperti dokter: bertanya, menentukan sakit, memikirkan obat, memberi obat, mengecek.',
+          'Urutannya: Empathize, Define, Ideate, Prototype, Test. Setiap tahap memakai hasil tahap sebelumnya.',
+        ),
+        hints: [
+          t(
+            'Ingat dokter: bertanya, menentukan sakit, memikirkan obat, memberi obat, mengecek.',
+            'Mulai dari pemakai, akhiri dengan pengujian ke pemakai.',
+          ),
+          undefined,
+        ],
         tags: ['design-thinking'],
       }),
       qStep(
         makeMcq({
-          id: 'a06-l02-q2',
-          type: 'analogy',
-          prompt: t('Saat dokter mendengarkan semua keluhan pasien sebelum memberi resep, itu mirip tahap…'),
-          choices: [
-            { id: 'emp', label: t('Empathize') },
-            {
-              id: 'tst',
-              label: t('Test'),
-              explainWrong: t('Test dilakukan setelah solusi dibuat untuk mengecek apakah sudah membaik.'),
-            },
-            {
-              id: 'pro',
-              label: t('Prototype'),
-              explainWrong: t('Prototype adalah membuat contoh kasar solusinya.'),
-            },
-          ],
-          answer: 'emp',
-          explainCorrect: t('Benar! Empathize berarti mendengarkan dan mengamati situasi pengguna lebih dulu.'),
-          tags: ['design-thinking'],
-        }),
-      ),
-      qStep(
-        makeTf({
-          id: 'a06-l02-q3',
-          prompt: t('Design Thinking selalu berjalan lurus satu kali saja dan tidak pernah kembali ke tahap sebelumnya.'),
-          answer: false,
-          explainCorrect: t('Benar, pernyataan itu salah! Proses ini berulang: jika uji coba kurang pas, kita perbaiki lagi.'),
-          explainWrong: t('Hampir! Sama seperti dokter mengecek pasien lagi, Design Thinking berputar memperbaiki hasil.'),
-          tags: ['design-thinking'],
-        }),
-      ),
-      qStep(
-        makeMcq({
           id: 'a06-l02-q4',
           type: 'limit',
-          analogy: t('Dokter memeriksa pasien'),
-          prompt: t('Perbedaan apa yang berlaku pada Design Thinking dibanding pekerjaan dokter sungguhan?'),
+          analogy: t('Mirip dokter yang memeriksa pasien'),
+          prompt: t(
+            'Dokter harus berhati-hati dengan obat. Mana yang hanya aman bagi pembuat aplikasi?',
+            'Apa yang aman dicoba berkali-kali oleh desainer UX, tetapi tidak oleh dokter?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'exp', label: t('Desainer bebas menguji banyak ide kasar sebelum membuat aplikasi jadi') },
+            { id: 'exp', label: t('Mencoba banyak contoh sederhana', 'Mencoba banyak contoh kasar') },
             {
               id: 'ask',
-              label: t('Harus mencari akar masalah sebelum memilih solusi'),
-              explainWrong: t('Itu persamaan penting antara dokter dan desainer UX.'),
+              label: t('Mendengarkan keluhan lebih dulu'),
+              explainWrong: t('Dokter juga mendengarkan keluhan lebih dulu. Itu bagian yang mirip.'),
             },
             {
               id: 'eval',
-              label: t('Memantau hasil setelah solusi dicoba'),
-              explainWrong: t('Evaluasi setelah solusi dicoba juga persamaan keduanya.'),
+              label: t('Mengecek hasil sesudah dicoba'),
+              explainWrong: t('Dokter juga mengecek hasil pengobatan. Itu bagian yang mirip.'),
             },
           ],
           answer: 'exp',
-          explainCorrect: t('Tepat! Sketsa kasar aplikasi sangat aman dan murah untuk diuji berkali-kali.'),
+          explainCorrect: t(
+            'Contoh aplikasi aman dan murah dicoba berkali-kali. Obat tidak bisa dicoba begitu.',
+            'Sketsa kasar aplikasi aman dan murah diuji berkali-kali. Obat tidak bisa dicoba seperti itu pada pasien.',
+          ),
+          hints: [t('Cari hal yang tidak boleh dilakukan dokter.')],
           tags: ['design-thinking'],
         }),
       ),
@@ -695,30 +887,49 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a06-l02-q5',
           type: 'scenario',
-          story: t('Tim Raka langsung membuat aplikasi selama 3 bulan tanpa bertanya ke calon pemakai. Setelah jadi, tidak ada warga yang mau memakai karena tidak sesuai masalah mereka.'),
-          prompt: t('Tahap awal mana yang dilewati tim Raka?'),
+          story: t(
+            'Tim Dimas membuat aplikasi selama 3 bulan. Mereka tidak bertanya ke calon pemakai. Setelah jadi, tidak ada warga yang mau memakainya.',
+            'Tim Dimas membangun aplikasi selama 3 bulan tanpa bertanya ke calon pemakai. Setelah rilis, tidak ada warga yang memakainya.',
+          ),
+          prompt: t('Langkah awal mana yang dilewati tim Dimas?', 'Tahap awal mana yang dilewati tim?'),
           difficulty: 2,
           choices: [
-            { id: 'ed', label: t('Empathize dan Define (memahami pengguna dan merumuskan masalahnya)') },
+            { id: 'ed', label: t('Memahami pemakai dan masalahnya', 'Empathize dan Define (memahami pemakai)') },
             {
               id: 'color',
-              label: t('Memilih warna ungu yang lebih cerah'),
-              explainWrong: t('Aplikasi yang tidak memecahkan masalah pengguna tetap ditinggalkan meski warnanya cerah.'),
+              label: t('Memilih warna yang lebih cerah', 'Memilih warna ungu yang lebih cerah dan menarik'),
+              explainWrong: t(
+                'Warna cerah tidak menolong aplikasi yang tidak dibutuhkan. Warga butuh solusi, bukan hiasan.',
+                'Aplikasi yang tidak memecahkan masalah pemakai tetap ditinggalkan, secerah apa pun warnanya.',
+              ),
             },
             {
               id: 'server',
-              label: t('Menambah kecepatan server'),
-              explainWrong: t('Masalahnya bukan di server, melainkan di ketidakcocokan solusi dengan kebutuhan pengguna.'),
+              label: t('Membuat aplikasinya lebih cepat', 'Menambah kecepatan server'),
+              explainWrong: t(
+                'Aplikasi yang cepat pun tidak dipakai kalau tidak dibutuhkan. Masalahnya ada di awal.',
+                'Masalahnya bukan di server, tetapi di solusi yang tidak cocok dengan kebutuhan pemakai.',
+              ),
             },
           ],
           answer: 'ed',
-          explainCorrect: t('Benar! Tanpa Empathize dan Define, tim bisa bekerja keras membangun hal yang tidak dibutuhkan.'),
+          explainCorrect: t(
+            'Tanpa bertanya, tim membangun hal yang tidak dibutuhkan. Seperti dokter yang memberi obat tanpa mendengar keluhan.',
+            'Tanpa Empathize dan Define, tim bisa bekerja keras membangun hal yang tidak dibutuhkan.',
+          ),
+          hints: [
+            t(
+              'Ingat apa yang dilakukan dokter sebelum memberi obat.',
+              'Cari tahap sebelum tim mulai membangun.',
+            ),
+          ],
           tags: ['design-thinking', 'ux'],
         }),
       ),
       qStep({
         id: 'a06-l02-q6',
         type: 'match',
+        modes: ['pro'],
         prompt: t('Pasangkan tahap Design Thinking dengan kegiatan utamanya:'),
         difficulty: 2,
         left: [
@@ -729,185 +940,118 @@ export const lessons: Lesson[] = [
         right: [
           { id: 'rdef', label: t('Merumuskan satu masalah inti dengan jelas') },
           { id: 'ride', label: t('Mengumpulkan banyak ide tanpa langsung mengkritik') },
-          { id: 'rtst', label: t('Mengamati pengguna asli mencoba rancangan') },
+          { id: 'rtst', label: t('Mengamati pemakai asli mencoba rancangan') },
         ],
         answer: { def: 'rdef', ide: 'ride', tst: 'rtst' },
-        explainCorrect: t('Keren! Setiap tahap memiliki peran khusus sebelum produk dirilis.'),
+        explainCorrect: t('Tiap tahap punya hasil sendiri: masalah inti, kumpulan ide, dan temuan dari uji.'),
+        hints: [t('Tahap Test selalu melibatkan pemakai asli.'), undefined],
         tags: ['design-thinking'],
       }),
       qStep({
         id: 'a06-l02-q7',
         type: 'type',
         modes: ['pro'],
-        prompt: t('Apa nama tahap ketiga dalam Design Thinking saat tim mengumpulkan sebanyak mungkin ide solusi sebelum menilainya?'),
+        prompt: t('Apa nama tahap ketiga Design Thinking, saat tim mengumpulkan sebanyak mungkin ide sebelum menilainya?'),
         difficulty: 2,
         accept: ['ideate'],
-        explainCorrect: t('Tepat! Tahap Ideate membuka ruang bagi sebanyak mungkin alternatif solusi.'),
+        explainCorrect: t('Ideate membuka ruang untuk banyak alternatif solusi. Seperti mencatat semua ide di papan tulis sebelum memilih.'),
+        hints: [t('Tahap ini ada di antara Define dan Prototype.'), undefined],
         tags: ['design-thinking'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a06-l02-r1',
-        prompt: t('Langkah pertama dalam Design Thinking adalah…'),
+        prompt: t(
+          'Apa langkah pertama saat mencari solusi untuk pemakai?',
+          'Apa tahap pertama dalam Design Thinking?',
+        ),
         choices: [
-          { id: 'e', label: t('Empathize (memahami pengguna)') },
-          { id: 't', label: t('Test (uji hasil akhir)'), explainWrong: t('Test adalah tahap kelima setelah prototype dibuat.') },
+          { id: 'e', label: t('Pahami pemakai', 'Empathize (memahami pemakai)') },
+          {
+            id: 't',
+            label: t('Uji hasil akhir', 'Test (menguji hasil akhir)'),
+            explainWrong: t(
+              'Uji adalah langkah terakhir, setelah ada contoh.',
+              'Test adalah tahap kelima, setelah prototype dibuat.',
+            ),
+          },
+          {
+            id: 'p',
+            label: t('Kumpulkan banyak ide', 'Ideate (mengumpulkan ide)'),
+            explainWrong: t(
+              'Ide dikumpulkan setelah kamu paham masalahnya.',
+              'Ideate datang setelah masalah dipahami dan dirumuskan.',
+            ),
+          },
         ],
         answer: 'e',
-        explainCorrect: t('Empathize menjadi pintu masuk agar kita paham siapa yang dibantu.'),
+        explainCorrect: t(
+          'Mendengarkan pemakai adalah pintu masuk. Dokter menanyakan keluhan sebelum memberi obat.',
+          'Empathize menjadi pintu masuk supaya tim paham siapa yang dibantu. Dokter menanyakan keluhan sebelum memberi resep.',
+        ),
+        hints: [t('Dokter bertanya dulu sebelum memeriksa.')],
         tags: ['design-thinking'],
       }),
       makeTf({
         id: 'a06-l02-r2',
-        prompt: t('Pada tahap Ideate, tim langsung menolak ide-ide aneh sebelum sempat dicatat.'),
+        prompt: t(
+          'Saat mengumpulkan ide, ide yang aneh langsung ditolak.',
+          'Pada tahap Ideate, tim langsung menolak ide yang aneh sebelum sempat dicatat.',
+        ),
         answer: false,
-        explainCorrect: t('Betul, pernyataan itu salah! Pada Ideate, kita kumpulkan banyak ide dulu tanpa langsung menilai.'),
-        explainWrong: t('Hampir! Menilai terlalu cepat mematikan ide kreatif yang mungkin sangat berguna.'),
+        explainCorrect: t(
+          'Pernyataan itu keliru: ide dikumpulkan dulu tanpa dinilai. Seperti menulis semua usul teman di papan tulis.',
+          'Pernyataan itu keliru: pada Ideate, tim mengumpulkan banyak ide dulu tanpa menilai.',
+        ),
+        explainWrong: t(
+          'Menolak terlalu cepat mematikan ide bagus. Ide aneh kadang menjadi ide terbaik.',
+          'Menilai terlalu cepat mematikan ide kreatif yang mungkin berguna.',
+        ),
+        hints: [t('Ingat langkah 3: kumpulkan banyak ide.', 'Ingat tujuan tahap Ideate: jumlah ide dulu, penilaian kemudian.')],
         tags: ['design-thinking'],
       }),
     ],
     recap: t(
-      'Design Thinking berputar lewat 5 langkah: Empathize, Define, Ideate, Prototype, dan Test.',
-      'Design Thinking memandu pemecahan masalah secara iteratif mulai dari empati pengguna hingga pengujian prototype.',
+      'Cara mencari solusi punya 5 langkah: pahami, tentukan, ide, contoh, uji.',
+      'Design Thinking memecahkan masalah lewat Empathize, Define, Ideate, Prototype, dan Test. Prosesnya berulang sampai hasil uji memuaskan.',
     ),
     companion: {
-      talkPrompts: ['Kalau kita mau merancang tas sekolah baru, apa saja pertanyaan Empathize yang bisa ditanyakan ke teman?'],
-      offlineActivity: 'Amati barang yang sering bikin kesal di rumah (Define), lalu tuliskan 5 ide perbaikan lucu maupun serius (Ideate).',
+      talkPrompts: ['Kalau merancang tas sekolah baru, apa yang kamu tanyakan ke teman?'],
+      offlineActivity:
+        'Amati satu barang di rumah yang sering membuatmu kesal. Tulis 5 ide perbaikannya, yang lucu maupun yang serius.',
     },
   }),
 
+  // ---------------------------------------------------------------------------------------------
+  // a06-l03  Persona, user flow, user journey (Pro)
+  // ---------------------------------------------------------------------------------------------
   makeLesson({
     id: 'a06-l03',
     worldId: 'a06',
     title: 'Persona, user flow, user journey',
     modes: ['pro'],
-    objective: t('Aku bisa menyusun persona berbasis riset, membedakan user flow dan user journey, serta mengenali istilah UX penting.'),
+    objective: t('Kamu bisa menyusun persona berbasis riset dan memetakan alur belanja pemakai.'),
     estMinutes: 6,
     introducesTerms: ['persona', 'user-flow'],
     usesTerms: ['ux', 'design-thinking'],
     warmupFrom: 'a06-l02',
+    atWork: 'Di rapat desain, kamu akan membawa persona untuk memutuskan layar mana yang dibuat lebih dulu.',
     steps: [
       storyStep('a06/peta-sutradara.svg', [
-        rText('Sebelum merekam film, sutradara membuat profil tokoh utama serta papan urutan adegan dari awal sampai akhir agar seluruh kru merancang adegan untuk sosok yang sama.'),
+        rText('Tim aplikasi Toko Rani berdebat tentang siapa pembelinya. Sutradara film punya cara untuk masalah seperti ini: profil tokoh dan papan urutan adegan.'),
       ]),
       conceptStep({
         title: t('Persona Berbasis Riset'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'kartu-persona' },
-        alt: t('Kartu persona Rani 21 tahun berisi tujuan, kesulitan, dan kebiasaan pakai HP.'),
+        alt: t('Kartu persona Rani, 21 tahun, berisi tujuan, kesulitan, dan kebiasaan memakai HP.'),
         body: [
           rTerm('persona', 'Persona'),
-          rText(' adalah tokoh rekaan hasil riset yang mewakili kelompok pengguna (berisi tujuan, kesulitan, dan kebiasaan). Misalnya: Rani, mahasiswi berkuota terbatas yang mengakses lewat HP.'),
+          rText(
+            ' adalah tokoh rekaan dari hasil riset yang menggambarkan satu kelompok pemakai. Isinya tujuan, kesulitan, dan kebiasaan, misalnya Rani, mahasiswi berkuota terbatas yang memakai HP.',
+          ),
         ],
-      }),
-      conceptStep({
-        title: t('User Flow vs User Journey'),
-        visualName: 'SequenceDiagram',
-        visualProps: { worldId: 'a06', topic: 'user-flow-journey' },
-        alt: t('Urutan layar user flow dari buka aplikasi hingga bayar serta perasaan user journey.'),
-        body: [
-          rTerm('user-flow', 'User flow'),
-          rText(' memetakan langkah di dalam layar (Buka → Cari → Detail → Keranjang → Bayar). Sebaliknya, '),
-          rBold('user journey'),
-          rText(' lebih luas: mencatat emosi dan kejadian di luar layar, seperti kesal karena ongkir mahal.'),
-        ],
-      }),
-      conceptStep({
-        title: t('Kamus Istilah UX Harian'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'a06', topic: 'kamus-istilah-ux' },
-        alt: t('Istilah IA, pain point, affordance, feedback, friction, microcopy, dan MVP.'),
-        body: [
-          rText('Kenali istilah inti: '),
-          rBold('Information Architecture'),
-          rText(' (menata lorong supermarket), '),
-          rBold('Pain point'),
-          rText(' & '),
-          rBold('Friction'),
-          rText(' (hambatan), '),
-          rBold('Affordance'),
-          rText(' (petunjuk bentuk klik), '),
-          rBold('Feedback'),
-          rText(' (tanggapan sistem), '),
-          rBold('Microcopy'),
-          rText(' (teks kecil tombol/error), serta '),
-          rBold('MVP'),
-          rText(' (versi paling sederhana yang sudah bisa diuji).'),
-        ],
-      }),
-      limitStep({
-        analogy: t('Papan cerita film untuk persona dan user flow'),
-        same: [
-          t('Menyatukan pemahaman seluruh tim tentang siapa tokohnya dan bagaimana alur perjalanannya.'),
-        ],
-        different: [
-          t('Karakter film dibuat dari imajinasi penulis, sedangkan persona wajib dibangun dari hasil riset nyata dan alur aplikasi punya banyak cabang aksi pengguna.'),
-        ],
-      }),
-      simStep(
-        'desa-ux',
-        t('Tinjau alur tahapan kerja UX untuk memastikan persona dan user flow selalu berangkat dari data riset.'),
-      ),
-      qStep(
-        makeMcq({
-          id: 'a06-l03-q1',
-          prompt: t('Manakah perbedaan paling akurat antara user flow dan user journey?'),
-          difficulty: 2,
-          choices: [
-            { id: 'uj', label: t('User flow menggambarkan langkah di dalam aplikasi, sedangkan user journey mencakup perasaan dan kejadian sebelum maupun sesudah memakai aplikasi') },
-            {
-              id: 'code',
-              label: t('User flow ditulis memakai CSS, sedangkan user journey memakai HTML'),
-              explainWrong: t('Keduanya adalah diagram perencanaan UX sebelum penulisan kode.'),
-            },
-            {
-              id: 'one',
-              label: t('User journey hanya berisi satu tombol saja'),
-              explainWrong: t('User journey merangkum perjalanan lengkap lintas titik kontak.'),
-            },
-          ],
-          answer: 'uj',
-          explainCorrect: t('Benar! Misalnya keluhan soal biaya ongkir atau menunggu kurir termasuk bagian user journey.'),
-          tags: ['user-flow', 'ux'],
-        }),
-      ),
-      qStep({
-        id: 'a06-l03-q2',
-        type: 'match',
-        prompt: t('Pasangkan istilah UX berikut dengan maknanya yang tepat:'),
-        difficulty: 2,
-        left: [
-          { id: 'pp', label: t('Pain point') },
-          { id: 'af', label: t('Affordance') },
-          { id: 'fb', label: t('Feedback') },
-          { id: 'fr', label: t('Friction') },
-        ],
-        right: [
-          { id: 'rpp', label: t('Titik yang membuat pengguna kesal atau terhambat') },
-          { id: 'raf', label: t('Petunjuk dari bentuk benda tentang cara memakainya') },
-          { id: 'rfb', label: t('Tanggapan sistem atas aksi, misal pesan "Tersimpan"') },
-          { id: 'rfr', label: t('Hambatan yang memperlambat, misal form terlalu panjang') },
-        ],
-        answer: { pp: 'rpp', af: 'raf', fb: 'rfb', fr: 'rfr' },
-        explainCorrect: t('Mantap! Menguasai kosa kata ini membuat diskusi desain dan pengembangan jauh lebih tepat.'),
-        tags: ['ux'],
-      }),
-      qStep({
-        id: 'a06-l03-q3',
-        type: 'order',
-        prompt: t('Urutkan user flow penyelesaian tugas belanja di aplikasi toko online:'),
-        difficulty: 1,
-        items: [
-          { id: 'det', label: t('Lihat detail produk') },
-          { id: 'pay', label: t('Bayar pesanan') },
-          { id: 'open', label: t('Buka aplikasi') },
-          { id: 'cart', label: t('Masukkan ke keranjang') },
-          { id: 'find', label: t('Cari produk') },
-        ],
-        answer: ['open', 'find', 'det', 'cart', 'pay'],
-        explainCorrect: t('Tepat! Buka aplikasi → Cari produk → Lihat detail → Keranjang → Bayar.'),
-        tags: ['user-flow'],
       }),
       qStep(
         makeMcq({
@@ -917,103 +1061,238 @@ export const lessons: Lesson[] = [
           prompt: t('Apa yang TIDAK boleh dilakukan saat menyusun persona seperti membuat tokoh film?'),
           difficulty: 2,
           choices: [
-            { id: 'fake', label: t('Mengarang sifat dan kebutuhan pengguna secara asal tanpa melakukan riset terlebih dahulu') },
+            { id: 'fake', label: t('Mengarang sifat dan kebutuhan pemakai tanpa riset') },
             {
               id: 'team',
-              label: t('Memakai tokoh tersebut agar seluruh tim memiliki satu sasaran yang sama'),
+              label: t('Memakai tokoh itu sebagai sasaran bersama seluruh tim'),
               explainWrong: t('Menyatukan pemahaman tim justru manfaat utama persona.'),
             },
             {
               id: 'goal',
-              label: t('Mencantumkan tujuan dan kebiasaan pengguna'),
+              label: t('Mencantumkan tujuan dan kebiasaan pemakai'),
               explainWrong: t('Tujuan dan kebiasaan memang bagian penting persona.'),
             },
           ],
           answer: 'fake',
-          explainCorrect: t('Benar! Persona bukan karangan bebas, melainkan rangkuman pola nyata hasil riset pengguna.'),
+          explainCorrect: t('Persona harus berasal dari pola hasil riset, bukan karangan bebas. Tokoh film boleh dikarang, persona tidak.'),
+          hints: [t('Tanyakan dari mana isi persona berasal.')],
           tags: ['persona'],
         }),
+      ),
+      conceptStep({
+        title: t('User Flow vs User Journey'),
+        visualName: 'SequenceDiagram',
+        visualProps: { worldId: 'a06', topic: 'user-flow-journey' },
+        alt: t('Urutan layar user flow dari buka aplikasi hingga bayar serta perasaan user journey.'),
+        body: [
+          rTerm('user-flow', 'User flow'),
+          rText(' memetakan langkah di dalam layar (Buka → Cari → Detail → Keranjang → Bayar). Sebaliknya, '),
+          rBold('user journey'),
+          rText(' lebih luas. Ia mencatat perasaan dan kejadian di luar layar, seperti kesal karena ongkir mahal.'),
+        ],
+      }),
+      qStep({
+        id: 'a06-l03-q3',
+        type: 'order',
+        prompt: t('Urutkan user flow menyelesaikan belanja di aplikasi toko online:'),
+        difficulty: 1,
+        items: [
+          { id: 'det', label: t('Lihat detail produk') },
+          { id: 'pay', label: t('Bayar pesanan') },
+          { id: 'open', label: t('Buka aplikasi') },
+          { id: 'cart', label: t('Masukkan ke keranjang') },
+          { id: 'find', label: t('Cari produk') },
+        ],
+        answer: ['open', 'find', 'det', 'cart', 'pay'],
+        explainCorrect: t('Urutannya: buka aplikasi, cari produk, lihat detail, keranjang, bayar. Setiap layar mengarah ke layar berikutnya.'),
+        hints: [t('Mulai dari membuka aplikasi, akhiri dengan membayar.'), undefined],
+        tags: ['user-flow'],
+      }),
+      qStep(
+        makeMcq({
+          id: 'a06-l03-q1',
+          prompt: t('Pembeli kesal karena kurir terlambat dua hari. Diagram mana yang mencatat kejadian itu?'),
+          difficulty: 2,
+          choices: [
+            { id: 'uj', label: t('User journey') },
+            {
+              id: 'code',
+              label: t('User flow'),
+              explainWrong: t('User flow hanya memetakan langkah di layar aplikasi. Kurir terlambat terjadi di luar layar.'),
+            },
+            {
+              id: 'one',
+              label: t('Persona'),
+              explainWrong: t('Persona menggambarkan siapa pemakainya, bukan urutan kejadian yang ia alami.'),
+            },
+          ],
+          answer: 'uj',
+          explainCorrect: t('User journey mencatat perasaan dan kejadian di luar layar, termasuk pengiriman. User flow berhenti di langkah dalam aplikasi.'),
+          hints: [t('Tanyakan: apakah kurir terlihat di layar aplikasi?')],
+          tags: ['user-flow', 'ux'],
+        }),
+      ),
+      conceptStep({
+        title: t('Hambatan dan Petunjuk di Layar'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a06', topic: 'kamus-istilah-ux' },
+        alt: t('Istilah pain point, friction, affordance, dan feedback pada satu layar.'),
+        body: [
+          rBold('Pain point'),
+          rText(' adalah titik yang membuat pemakai kesal, misalnya ongkir yang baru muncul di akhir. '),
+          rBold('Friction'),
+          rText(' adalah hambatan yang memperlambat, misalnya form 22 kolom. '),
+          rBold('Affordance'),
+          rText(' adalah petunjuk dari bentuk tentang cara memakai, misalnya tombol yang tampak timbul. '),
+          rBold('Feedback'),
+          rText(' adalah tanggapan sistem atas aksi pemakai, misalnya tanda centang setelah menekan Simpan.'),
+        ],
+      }),
+      qStep({
+        id: 'a06-l03-q2',
+        type: 'match',
+        prompt: t('Pasangkan istilah UX dengan maknanya:'),
+        difficulty: 2,
+        left: [
+          { id: 'pp', label: t('Pain point') },
+          { id: 'af', label: t('Affordance') },
+          { id: 'fb', label: t('Feedback') },
+          { id: 'fr', label: t('Friction') },
+        ],
+        right: [
+          { id: 'rpp', label: t('Titik yang membuat pemakai kesal, misalnya biaya tersembunyi') },
+          { id: 'raf', label: t('Petunjuk dari bentuk benda tentang cara memakainya') },
+          { id: 'rfb', label: t('Tanggapan sistem atas aksi, misalnya pesan "Tersimpan"') },
+          { id: 'rfr', label: t('Hambatan yang memperlambat, misalnya form terlalu panjang') },
+        ],
+        answer: { pp: 'rpp', af: 'raf', fb: 'rfb', fr: 'rfr' },
+        explainCorrect: t('Pain point membuat pemakai kesal, friction memperlambat. Affordance memberi petunjuk, feedback memberi tanggapan.'),
+        hints: [t('Feedback datang sesudah pemakai menekan sesuatu.'), undefined],
+        tags: ['ux'],
+      }),
+      conceptStep({
+        title: t('Tata Isi, Teks Kecil, dan MVP'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'a06', topic: 'kamus-istilah-ux' },
+        alt: t('Istilah information architecture, microcopy, dan MVP.'),
+        body: [
+          rBold('Information Architecture'),
+          rText(' (IA) adalah cara menata isi halaman, seperti menata lorong supermarket. '),
+          rBold('Microcopy'),
+          rText(' adalah teks kecil di tombol atau pesan error. '),
+          rBold('MVP'),
+          rText(' adalah versi paling sederhana yang sudah bisa diuji, misalnya daftar produk dan satu tombol pesan. Tim memakainya untuk mengecek ide inti sebelum membangun semua fitur.'),
+        ],
+      }),
+      limitStep({
+        riskyAnalogy: false,
+        analogy: t('Papan cerita dan profil tokoh film'),
+        same: [t('Menyatukan pemahaman seluruh tim tentang siapa tokohnya dan bagaimana alurnya.')],
+        different: [t('Karakter film lahir dari imajinasi penulis. Persona harus dibangun dari hasil riset sungguhan.')],
+      }),
+      simStep(
+        'desa-ux',
+        t('Telusuri alur kerja UX di simulator dan lihat bagaimana riset mendasari tiap tahap.'),
       ),
       qStep(
         makeMcq({
           id: 'a06-l03-q5',
           type: 'scenario',
-          story: t('Di halaman daftar aplikasi Nadia, banyak calon pendaftar berhenti di tengah karena harus mengisi 22 kolom sekaligus, dan label tombolnya hanya bertulis "Proses" tanpa penjelasan jelas.'),
-          prompt: t('Kombinasi masalah UX manakah yang sedang terjadi?'),
+          story: t('Banyak calon pendaftar di aplikasi Rani berhenti di tengah, karena harus mengisi 22 kolom. Tombol terakhir hanya bertulis "Proses".'),
+          prompt: t('Masalah UX apa yang sedang terjadi?'),
           difficulty: 3,
           choices: [
-            { id: 'fm', label: t('Friction tinggi (form kepanjangan) dan microcopy kurang jelas') },
+            { id: 'fm', label: t('Friction tinggi karena form panjang, dan microcopy kurang jelas') },
             {
               id: 'mvp',
-              label: t('Kelebihan feedback positif'),
-              explainWrong: t('Pengguna justru terhambat dan bingung, bukan mendapat umpan balik yang jelas.'),
+              label: t('Feedback yang terlalu banyak muncul setelah pemakai menekan tombol'),
+              explainWrong: t('Pemakai justru terhambat dan bingung, bukan kebanjiran tanggapan.'),
             },
             {
               id: 'ia',
-              label: t('Affordance tombol terlalu cepat'),
-              explainWrong: t('Affordance tidak memiliki ukuran kecepatan; masalahnya ada pada panjang form dan teks tombol.'),
+              label: t('Information Architecture yang terlalu rumit di halaman beranda'),
+              explainWrong: t('Masalahnya ada di panjang form dan teks tombol, bukan di cara menata isi halaman.'),
             },
           ],
           answer: 'fm',
-          explainCorrect: t('Tepat! Memotong jumlah kolom mengurangi friction, dan microcopy tombol yang jelas meningkatkan konversi.'),
+          explainCorrect: t('Memotong kolom mengurangi friction, dan teks tombol yang mudah dipahami membantu pemakai menyelesaikan form. Keduanya menaikkan jumlah yang mendaftar.'),
+          hints: [t('Hitung kolom yang harus diisi, lalu baca tulisan tombolnya.')],
           tags: ['ux'],
         }),
       ),
       qStep({
         id: 'a06-l03-q6',
         type: 'fill',
-        prompt: t('Lengkapi istilah UX berikut: Cara mengelompokkan dan memberi nama isi halaman seperti menata lorong supermarket disebut ___ architecture.'),
+        prompt: t('Lengkapi istilah ini: cara menata dan memberi nama isi halaman, seperti lorong supermarket, disebut ___ architecture.'),
         difficulty: 2,
         template: '___ architecture',
         bank: ['Information', 'Conversion', 'Onboarding'],
         answer: ['Information'],
-        explainCorrect: t('Tepat! Information Architecture (IA) memastikan pengguna mudah menemukan letak informasi.'),
+        explainCorrect: t('Information Architecture (IA) menata dan menamai isi halaman supaya mudah ditemukan. Seperti papan petunjuk di lorong supermarket.'),
+        hints: [t('Pikirkan isi halaman: apa yang ditata?'), undefined],
         tags: ['ux'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a06-l03-r1',
-        prompt: t('Versi paling sederhana dari sebuah produk yang sudah bisa dipakai dan diuji ke pengguna nyata disebut…'),
+        prompt: t('Apa nama versi produk paling sederhana yang sudah bisa diuji ke pemakai sungguhan?'),
         choices: [
           { id: 'mvp', label: t('MVP (Minimum Viable Product)') },
-          { id: 'ia', label: t('Information Architecture'), explainWrong: t('IA adalah cara menata dan mengelompokkan isi halaman.') },
+          {
+            id: 'ia',
+            label: t('Information Architecture'),
+            explainWrong: t('IA adalah cara menata dan mengelompokkan isi halaman.'),
+          },
+          {
+            id: 'pers',
+            label: t('Persona'),
+            explainWrong: t('Persona adalah tokoh rekaan dari riset, bukan versi produk.'),
+          },
         ],
         answer: 'mvp',
-        explainCorrect: t('MVP memungkinkan tim menguji ide inti secepat mungkin tanpa menunggu seluruh fitur lengkap.'),
+        explainCorrect: t('MVP memungkinkan tim menguji ide inti tanpa menunggu semua fitur selesai. Seperti mencoba satu resep dulu sebelum membuka restoran.'),
+        hints: [t('Cari versi yang paling sederhana, tetapi sudah bisa dipakai.')],
         tags: ['ux'],
       }),
       makeTf({
         id: 'a06-l03-r2',
-        prompt: t('Teks kecil pada antarmuka seperti label tombol dan pesan error termasuk microcopy / UX writing.'),
+        prompt: t('Teks kecil seperti label tombol dan pesan error termasuk microcopy.'),
         answer: true,
-        explainCorrect: t('Betul! Microcopy yang ramah dan jelas sangat membantu mencegah kebingungan pengguna.'),
-        explainWrong: t('Label tombol, petunjuk isian, dan pesan error memang bagian dari microcopy.'),
+        explainCorrect: t('Label tombol, petunjuk isian, dan pesan error adalah microcopy. Teks yang mudah dipahami mencegah pemakai bingung.'),
+        explainWrong: t('Label tombol, petunjuk isian, dan pesan error memang microcopy. Teks kecil itu ikut menentukan UX.'),
+        hints: [t('Pikirkan tulisan kecil di layar.')],
         tags: ['ux'],
       }),
     ],
-    recap: t('Gunakan persona berbasis riset, petakan user flow & journey, serta minimalkan friction lewat IA, affordance, feedback, dan microcopy yang jelas.'),
+    recap: t(
+      'Persona berasal dari riset. User flow memetakan langkah di layar, user journey mencakup perasaan di luar layar.',
+    ),
   }),
 
+  // ---------------------------------------------------------------------------------------------
+  // a06-l04  Wireframe, mockup, prototype
+  // ---------------------------------------------------------------------------------------------
   makeLesson({
     id: 'a06-l04',
     worldId: 'a06',
     title: 'Wireframe, mockup, prototype',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa membedakan denah kasar (wireframe), gambar berwarna (mockup), dan contoh bisa diklik (prototype).',
-      'Aku bisa menjelaskan peran wireframe, mockup, dan prototype untuk menekan biaya revisi sebelum coding.',
+      'Aku bisa membedakan denah kasar, gambar berwarna, dan contoh yang bisa diklik.',
+      'Kamu bisa menjelaskan peran wireframe, mockup, dan prototype dalam menekan biaya revisi sebelum menulis kode.',
     ),
-    estMinutes: 5,
+    estMinutes: 6,
     introducesTerms: ['prototype'],
     usesTerms: ['wireframe', 'ux', 'ui', 'design-thinking'],
     stickerId: 'denah-rumah',
     warmupFrom: 'a06-l03',
+    atWork: 'Kamu akan membuat prototype di alat desain, lalu menunjukkannya ke pemakai sebelum programmer mulai menulis kode.',
     steps: [
       storyStep('a06/denah-rumah.svg', [
         rText(
-          'Sebelum membangun rumah, arsitek menggambar denah pensil dulu. Lalu dibuat gambar 3D berwarna, lalu rumah contoh yang pintunya bisa dibuka!',
-          'Membangun rumah dilakukan bertahap dari denah garis kasar, gambar 3D berwarna, hingga rumah contoh yang bisa dimasuki. Merancang web juga melewati tiga tahap tersebut.',
+          'Arsitek menggambar denah pensil dulu. Lalu gambar 3D berwarna, lalu rumah contoh yang pintunya bisa dibuka. Bagaimana cara merancang web seperti itu?',
+          'Tim Dimas ingin menguji alur beli sepatu sebelum menulis kode. Mereka memakai tiga tahap seperti arsitek: denah, gambar 3D, lalu rumah contoh.',
         ),
       ]),
       conceptStep({
@@ -1024,21 +1303,47 @@ export const lessons: Lesson[] = [
         body: [
           rTerm('wireframe', 'Wireframe', 'Wireframe'),
           rText(
-            ' itu sketsa kasar hitam-putih. Fokus menata letak bagian halaman sebelum memilih warna.',
-            ' adalah sketsa struktur hitam-putih. Fokus utamanya menata hierarki dan letak bagian halaman, belum membahas warna atau foto.',
+            ' adalah sketsa kasar hitam-putih. Ia menata letak tombol dan gambar. Warna dipilih nanti.',
+            ' adalah sketsa struktur hitam-putih. Ia menata letak dan urutan bagian halaman, tanpa warna atau foto.',
           ),
         ],
       }),
+      qStep(
+        makeTf({
+          id: 'a06-l04-q3',
+          prompt: t(
+            'Saat membuat wireframe, kamu sebaiknya langsung memilih warna yang rumit.',
+            'Pada wireframe awal, tim sebaiknya langsung memilih kombinasi warna gradasi yang rumit.',
+          ),
+          answer: false,
+          explainCorrect: t(
+            'Pernyataan itu keliru: wireframe hitam-putih supaya kamu fokus ke letak. Seperti denah pensil tanpa cat.',
+            'Pernyataan itu keliru: wireframe dibuat hitam-putih supaya tim fokus pada susunan. Warna baru dipilih di tahap mockup.',
+          ),
+          explainWrong: t(
+            'Warna dipilih nanti, di tahap gambar berwarna. Denah pensil tidak memakai cat.',
+            'Warna dan gaya visual dipilih nanti, pada tahap mockup.',
+          ),
+          hints: [t('Ingat denah pensil di cerita arsitek.')],
+          tags: ['wireframe'],
+        }),
+      ),
       conceptStep({
-        title: t('Gambar Jadi & Versi Bisa Diklik', 'Tahap 2 & 3: Mockup dan Prototype'),
+        title: t('Gambar Jadi dan Versi Bisa Diklik', 'Tahap 2 dan 3: Mockup dan Prototype'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'mockup-dan-prototype' },
         alt: t('Mockup gambar berwarna statis dan prototype yang menghubungkan antarlayar saat diklik.'),
         body: [
           rBold('Mockup', 'Mockup'),
-          rText(' sudah penuh warna dan huruf, tapi diam. ', ' memberi warna, huruf, dan gaya visual lengkap (statis). '),
+          rText(
+            ' sudah penuh warna dan huruf, tetapi diam. ',
+            ' memberi warna, huruf, dan gaya visual lengkap (statis). ',
+          ),
           rTerm('prototype', 'Prototype', 'Prototype'),
-          rText(' sudah bisa dicoba klik seperti asli.', ' menghubungkan layar agar bisa diklik guna menguji alur.'),
+          rText(
+            ' sudah bisa diklik seperti aslinya. Mengubah rancangan jauh lebih mudah daripada membongkar tembok.',
+            ' adalah mockup yang layarnya terhubung, jadi bisa diklik untuk menguji alur.',
+          ),
         ],
       }),
       conceptStep({
@@ -1046,98 +1351,104 @@ export const lessons: Lesson[] = [
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'hemat-biaya-revisi' },
         alt: t('Grafik biaya perbaikan murah di wireframe dan mahal setelah menulis kode penuh.'),
+        modes: ['pro'],
         body: [
           rText(
-            'Mengubah garis pensil jauh lebih mudah daripada membongkar tembok. Uji rancangan sebelum menulis kode!',
-            'Makin awal kesalahan alur ketahuan di wireframe atau prototype, makin murah dan cepat memperbaikinya dibanding membongkar kode program.',
+            'Makin awal kesalahan alur ketahuan di wireframe atau prototype, makin murah dan cepat perbaikannya. Membongkar kode yang sudah jadi jauh lebih mahal.',
           ),
         ],
-      }),
-      limitStep({
-        analogy: t('Membangun rumah: denah (wireframe), 3D (mockup), rumah contoh (prototype)'),
-        same: [
-          t('Menguji tata ruang sebelum bahan bangunan atau kode terpasang permanen.'),
-        ],
-        different: [
-          t('Rumah contoh fisik butuh biaya besar dan lama dibangun, sedangkan prototype digital dapat direvisi atau diganti warnanya dalam hitungan menit.'),
-        ],
-      }),
-      simStep(
-        'desa-ux',
-        t(
-          'Lihat di mana tahap Prototype bekerja dalam alur UX di Desa UX!',
-          'Amati posisi tahap Prototype dan Test sebelum tim melangkah ke penulisan kode.',
-        ),
-      ),
-      qStep({
-        id: 'a06-l04-q1',
-        type: 'order',
-        prompt: t('Urutkan tiga tahap rancangan desain dari paling kasar sampai yang sudah bisa dicoba klik:'),
-        difficulty: 1,
-        items: [
-          { id: 'mk', label: t('Mockup (gambar jadi berwarna)') },
-          { id: 'pr', label: t('Prototype (bisa diklik pindah halaman)') },
-          { id: 'wf', label: t('Wireframe (sketsa kasar hitam-putih)') },
-        ],
-        answer: ['wf', 'mk', 'pr'],
-        explainCorrect: t('Tepat! Wireframe (susunan) → Mockup (tampilan visual) → Prototype (interaktif).'),
-        tags: ['wireframe', 'prototype'],
       }),
       qStep(
         makeMcq({
           id: 'a06-l04-q2',
           type: 'analogy',
-          prompt: t('Gambar 3D rumah yang cat dan perabotnya sudah cantik, tetapi pintunya belum bisa dibuka, mirip dengan…'),
+          prompt: t(
+            'Gambar 3D rumah sudah dicat, tetapi pintunya belum bisa dibuka. Itu mirip apa?',
+            'Gambar 3D rumah sudah dicat dan berperabot, tetapi pintunya belum bisa dibuka. Itu mirip tahap apa?',
+          ),
           choices: [
-            { id: 'mk', label: t('Mockup') },
+            { id: 'mk', label: t('Mockup: gambar berwarna', 'Mockup') },
             {
               id: 'wf',
-              label: t('Wireframe'),
-              explainWrong: t('Wireframe masih berupa sketsa garis hitam-putih tanpa warna cat.'),
+              label: t('Wireframe: sketsa hitam-putih', 'Wireframe'),
+              explainWrong: t('Wireframe masih sketsa hitam-putih tanpa cat.'),
             },
             {
               id: 'pr',
-              label: t('Prototype'),
-              explainWrong: t('Pada prototype, tombol/pintu sudah bisa diklik dan dicoba alurnya.'),
+              label: t('Prototype: bisa diklik', 'Prototype'),
+              explainWrong: t(
+                'Prototype itu seperti rumah contoh yang pintunya bisa dibuka.',
+                'Pada prototype, tombol atau pintu sudah bisa diklik dan dicoba alurnya.',
+              ),
             },
           ],
           answer: 'mk',
-          explainCorrect: t('Benar! Mockup menampilkan hasil visual akhir, namun belum memiliki alur klik interaktif.'),
+          explainCorrect: t(
+            'Mockup sudah berwarna, tetapi masih diam. Seperti gambar rumah yang indah tetapi belum bisa dimasuki.',
+            'Mockup menampilkan hasil visual akhir, tetapi belum punya alur klik. Prototype menambahkan alur itu.',
+          ),
+          hints: [t('Ingat gambar kedua yang dibuat arsitek.', 'Warna sudah ada. Apa yang belum bisa?')],
           tags: ['prototype', 'ui'],
         }),
       ),
-      qStep(
-        makeTf({
-          id: 'a06-l04-q3',
-          prompt: t('Saat membuat wireframe awal, kita sebaiknya langsung sibuk memilih kombinasi warna gradasi yang rumit.'),
-          answer: false,
-          explainCorrect: t('Betul, pernyataan itu salah! Wireframe dibuat hitam-putih supaya fokus dulu ke susunan tata letak.'),
-          explainWrong: t('Hampir! Warna dan gaya visual baru dipilih nanti pada tahap mockup.'),
-          tags: ['wireframe'],
-        }),
+      limitStep({
+        riskyAnalogy: false,
+        analogy: t('Membangun rumah: denah, gambar 3D, rumah contoh'),
+        same: [t('Menguji tata ruang sebelum bahan bangunan atau kode terpasang permanen.')],
+        different: [t('Rumah contoh fisik mahal dan lama dibangun. Prototype digital bisa direvisi dalam hitungan menit.')],
+      }),
+      simStep(
+        'desa-ux',
+        t(
+          'Ketuk tahap Contoh dan lihat di mana ia berada.',
+          'Amati posisi tahap Prototype dan Test sebelum tim mulai menulis kode.',
+        ),
       ),
+      qStep({
+        id: 'a06-l04-q1',
+        type: 'order',
+        prompt: t(
+          'Urutkan 3 tahap rancangan, dari paling kasar sampai bisa diklik.',
+          'Urutkan tiga tahap rancangan dari paling kasar sampai yang bisa dicoba klik:',
+        ),
+        difficulty: 1,
+        items: [
+          { id: 'mk', label: t('Mockup: gambar berwarna', 'Mockup (gambar jadi berwarna)') },
+          { id: 'pr', label: t('Prototype: bisa diklik', 'Prototype (bisa diklik pindah halaman)') },
+          { id: 'wf', label: t('Wireframe: sketsa hitam-putih', 'Wireframe (sketsa kasar hitam-putih)') },
+        ],
+        answer: ['wf', 'mk', 'pr'],
+        explainCorrect: t(
+          'Urutannya: wireframe, mockup, prototype. Seperti denah pensil, gambar 3D, lalu rumah contoh.',
+          'Wireframe menyusun struktur, mockup menambah tampilan visual, prototype menambah alur klik.',
+        ),
+        hints: [t('Mulai dari denah pensil, akhiri dengan rumah contoh.'), undefined],
+        tags: ['wireframe', 'prototype'],
+      }),
       qStep(
         makeMcq({
           id: 'a06-l04-q4',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('Denah dan rumah contoh fisik'),
-          prompt: t('Apa perbedaan prototype aplikasi dibanding membangun rumah contoh fisik?'),
+          prompt: t('Apa beda prototype aplikasi dengan rumah contoh fisik?'),
           difficulty: 2,
           choices: [
-            { id: 'fast', label: t('Prototype digital dapat diubah, digeser, dan diperbanyak hanya dalam hitungan detik') },
+            { id: 'fast', label: t('Prototype digital bisa diubah dan digandakan dalam detik') },
             {
               id: 'cheap',
               label: t('Kesalahan lebih murah ditemukan sebelum bangunan atau kode jadi'),
-              explainWrong: t('Itu justru persamaan utamanya.'),
+              explainWrong: t('Itu persamaan, bukan perbedaan. Rumah contoh dan prototype sama-sama dibuat sebelum bangunan jadi.'),
             },
             {
               id: 'try',
-              label: t('Calon pemakai bisa merasakan alurnya lebih awal'),
-              explainWrong: t('Ini juga persamaan keduanya.'),
+              label: t('Calon pemakai bisa mencoba alurnya lebih awal'),
+              explainWrong: t('Itu juga persamaan keduanya. Rumah contoh pun bisa dimasuki sebelum rumah asli dibangun.'),
             },
           ],
           answer: 'fast',
-          explainCorrect: t('Tepat! Prototype web sangat fleksibel diedit ulang berkali-kali setelah mendapat masukan.'),
+          explainCorrect: t('Prototype digital bisa direvisi berkali-kali dengan cepat. Rumah contoh fisik harus dibongkar dan dibangun ulang.'),
+          hints: [t('Cari hal yang hanya berlaku untuk prototype digital.')],
           tags: ['prototype'],
         }),
       ),
@@ -1145,24 +1456,42 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a06-l04-q5',
           type: 'scenario',
-          story: t('Tim Dimas ingin memastikan pembeli paham urutan klik dari memilih sepatu sampai membayar sebelum programmer menulis kode satu baris pun.'),
-          prompt: t('Rancangan apakah yang paling cocok dibuat tim Dimas sekarang?'),
+          story: t(
+            'Tim Dimas ingin tahu apakah pembeli paham cara memilih sepatu sampai membayar. Programmer belum mulai bekerja.',
+            'Tim Dimas ingin memastikan pembeli paham urutan klik dari memilih sepatu sampai membayar, sebelum programmer menulis kode.',
+          ),
+          prompt: t('Apa yang paling cocok dibuat tim Dimas sekarang?', 'Rancangan apa yang paling cocok dibuat sekarang?'),
           difficulty: 2,
           choices: [
-            { id: 'pr', label: t('Prototype yang bisa diklik dari halaman produk ke pembayaran') },
+            { id: 'pr', label: t('Contoh yang bisa diklik sampai bayar', 'Prototype yang bisa diklik sampai pembayaran') },
             {
               id: 'wf',
-              label: t('Cukup foto warna cat merek di kertas'),
-              explainWrong: t('Foto warna saja tidak menguji alur klik antarhalaman.'),
+              label: t('Gambar berwarna satu halaman saja', 'Mockup satu halaman produk'),
+              explainWrong: t(
+                'Satu gambar diam tidak menguji urutan klik. Pembeli perlu mencoba berpindah halaman.',
+                'Mockup statis tidak menguji urutan klik antarhalaman.',
+              ),
             },
             {
               id: 'db',
-              label: t('Langsung membangun database server dulu'),
-              explainWrong: t('Alur klik harus diuji di prototype sebelum masuk ke pembangunan sistem penuh.'),
+              label: t('Menyiapkan penyimpanan data dulu', 'Membangun database dan server dulu'),
+              explainWrong: t(
+                'Penyimpanan data dibangun belakangan. Urutan klik diuji lebih dulu.',
+                'Alur klik diuji di prototype sebelum sistem penuh dibangun.',
+              ),
             },
           ],
           answer: 'pr',
-          explainCorrect: t('Benar! Prototype menguji pengalaman alur klik secara nyata sebelum coding dimulai.'),
+          explainCorrect: t(
+            'Contoh yang bisa diklik menguji urutan langkah pembeli. Seperti rumah contoh yang pintunya bisa dibuka.',
+            'Prototype menguji alur klik sebelum coding dimulai. Kesalahan urutan ketahuan saat perbaikannya masih murah.',
+          ),
+          hints: [
+            t(
+              'Ingat rumah contoh yang pintunya bisa dibuka.',
+              'Cari rancangan yang bisa diklik, bukan hanya dilihat.',
+            ),
+          ],
           tags: ['prototype', 'ux'],
         }),
       ),
@@ -1171,23 +1500,47 @@ export const lessons: Lesson[] = [
           id: 'a06-l04-q6',
           type: 'why',
           base: 'early-testing',
-          prompt: t('Mengapa kesalahan desain jauh lebih baik ditemukan pada tahap wireframe atau prototype daripada setelah aplikasi selesai dikoding?'),
+          prompt: t(
+            'Mengapa lebih baik menemukan kesalahan saat masih sketsa?',
+            'Mengapa kesalahan desain lebih baik ditemukan di wireframe atau prototype daripada setelah aplikasi dikoding?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'save', label: t('Karena memperbaiki sketsa atau prototype jauh lebih cepat dan murah daripada menulis ulang kode') },
+            {
+              id: 'save',
+              label: t(
+                'Karena sketsa lebih mudah dan murah diubah',
+                'Membetulkan sketsa lebih cepat dan murah daripada menulis ulang',
+              ),
+            },
             {
               id: 'css',
-              label: t('Karena CSS tidak bisa diubah lagi setelah file disimpan'),
-              explainWrong: t('CSS bisa diubah, tetapi membongkar alur kode dan database yang sudah terikat memakan banyak waktu.'),
+              label: t('Karena aplikasi jadi tidak perlu diuji lagi', 'Prototype yang lolos uji tidak perlu diuji lagi setelah dikoding'),
+              explainWrong: t(
+                'Aplikasi tetap perlu diuji berkali-kali. Sketsa hanya membuat perbaikan lebih murah.',
+                'Aplikasi jadi tetap perlu diuji. Uji awal hanya membuat perbaikan lebih murah.',
+              ),
             },
             {
               id: 'font',
-              label: t('Karena browser hanya mau membuka website yang pernah digambar di kertas'),
-              explainWrong: t('Browser tidak tahu apakah ada sketsa kertas; manfaatnya adalah efisiensi tim.'),
+              label: t('Karena fitur aplikasi jadi lebih banyak', 'Wireframe sudah menunjukkan kecepatan aplikasi di HP pemakai'),
+              explainWrong: t(
+                'Tujuannya bukan fitur lebih banyak. Tujuannya menghemat tenaga saat membetulkan.',
+                'Wireframe dan prototype menguji alur, bukan kecepatan. Kecepatan baru terukur setelah ada kode.',
+              ),
             },
           ],
           answer: 'save',
-          explainCorrect: t('Tepat! Memindah kotak di Figma cuma butuh detik, sedangkan merombak fitur di kode butuh berhari-hari.'),
+          explainCorrect: t(
+            'Menghapus garis pensil jauh lebih mudah daripada membongkar tembok. Perbaiki rancangan dulu, baru bangun.',
+            'Memindahkan kotak di alat desain hanya butuh detik. Merombak fitur di kode butuh berhari-hari.',
+          ),
+          hints: [
+            t(
+              'Mana lebih mudah: menghapus pensil atau membongkar tembok?',
+              'Bandingkan waktu memindahkan kotak dengan menulis ulang kode.',
+            ),
+          ],
           tags: ['wireframe', 'prototype'],
         }),
       ),
@@ -1195,67 +1548,89 @@ export const lessons: Lesson[] = [
         id: 'a06-l04-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi urutan istilah tiga tahap rancangan UX:'),
+        prompt: t('Lengkapi tiga tahap rancangan UX sesuai tugasnya:'),
         difficulty: 2,
-        template: 'Sketsa hitam-putih disebut ___, tampilan warna statis disebut mockup, dan versi interaktif bisa diklik disebut prototype.',
-        bank: ['wireframe', 'persona', 'hosting'],
-        answer: ['wireframe'],
-        explainCorrect: t('Benar! Wireframe meletakkan kerangka struktur di awal sebelum masuk ke detail visual.'),
+        template: 'Tim menata letak di ___, memberi warna dan huruf di ___, lalu menguji alur klik di ___.',
+        bank: ['prototype', 'user flow', 'wireframe', 'mockup'],
+        answer: ['wireframe', 'mockup', 'prototype'],
+        explainCorrect: t('Wireframe menyusun struktur, mockup menambah warna dan huruf, prototype menghubungkan layar supaya alurnya bisa diuji.'),
+        hints: [t('Struktur dulu, tampilan kemudian, uji klik terakhir.'), undefined],
         tags: ['wireframe', 'prototype'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a06-l04-r1',
-        prompt: t('Tahap rancangan yang masih hitam-putih polos untuk fokus pada tata letak adalah…'),
+        prompt: t(
+          'Arsitek menggambar denah pensil dulu. Di web, itu mirip apa?',
+          'Tahap rancangan mana yang masih hitam-putih dan berfokus pada tata letak?',
+        ),
         choices: [
-          { id: 'wf', label: t('Wireframe') },
-          { id: 'mk', label: t('Mockup'), explainWrong: t('Mockup sudah lengkap warna dan jenis hurufnya.') },
+          { id: 'wf', label: t('Wireframe: sketsa hitam-putih', 'Wireframe') },
+          { id: 'mk', label: t('Mockup: gambar berwarna', 'Mockup'), explainWrong: t('Mockup sudah punya warna dan jenis huruf.') },
+          { id: 'pr', label: t('Prototype: bisa diklik', 'Prototype'), explainWrong: t('Prototype sudah bisa diklik untuk dicoba.') },
         ],
         answer: 'wf',
-        explainCorrect: t('Wireframe seperti denah pensil yang fokus ke susunan isi.'),
+        explainCorrect: t(
+          'Wireframe hanya menata letak, tanpa warna. Seperti denah pensil sebelum rumah dibangun.',
+          'Wireframe menata susunan isi tanpa warna dan foto. Warna baru dipilih di tahap mockup.',
+        ),
+        hints: [t('Denah pensil belum diberi cat.', 'Ingat denah pensil tanpa cat.')],
         tags: ['wireframe'],
       }),
       makeMcq({
         id: 'a06-l04-r2',
-        prompt: t('Tahap rancangan yang tombolnya sudah bisa diklik pindah halaman untuk diuji adalah…'),
+        prompt: t(
+          'Rumah contoh pintunya sudah bisa dibuka. Di web, itu mirip apa?',
+          'Tahap rancangan mana yang tombolnya sudah bisa diklik untuk menguji alur?',
+        ),
         choices: [
-          { id: 'pr', label: t('Prototype') },
-          { id: 'mk', label: t('Mockup statis'), explainWrong: t('Mockup masih berupa gambar diam.') },
+          { id: 'pr', label: t('Prototype: bisa diklik', 'Prototype') },
+          { id: 'mk', label: t('Mockup: gambar berwarna', 'Mockup'), explainWrong: t('Mockup masih gambar diam.') },
+          { id: 'wf', label: t('Wireframe: sketsa hitam-putih', 'Wireframe'), explainWrong: t('Wireframe masih sketsa hitam-putih.') },
         ],
         answer: 'pr',
-        explainCorrect: t('Prototype membolehkan pengguna mencoba alur interaksi sebelum coding.'),
+        explainCorrect: t(
+          'Prototype bisa diklik dan dicoba. Seperti rumah contoh yang pintunya bisa dibuka.',
+          'Prototype memungkinkan pemakai mencoba alur klik sebelum coding.',
+        ),
+        hints: [t('Ingat tahap terakhir yang dibuat arsitek.', 'Ingat rumah contoh yang pintunya bisa dibuka.')],
         tags: ['prototype'],
       }),
     ],
     recap: t(
-      'Rancang bertahap dari wireframe (denah), mockup (gambar berwarna), hingga prototype (bisa diklik).',
-      'Mulai dari wireframe untuk struktur, lanjut mockup untuk visual, lalu prototype untuk uji alur sebelum menulis kode.',
+      'Rancang bertahap: denah kasar, gambar berwarna, lalu contoh yang bisa diklik.',
+      'Mulai dari wireframe untuk struktur, lanjut ke mockup untuk visual, lalu prototype untuk menguji alur sebelum menulis kode.',
     ),
     companion: {
-      talkPrompts: ['Kalau mau bikin aplikasi catatan PR, lebih cepat bikin denah kotak pakai pensil dulu atau langsung mewarnai?'],
-      offlineActivity: 'Gambar 1 wireframe kotak-kotak hitam putih untuk halaman beranda toko mainan di buku tulis dalam 3 menit.',
+      talkPrompts: ['Mana lebih cepat: menggambar denah pensil atau langsung mewarnai?'],
+      offlineActivity:
+        'Gambar satu wireframe kotak-kotak hitam-putih untuk beranda toko mainan di buku tulis dalam 3 menit.',
     },
   }),
 
+  // ---------------------------------------------------------------------------------------------
+  // a06-l05  Usability testing
+  // ---------------------------------------------------------------------------------------------
   makeLesson({
     id: 'a06-l05',
     worldId: 'a06',
     title: 'Usability testing',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa tahu cara mengajak 5 teman menguji rancangan tanpa mendikte mereka.',
-      'Aku bisa merencanakan usability testing, menjaga sikap netral saat observasi, dan memahami A/B testing.',
+      'Aku bisa mengajak 5 teman mencoba rancangan tanpa memberi tahu caranya.',
+      'Kamu bisa merencanakan usability testing, menjaga sikap netral, dan membedakannya dari A/B testing.',
     ),
     estMinutes: 5,
     introducesTerms: ['usability-testing'],
     usesTerms: ['ux', 'prototype', 'design-thinking'],
     warmupFrom: 'a06-l04',
+    atWork: 'Kamu akan melihat peserta salah klik di rekaman sesi uji, lalu mencatatnya sebagai masalah desain.',
     steps: [
       storyStep('a06/uji-papan-main.svg', [
         rText(
-          'Sari membuat papan permainan baru. Ia mengajak 5 teman memainkannya tanpa ia bantu sama sekali, lalu ia mencatat di mana mereka bingung!',
-          'Sebelum menerbitkan papan permainan buatannya, Sari meminta beberapa teman mencoba bermain sendiri sambil ia diam mencatat bagian aturan mana yang membingungkan.',
+          'Sari membuat papan permainan baru. Ia mengajak 5 teman bermain, tanpa membantu sedikit pun. Di mana teman-temannya bingung?',
+          'Sebelum menerbitkan papan permainannya, Sari meminta 5 teman bermain sendiri. Ia diam dan mencatat bagian aturan yang membingungkan.',
         ),
       ]),
       conceptStep({
@@ -1266,103 +1641,138 @@ export const lessons: Lesson[] = [
         body: [
           rTerm('usability-testing', 'Usability testing', 'Usability testing'),
           rText(
-            ' adalah mengajak orang mencoba rancangan kita. Jangan dibantu! Catat di mana mereka berhenti atau bingung.',
-            ' meminta pengguna mencoba rancangan sambil diamati titik hambatannya. Diam dan catatlah—jangan membimbing tangan mereka.',
+            ' adalah mengajak orang mencoba rancanganmu. Jangan dibantu! Catat di mana mereka bingung.',
+            ' adalah meminta pemakai mencoba rancangan sambil diamati. Penguji diam dan mencatat titik hambatan, tidak membimbing mereka.',
           ),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'a06-l05-q1',
+          prompt: t(
+            'Temanmu bingung mencari tombol Bayar di rancanganmu. Apa yang kamu lakukan?',
+            'Peserta bingung mencari tombol Bayar di prototype. Apa sikap terbaik penguji?',
+          ),
+          choices: [
+            { id: 'obs', label: t('Mengamati dan mencatat tempat ia bingung') },
+            {
+              id: 'point',
+              label: t('Menunjuk tombolnya dan memberi tahu letaknya'),
+              explainWrong: t(
+                'Kalau dibantu, kamu tidak tahu di mana orang lain akan tersesat. Seperti membisikkan jawaban saat teman bermain.',
+                'Kalau dibantu, kamu tidak tahu di mana pemakai asli akan tersesat saat sendirian.',
+              ),
+            },
+            {
+              id: 'blame',
+              label: t('Menegur temanmu karena kurang teliti', 'Menegur peserta karena kurang teliti'),
+              explainWrong: t(
+                'Yang diuji adalah rancanganmu, bukan temanmu. Titik bingung itu berharga.',
+                'Yang diuji adalah rancangan, bukan peserta. Titik bingung itu berharga.',
+              ),
+            },
+          ],
+          answer: 'obs',
+          explainCorrect: t(
+            'Titik bingung memberi tahu bagian yang perlu dibetulkan. Seperti peta yang menunjukkan jalan buntu.',
+            'Titik kebingungan menunjukkan bagian rancangan yang perlu dibetulkan. Catat letaknya dan apa yang peserta ucapkan.',
+          ),
+          hints: [t('Ingat Sari yang hanya mencatat, tidak membantu.')],
+          tags: ['usability-testing'],
+        }),
+      ),
       conceptStep({
-        title: t('Lima Orang Sudah Cukup Ampuh', 'Aturan 5 Pengguna & Sikap Netral'),
+        title: t('Lima Orang Sudah Cukup', 'Aturan 5 Pemakai dan Sikap Netral'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'lima-pengguna' },
-        alt: t('Lima ikon pengguna sudah menyingkap mayoritas hambatan desain.'),
+        alt: t('Lima ikon pemakai sudah menyingkap sebagian besar hambatan desain.'),
         body: [
           rText(
-            'Cukup 5 orang sudah bisa menemukan sebagian besar masalah. Ingat, yang diuji adalah aplikasinya, bukan kepintaran orangnya.',
-            'Menguji kepada 5 pengguna saja sudah menemukan sebagian besar masalah. Jika peserta salah klik, desainlah yang harus diperbaiki, bukan menyalahkan pengguna.',
+            'Mengajak 5 orang mencoba sudah menemukan banyak masalah. Kalau temanmu salah klik, rancangannya yang perlu dibetulkan.',
+            'Menguji 5 pemakai sudah menemukan sebagian besar masalah. Kalau peserta salah klik, rancangannya yang dibetulkan, bukan pemakainya yang disalahkan.',
           ),
         ],
       }),
+      qStep(
+        makeTf({
+          id: 'a06-l05-q2',
+          prompt: t(
+            'Mengajak 5 orang mencoba sudah cukup untuk menemukan banyak masalah.',
+            'Menguji lima orang saja sudah cukup untuk menemukan sebagian besar masalah besar pada tampilan.',
+          ),
+          answer: true,
+          explainCorrect: t(
+            'Lima orang sudah menunjukkan masalah yang berulang. Tidak perlu menunggu 1.000 orang.',
+            'Uji kecil ke 5 pemakai sudah menunjukkan pola kebingungan yang berulang. Pola itu cukup untuk mulai membetulkan rancangan.',
+          ),
+          explainWrong: t(
+            'Lima orang sudah cukup untuk mulai. Banyak masalah muncul berulang pada orang berbeda.',
+            'Pola kebingungan yang sama muncul pada sekitar 5 pemakai. Menunggu ratusan peserta hanya menunda perbaikan.',
+          ),
+          hints: [t('Ingat Sari dan 5 temannya.')],
+          tags: ['usability-testing'],
+        }),
+      ),
       conceptStep({
         title: t('Membandingkan Dua Pilihan', 'A/B Testing dan Conversion'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'a06', topic: 'ab-testing-conversion' },
         alt: t('Perbandingan tombol versi A dan versi B untuk mengukur mana yang lebih banyak dipilih.'),
+        modes: ['pro'],
         body: [
           rText(
-            'Kita bisa membandingkan dua desain A dan B. Lihat mana yang lebih berhasil.',
-            'Setelah dirilis, tim juga memakai A/B testing untuk membandingkan dua versi halaman secara nyata guna mengukur mana yang menghasilkan conversion lebih tinggi.',
+            'A/B testing membandingkan dua versi halaman pada pemakai sungguhan setelah rilis. Versi yang membuat lebih banyak orang menyelesaikan tujuan (conversion) dianggap lebih baik.',
           ),
         ],
       }),
       limitStep({
+        riskyAnalogy: false,
         analogy: t('Mengamati teman mencoba papan permainan baru'),
-        same: [
-          t('Kita melihat langsung bagian mana pemain berhenti atau salah paham tanpa dibisiki jawaban.'),
-        ],
+        same: [t('Kamu melihat langsung bagian mana pemain berhenti atau salah paham tanpa membocorkan jawaban.')],
         different: [
-          t('Jika empat dari lima teman bingung di papan permainan, aturannya mungkin diubah di cetakan; di aplikasi web, perbaikan bisa langsung diuji lewat A/B testing kepada ribuan pemakai.'),
+          t('Aturan papan permainan dicetak sekali dan sulit diubah. Aplikasi bisa dibetulkan dan diuji ulang, bahkan lewat A/B testing.'),
         ],
       }),
       simStep(
         'desa-ux',
         t(
-          'Lihat tahap akhir di Desa UX tempat Prototype diuji kepada pemakai asli!',
-          'Telusuri tahap Prototype & Test pada alur UX untuk melihat mengapa umpan balik langsung sangat menentukan.',
+          'Lihat tahap terakhir di Desa UX: contoh diuji pemakai asli.',
+          'Telusuri tahap Prototype dan Test di alur UX untuk melihat mengapa umpan balik langsung menentukan.',
         ),
-      ),
-      qStep(
-        makeMcq({
-          id: 'a06-l05-q1',
-          prompt: t('Saat teman mencoba prototype buatanmu dan dia bingung mencari tombol Bayar, sikap terbaikmu adalah…'),
-          choices: [
-            { id: 'obs', label: t('Tetap tenang mengamati dan mencatat mengapa tombol itu sulit ia temukan') },
-            {
-              id: 'point',
-              label: t('Langsung menunjuk layarnya sambil berkata "Itu tombolnya di pojok!"'),
-              explainWrong: t('Kalau dibantu, kamu tidak tahu cara pengguna asli nanti tersesat saat sendirian.'),
-            },
-            {
-              id: 'blame',
-              label: t('Memarahinya karena dianggap kurang teliti melihat layar'),
-              explainWrong: t('Dalam UX, pengguna bukan objek ujian—desainlah yang diuji.'),
-            },
-          ],
-          answer: 'obs',
-          explainCorrect: t('Tepat! Titik kebingungan itu adalah emas berharga untuk memperbaiki desainmu.'),
-          tags: ['usability-testing'],
-        }),
-      ),
-      qStep(
-        makeTf({
-          id: 'a06-l05-q2',
-          prompt: t('Menguji kepada lima orang saja sudah cukup untuk menemukan sebagian besar masalah besar pada tampilan.'),
-          answer: true,
-          explainCorrect: t('Betul! Uji kecil ke 5 orang sudah cepat menemukan pola kebingungan yang berulang.'),
-          explainWrong: t('Hampir! Kamu tidak perlu menunggu seribu peserta untuk mulai menemukan masalah desain.'),
-          tags: ['usability-testing'],
-        }),
       ),
       qStep(
         makeMcq({
           id: 'a06-l05-q3',
           type: 'analogy',
-          prompt: t('Meminta teman mencoba permainan baru sendirian tanpa kita bocorkan caranya mirip kegiatan…'),
+          prompt: t(
+            'Temanmu mencoba permainan baru tanpa kamu bocorkan caranya. Itu mirip apa?',
+            'Meminta teman mencoba permainan baru sendirian tanpa membocorkan caranya mirip kegiatan apa?',
+          ),
           choices: [
-            { id: 'ut', label: t('Usability testing') },
+            { id: 'ut', label: t('Usability testing: menguji ke pemakai', 'Usability testing') },
             {
               id: 'wf',
-              label: t('Membuat wireframe'),
-              explainWrong: t('Wireframe adalah menggambar sketsa kasarnya, bukan mengamati orang mencobanya.'),
+              label: t('Wireframe: menggambar sketsa hitam-putih', 'Membuat wireframe'),
+              explainWrong: t(
+                'Wireframe itu menggambar sketsanya, bukan mengamati orang yang mencoba.',
+                'Wireframe adalah menggambar sketsa kasarnya, bukan mengamati orang mencobanya.',
+              ),
             },
             {
               id: 'css',
-              label: t('Menulis media query'),
-              explainWrong: t('Media query adalah aturan CSS untuk ukuran layar.'),
+              label: t('Prototype: membuat contoh bisa diklik', 'Membuat prototype'),
+              explainWrong: t(
+                'Prototype itu contoh yang dicoba. Yang mirip di sini adalah mengamati orang mencobanya.',
+                'Prototype adalah bahan yang diuji. Mengamati orang yang mencobanya adalah usability testing.',
+              ),
             },
           ],
           answer: 'ut',
-          explainCorrect: t('Benar! Usability testing menguji apakah rancangan mudah dipahami tanpa petunjuk pembuatnya.'),
+          explainCorrect: t(
+            'Usability testing melihat apakah rancangan mudah dipahami tanpa petunjuk. Seperti teman yang bermain tanpa dibisiki.',
+            'Usability testing menilai apakah rancangan mudah dipahami tanpa petunjuk dari pembuatnya. Peserta mencoba sendiri, penguji hanya mengamati.',
+          ),
+          hints: [t('Ingat teman Sari yang bermain sendiri.')],
           tags: ['usability-testing'],
         }),
       ),
@@ -1370,24 +1780,26 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a06-l05-q4',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('Menguji papan permainan ke teman'),
-          prompt: t('Jika 4 dari 5 penguji aplikasi gagal menemukan tombol Simpan, kesimpulan mana yang SALAH?'),
+          prompt: t('Empat dari lima peserta gagal menemukan tombol Simpan. Kesimpulan mana yang keliru?'),
           difficulty: 2,
           choices: [
-            { id: 'err', label: t('Berarti penggunanya yang kurang pintar, desainnya tidak perlu diubah') },
+            { id: 'err', label: t('Pemakainya kurang pintar, desain tidak perlu diubah') },
             {
               id: 'fix',
-              label: t('Berarti letak atau bentuk tombol Simpan perlu dibuat lebih jelas'),
-              explainWrong: t('Itu kesimpulan yang benar!'),
+              label: t('Letak atau bentuk tombol Simpan perlu dibuat lebih jelas'),
+              explainWrong: t('Itu kesimpulan yang masuk akal dari hasil uji. Banyak peserta gagal di bagian yang sama.'),
             },
             {
               id: 'retest',
-              label: t('Setelah diperbaiki, rancangan perlu diuji ulang'),
-              explainWrong: t('Menguji ulang setelah revisi memang langkah yang tepat.'),
+              label: t('Setelah dibetulkan, rancangan diuji ulang'),
+              explainWrong: t('Menguji ulang setelah revisi memang langkah yang benar. Siklusnya berulang.'),
             },
           ],
           answer: 'err',
-          explainCorrect: t('Tepat! Jika banyak orang gagal pada bagian yang sama, masalahnya pasti ada pada desain antarmuka.'),
+          explainCorrect: t('Kalau banyak peserta gagal di bagian yang sama, masalahnya ada di rancangan. Peserta bukan penyebabnya.'),
+          hints: [t('Siapa yang diuji: peserta atau rancangan?')],
           tags: ['usability-testing', 'ux'],
         }),
       ),
@@ -1395,85 +1807,131 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'a06-l05-q5',
           type: 'scenario',
-          story: t('Nadia ingin tahu apakah tombol warna hijau bertulis "Daftar Gratis" atau tombol biru bertulis "Mulai Sekarang" lebih banyak diklik oleh pengunjung situsnya.'),
-          prompt: t('Cara terbaik membandingkan kedua versi itu ke pengunjung nyata adalah…'),
+          modes: ['pro'],
+          story: t('Rani ingin tahu mana yang lebih sering diklik pengunjung: tombol hijau "Daftar Gratis" atau tombol biru "Mulai Sekarang".'),
+          prompt: t('Cara apa yang paling tepat membandingkan kedua versi pada pengunjung sungguhan?'),
           difficulty: 2,
           choices: [
-            { id: 'ab', label: t('A/B testing (memperlihatkan versi A dan versi B ke dua kelompok pengunjung lalu hitung hasilnya)') },
+            { id: 'ab', label: t('A/B testing: tiap versi dilihat kelompok pengunjung berbeda') },
             {
               id: 'coin',
-              label: t('Melempar koin tanpa melihat data pengunjung'),
-              explainWrong: t('Melempar koin tidak membuktikan mana yang lebih jelas bagi pengguna.'),
+              label: t('Menanyakan pendapat seluruh tim desain tentang tombol yang paling bagus'),
+              explainWrong: t('Pendapat tim belum tentu sama dengan perilaku pengunjung. A/B testing memakai data klik sungguhan.'),
             },
             {
               id: 'both',
-              label: t('Menaruh kedua tombol itu bersebelahan untuk aksi yang persis sama'),
-              explainWrong: t('Dua tombol untuk satu aksi sama justru membuat pengguna bingung memilih.'),
+              label: t('Memasang kedua tombol bersebelahan untuk aksi yang sama'),
+              explainWrong: t('Dua tombol untuk satu aksi membingungkan pemakai. Hasilnya juga tidak bisa dibandingkan dengan adil.'),
             },
           ],
           answer: 'ab',
-          explainCorrect: t('Benar! A/B testing membandingkan performa dua variasi desain langsung berdasarkan perilaku pengguna.'),
+          explainCorrect: t('A/B testing membandingkan dua versi lewat perilaku pengunjung sungguhan. Versi dengan hasil lebih baik yang dipakai.'),
+          hints: [t('Cari cara yang memakai data, bukan pendapat.')],
           tags: ['usability-testing', 'ux'],
         }),
       ),
       qStep({
         id: 'a06-l05-q6',
         type: 'sort',
-        prompt: t('Kelompokkan tindakan saat memandu usability testing ke "Lakukan" atau "Hindari":'),
+        prompt: t(
+          'Kelompokkan tindakan penguji: dilakukan atau dihindari.',
+          'Kelompokkan tindakan saat memimpin usability testing ke "Lakukan" atau "Hindari":',
+        ),
         difficulty: 2,
         items: [
-          { id: 's1', label: t('Mencatat di bagian mana peserta berhenti atau ragu') },
-          { id: 's2', label: t('Langsung menunjuk tombol yang benar saat peserta bingung') },
-          { id: 's3', label: t('Meminta peserta menceritakan apa yang sedang ia pikirkan') },
-          { id: 's4', label: t('Membela desain dan menyalahkan peserta') },
+          { id: 's1', label: t('Mencatat tempat teman berhenti atau ragu', 'Mencatat bagian saat peserta berhenti atau ragu') },
+          { id: 's2', label: t('Menunjuk tombol yang benar saat teman bingung', 'Menunjuk tombol yang benar saat peserta bingung') },
+          { id: 's3', label: t('Bertanya apa yang sedang ia pikirkan', 'Meminta peserta menceritakan apa yang ia pikirkan') },
+          { id: 's4', label: t('Membela rancangan dan menyalahkan teman', 'Membela rancangan dan menyalahkan peserta') },
         ],
         bins: [
-          { id: 'do', label: t('Lakukan ✓') },
-          { id: 'dont', label: t('Hindari ✗') },
+          { id: 'do', label: t('Lakukan'), icon: 'lightbulb' },
+          { id: 'dont', label: t('Hindari'), icon: 'lock' },
         ],
         answer: { s1: 'do', s2: 'dont', s3: 'do', s4: 'dont' },
-        explainCorrect: t('Luar biasa! Penguji yang baik mengamati dengan netral tanpa membimbing atau membela diri.'),
+        explainCorrect: t(
+          'Penguji yang baik mengamati dengan tenang. Ia tidak membantu dan tidak membela diri.',
+          'Penguji netral mengamati, mencatat, dan menggali pikiran peserta. Membantu atau membela rancangan merusak hasil uji.',
+        ),
+        hints: [
+          t(
+            'Ingat Sari: ia hanya mengamati dan mencatat.',
+            'Penguji netral tidak mengubah apa yang dilakukan peserta.',
+          ),
+          undefined,
+        ],
         tags: ['usability-testing'],
       }),
       qStep({
         id: 'a06-l05-q7',
         type: 'type',
         modes: ['pro'],
-        prompt: t('Istilah UX saat pengguna akhirnya melakukan aksi yang diharapkan (seperti mendaftar atau menyelesaikan pembelian) disebut…'),
+        prompt: t('Apa nama persentase pemakai yang akhirnya menyelesaikan aksi yang diharapkan, seperti mendaftar atau membeli?'),
         difficulty: 2,
         accept: ['conversion', 'konversi'],
-        explainCorrect: t('Tepat! Conversion mengukur persentase pengguna yang menuntaskan tujuan utama alur.'),
+        explainCorrect: t('Conversion mengukur berapa persen pemakai yang menyelesaikan tujuan utama alur. Naiknya angka itu tanda alurnya makin lancar.'),
+        hints: [t('Angka ini dipantau tim saat A/B testing.'), undefined],
         tags: ['ux'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'a06-l05-r1',
-        prompt: t('Mengapa kita tidak boleh membantu peserta mengklik tombol saat sesi usability testing?'),
+        prompt: t(
+          'Mengapa kamu tidak boleh membantu teman saat ia mencoba rancanganmu?',
+          'Mengapa penguji tidak boleh membantu peserta mengklik tombol saat sesi?',
+        ),
         choices: [
-          { id: 'ok', label: t('Agar ketahuan di mana pengguna asli bisa tersesat saat memakai sendirian') },
-          { id: 'no', label: t('Supaya sesi ujiannya menjadi sangat lama'), explainWrong: t('Tujuannya adalah melihat kebingungan nyata pengguna tanpa bantuan.') },
+          { id: 'ok', label: t('Supaya terlihat di mana ia tersesat sendiri') },
+          {
+            id: 'no',
+            label: t('Supaya temanmu belajar lebih pintar', 'Supaya peserta belajar lebih pintar'),
+            explainWrong: t(
+              'Yang diuji adalah rancanganmu, bukan kepintaran temanmu. Bantuan menutupi masalah.',
+              'Yang diuji adalah rancangan, bukan kepintaran peserta. Bantuan menutupi masalah.',
+            ),
+          },
+          {
+            id: 'p',
+            label: t('Supaya rancanganmu terlihat sempurna', 'Supaya rancangan terlihat sempurna'),
+            explainWrong: t('Bantuan justru menutupi masalah. Yang kamu cari adalah masalahnya.'),
+          },
         ],
         answer: 'ok',
-        explainCorrect: t('Pengamatan jujur tanpa bantuan membuka titik hambatan yang tersembunyi.'),
+        explainCorrect: t(
+          'Tanpa bantuan, kamu melihat kesulitan yang asli. Pemakai sungguhan nanti juga memakai sendiri.',
+          'Pengamatan jujur tanpa bantuan membuka titik hambatan yang tersembunyi.',
+        ),
+        hints: [t('Ingat Sari yang hanya mencatat.')],
         tags: ['usability-testing'],
       }),
       makeTf({
         id: 'a06-l05-r2',
-        prompt: t('A/B testing adalah membandingkan dua versi tampilan ke pengguna asli untuk melihat mana yang lebih berhasil.'),
+        prompt: t(
+          'Kalau temanmu salah klik, rancanganmu mungkin perlu dibetulkan.',
+          'A/B testing membandingkan dua versi tampilan pada pemakai asli untuk melihat mana yang lebih berhasil.',
+        ),
         answer: true,
-        explainCorrect: t('Betul!'),
-        explainWrong: t('A/B testing membantu mengambil keputusan berdasarkan data perilaku pengguna nyata.'),
+        explainCorrect: t(
+          'Kalau banyak teman salah di tempat yang sama, rancangannya yang perlu diubah. Orangnya tidak salah.',
+          'A/B testing membandingkan dua versi pada pemakai asli lewat data perilaku. Hasilnya menunjukkan versi mana yang lebih berhasil.',
+        ),
+        explainWrong: t(
+          'Kalau salah klik terjadi, biasanya rancangannya membingungkan, bukan temanmu yang ceroboh.',
+          'A/B testing memang membandingkan dua versi tampilan. Keputusannya diambil dari data klik, bukan dari selera.',
+        ),
+        hints: [t('Ingat: yang diuji adalah rancangannya.')],
         tags: ['usability-testing'],
       }),
     ],
     recap: t(
-      'Ajak 5 orang mencoba rancangan tanpa dibantu untuk menemukan bagian yang membingungkan.',
-      'Lakukan usability testing ke sekitar 5 pengguna secara netral tanpa menuntun, dan gunakan A/B testing untuk membandingkan variasi.',
+      'Ajak 5 orang mencoba tanpa dibantu, lalu catat bagian yang membingungkan.',
+      'Uji ke sekitar 5 pemakai secara netral tanpa menuntun. Pakai A/B testing untuk membandingkan dua versi.',
     ),
     companion: {
-      talkPrompts: ['Kalau teman bingung memakai aplikasi buatan kita, siapa yang perlu diperbaiki: teman atau desain aplikasinya?'],
-      offlineActivity: 'Minta satu teman atau keluarga memesan atau mencari satu menu di aplikasi yang belum pernah ia pakai tanpa dibantu, lalu catat titik bingungnya.',
+      talkPrompts: ['Mana yang perlu dibetulkan: temanmu atau aplikasinya?'],
+      offlineActivity:
+        'Minta satu teman atau anggota keluarga mencari satu menu di aplikasi yang belum pernah ia pakai, tanpa dibantu. Catat tempat ia bingung.',
     },
   }),
 ];

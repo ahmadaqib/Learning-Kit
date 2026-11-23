@@ -1,0 +1,161 @@
+{
+ "world": "a10",
+ "status": "APPLIED",
+ "decision": {
+  "decidedBy": "opus",
+  "accepted": 12,
+  "rejected": 0,
+  "instructions": "FILE (only one): src/content/worlds/a10-taman-ramah/index.ts. Keep every id, answer, choice id, tag and step order unless stated. Do not commit.\n\n1) a10-l01 conceptStep \"Apa itu aksesibilitas?\" body. Replace the two Junior parts around rCode('a11y', ['junior']):\n - rJunior(' artinya halaman web yang bisa dipakai semua orang. Seperti jalur miring: kursi roda, koper, dan kereta bayi sama-sama terbantu. Singkatannya ') -> rJunior(' artinya web bisa dipakai semua orang. Seperti jalur miring: kursi roda, koper, dan kereta bayi sama-sama terbantu. Kata Inggrisnya accessibility, disingkat ')\n - rJunior(', karena ada 11 huruf di antara a dan y.') -> rJunior(' karena ada 11 huruf di tengah.')\n Leave the Pro parts and rCode calls as they are.\n\n2) a10-l01-q6 (makeTf):\n - prompt junior 'Fitur aksesibilitas bisa menolong siapa saja.' -> 'Web yang ramah bisa menolong siapa saja.' (keep Pro prompt)\n - explainCorrect junior 'Siapa saja pernah silau atau membawa barang dengan satu tangan. Fitur itu menolong saat itu.' -> 'Tulisan ucapan di video menolong saat tempat berisik. Tulisan yang jelas menolong saat layar silau.' (keep Pro)\n\n3) a10-l01-q2 (sort):\n - explainCorrect junior -> 'Gips akan dilepas, tetapi mata yang tidak melihat tetap begitu. Silau hilang di tempat teduh, dan tas belanja bisa ditaruh.'\n - explainCorrect Pro -> 'Situasional datang dari lingkungan dan hilang saat keadaan berubah. Dari tubuh: permanen bila tidak pulih, sementara bila akan pulih.'\n - hints[0] Pro 'Tanyakan: apakah hambatan itu berasal dari tubuh atau dari lingkungan?' -> 'Dari tubuh atau lingkungan? Kalau dari tubuh, apakah akan pulih?' (keep Junior hint and the trailing undefined)\n\n4) a10-l01 limitStep: different[0] junior 'Jalur itu beton. Web harus cocok dengan alat bantu.' -> 'Jalur dilewati roda. Web juga dipakai tanpa mouse, lewat keyboard.' (keep Pro text)\n\n5) a10-l01 companion.offlineActivity -> 'Tutup matamu 1 menit. Minta orang di rumah menjelaskan isi kemasan makanan. Rasakan mengapa gambar perlu penjelasan tulisan.'\n\n6) Anchor a10-anc-j1, choice id 'car': label -> t('Orang yang naik sepeda motor'); explainWrong -> t('Motor lewat jalan raya, bukan trotoar. Jalur miring menolong pejalan kaki dan roda kecil.')\n\n7) Anchor a10-anc-j5:\n - choice 'soft' label 'Alat bantu, misalnya pembaca layar' -> 'Web dipakai lewat keyboard atau suara'\n - explainCorrect -> t('Ada orang yang memakai web dengan keyboard atau mendengar layar dibacakan. Halamannya harus cocok untuk cara itu.')\n\n8) Anchor a10-anc-p4 explainCorrect -> t('ARIA hanya menambal yang belum jelas dari HTML, seperti nama tombol ikon ×. HTML asli sudah membawa dukungan keyboard.')\n\n9) a10-l02 storyStep, first rText: replace 'Pedoman web bernama WCAG punya empat prinsip yang disebut ' with 'Pedoman internasional WCAG (Web Content Accessibility Guidelines) punya empat prinsip yang disebut ' (the first sentence stays as it is).\n\n10) a10-l02 conceptStep \"ARIA dan aturan pertamanya\" body:\n - rText(' adalah atribut tambahan yang memberi tahu pembaca layar peran sebuah elemen. Contohnya, tombol ikon tutup diberi ') -> rText(' adalah atribut tambahan yang memberi tahu pembaca layar nama, peran, atau keadaan elemen. Contohnya, tombol ikon × sudah berperan tombol tetapi belum punya nama, jadi diberi ')\n - Keep rCode('aria-label=\"Tutup\"') and the final rText unchanged.\n\n11) a10-l02-q2: type 'analogy' -> 'mcq'. Nothing else changes.\n\n12) a10-l02-q3 (spotbug) lines[2] '  <button aria-label=\"Cari\">Cari</button>' -> '  <button>Cari</button>'. answer stays [2].\n\n13) a10-l02-q4: keep type 'limit' (the validator requires one limit question in a lesson that has a limit card).\n - analogy 'Fasilitas taman umum yang ramah' -> 'POUR seperti standar fasilitas taman umum'\n - prompt -> t('Di taman, papan \"Pintu\" tidak membuat dinding bisa dibuka. Apa kesalahan serupa saat ARIA dipakai tanpa elemen asli?')\n\n14) a10-l02-r1, choice 'only' label 'Saat elemen HTML asli belum cukup menjelaskan peran' -> 'Saat HTML asli belum cukup menjelaskan elemen itu' (same name-vs-role fix as item 10)\n\n15) a10-l03 storyStep, rPro text -> 'Sebelum halaman baru dirilis, tim menjalankan daftar periksa aksesibilitas, seperti petugas mengecek taman sebelum dibuka.'\n\n16) a10-l03 conceptStep \"Keyboard, tombol besar, gerak lembut\":\n - Junior: rJunior(' memindahkan pilihan ke tombol berikutnya. Buat ') -> rJunior(' memindahkan garis penanda ke tombol berikutnya. Buat ')\n - Pro: rPro(', ukuran huruf dalam ') -> rPro(' (anjuran umum; batas minimal WCAG 2.2 AA 24 px), ukuran huruf dalam ')\n\n17) a10-l03 limitStep different[0] junior 'Alat otomatis hanya menangkap sebagian masalah. Kamu tetap perlu mencoba sendiri.' -> 'Taman cukup dilihat. Web perlu dicoba, misalnya tanpa mouse.' (keep Pro)\n\n18) a10-l03-q3, Junior text only (keep every Pro string):\n - choice 'bright': label junior 'Naikkan kecerahan layar sampai paling terang' -> 'Tekan Caps Lock untuk berpindah tombol'; explainWrong junior -> 'Caps Lock hanya mengganti huruf besar dan kecil. Tab yang memindahkan pilihan.'\n - choice 'wifi': label junior 'Perbesar tulisan di layar' -> 'Tekan Enter berkali-kali di tombol pertama'; explainWrong junior -> 'Enter hanya menekan tombol yang sedang dipilih. Untuk pindah tombol, pakai Tab.'\n\n19) a10-l03-q2 (sort) item b1: label t('Menghapus garis penanda tombol tanpa pengganti') -> t('Menghapus garis penanda tombol yang dipilih', 'Menghapus garis penanda tombol tanpa pengganti')\n\n20) a10-l03-q5:\n - prompt Pro 'Pengaturan CSS apa yang sebaiknya dihormati untuk membantu Bito?' -> 'Apa yang sebaiknya dilakukan halaman untuk membantu Bito?' (keep Junior)\n - choice 'prm' label junior 'Mengurangi gerakan saat diminta' -> 'Menyediakan tombol untuk menghentikan gerakan' (keep Pro 'Mengurangi animasi saat reduced motion aktif')\n - choice 'lock': label Pro 'Mengunci ukuran huruf supaya tidak bisa diubah' -> 'Mengganti animasi putar dengan animasi memantul'; explainWrong Pro -> 'Animasi memantul tetap bergerak terus. Reduced motion meminta gerakan dikurangi atau dimatikan.' (keep Junior label and Junior explainWrong)\n - explainCorrect junior -> 'Tombol itu menghentikan kartu yang berputar, jadi Bito tidak pusing. Seperti menghentikan komidi putar saat ada yang pusing.' (keep Pro)\n - hints: [t('Bito butuh gerakan yang lebih sedikit atau berhenti.')] -> [t('Ingat: apa yang membuat Bito pusing?', 'Bito butuh gerakan yang lebih sedikit atau berhenti.')]\n\n21) a10-l03-r2 (makeTf), Junior text only. Answer stays true and the Pro strings do not change:\n - prompt junior -> 'Tombol besar lebih mudah diketuk jari.'\n - explainCorrect junior -> 'Jari lebih mudah mengenai tombol yang besar. Seperti gawang lebar yang lebih mudah dimasuki bola.'\n - explainWrong junior -> 'Pernyataan itu benar. Tombol besar lebih mudah diketuk siapa saja.'\n - hints: [t('Ingat hiasan dinding di kelas.')] -> [t('Ingat main bola: gawang lebar atau sempit?', 'Ingat hiasan dinding di kelas.')]\n\nAfterwards run `npm run validate:content` and confirm that a10 shows no new C-warnings or errors.\n\nVERDICT TABLE (# | source | issue | verdict | reason):\n1 | naya/wulan | junior a11y counts letters of \"aksesibilitas\" | Accept | factual blocker; fixed in item 1 within 3 sentences\n2 | naya/wulan | l03-r2 junior tests screen reader/decorative alt never taught | Adapt | r2 junior now tests big buttons, which junior learned (item 21); keeps review-card count and answer\n3 | naya | anc-j5 / l01 limit use \"alat bantu/pembaca layar\" untaught | Adapt | removed jargon instead of adding a 4th sentence to the card (items 4, 7)\n4 | dimas/sari | ARIA described as giving \"peran\" but example gives a name | Accept | correctness; items 8, 10, 14\n5 | naya/raka | anc-j1 distractor ruled out by prompt | Accept | plausible distractor (item 6)\n6 | naya/wulan | l03 junior limit mentions \"alat otomatis\" | Accept | item 17\n7 | raka | l03-q3 junior keyword giveaway | Accept | keyboard-based distractors (item 18)\n8 | sari/wulan | l01-q2 Pro hint and explanation use different sort rules | Accept | one two-step rule (item 3)\n9 | naya/raka | b1 \"garis penanda... tanpa pengganti\" unclear | Adapt | concept sentence reworded rather than adding a 4th sentence (items 16, 19)\n10 | naya | l03-q5 \"saat diminta\" unclear | Accept | item 20; hint changed so it no longer echoes the answer word\n11 | dimas/sari | l03-q5 Pro prompt asks for setting, choices are actions; off-topic distractor | Accept | item 20\n12 | naya/wulan | l01-q6 \"fitur aksesibilitas\" hard, explanation gives no why | Adapt | suggested sentence was 13 words; split into two (item 2)\n13 | wulan | junior defines aksesibilitas as a page | Accept | merged into item 1\n14 | sari | WCAG without full name | Adapt | full name added; unverified legal claim dropped, atWork already covers client use (item 9)\n15 | dimas | l02-q3 redundant aria-label shown as good code | Accept | item 12\n16 | dimas/sari | q2/q4 type metadata | Adapt | q2 -> mcq; q4 must stay 'limit' (validator), so the analogy and prompt are tied to the limit card (items 11, 13)\n17 | sari | 44–48 px implied as AA | Adapt | WCAG 2.2 AA 24 px noted without brand names (item 16)\n18 | dimas | Pro l03 story flowery | Accept | item 15\n19 | naya/raka | l01-q2 junior explanation skips tas belanja | Adapt | kept to the 2-sentence limit (item 3)\n20 | wulan | offlineActivity assumes older sibling | Accept | item 5\nCounts: accepted 12, adapted 8, rejected 0, deferred 0. All blocker and major issues are covered, so done: true.",
+  "rationale": "I applied the decision guide's authority order. Correctness fixes come first: the a11y letter count and ARIA name vs role. Next come the copydeck rules: junior sentences of at most 12 words and cards of at most 3 sentences, no giveaways, hints that do not echo the answer, no brand names, and 2-sentence explanations. Several persona suggestions would have broken those limits, so I adapted them. Two of them also hit the validator rule that a lesson with a limit card needs a limit question, which is why l02-q4 stays type 'limit'. Every fix stays inside the one owned file, and no ids or answers change. I made no file edits, so the verdict table is included in the instructions; no spec file was assigned to write it into.",
+  "done": true,
+  "applicationNotes": [
+   "Replaced the blindfold-style prompt with a companion reading the packaging without showing the image, keeping the focus on what a description conveys.",
+   "Kept 44–48 px as a recommendation and explained the WCAG 2.2 AA default of 24 × 24 CSS pixels with exceptions.",
+   "Used keyboard-only testing in the park analogy limit without implying that physical accessibility can be judged by sight alone.",
+   "Balanced choice length cues and synchronized the Junior tagline from the existing world metadata."
+  ],
+  "verification": "node --import tsx scripts/validate-content.ts --world=a10 passed with zero findings for a10."
+ },
+ "judgeIssues": [
+  {
+   "persona": "naya-8 / wulan-38",
+   "where": "a10-l01 conceptStep 'Apa itu aksesibilitas?' (junior body)",
+   "problem": "Meaning error. The junior text reads \"Singkatannya a11y, karena ada 11 huruf di antara a dan y.\" right after the word \"Aksesibilitas\". The English word 'accessibility' appears only in the Pro text. A child who counts the letters of 'aksesibilitas' finds it ends in 's', not 'y', so the explanation does not work.",
+   "suggestion": "Junior: \"Dalam bahasa Inggris, kata ini ditulis accessibility. Ada 11 huruf di antara a dan y, jadi disingkat a11y.\" Or remove a11y from junior entirely.",
+   "severity": "blocker"
+  },
+  {
+   "persona": "naya-8 / wulan-38",
+   "where": "a10-l03-r2 (junior)",
+   "problem": "Tests something junior never learned. \"Gambar hiasan sebaiknya tidak dibacakan oleh alat pembaca layar.\" In l03 the alt text and decorative-image card is Pro-only (modes: ['pro']), and no junior card explains what a 'pembaca layar' is.",
+   "suggestion": "Make r2 Pro-only, or add a junior concept line: 'Ada alat yang membacakan isi layar dengan suara untuk orang yang tidak bisa melihat. Gambar hiasan cukup dilewati.'",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a10-anc-j5 / a10-l01 limitStep (junior)",
+   "problem": "The words 'alat bantu' and 'pembaca layar' are never explained in junior mode: \"Alat bantu, misalnya pembaca layar\" and \"Jalur itu beton. Web harus cocok dengan alat bantu.\" The 'beton' sentence also does not explain why web is different.",
+   "suggestion": "Add one junior sentence in l01: 'Ada orang yang memakai alat yang membacakan layar dengan suara.' Change the limit text to 'Jalur miring cukup dilewati. Web juga harus bisa dipakai dengan keyboard dan alat pembaca suara.'",
+   "severity": "major"
+  },
+  {
+   "persona": "dimas-14 / sari-27",
+   "where": "a10-l02 conceptStep 'ARIA dan aturan pertamanya' + a10-anc-p4 explainCorrect",
+   "problem": "Factual muddle. The card says \"ARIA adalah atribut tambahan yang memberi tahu pembaca layar peran sebuah elemen\", but the example, aria-label=\"Tutup\", gives a name, not a role. a10-anc-p4 repeats the mistake: \"menambal elemen yang belum cukup menjelaskan peran, seperti tombol ikon ×\". A <button> already has its role; what it lacks is a name.",
+   "suggestion": "'ARIA memberi tahu pembaca layar nama, peran, atau keadaan elemen yang belum jelas dari HTML. Tombol ikon × sudah berperan tombol, tetapi belum punya nama, jadi diberi aria-label=\"Tutup\".'",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8 / raka-11",
+   "where": "a10-anc-j1",
+   "problem": "The answer is given away. The prompt starts \"Selain kursi roda, siapa lagi...\" and then offers \"Hanya orang yang memakai kursi roda\" as a choice, which the prompt itself rules out. Only two real choices remain.",
+   "suggestion": "Replace that distractor with something believable, such as 'Orang yang naik sepeda motor', with explainWrong 'Motor lewat jalan raya, bukan trotoar.'",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8 / wulan-38",
+   "where": "a10-l03 limitStep (junior 'different')",
+   "problem": "\"Alat otomatis hanya menangkap sebagian masalah. Kamu tetap perlu mencoba sendiri.\" Junior mode never mentions any automatic tool, so Naya has nothing to connect 'alat otomatis' to.",
+   "suggestion": "Junior: 'Taman dicek dengan mata. Web juga perlu dicoba sendiri, misalnya tanpa mouse.'",
+   "severity": "major"
+  },
+  {
+   "persona": "raka-11",
+   "where": "a10-l03-q3 (junior)",
+   "problem": "Giveaway. The prompt asks about \"mencoba web hanya dengan keyboard\", and only the correct choice, \"Lepas mouse, lalu tekan Tab untuk berpindah\", mentions mouse, keyboard or Tab. Raka can match keywords without thinking.",
+   "suggestion": "Use distractors that also involve the keyboard, e.g. 'Tekan Caps Lock berkali-kali' or 'Ketik namamu di kolom isian'.",
+   "severity": "major"
+  },
+  {
+   "persona": "sari-27 / wulan-38",
+   "where": "a10-l01-q2 (Pro hint vs explainCorrect)",
+   "problem": "The hint and the explanation sort by different rules. The hint says \"apakah hambatan itu berasal dari tubuh atau dari lingkungan?\", which separates only situational from the rest; permanent and temporary both come from the body. The explanation says \"Hambatan dibedakan dari lamanya\".",
+   "suggestion": "Use one two-step rule in both: 'Dari tubuh atau lingkungan? Kalau dari tubuh: akan pulih atau tidak?'",
+   "severity": "major"
+  },
+  {
+   "persona": "naya-8 / raka-11",
+   "where": "a10-l03-q2 (junior item b1) + a10-l03 keyboard concept",
+   "problem": "\"Menghapus garis penanda tombol tanpa pengganti\": the junior concept never explains what a focus 'garis penanda' is (it appears only in the alt text), and 'tanpa pengganti' is abstract for an 8-year-old.",
+   "suggestion": "Add to the junior concept: 'Saat menekan Tab, tombol yang dipilih diberi garis. Garis itu jangan dihapus.' Shorten b1 to 'Menghapus garis tanda tombol yang dipilih'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8",
+   "where": "a10-l03-q5 (junior correct choice)",
+   "problem": "\"Mengurangi gerakan saat diminta\": it is unclear who asks or how. The idea of a setting that asks for less motion is never introduced in junior mode.",
+   "suggestion": "'Membuat kartu berhenti berputar kalau Bito pusing' or 'Menyediakan tombol untuk menghentikan gerakan'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14 / sari-27",
+   "where": "a10-l03-q5 (Pro prompt vs choices)",
+   "problem": "The prompt asks \"Pengaturan CSS apa yang sebaiknya dihormati\" but the choices are actions (\"Mengurangi animasi saat reduced motion aktif\"), not settings. The distractor \"Mengunci ukuran huruf\" has nothing to do with motion.",
+   "suggestion": "Prompt: 'Apa yang sebaiknya dilakukan halaman untuk membantu Bito?' Or make the choices settings: prefers-reduced-motion / prefers-color-scheme / font-size: 2rem.",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8 / wulan-38",
+   "where": "a10-l01-q6 (junior)",
+   "problem": "The word 'fitur aksesibilitas' is too hard for Naya, and the explanation does not say why: \"Fitur itu menolong saat itu.\" It never names which feature.",
+   "suggestion": "Prompt: 'Web yang ramah bisa menolong siapa saja.' Explanation: 'Tulisan besar dan tulisan ucapan video menolong saat layar silau atau tempat berisik.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a10-l01 conceptStep 'Apa itu aksesibilitas?' (junior)",
+   "problem": "Small meaning slip: \"Aksesibilitas artinya halaman web yang bisa dipakai semua orang\" defines the word as a page rather than a quality.",
+   "suggestion": "'Aksesibilitas artinya web bisa dipakai semua orang.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a10-l02 storyStep",
+   "problem": "WCAG is introduced only as \"Pedoman web bernama WCAG\" with no full name and no hint of how it is used at work. Sari will see the acronym in job posts and audit reports.",
+   "suggestion": "Add '(Web Content Accessibility Guidelines), standar yang sering diminta klien dan dipakai sebagai acuan hukum di banyak negara.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a10-l02-q3 line 3",
+   "problem": "The 'correct' line <button aria-label=\"Cari\">Cari</button> uses aria-label that only repeats the visible text. That is the ARIA overuse the lesson itself warns against (\"Pakai seperlunya\").",
+   "suggestion": "Use <button>Cari</button> without aria-label, or make line 3 an icon button that actually needs aria-label.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14 / sari-27",
+   "where": "a10-l02-q2 / a10-l02-q4 (type metadata)",
+   "problem": "Labelled type 'analogy' / 'limit' with analogy 'Fasilitas taman umum yang ramah', but neither question is about an analogy or its limits. If the UI shows an analogy label, the learner will be confused.",
+   "suggestion": "Change both types to standard mcq/scenario and remove the analogy field from q4.",
+   "severity": "minor"
+  },
+  {
+   "persona": "sari-27",
+   "where": "a10-l03 keyboard concept (Pro) + a10-l03-q2 g2",
+   "problem": "\"Jaga target sentuh 44–48 px\" sits next to the WCAG AA target, which implies AA requires it. It does not: AA (2.5.8) requires 24 px; 44 px is AAA or a platform guideline.",
+   "suggestion": "Add 'rekomendasi Apple/Google; WCAG AA minimal 24 px'.",
+   "severity": "minor"
+  },
+  {
+   "persona": "dimas-14",
+   "where": "a10-l03 storyStep (Pro)",
+   "problem": "\"supaya tidak ada orang yang tertinggal di belakang pintu tertutup\" is flowery and slightly preachy, and the sentence is long.",
+   "suggestion": "Cut it to: 'Sebelum rilis, tim menjalankan daftar periksa aksesibilitas, seperti petugas mengecek taman sebelum dibuka.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "naya-8 / raka-11",
+   "where": "a10-l01-q2 (junior explainCorrect)",
+   "problem": "The explanation covers the cast, eyes and glare, but not item c4 \"Satu tangan memegang tas belanja\", the trickiest case for a child, so it does not say why it counts as 'Karena situasi'.",
+   "suggestion": "Add: 'Tas belanja bisa ditaruh, jadi kesulitannya karena situasi.'",
+   "severity": "minor"
+  },
+  {
+   "persona": "wulan-38",
+   "where": "a10-l01 companion.offlineActivity",
+   "problem": "\"Minta kakak menjelaskan...\" assumes the child has an older sibling. It is also not clear whose eyes are closed.",
+   "suggestion": "'Tutup matamu 1 menit. Minta orang di rumah menjelaskan isi kemasan makanan.'",
+   "severity": "minor"
+  }
+ ]
+}
