@@ -3,6 +3,7 @@ import { Star, X } from 'lucide-react';
 import type { Mode } from '@/content/schema';
 import { useCountUp } from '@/motion/useCountUp';
 import { Annot } from '@/components/fx/Annot';
+import { usePetForeground } from '@/components/pet/usePetMotion';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 
 interface LessonHeaderProps {
@@ -19,6 +20,7 @@ interface LessonHeaderProps {
   combo: number;
   focus: boolean;
   pet?: React.ReactNode;
+  petTravelPaused?: boolean;
   onToggleFocus: () => void;
   onExit: () => void;
 }
@@ -35,9 +37,11 @@ export const LessonHeader: React.FC<LessonHeaderProps> = ({
   onExit,
   focus,
   pet,
+  petTravelPaused = false,
   onToggleFocus,
 }) => {
   const shown = useCountUp(sessionXp, { duration: 300, from: sessionXp });
+  const foreground = usePetForeground();
 
   // The combo chip stays mounted for a moment after a miss so it can fade out (M48)
   const [display, setDisplay] = useState(combo >= COMBO_MIN ? combo : 0);
@@ -61,27 +65,21 @@ export const LessonHeader: React.FC<LessonHeaderProps> = ({
         data-sfx="back"
         onClick={onExit}
         aria-label="Keluar pelajaran"
-        className="pw-pressable flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] cursor-pointer"
+        className="pw-pressable order-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] cursor-pointer"
       >
         <X className="h-5 w-5" aria-hidden="true" />
       </button>
 
-      <div className="min-w-[96px] flex-1">
-        <ProgressBar value={progress} label="Kemajuan pelajaran" halfwayNote={mode === 'junior'} />
-      </div>
-
       <button type="button" aria-pressed={focus} onClick={onToggleFocus}
-        className="pw-pressable min-h-11 rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] px-3 font-bold aria-pressed:border-[var(--world-700)] aria-pressed:bg-[var(--world-50)]">
+        className={`pw-pressable order-3 min-h-11 rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] px-3 font-bold aria-pressed:border-[var(--world-700)] aria-pressed:bg-[var(--world-50)] ${pet ? 'ml-auto' : ''}`}>
         Fokus
       </button>
-
-      {pet}
 
       <span
         ref={xpChipRef}
         role="img"
         aria-label={label}
-        className="inline-flex min-h-[32px] flex-shrink-0 items-center rounded-[var(--radius-full)] border-[1.5px] border-[var(--star)] bg-[var(--star-50)] px-3 text-[var(--star-700)]"
+        className="order-4 inline-flex min-h-[32px] flex-shrink-0 items-center rounded-[var(--radius-full)] border-[1.5px] border-[var(--star)] bg-[var(--star-50)] px-3 text-[var(--star-700)]"
       >
         <span key={bumpKey} aria-hidden="true" className={`inline-flex items-center gap-1 font-extrabold ${bumpKey > 0 ? 'pw-fx-bump' : ''} ${mode === 'pro' ? 'font-mono tabular-nums' : ''}`}>
           <Star className="h-4 w-4" fill="currentColor" aria-hidden="true" />
@@ -99,7 +97,7 @@ export const LessonHeader: React.FC<LessonHeaderProps> = ({
               setDisplay(0);
             }
           }}
-          className={`flex-shrink-0 ${leaving ? 'pw-fx-out' : 'pw-enter'}`}
+          className={`order-5 flex-shrink-0 ${leaving ? 'pw-fx-out' : 'pw-enter'}`}
         >
           <Annot label={`${display} beruntun`}>
             <span key={display} className="pw-fx-bump inline-block">
@@ -109,6 +107,24 @@ export const LessonHeader: React.FC<LessonHeaderProps> = ({
           </Annot>
         </span>
       )}
+
+      <div className={pet ? 'relative order-last min-w-0 basis-full' : 'order-2 min-w-[96px] flex-1'}>
+        <div className={pet ? 'pointer-events-none absolute inset-x-7 top-1/2 -translate-y-1/2 print:static print:translate-y-0' : undefined}>
+          <ProgressBar value={progress} label="Kemajuan pelajaran" halfwayNote={mode === 'junior'} />
+        </div>
+        {pet && (
+          <div data-pet-lane="" className="no-print pointer-events-none relative h-14 overflow-clip [overflow-clip-margin:4px]">
+            {/* The traveler spans the distance between the first and last safe positions of the button. */}
+            <div
+              data-pet-travel={foreground && !petTravelPaused ? 'on' : 'off'}
+              className="pw-pet-travel pointer-events-none absolute inset-y-0 left-1 right-[3.25rem] flex items-center [&_dialog]:pointer-events-auto"
+              style={{ transform: `translateX(${Math.max(0, Math.min(100, progress))}%)` }}
+            >
+              {pet}
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   );
 };

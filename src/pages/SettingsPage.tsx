@@ -554,7 +554,7 @@ export const SettingsPage: React.FC = () => {
           id="pet-voice"
           icon={PawPrint}
           label="Suara hewan pendamping"
-          effect="Studio memakai klip suara bawaan aplikasi. Kalimat lainnya mengikuti suara bacaan yang kamu pilih."
+          effect="Suara Studio dibuat dengan sintesis suara bahasa Indonesia. Untuk teks lain, pet memakai suara bacaan yang kamu pilih."
           below={
             <div className="space-y-2">
               <Segmented
