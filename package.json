@@ -7,8 +7,9 @@
     "dev": "vite",
     "validate:content": "tsx scripts/validate-content.ts",
     "check:contrast": "tsx scripts/check-contrast.ts",
+    "check:colors": "tsx scripts/check-hardcoded-colors.ts",
     "typecheck": "tsc --noEmit",
-    "build": "npm run validate:content && npm run check:contrast && tsc --noEmit && vite build",
+    "build": "npm run validate:content && npm run check:contrast && npm run check:colors && tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run"
   },

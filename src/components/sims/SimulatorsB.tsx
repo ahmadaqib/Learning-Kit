@@ -23,7 +23,7 @@ const SimShellB: React.FC<{
               setTab('example');
               onRunDemo();
             }}
-            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-full px-3.5 text-xs font-extrabold cursor-pointer ${
+            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-[var(--radius-full)] px-3.5 text-xs font-extrabold cursor-pointer ${
               tab === 'example'
                 ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
                 : 'bg-[var(--cream)] text-[var(--ink-2)] hover:text-[var(--ink)]'
@@ -35,7 +35,7 @@ const SimShellB: React.FC<{
           <button
             type="button"
             onClick={() => setTab('try')}
-            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-full px-3.5 text-xs font-extrabold cursor-pointer ${
+            className={`pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-[var(--radius-full)] px-3.5 text-xs font-extrabold cursor-pointer ${
               tab === 'try'
                 ? 'pw-squish-pop bg-[var(--world-600)] text-[var(--world-btn-text)] shadow-[0_2px_0_var(--world-700)]'
                 : 'bg-[var(--cream)] text-[var(--ink-2)] hover:text-[var(--ink)]'
@@ -48,7 +48,7 @@ const SimShellB: React.FC<{
             type="button"
             onClick={onReset}
             aria-label="Ulangi simulator"
-            className="pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-full bg-[var(--cream)] px-3.5 text-xs font-bold text-[var(--ink-2)] hover:text-[var(--ink)] cursor-pointer"
+            className="pw-pressable inline-flex min-h-[40px] items-center gap-1 rounded-[var(--radius-full)] bg-[var(--cream)] px-3.5 text-xs font-bold text-[var(--ink-2)] hover:text-[var(--ink)] cursor-pointer"
           >
             <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
             Ulangi
@@ -56,7 +56,7 @@ const SimShellB: React.FC<{
         </div>
       </div>
       {tab === 'example' && (
-        <p className="rounded-lg bg-[var(--world-50)] px-3 py-2 text-xs font-semibold text-[var(--world-700)]">
+        <p className="rounded-[var(--radius-sm)] bg-[var(--world-50)] px-3 py-2 text-xs font-semibold text-[var(--world-700)]">
           Contoh otomatis: {demoHint}
         </p>
       )}
@@ -107,12 +107,12 @@ export const PenyortirStatusSim: React.FC<SimComponentProps> = ({ onCompleteInte
       }}
     >
       {current ? (
-        <div className="rounded-xl bg-[#1F2340] p-4 text-center text-white">
-          <div className="text-xs text-[#B8BCE0]">Kartu {idx + 1} dari {cards.length}</div>
-          <div className="pw-code mt-1 text-xl font-bold text-[#F5B400]">{current.code}</div>
+        <div className="rounded-[var(--radius-md)] bg-[var(--boss)] p-4 text-center text-[var(--on-boss)]">
+          <div className="text-xs text-[var(--on-boss)] opacity-80">Kartu {idx + 1} dari {cards.length}</div>
+          <div className="pw-code mt-1 text-xl font-bold text-[var(--star)]">{current.code}</div>
         </div>
       ) : (
-        <div className="rounded-xl bg-[var(--ok-50)] p-4 text-center font-bold text-[var(--ok-600)]">
+        <div className="rounded-[var(--radius-md)] bg-[var(--ok-50)] p-4 text-center font-bold text-[var(--ok-600)]">
           Selesai! Skor {score}/{cards.length}
         </div>
       )}
@@ -164,7 +164,7 @@ export const PerakitRequestSim: React.FC<SimComponentProps> = ({ onCompleteInter
           aria-label="Pilih method HTTP"
           value={method}
           onChange={(e) => setMethod(e.target.value as 'GET' | 'POST' | 'DELETE')}
-          className="pw-code rounded-lg border border-[var(--line)] bg-[var(--paper)] px-3 py-2 font-bold"
+          className="pw-code min-h-[48px] rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] px-3 py-2 font-bold"
         >
           <option value="GET">GET</option>
           <option value="POST">POST</option>
@@ -174,7 +174,7 @@ export const PerakitRequestSim: React.FC<SimComponentProps> = ({ onCompleteInter
           aria-label="Pilih endpoint"
           value={path}
           onChange={(e) => setPath(e.target.value)}
-          className="pw-code flex-1 rounded-lg border border-[var(--line)] bg-[var(--paper)] px-3 py-2"
+          className="pw-code min-h-[48px] flex-1 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] px-3 py-2"
         >
           <option value="/produk">/produk</option>
           <option value="/produk/7">/produk/7</option>
@@ -186,9 +186,12 @@ export const PerakitRequestSim: React.FC<SimComponentProps> = ({ onCompleteInter
           Kirim
         </Button>
       </div>
+      <div className="sr-only" role="status">
+        {loading ? 'Menunggu balasan.' : resp ? `Status balasan ${resp.status} ${resp.statusText}.` : ''}
+      </div>
       {resp && (
-        <div className="pw-code rounded-xl bg-[#1F2340] p-3 text-xs text-[#E8EAF6] overflow-x-auto">
-          <div className="mb-1 font-bold text-[#F5B400]">
+        <div className="pw-code rounded-[var(--radius-md)] bg-[var(--boss)] p-3 text-xs text-[var(--on-boss)] overflow-x-auto">
+          <div className="mb-1 font-bold text-[var(--star)]">
             Status: {resp.status} {resp.statusText} ({resp.durationMs} ms)
           </div>
           <pre className="m-0 whitespace-pre-wrap">{JSON.stringify(resp.body, null, 2)}</pre>
@@ -219,7 +222,7 @@ export const DokterJsonSim: React.FC<SimComponentProps> = ({ onCompleteInteracti
       }}
     >
       <p className="text-xs text-[var(--ink-2)]">Ketuk baris JSON yang sakit untuk memperbaikinya:</p>
-      <div className="pw-code space-y-1 rounded-xl bg-[#1F2340] p-3 text-xs text-[#E8EAF6]">
+      <div className="pw-code space-y-1 rounded-[var(--radius-md)] bg-[var(--boss)] p-3 text-xs text-[var(--on-boss)]">
         <div>{'{'}</div>
         <button
           type="button"
@@ -227,8 +230,8 @@ export const DokterJsonSim: React.FC<SimComponentProps> = ({ onCompleteInteracti
             setFixedQuotes(true);
             onCompleteInteraction?.();
           }}
-          className={`block w-full rounded px-2 py-1 text-left cursor-pointer ${
-            fixedQuotes ? 'bg-[#1C7432] text-white' : 'bg-[#C97A00] text-[#1F2340] font-bold'
+          className={`block w-full rounded-[var(--radius-xs)] px-2 py-1 text-left cursor-pointer ${
+            fixedQuotes ? 'border-2 border-solid border-[var(--ok-500)] bg-[var(--ok-50)] text-[var(--ink)]' : 'border-2 border-dashed border-[var(--warn-500)] bg-[var(--warn-50)] text-[var(--ink)] font-bold'
           }`}
         >
           {fixedQuotes ? '  "nama": "Tas Kanvas",' : "  nama: 'Tas Kanvas',   // ketuk perbaiki kutip!"}
@@ -239,8 +242,8 @@ export const DokterJsonSim: React.FC<SimComponentProps> = ({ onCompleteInteracti
             setFixedComma(true);
             onCompleteInteraction?.();
           }}
-          className={`block w-full rounded px-2 py-1 text-left cursor-pointer ${
-            fixedComma ? 'bg-[#1C7432] text-white' : 'bg-[#C97A00] text-[#1F2340] font-bold'
+          className={`block w-full rounded-[var(--radius-xs)] px-2 py-1 text-left cursor-pointer ${
+            fixedComma ? 'border-2 border-solid border-[var(--ok-500)] bg-[var(--ok-50)] text-[var(--ink)]' : 'border-2 border-dashed border-[var(--warn-500)] bg-[var(--warn-50)] text-[var(--ink)] font-bold'
           }`}
         >
           {fixedComma ? '  "harga": 85000' : '  "harga": 85000,       // ketuk hapus koma akhir!'}
@@ -280,20 +283,20 @@ export const PelayanGraphqlSim: React.FC<SimComponentProps> = ({ onCompleteInter
     >
       <div className="flex flex-wrap gap-3">
         {(['nama', 'harga', 'stok'] as const).map((k) => (
-          <label key={k} className="inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-[var(--line)] px-3 cursor-pointer">
+          <label key={k} className="inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--line)] px-3 cursor-pointer">
             <input type="checkbox" checked={fields[k]} onChange={() => toggle(k)} />
             <span className="pw-code text-sm font-bold">{k}</span>
           </label>
         ))}
       </div>
       <div className="grid gap-2 sm:grid-cols-2 pw-code text-xs">
-        <pre className="rounded-xl bg-[#1F2340] p-3 text-[#E8EAF6] m-0">
+        <pre className="rounded-[var(--radius-md)] bg-[var(--boss)] p-3 text-[var(--on-boss)] m-0">
           {`query {\n  produk(id: 2) {\n${Object.entries(fields)
             .filter(([, v]) => v)
             .map(([k]) => `    ${k}`)
             .join('\n')}\n  }\n}`}
         </pre>
-        <pre className="rounded-xl bg-[var(--cream)] p-3 text-[var(--ink)] border border-[var(--line)] m-0">
+        <pre className="rounded-[var(--radius-md)] bg-[var(--cream)] p-3 text-[var(--ink)] border border-[var(--line)] m-0">
           {JSON.stringify({ data: { produk: responseObj } }, null, 2)}
         </pre>
       </div>
@@ -315,15 +318,15 @@ export const BalapRealtimeSim: React.FC<SimComponentProps> = ({ onCompleteIntera
       onReset={() => setStep(0)}
     >
       <div className="space-y-2 text-xs">
-        <div className="rounded-lg border border-[var(--line)] p-2.5">
+        <div className="rounded-[var(--radius-sm)] border border-[var(--line)] p-2.5">
           <strong>Polling:</strong>{' '}
           {step === 0 ? 'Diam' : `${step * 3} request dikirim ("Sudah? Belum. Sudah? Belum...")`}
         </div>
-        <div className="rounded-lg border border-[var(--ok-500)] bg-[var(--ok-50)] p-2.5">
+        <div className="rounded-[var(--radius-sm)] border border-[var(--ok-500)] bg-[var(--ok-50)] p-2.5">
           <strong>SSE (Radio):</strong>{' '}
           {step === 0 ? 'Diam' : `1 koneksi terbuka, server kirim ${step} kabar seketika!`}
         </div>
-        <div className="rounded-lg border border-[var(--world-600)] bg-[var(--world-50)] p-2.5">
+        <div className="rounded-[var(--radius-sm)] border border-[var(--world-600)] bg-[var(--world-50)] p-2.5">
           <strong>WebSocket (Telepon):</strong>{' '}
           {step === 0 ? 'Diam' : `1 koneksi dua arah! Server & client sudah bertukar ${step * 2} pesan!`}
         </div>
@@ -354,7 +357,7 @@ export const BelWebhookSim: React.FC<SimComponentProps> = ({ onCompleteInteracti
       }}
       onReset={() => setPaid(false)}
     >
-      <div className="flex items-center justify-between gap-3 rounded-xl bg-[var(--cream)] p-4">
+      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] bg-[var(--cream)] p-4">
         <div>
           <div className="font-bold">Status Tagihan #88</div>
           <div className="text-xs text-[var(--ink-2)]">
@@ -389,12 +392,12 @@ export const PembacaGelangJwtSim: React.FC<SimComponentProps> = ({ onCompleteInt
       }}
       onReset={() => setTampered(false)}
     >
-      <div className="pw-code break-all rounded-xl bg-[#1F2340] p-3 text-xs">
-        <span className="text-[#FF8577]">eyJhbGciOiJIUzI1NiJ9</span>.
-        <span className="text-[#FFD466]">{tampered ? 'eyJyb2xlIjoiYWRtaW4ifQ' : 'eyJyb2xlIjoicGVtYmVsaSJ9'}</span>.
-        <span className="text-[#6FE08B]">7mK2xQ9vR_sig</span>
+      <div className="pw-code break-all rounded-[var(--radius-md)] bg-[var(--surface-well)] p-3 text-xs text-[var(--ink)]">
+        <span className="text-[var(--err-600)]">eyJhbGciOiJIUzI1NiJ9</span>.
+        <span className="text-[var(--warn-700)]">{tampered ? 'eyJyb2xlIjoiYWRtaW4ifQ' : 'eyJyb2xlIjoicGVtYmVsaSJ9'}</span>.
+        <span className="text-[var(--ok-600)]">7mK2xQ9vR_sig</span>
       </div>
-      <div className="rounded-xl border border-[var(--line)] bg-[var(--cream)] p-3 text-xs space-y-1">
+      <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--cream)] p-3 text-xs space-y-1">
         <div><strong>Payload terbaca:</strong> {tampered ? '{"role":"admin"}' : '{"role":"pembeli"}'}</div>
         <div className={`font-extrabold ${tampered ? 'text-[var(--warn-700)]' : 'text-[var(--ok-600)]'}`}>
           {tampered
@@ -438,7 +441,7 @@ export const SatpamCorsSim: React.FC<SimComponentProps> = ({ onCompleteInteracti
               setOrigin(orig);
               onCompleteInteraction?.();
             }}
-            className={`pw-code min-h-[44px] rounded-lg border-2 px-3 text-xs font-bold cursor-pointer ${
+            className={`pw-code min-h-[44px] rounded-[var(--radius-sm)] border-2 px-3 text-xs font-bold cursor-pointer ${
               origin === orig ? 'border-[var(--world-600)] bg-[var(--world-50)]' : 'border-[var(--line)]'
             }`}
           >
@@ -446,7 +449,7 @@ export const SatpamCorsSim: React.FC<SimComponentProps> = ({ onCompleteInteracti
           </button>
         ))}
       </div>
-      <div className={`flex items-center gap-3 rounded-xl p-3 text-xs font-bold ${allowed ? 'bg-[var(--ok-50)] text-[var(--ok-600)]' : 'bg-[var(--warn-50)] text-[var(--warn-700)]'}`}>
+      <div className={`flex items-center gap-3 rounded-[var(--radius-md)] p-3 text-xs font-bold ${allowed ? 'bg-[var(--ok-50)] text-[var(--ok-600)]' : 'bg-[var(--warn-50)] text-[var(--warn-700)]'}`}>
         {allowed ? <ShieldCheck className="h-6 w-6 flex-shrink-0" /> : <ShieldAlert className="h-6 w-6 flex-shrink-0" />}
         <span>
           {allowed
@@ -479,7 +482,7 @@ export const TeleponSopanSim: React.FC<SimComponentProps> = ({ onCompleteInterac
           Jeda Bertahap (1s → 2s → 4s)
         </Button>
       </div>
-      <p className="rounded-xl bg-[var(--cream)] p-3 text-xs font-semibold">
+      <p className="rounded-[var(--radius-md)] bg-[var(--cream)] p-3 text-xs font-semibold">
         {strategy === 'spam'
           ? 'Server makin kewalahan dan terus menjawab 429 Too Many Requests!'
           : 'Server punya waktu bernapas dan berhasil menjawab 200 OK pada percobaan ketiga!'}
@@ -515,7 +518,7 @@ export const EmpatWajahLayarSim: React.FC<SimComponentProps> = ({ onCompleteInte
               setView(v);
               onCompleteInteraction?.();
             }}
-            className={`min-h-[40px] rounded-lg border px-3 text-xs font-bold cursor-pointer ${
+            className={`min-h-[40px] rounded-[var(--radius-sm)] border px-3 text-xs font-bold cursor-pointer ${
               view === v ? 'border-[var(--world-600)] bg-[var(--world-50)]' : 'border-[var(--line)]'
             }`}
           >
@@ -523,8 +526,8 @@ export const EmpatWajahLayarSim: React.FC<SimComponentProps> = ({ onCompleteInte
           </button>
         ))}
       </div>
-      <div className="min-h-[84px] rounded-xl border border-[var(--line)] bg-[var(--cream)] p-4 flex items-center justify-center text-center text-sm">
-        {view === 'loading' && <div className="h-8 w-48 animate-pulse rounded bg-[var(--line)]" aria-label="Skeleton memuat" />}
+      <div className="min-h-[84px] rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--cream)] p-4 flex items-center justify-center text-center text-sm">
+        {view === 'loading' && <div role="status" className="pw-well h-8 w-48" aria-label="Skeleton memuat" />}
         {view === 'error' && <span className="font-bold text-[var(--warn-700)]">Koneksi terputus. [Tombol Coba Lagi]</span>}
         {view === 'empty' && <span className="font-semibold text-[var(--ink-2)]">Belum ada pesanan. [Mulai Belanja]</span>}
         {view === 'ok' && <span className="font-bold text-[var(--ok-600)]">✓ 4 Produk Toko Rani tampil rapi!</span>}
@@ -572,7 +575,7 @@ export const PuncakApiSim: React.FC<SimComponentProps> = ({ onCompleteInteractio
           </Button>
         ))}
       </div>
-      <div className="rounded-xl bg-[var(--world-50)] p-3 text-sm font-bold text-[var(--world-700)]">
+      <div className="rounded-[var(--radius-md)] bg-[var(--world-50)] p-3 text-sm font-bold text-[var(--world-700)]">
         Rekomendasi: {advice[need]}
       </div>
     </SimShellB>

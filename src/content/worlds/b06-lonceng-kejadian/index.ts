@@ -7,6 +7,8 @@ import {
   makeTf,
   qStep,
   rCode,
+  rJunior,
+  rPro,
   rTerm,
   rText,
   simStep,
@@ -21,8 +23,8 @@ export const world: World = {
   order: 6,
   title: 'Lonceng Kejadian',
   tagline: t(
-    'Menerima bel pintu webhook saat pesanan lunas dan antrean pekerja.',
-    'Memahami webhook, verifikasi signature HMAC, idempotensi penerima, Message Queue, dan Pub/Sub.',
+    'Bel pintu berbunyi saat pesanan lunas. Tugasnya antre, lalu pekerja mengambilnya satu per satu.',
+    'Kamu bisa menerima kabar dari sistem lain lewat webhook dan memprosesnya dengan antrean pesan.',
   ),
   color: '#2BA84A',
   illustration: 'b06-lonceng-kejadian',
@@ -33,8 +35,8 @@ export const world: World = {
   boss: {
     title: 'Tantangan Penjaga Lonceng',
     greeting: t(
-      'Halo! Buktikan kamu paham bel pintu webhook dan antrean pesan!',
-      'Tunjukkan penguasaanmu tentang webhook, pengamanan signature, serta pola queue dan Pub/Sub.',
+      'Halo, aku Penjaga Lonceng! Coba jawab soal tentang bel webhook dan antrean pesan.',
+      'Jawab soal tentang webhook, signature, Message Queue, dan Pub/Sub.',
     ),
     guardianName: 'Penjaga Lonceng',
     junior: { count: 8, pool: 'world' },
@@ -45,252 +47,226 @@ export const world: World = {
     junior: [
       makeAnchorMcq({
         id: 'b06-anc-j1',
-        prompt: t('Cara layanan lain mengetuk servermu otomatis saat pembayaran selesai disebut…'),
+        prompt: t('Layanan bayar memencet bel servermu saat pembayaran selesai. Apa namanya?'),
         choices: [
-          {
-            id: 'wh',
-            label: t('Webhook'),
-            explainWrong: t('Benar, webhook itu bel pintu server.'),
-          },
+          { id: 'wh', label: t('Webhook') },
           {
             id: 'css',
-            label: t('CSS'),
-            explainWrong: t('CSS hanya mengatur warna dan tata letak.'),
+            label: t('Antrean pesan'),
+            explainWrong: t('Antrean pesan menyimpan tugas untuk pekerja. Bukan kabar yang datang sendiri.'),
           },
           {
             id: 'poll',
-            label: t('Polling terus-menerus'),
-            explainWrong: t('Polling itu kamu yang bertanya berulang kali.'),
+            label: t('Bertanya berulang kali'),
+            explainWrong: t('Itu berarti kamu yang bertanya terus. Seperti membuka pintu tiap 5 menit.'),
           },
         ],
         answer: 'wh',
-        explainCorrect: t('Webhook memencet bel servermu otomatis begitu ada kejadian baru.'),
+        explainCorrect: t('Webhook memencet bel servermu saat ada kabar. Seperti kurir menekan bel rumah.'),
         tags: ['webhook'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-j2',
         prompt: t('Ke mana kurir webhook datang memencet bel saat ada kabar baru?'),
         choices: [
-          {
-            id: 'srv',
-            label: t('Ke alamat server toko'),
-            explainWrong: t('Tepat!'),
-          },
+          { id: 'srv', label: t('Ke alamat server toko') },
           {
             id: 'brw',
-            label: t('Langsung ke tab browser pembeli'),
-            explainWrong: t('Tab browser tidak punya alamat tetap di internet.'),
+            label: t('Ke HP pembeli'),
+            explainWrong: t('HP pembeli tidak punya alamat tetap. Bel hanya bisa dipasang di server.'),
           },
           {
             id: 'key',
-            label: t('Ke keyboard laptop'),
-            explainWrong: t('Webhook dikirim lewat jaringan ke server.'),
+            label: t('Ke server layanan bayar'),
+            explainWrong: t('Layanan bayar yang memencet bel. Bel itu ada di server tokomu.'),
           },
         ],
         answer: 'srv',
-        explainCorrect: t('Webhook selalu dikirim dari server ke server melalui URL tetap.'),
+        explainCorrect: t('Server toko punya alamat tetap. Seperti rumah yang dikenal kurir.'),
         tags: ['webhook', 'server'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-j3',
-        prompt: t('Dalam nomor antrean bank (Message Queue), satu pesan diambil oleh…'),
+        prompt: t('Di antrean kerja, satu tugas diambil oleh siapa?'),
         choices: [
-          {
-            id: 'one',
-            label: t('Satu pekerja saja'),
-            explainWrong: t('Benar!'),
-          },
+          { id: 'one', label: t('Satu pekerja saja') },
           {
             id: 'all',
-            label: t('Semua pembeli di toko'),
-            explainWrong: t('Pembeli tidak mengambil tugas antrean pekerja.'),
+            label: t('Setiap pekerja dapat salinan'),
+            explainWrong: t('Salinan untuk semua itu grup pengumuman. Antrean memberi tugas ke satu pekerja.'),
           },
           {
             id: 'none',
-            label: t('Dibuang langsung'),
-            explainWrong: t('Pesan justru disimpan aman sampai dikerjakan.'),
+            label: t('Dua pekerja bekerja bersama'),
+            explainWrong: t('Tugas yang sama tidak perlu dikerjakan dua kali. Satu pekerja sudah cukup.'),
           },
         ],
         answer: 'one',
-        explainCorrect: t('Di antrean kerja, satu tugas diambil oleh satu pekerja agar tidak dikerjakan dua kali.'),
+        explainCorrect: t('Satu tugas dikerjakan satu pekerja. Seperti nomor antrean dipanggil satu petugas.'),
         tags: ['queue-pubsub'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-j4',
-        prompt: t('Papan pengumuman grup (Pub/Sub) paling mirip dengan kejadian…'),
+        prompt: t('Admin mengirim satu pengumuman ke grup kelas. Siapa yang menerimanya?'),
         choices: [
-          {
-            id: 'grp',
-            label: t('Satu pesan admin dibaca semua anggota grup'),
-            explainWrong: t('Tepat!'),
-          },
+          { id: 'grp', label: t('Semua anggota grup') },
           {
             id: 'loket',
-            label: t('Satu nomor antrean dipanggil satu teller'),
-            explainWrong: t('Itu perumpamaan Message Queue.'),
+            label: t('Satu anggota yang paling cepat'),
+            explainWrong: t('Satu penerima itu cara antrean. Grup pengumuman memberi kabar ke semua anggota.'),
           },
           {
             id: 'kunci',
-            label: t('Mengunci pintu rumah'),
-            explainWrong: t('Pub/Sub menyiarkan kabar ke banyak penerima.'),
+            label: t('Anggota yang dipanggil namanya'),
+            explainWrong: t('Pengumuman grup tidak memilih orang. Semua anggota membaca kabar yang sama.'),
           },
         ],
         answer: 'grp',
-        explainCorrect: t('Pub/Sub menerbitkan kabar ke satu topik untuk diterima semua pelanggan topik itu.'),
+        explainCorrect: t('Satu pengumuman sampai ke semua anggota. Seperti pesan di grup kelas.'),
         tags: ['queue-pubsub'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-j5',
-        prompt: t('Kalau pembayaran sedang diproses lewat antrean, tampilan layar yang ramah sebaiknya…'),
+        prompt: t('Pembayaran masih antre untuk diproses. Apa yang sebaiknya tampil di layar?'),
         choices: [
-          {
-            id: 'info',
-            label: t('Menulis "Pembayaran sedang diverifikasi"'),
-            explainWrong: t('Benar!'),
-          },
+          { id: 'info', label: t('Tulisan "Pembayaran sedang diperiksa"') },
           {
             id: 'blank',
-            label: t('Diam putih polos saja'),
-            explainWrong: t('Layar kosong bikin pengguna bingung.'),
+            label: t('Layar putih tanpa tulisan'),
+            explainWrong: t('Layar kosong membuat pembeli bingung. Mereka tidak tahu apa yang terjadi.'),
           },
           {
             id: 'err',
-            label: t('Langsung menulis gagal total'),
-            explainWrong: t('Pesanan belum gagal, hanya sedang antre diproses.'),
+            label: t('Tulisan "Pembayaran gagal"'),
+            explainWrong: t('Pembayaran belum gagal. Pesanan hanya menunggu giliran.'),
           },
         ],
         answer: 'info',
-        explainCorrect: t('Memberi info yang jujur membuat pengguna tenang saat antrean bekerja.'),
+        explainCorrect: t('Tulisan yang jujur membuat pembeli tenang. Pembayaran memang masih diperiksa.'),
         tags: ['queue-pubsub', 'frontend'],
       }),
     ],
     pro: [
       makeAnchorMcq({
         id: 'b06-anc-p1',
-        prompt: t('Apa perbedaan utama antara memanggil API biasa secara berkala dan menerima webhook?'),
+        prompt: t('Apa beda utama polling dan webhook?'),
         choices: [
-          {
-            id: 'push',
-            label: t('Pada webhook, penyedia mengirim HTTP POST otomatis saat event terjadi sehingga server tidak perlu polling'),
-          },
+          { id: 'push', label: t('Penyedia mengirim POST sendiri saat event terjadi') },
           {
             id: 'html',
-            label: t('Webhook selalu mengirim file HTML lengkap ke browser'),
+            label: t('Server toko mengirim GET ke penyedia tiap beberapa detik'),
+            explainWrong: t('Itu cara kerja polling: servermu yang bertanya berulang kali. Webhook membalik arah itu.'),
           },
           {
             id: 'get',
-            label: t('Webhook hanya berjalan memakai method GET tanpa body'),
+            label: t('Browser pembeli mengirim POST ke server toko'),
+            explainWrong: t('Webhook tidak berasal dari browser. Pengirimnya server milik penyedia layanan.'),
           },
         ],
         answer: 'push',
-        explainCorrect: t('Webhook membalik arah inisiatif: penyedia menghubungi URL server kita saat kejadian muncul.'),
+        explainCorrect: t('Webhook membalik arah: penyedia yang menghubungi servermu saat kejadian muncul.'),
         tags: ['webhook'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-p2',
-        prompt: t('Mengapa server penerima wajib memverifikasi HMAC signature pada header webhook?'),
+        prompt: t('Mengapa penerima webhook harus memeriksa signature HMAC?'),
         choices: [
-          {
-            id: 'auth',
-            label: t('Memastikan request benar-benar berasal dari pengirim sah dan isinya tidak diubah di jalan'),
-          },
+          { id: 'auth', label: t('Memastikan pengirimnya asli dan isinya tidak diubah') },
           {
             id: 'fast',
-            label: t('Supaya file JSON otomatis terkompresi lebih kecil'),
+            label: t('Menyembunyikan isi pesan dari pihak ketiga'),
+            explainWrong: t('HMAC tidak menyembunyikan isi pesan. Ia hanya membuktikan siapa pengirimnya dan isinya tidak berubah.'),
           },
           {
             id: 'css',
-            label: t('Agar browser mengizinkan perubahan warna tombol'),
+            label: t('Mencegah pengirim mengirim event yang sama dua kali'),
+            explainWrong: t('Kiriman ganda ditangani dengan menyimpan ID kejadian. Signature hanya memeriksa keaslian.'),
           },
         ],
         answer: 'auth',
-        explainCorrect: t('Karena URL webhook terbuka di internet, signature mencegah request palsu dari pihak iseng.'),
+        explainCorrect: t('URL webhook terbuka di internet. Signature mencegah request palsu dari pihak iseng.'),
         tags: ['signature-webhook'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-p3',
-        prompt: t('Bagaimana pola terbaik jika pemrosesan tugas setelah menerima webhook memakan waktu 15 detik?'),
+        prompt: t('Pemrosesan setelah webhook butuh 15 detik. Apa pola terbaiknya?'),
         choices: [
-          {
-            id: 'ack',
-            label: t('Validasi signature, balas 200 OK secepatnya, lalu taruh tugas ke message queue'),
-          },
+          { id: 'ack', label: t('Periksa signature, simpan ke antrean, lalu balas 200 OK') },
           {
             id: 'wait',
-            label: t('Tahan koneksi HTTP selama 15 detik sebelum mengirim status 200'),
+            label: t('Tahan koneksi 15 detik, baru balas 200 OK'),
+            explainWrong: t('Koneksi yang ditahan lama kena timeout. Pengirim mengira servermu gagal.'),
           },
           {
             id: 'drop',
-            label: t('Tolak dengan status 500 agar pengirim mencoba lagi nanti'),
+            label: t('Balas 500 dulu agar pengirim mencoba lagi nanti'),
+            explainWrong: t('Status 500 berarti servermu bermasalah. Pengirim akan mengirim ulang tanpa hasil.'),
           },
         ],
         answer: 'ack',
-        explainCorrect: t('Balasan lambat memicu timeout dan retry ganda dari pengirim webhook.'),
+        explainCorrect: t('Antrean menyimpan tugas berat, jadi balasan tetap cepat dan tugas tidak hilang.'),
         tags: ['signature-webhook', 'queue-pubsub'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-p4',
-        prompt: t('Alasan menyimpan ID kejadian webhook yang sudah diproses di server adalah agar…'),
+        prompt: t('Mengapa penerima webhook menyimpan ID setiap kejadian yang sudah diproses?'),
         choices: [
-          {
-            id: 'idem',
-            label: t('Penerima bersifat idempotent dan tidak memproses ulang saat pengirim melakukan retry'),
-          },
+          { id: 'idem', label: t('Agar kejadian yang sama tidak diproses dua kali') },
           {
             id: 'cache',
-            label: t('Browser menyimpan gambar lebih lama di disk'),
+            label: t('Agar penerima bisa mengurutkan kejadian dengan benar'),
+            explainWrong: t('ID dipakai untuk mengenali kejadian yang sama. Urutan harus dicek ke API sumber.'),
           },
           {
             id: 'cors',
-            label: t('CORS otomatis mati untuk semua domain'),
+            label: t('Agar pengirim berhenti mengirim ulang'),
+            explainWrong: t('Pengirim tidak membaca daftar ID milikmu. Ia berhenti kalau mendapat balasan 200.'),
           },
         ],
         answer: 'idem',
-        explainCorrect: t('Retry webhook dapat mengirim event yang sama lebih dari sekali; menyimpan ID event mencegah proses ganda.'),
+        explainCorrect: t('ID yang tersimpan mencegah proses ganda, dan itu membuat penerima idempotent.'),
         tags: ['signature-webhook', 'idempotent'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-p5',
-        prompt: t('Kapan Apache Kafka atau Redis Pub/Sub lebih cocok daripada Message Queue satu pekerja biasa?'),
+        prompt: t('Kapan Kafka atau Redis Pub/Sub lebih cocok daripada antrean biasa?'),
         choices: [
-          {
-            id: 'multi',
-            label: t('Ketika satu event seperti pesanan.dibayar perlu memicu banyak layanan sekaligus secara paralel'),
-          },
+          { id: 'multi', label: t('Saat satu event harus sampai ke banyak layanan sekaligus') },
           {
             id: 'form',
-            label: t('Ketika hanya ingin mengirim formulir kontak statis di satu file HTML'),
+            label: t('Saat satu tugas harus dikerjakan tepat satu pekerja'),
+            explainWrong: t('Itu tugas message queue biasa. Pub/Sub menyiarkan ke banyak penerima.'),
           },
           {
             id: 'font',
-            label: t('Ketika mengatur ukuran huruf judul di CSS'),
+            label: t('Saat pesan harus tiba lebih cepat daripada HTTP'),
+            explainWrong: t('Pub/Sub bukan soal kecepatan. Ia soal siapa saja yang menerima pesan.'),
           },
         ],
         answer: 'multi',
-        explainCorrect: t('Pub/Sub menyiarkan salinan event ke banyak subscriber berbeda tanpa penerbit harus mengenal semuanya.'),
+        explainCorrect: t('Pub/Sub menyiarkan salinan event ke banyak pelanggan. Penerbitnya tidak perlu mengenal mereka satu per satu.'),
         tags: ['queue-pubsub'],
       }),
       makeAnchorMcq({
         id: 'b06-anc-p6',
         type: 'limit',
         analogy: t('Kurir memencet bel pintu rumah'),
-        prompt: t('Apa batas penting dari analogi bel pintu rumah ketika diterapkan pada webhook?'),
+        prompt: t('Apa batas penting dari analogi bel pintu untuk webhook?'),
         choices: [
-          {
-            id: 'srv',
-            label: t('Bel webhook berbunyi di server ber-URL publik, bukan di browser pengguna, dan paket bisa datang dua kali atau terbalik urutannya'),
-          },
+          { id: 'srv', label: t('Kabar webhook bisa datang dua kali atau terbalik') },
           {
             id: 'ring',
-            label: t('Pemilik rumah tidak perlu membuka pintu setiap lima menit'),
+            label: t('Pemilik rumah tidak perlu bertanya setiap lima menit'),
+            explainWrong: t('Itu justru kemiripan analogi ini. Webhook juga membuatmu tidak perlu bertanya berulang.'),
           },
           {
             id: 'addr',
-            label: t('Pengirim butuh alamat tujuan yang jelas'),
+            label: t('Pengirim perlu alamat tujuan yang jelas'),
+            explainWrong: t('Itu juga kemiripan: webhook butuh URL tujuan yang terdaftar.'),
           },
         ],
         answer: 'srv',
-        explainCorrect: t('Webhook berjalan antar server dan di jaringan nyata pengiriman ulang atau urutan tertukar tetap bisa terjadi.'),
+        explainCorrect: t('Kurir jarang memencet bel dua kali untuk paket yang sama, tetapi webhook bisa dikirim ulang atau tiba terbalik.'),
         tags: ['webhook'],
       }),
     ],
@@ -304,10 +280,11 @@ export const lessons: Lesson[] = [
     title: 'Webhook: kurir memencet bel',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku tahu cara kerja webhook sebagai bel pintu server saat ada kejadian baru.',
-      'Aku bisa menjelaskan cara kerja webhook serta perbedaannya dengan polling ke API biasa.',
+      'Aku bisa menceritakan cara kerja webhook dengan bel pintu.',
+      'Kamu bisa menjelaskan cara kerja webhook dan bedanya dengan polling.',
     ),
-    estMinutes: 5,
+    atWork: 'Saat Toko Rani menerima pembayaran, kamu akan menulis kode penerima webhook yang mengubah status pesanan menjadi lunas.',
+    estMinutes: 6,
     introducesTerms: ['webhook'],
     usesTerms: ['api', 'server', 'browser', 'request', 'http-method', 'polling', 'sse', 'websocket'],
     stickerId: 'bel-pintu',
@@ -315,137 +292,197 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('b06/bel-pintu.svg', [
         rText(
-          'Daripada membuka pintu setiap 5 menit untuk mengecek paket, kamu bilang ke kurir: pencet bel rumah kalau paket sudah tiba!',
-          'Daripada terus bertanya "Pembayaran pesanan 88 sudah masuk belum?" lewat polling, kamu mendaftarkan alamat ke layanan lain agar ia memencet bel servermu saat kejadian terjadi.',
+          'Kamu menunggu paket di rumah. Kamu minta kurir memencet bel kalau paket tiba. Bagaimana toko online tahu bahwa pembayaran sudah selesai?',
+          'Pembeli sudah membayar pesanan 88 di Toko Rani, tetapi statusnya masih "menunggu". Bagaimana server toko tahu pembayaran sudah masuk?',
         ),
       ]),
       conceptStep({
-        title: t('Apa Itu Webhook?', 'Konsep Dasar Webhook'),
+        title: t('Apa itu webhook?'),
         visualName: 'SequenceDiagram',
         visualProps: { worldId: 'b06', topic: 'webhook-request' },
-        alt: t('Diagram penyedia pembayaran mengirim request POST webhook ke server toko.'),
+        alt: t(
+          'Gambar layanan bayar memencet bel di server toko.',
+          'Diagram penyedia pembayaran mengirim POST ke server toko.',
+        ),
         body: [
           rTerm('webhook', 'Webhook', 'Webhook'),
-          rText(
-            ' mengirim HTTP POST ke alamat servermu. Pesan dikirim otomatis saat kejadian muncul.',
-            ' adalah panggilan HTTP otomatis (umumnya POST) dari layanan lain ke URL server yang sudah kamu daftarkan.',
+          rJunior(
+            ' adalah bel pintu untuk server. Layanan lain memencet bel itu sendiri saat ada kabar baru. Kamu memasang bel itu di server, bukan di HP pembeli.',
+          ),
+          rPro(
+            ' adalah panggilan HTTP otomatis dari layanan lain ke URL yang kamu daftarkan. Layanan itu memanggil saat sebuah event terjadi, umumnya dengan method POST. Servermu tidak perlu polling, yaitu bertanya berulang kali.',
           ),
         ],
       }),
-      conceptStep({
-        title: t('Contoh Bayar Online', 'Alur Pembayaran Online'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'b06', topic: 'bayar-online' },
-        alt: t('Alur pembeli membayar di bank lalu payment gateway memanggil webhook server toko.'),
-        body: [
-          rText(
-            'Saat pembeli bayar lewat bank, server tidak tahu. Layanan bayar memencet bel webhook ke servermu.',
-            'Payment gateway tidak tahu kapan pembeli selesai transfer, namun begitu dana masuk, ia mengirim webhook ke server Toko Rani dan menerima jawaban 200 OK.',
-          ),
-        ],
-      }),
-      conceptStep({
-        title: t('Server ke Server', 'Webhook Bukan untuk Browser'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'b06', topic: 'server-ke-server' },
-        alt: t('Webhook berhenti di server, lalu server meneruskannya ke browser lewat SSE atau WebSocket.'),
-        body: [
-          rText(
-            'Webhook datang ke server, bukan ke browser. Server lalu mengabari layar lewat siaran atau telepon.',
-            'Browser tidak punya URL publik tetap yang bisa dipanggil dari luar. Server menerima webhook lebih dulu, lalu mengabari browser via ',
-          ),
-          rTerm('sse', 'SSE', 'SSE'),
-          rText(' atau ', ' atau '),
-          rTerm('websocket', 'WebSocket', 'WebSocket'),
-          rText('.', '.'),
-        ],
-      }),
-      limitStep({
-        analogy: t('Kurir memencet bel pintu rumah'),
-        same: [
-          t('Kamu tidak perlu bertanya berulang kali; pengirim mengabari begitu paket datang.'),
-          t('Alamat rumah yang didaftarkan mirip URL endpoint webhook di servermu.'),
-        ],
-        different: [
-          t('Bel webhook hanya bisa dipasang di server publik, bukan di browser HP pengguna.'),
-          t('Di internet, kurir webhook bisa memencet bel dua kali atau urutan kabar tertukar.'),
-        ],
-      }),
-      simStep(
-        'bel-webhook',
-        t(
-          'Klik tombol bayar untuk melihat layanan bayar memencet bel webhook ke server Toko Rani!',
-          'Simulasikan alur pembeli membayar di bank hingga payment gateway mengirim POST /webhook ke server.',
-        ),
-      ),
       qStep(
         makeMcq({
           id: 'b06-l01-q1',
           type: 'analogy',
-          prompt: t('Dalam analogi kurir dan bel rumah, bunyi bel yang terdengar di rumah ibarat…'),
+          prompt: t(
+            'Kurir memencet bel rumahmu. Bunyi bel itu ibarat apa?',
+            'Dalam analogi kurir dan bel rumah, bunyi bel itu sama dengan apa?',
+          ),
           choices: [
-            { id: 'req', label: t('Request webhook yang masuk ke servermu') },
+            { id: 'req', label: t('Kabar baru yang masuk ke server', 'Request webhook yang masuk ke servermu') },
             {
               id: 'poll',
-              label: t('Membuka pintu tiap 5 menit sendiri'),
-              explainWrong: t('Membuka pintu terus-menerus itulah cara polling, bukan bel webhook.'),
+              label: t('Kamu membuka pintu tiap 5 menit', 'Polling: servermu bertanya tiap 5 menit'),
+              explainWrong: t(
+                'Membuka pintu terus-menerus itu cara lama. Dengan bel, kamu cukup menunggu.',
+                'Itu polling: servermu yang bertanya berulang kali. Webhook membalik arah itu.',
+              ),
             },
             {
               id: 'css',
-              label: t('Warna cat pintu rumah'),
-              explainWrong: t('Warna pintu mirip CSS, bukan kabar yang masuk.'),
+              label: t('Pembeli menekan tombol Bayar'),
+              explainWrong: t(
+                'Pembeli hanya menekan Bayar. Bel dipencet layanan bayar, bukan pembeli.',
+                'Pembeli hanya memulai pembayaran. Bel dipencet layanan pembayaran, bukan pembeli.',
+              ),
             },
           ],
           answer: 'req',
-          explainCorrect: t('Benar! Bunyi bel adalah request HTTP yang dikirim ke URL servermu.'),
-          hints: [t('Siapa yang memicu bunyi bel?'), t('Pengirim mengirim pesan ketika kejadian selesai.')],
+          explainCorrect: t(
+            'Bunyi bel adalah kabar baru yang datang sendiri. Seperti kurir yang menekan bel saat paket tiba.',
+            'Bunyi bel adalah request HTTP yang dikirim ke URL servermu.',
+          ),
+          hints: [
+            t('Ingat siapa yang menekan bel di cerita.', 'Siapa yang mengirim request saat kejadian selesai?'),
+            t('Pembeli tidak ikut menekan bel.', 'Pengirimnya layanan lain, bukan pembeli.'),
+          ],
           tags: ['webhook'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'b06-l01-q2',
-          prompt: t('Method HTTP apa yang paling sering dipakai layanan lain saat mengirim data webhook?'),
+          modes: ['pro'],
+          prompt: t('Method HTTP apa yang paling sering dipakai layanan lain untuk mengirim webhook?'),
           choices: [
-            { id: 'post', label: t('POST') },
+            { id: 'post', label: t('POST (mengirim data)') },
             {
               id: 'get',
-              label: t('GET tanpa isi data'),
-              explainWrong: t('Webhook membawa payload data kejadian di body sehingga memakai POST.'),
+              label: t('GET (meminta data baru)'),
+              explainWrong: t('GET meminta data dan umumnya tanpa body. Webhook perlu membawa data kejadian.'),
             },
             {
               id: 'del',
-              label: t('DELETE'),
-              explainWrong: t('DELETE untuk menghapus resource, bukan mengabari kejadian baru.'),
+              label: t('PUT (mengganti data)'),
+              explainWrong: t('PUT dipakai untuk mengganti data yang sudah ada. Webhook mengabarkan kejadian baru.'),
             },
           ],
           answer: 'post',
-          explainCorrect: t('Tepat! Webhook umumnya mengirim request POST berisi JSON detail kejadian.'),
+          explainCorrect: t('Webhook umumnya memakai POST, karena ia membawa data kejadian. Data itu biasanya berupa JSON.'),
+          hints: [t('Method mana yang dipakai untuk mengirim data?')],
           tags: ['webhook', 'http-method'],
         }),
       ),
+      conceptStep({
+        title: t('Contoh: bayar online', 'Alur pembayaran online'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'b06', topic: 'bayar-online' },
+        alt: t(
+          'Gambar pembeli membayar di bank, lalu layanan bayar memencet bel toko.',
+          'Alur pembeli membayar di bank, lalu payment gateway memanggil webhook server toko.',
+        ),
+        body: [
+          rText(
+            'Pembeli membayar lewat bank. Server toko belum tahu. Layanan bayar lalu memencet bel webhook di server toko.',
+            'Server toko tidak tahu kapan pembeli selesai membayar di bank. Begitu dana masuk, payment gateway (layanan penerima pembayaran) mengirim webhook ke server toko. Server membalas 200 OK.',
+          ),
+        ],
+      }),
       qStep({
         id: 'b06-l01-q3',
         type: 'order',
-        prompt: t('Urutkan alur pembayaran online memakai webhook dari awal hingga lunas:'),
+        prompt: t(
+          'Urutkan cerita bayar online dari awal sampai akhir.',
+          'Urutkan alur pembayaran online dengan webhook, dari awal sampai pesanan tercatat lunas.',
+        ),
         difficulty: 2,
         items: [
-          { id: 's3', label: t('Payment gateway mengirim POST webhook ke server toko') },
-          { id: 's1', label: t('Pembeli menekan Bayar dan melunasi tagihan di bank') },
-          { id: 's4', label: t('Server toko mencatat lunas lalu mengabari browser pembeli') },
-          { id: 's2', label: t('Layanan pembayaran menerima konfirmasi dana masuk') },
+          {
+            id: 's3',
+            label: t('Layanan bayar memencet bel server toko', 'Payment gateway mengirim POST webhook ke server toko'),
+          },
+          {
+            id: 's1',
+            label: t('Pembeli membayar lewat bank', 'Pembeli menekan Bayar dan melunasi tagihan di bank'),
+          },
+          {
+            id: 's4',
+            label: t('Server toko mencatat lunas, lalu mengabari pembeli', 'Server toko mencatat lunas lalu mengabari browser pembeli'),
+          },
+          {
+            id: 's2',
+            label: t('Layanan bayar tahu uang sudah masuk', 'Layanan pembayaran menerima konfirmasi dana masuk'),
+          },
         ],
         answer: ['s1', 's2', 's3', 's4'],
-        explainCorrect: t('Mantap! Bank mengabari payment gateway, lalu gateway memencet bel server toko.'),
+        explainCorrect: t(
+          'Bank memberi kabar ke layanan bayar dulu. Seperti kurir yang baru memencet bel setelah paket tiba.',
+          'Bank mengabari payment gateway, lalu gateway mengirim webhook ke server toko.',
+        ),
+        hints: [
+          t('Ingat urutan kurir: paket tiba dulu, baru bel.', 'Pembayaran terjadi lebih dulu daripada webhook.'),
+          undefined,
+        ],
         tags: ['webhook'],
+      }),
+      conceptStep({
+        title: t('Webhook bukan untuk browser'),
+        modes: ['pro'],
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'b06', topic: 'server-ke-server' },
+        alt: t('Webhook berhenti di server. Server meneruskan kabar ke browser lewat jalur lain.'),
+        body: [
+          rPro('Browser tidak punya URL publik tetap yang bisa dipanggil dari luar. Server menerima webhook lebih dulu. Lalu server meneruskan kabarnya ke halaman lewat '),
+          rTerm('sse', 'SSE', 'SSE'),
+          rPro('. '),
+          rTerm('websocket', 'WebSocket', 'WebSocket'),
+          rPro(' juga bisa dipakai untuk tujuan ini.'),
+        ],
+      }),
+      simStep(
+        'bel-webhook',
+        t(
+          'Ketuk Bayar, lalu lihat layanan bayar memencet bel toko.',
+          'Jalankan simulasi: pembeli membayar, lalu payment gateway mengirim POST ke server toko.',
+        ),
+      ),
+      limitStep({
+        analogy: t('Kurir memencet bel pintu rumah'),
+        riskyAnalogy: true,
+        same: [
+          t(
+            'Kabar datang sendiri, jadi kamu tidak perlu bertanya terus.',
+            'Kamu tidak perlu bertanya berulang kali; pengirim mengabari saat kejadian muncul.',
+          ),
+        ],
+        different: [
+          t(
+            'Bel rumah berbunyi sekali. Bel webhook bisa berbunyi dua kali untuk kabar yang sama.',
+            'Kurir jarang memencet bel dua kali untuk paket yang sama, tetapi webhook bisa dikirim ulang atau tiba terbalik.',
+          ),
+        ],
       }),
       qStep(
         makeTf({
           id: 'b06-l01-q4',
-          prompt: t('Dengan webhook, browser pengguna langsung menerima request POST dari server bank tanpa lewat server toko.'),
+          prompt: t(
+            'Bel webhook berbunyi di HP pembeli.',
+            'Bank mengirim webhook langsung ke browser pembeli.',
+          ),
           answer: false,
-          explainCorrect: t('Betul, pernyataan itu salah! Webhook selalu masuk ke server, bukan langsung ke browser.'),
-          explainWrong: t('Hampir! Browser pengguna tidak punya alamat publik tetap sehingga tidak bisa menerima webhook langsung.'),
+          explainCorrect: t(
+            'Pernyataan itu keliru: bel webhook ada di server toko. Seperti bel yang menempel di pintu.',
+            'Pernyataan itu keliru: webhook hanya masuk ke server. Browser tidak punya URL publik tetap untuk dipanggil dari luar.',
+          ),
+          explainWrong: t(
+            'Kurir hanya bisa memencet bel di rumah tetap. HP pembeli selalu berpindah tempat, jadi bel dipasang di server.',
+            'Browser tidak punya URL publik tetap. Karena itu webhook hanya bisa masuk ke server.',
+          ),
+          hints: [t('Ingat: bel dipasang di rumah, bukan di kurir.', 'Siapa yang punya alamat tetap di internet?')],
           tags: ['webhook', 'browser', 'server'],
         }),
       ),
@@ -454,51 +491,80 @@ export const lessons: Lesson[] = [
           id: 'b06-l01-q5',
           type: 'limit',
           analogy: t('Kurir memencet bel pintu rumah'),
-          prompt: t('Apa batas dari perumpamaan bel rumah saat menjelaskan webhook di aplikasi web?'),
+          prompt: t(
+            'Apa beda bel webhook dengan bel rumah?',
+            'Apa batas perumpamaan bel rumah saat menjelaskan webhook?',
+          ),
           difficulty: 2,
           choices: [
-            {
-              id: 'srv',
-              label: t('Webhook hanya bisa memanggil alamat server yang terbuka di internet, bukan browser pribadi'),
-            },
+            { id: 'srv', label: t('Bel webhook bisa berbunyi dua kali', 'Webhook yang sama bisa terkirim dua kali') },
             {
               id: 'wait',
-              label: t('Pemilik tidak perlu bertanya berulang kali'),
-              explainWrong: t('Itu justru bagian yang sama antara bel rumah dan webhook.'),
+              label: t('Kabar datang sendiri tanpa ditanya', 'Pemilik rumah tidak perlu bertanya berulang kali'),
+              explainWrong: t(
+                'Itu justru sama. Bel rumah juga membuat kabar datang sendiri.',
+                'Itu justru kemiripan: pemilik tidak perlu bertanya berulang kali. Bukan batas analogi.',
+              ),
             },
             {
               id: 'note',
-              label: t('Kurir mengantarkan kabar saat sesuatu tiba'),
-              explainWrong: t('Ini kemiripan utamanya.'),
+              label: t('Bel dipasang di tempat yang tetap', 'Kurir mengantarkan kabar saat sesuatu tiba'),
+              explainWrong: t(
+                'Itu juga sama. Bel rumah dan bel webhook dipasang di alamat tetap.',
+                'Itu kemiripan utamanya. Batas analogi ada pada kabar yang bisa datang lebih dari sekali.',
+              ),
             },
           ],
           answer: 'srv',
-          explainCorrect: t('Tepat! Saat mengembangkan di laptop lokal, kamu bahkan butuh tunnel seperti ngrok agar server punya alamat publik.'),
-          tags: ['webhook', 'server'],
+          explainCorrect: t(
+            'Kurir memencet bel sekali saja. Layanan bayar bisa mengirim kabar yang sama dua kali.',
+            'Kurir jarang memencet bel dua kali untuk satu paket. Webhook bisa dikirim ulang, jadi servermu harus siap menerima kabar ganda.',
+          ),
+          hints: [t('Cari hal yang tidak terjadi pada bel rumah.', 'Pikirkan apa yang bisa terjadi pada webhook, tetapi jarang pada bel rumah.')],
+          tags: ['webhook'],
         }),
       ),
       qStep(
         makeMcq({
           id: 'b06-l01-q6',
           type: 'scenario',
-          story: t('Raka membuat toko buku. Ia lelah karena servernya harus menanya status pembayaran ke API bank setiap 3 detik untuk ribuan pesanan.'),
-          prompt: t('Solusi paling hemat dan otomatis untuk mengganti tanya-tanya berulang itu adalah…'),
+          story: t(
+            'Raka punya toko buku. Server tokonya bertanya ke bank tiap 3 detik. Server itu kelelahan.',
+            'Raka membuat toko buku. Servernya menanyakan status pembayaran ke API bank tiap 3 detik untuk setiap pesanan yang menunggu.',
+          ),
+          prompt: t(
+            'Apa yang sebaiknya Raka lakukan?',
+            'Apa solusi paling hemat untuk menggantikan pengecekan berulang itu?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'wh', label: t('Daftarkan URL endpoint webhook di layanan pembayaran') },
+            {
+              id: 'wh',
+              label: t('Memberi alamat servernya ke layanan bayar', 'Daftarkan URL webhook di layanan pembayaran'),
+            },
             {
               id: 'fast',
-              label: t('Percepat polling menjadi setiap 0,1 detik'),
-              explainWrong: t('Itu justru membuat server dan bank makin kewalahan.'),
+              label: t('Bertanya ke bank lebih sering lagi', 'Percepat polling menjadi tiap 0,1 detik'),
+              explainWrong: t(
+                'Bertanya lebih sering membuat server makin sibuk. Cara itu tetap melelahkan.',
+                'Polling lebih sering membebani server dan bank. Pengecekan berulang tetap terjadi.',
+              ),
             },
             {
               id: 'css',
-              label: t('Ubah warna tombol Bayar'),
-              explainWrong: t('Warna tombol tidak memberi kabar pembayaran masuk.'),
+              label: t('Menambah server supaya bertanya lebih cepat', 'Tambah server untuk menjalankan lebih banyak polling'),
+              explainWrong: t(
+                'Server tambahan ikut bertanya terus. Pekerjaan yang sama tetap berulang.',
+                'Server tambahan hanya menambah jumlah pengecekan. Pola polling-nya tidak berubah.',
+              ),
             },
           ],
           answer: 'wh',
-          explainCorrect: t('Benar! Dengan webhook, layanan pembayaran langsung menghubungi server Raka saat uang masuk.'),
+          explainCorrect: t(
+            'Layanan bayar memencet bel saat uang masuk. Server Raka tidak perlu bertanya lagi.',
+            'Dengan webhook, layanan pembayaran menghubungi server Raka saat uang masuk. Pengecekan berulang tidak diperlukan lagi.',
+          ),
+          hints: [t('Ingat cara kerja kurir dan bel rumah.', 'Cari cara agar bank yang mengabari server toko.')],
           tags: ['webhook', 'polling'],
         }),
       ),
@@ -507,11 +573,12 @@ export const lessons: Lesson[] = [
         type: 'fill',
         modes: ['pro'],
         difficulty: 2,
-        prompt: t('Lengkapi contoh alur pengiriman kabar setelah server menerima webhook agar halaman browser ikut terbarui:'),
+        prompt: t('Lengkapi alur agar halaman pembeli ikut berubah setelah pembayaran masuk.'),
         template: 'Payment gateway kirim ___ ke server → Server balas 200 → Server dorong kabar ke browser via ___',
-        bank: ['POST webhook', 'SSE / WebSocket', 'CSS', 'HTML'],
+        bank: ['POST webhook', 'SSE / WebSocket', 'GET polling', 'Redirect HTTP'],
         answer: ['POST webhook', 'SSE / WebSocket'],
-        explainCorrect: t('Tepat. Webhook berhenti di server, kemudian server menyiarkannya ke browser via SSE atau WebSocket.'),
+        explainCorrect: t('Webhook berhenti di server. Dari sana, kabar diteruskan ke halaman lewat SSE atau WebSocket.'),
+        hints: [t('Server meneruskan kabar itu ke browser.'), undefined],
         tags: ['webhook', 'sse', 'websocket'],
       }),
     ],
@@ -520,33 +587,65 @@ export const lessons: Lesson[] = [
         id: 'b06-l01-r1',
         prompt: t('Apa tugas utama webhook?'),
         choices: [
-          { id: 'push', label: t('Mengabari servermu otomatis lewat HTTP POST saat ada kejadian') },
-          { id: 'ask', label: t('Menanya server terus-menerus tiap detik'), explainWrong: t('Menanya berulang kali disebut polling.') },
+          {
+            id: 'push',
+            label: t('Mengabari servermu saat ada kabar baru', 'Mengabari servermu lewat POST saat ada kejadian'),
+          },
+          {
+            id: 'ask',
+            label: t('Bertanya ke layanan lain tiap detik', 'Mengecek status ke API tiap beberapa detik'),
+            explainWrong: t(
+              'Bertanya berulang kali itu cara lama. Webhook membuat kabar datang sendiri.',
+              'Itu polling, bukan webhook. Pada webhook, penyedia yang mengabari.',
+            ),
+          },
+          {
+            id: 'store',
+            label: t('Menyimpan data pesanan di gudang data', 'Menyimpan data pesanan di database'),
+            explainWrong: t(
+              'Menyimpan data adalah tugas gudang data. Webhook hanya membawa kabar.',
+              'Menyimpan data adalah tugas database. Webhook hanya membawa kabar kejadian.',
+            ),
+          },
         ],
         answer: 'push',
-        explainCorrect: t('Webhook memencet bel servermu otomatis begitu sebuah event terjadi.'),
+        explainCorrect: t(
+          'Webhook memencet bel servermu saat ada kabar baru. Seperti kurir yang menekan bel rumah.',
+          'Webhook mengirim POST ke servermu saat sebuah event terjadi. Servermu tidak perlu bertanya.',
+        ),
+        hints: [t('Ingat siapa yang menekan bel.')],
         tags: ['webhook'],
       }),
       makeTf({
         id: 'b06-l01-r2',
-        prompt: t('Webhook dikirim dari server layanan ke server aplikasi kita, bukan langsung ke browser.'),
+        prompt: t(
+          'Bel webhook berbunyi di server toko, bukan di HP pembeli.',
+          'Browser tidak bisa menerima webhook secara langsung.',
+        ),
         answer: true,
-        explainCorrect: t('Benar! Browser tidak memiliki URL publik tetap untuk dipanggil dari luar.'),
-        explainWrong: t('Ingat: webhook adalah komunikasi server ke server.'),
+        explainCorrect: t(
+          'Server toko punya alamat tetap, jadi kurir bisa memencet bel. HP pembeli tidak punya.',
+          'Browser tidak punya URL publik tetap untuk dipanggil dari luar.',
+        ),
+        explainWrong: t(
+          'Server toko punya alamat tetap. HP pembeli berpindah-pindah, jadi bel ada di server.',
+          'Ingat: webhook adalah komunikasi server ke server.',
+        ),
+        hints: [t('Ingat tempat bel dipasang.')],
         tags: ['webhook', 'server'],
       }),
     ],
     recap: t(
-      'Webhook adalah bel pintu server: layanan lain mengirim kabar otomatis saat ada kejadian.',
-      'Webhook menggantikan polling antar server dengan mengirim HTTP POST ke URL terdaftar ketika event terjadi.',
+      'Webhook itu bel server: kabar datang sendiri saat ada kejadian.',
+      'Webhook mengirim kabar otomatis ke servermu saat event terjadi. Servermu tidak perlu polling.',
     ),
     companion: {
       talkPrompts: [
-        'Lebih capek mana: mengintip kotak surat setiap 5 menit atau memasang bel pintu untuk kurir?',
-        'Kenapa notifikasi lunas di HP butuh bantuan server toko dulu sebelum tampil di layar?',
+        'Mengapa bel lebih mudah daripada mengintip pintu tiap 5 menit?',
+        'Mengapa kabar lunas di HP perlu lewat server toko dulu?',
       ],
       offlineActivity:
-        'Main tebak peran 3 menit: satu orang jadi Pembeli, satu jadi Bank, satu jadi Server Toko. Saat Pembeli menaruh uang mainan ke Bank, Bank mengetuk meja Server Toko ("Ting! Lunas!").',
+        'Main peran 3 menit: satu orang jadi Pembeli, satu jadi Bank, satu jadi Server Toko. Saat Pembeli menaruh uang mainan ke Bank, Bank mengetuk meja Server Toko ("Ting! Lunas!").',
     },
   }),
 
@@ -555,226 +654,255 @@ export const lessons: Lesson[] = [
     worldId: 'b06',
     title: 'Mengamankan webhook',
     modes: ['pro'],
-    objective: t('Aku bisa memeriksa signature HMAC, menjaga idempotensi penerima, dan menghindari jebakan umum webhook.'),
+    objective: t('Kamu bisa memeriksa signature webhook dan mencegah proses ganda.'),
+    atWork: 'Kamu akan menulis pemeriksa signature di endpoint webhook pembayaran sebelum pesanan ditandai lunas.',
     estMinutes: 5,
     introducesTerms: ['signature-webhook'],
     usesTerms: ['webhook', 'server', 'header-body', 'status-code', 'idempotent', 'https', 'api'],
     warmupFrom: 'b06-l01',
     steps: [
       storyStep('b06/signature-webhook.svg', [
-        rText('Alamat webhook terbuka di internet sehingga siapa pun bisa iseng mengirim surat "pesanan 88 LUNAS". Seperti segel lilin bercap pada surat kerajaan, hanya pemilik kunci rahasia yang bisa membuat cap asli.'),
+        rText(
+          'Alamat webhook Toko Rani terbuka di internet, jadi siapa pun bisa mengirim kabar palsu "pesanan 88 lunas". Bagaimana servermu membedakan kabar asli dari yang palsu?',
+        ),
       ]),
       conceptStep({
-        title: t('Verifikasi Tanda Tangan (Signature)'),
+        title: t('Memeriksa tanda tangan (signature)'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b06', topic: 'signature-hmac' },
         alt: t('Pengirim dan server penerima menghitung HMAC SHA-256 lalu mencocokkannya.'),
         code: {
           lang: 'js',
-          code: 'const capKita = crypto.createHmac("sha256", RAHASIA_WEBHOOK)\n  .update(isiMentahRequest).digest("hex");\nif (capKita !== req.headers["x-signature"]) {\n  return res.status(401).send("Tanda tangan tidak cocok");\n}',
+          code: 'const capKita = crypto.createHmac("sha256", RAHASIA_WEBHOOK)\n  .update(isiMentahRequest).digest("hex");\n// Di produksi, bandingkan dengan crypto.timingSafeEqual\nif (capKita !== req.headers["x-signature"]) {\n  return res.status(401).send("Tanda tangan tidak cocok");\n}',
         },
         body: [
-          rText('Pengirim membuat '),
-          rTerm('signature-webhook', 'signature'),
-          rText(' dari isi pesan dan kunci rahasia di header. Server menghitung ulang cap yang sama dan menolak (401) jika tidak cocok, lalu mengecek ulang API sumber untuk transaksi uang.'),
+          rTerm('signature-webhook', 'Signature', 'Signature'),
+          rText(
+            ' adalah cap, seperti segel lilin, yang dibuat dari isi pesan dan kunci rahasia. Pengirim menaruhnya di header request. Servermu menghitung ulang cap yang sama, lalu menolak dengan 401 kalau tidak cocok. Untuk transaksi uang, cek ulang juga ke API sumber.',
+          ),
         ],
       }),
-      conceptStep({
-        title: t('Idempotensi & Balas 200 Cepat'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'b06', topic: 'aturan-main-webhook' },
-        alt: t('Tabel aturan main webhook: idempotent untuk retry, balas 200 cepat, jangan percaya urutan.'),
-        body: [
-          rText('Pengirim bisa mengirim ulang jika servermu lambat menjawab. Buat penerima '),
-          rTerm('idempotent', 'idempotent'),
-          rText(' dengan menyimpan ID kejadian agar tidak diproses dua kali, dan balas '),
-          rCode('200 OK'),
-          rText(' secepatnya.'),
-        ],
-      }),
-      conceptStep({
-        title: t('Urutan Terbalik & Uji Lokal'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'b06', topic: 'urutan-dan-tunnel' },
-        alt: t('Menangani urutan event terbalik serta memakai tunnel saat mengembangkan di laptop.'),
-        body: [
-          rText('Jangan bergantung pada urutan kedatangan webhook karena kabar "dikirim" bisa tiba sebelum "dibayar"; cek status terbaru dari API sumber. Saat coding di laptop, pakai '),
-          rCode('ngrok'),
-          rText(' atau '),
-          rCode('Cloudflare Tunnel'),
-          rText(' untuk alamat HTTPS sementara.'),
-        ],
-      }),
-      limitStep({
-        analogy: t('Segel lilin bercap pada surat kerajaan'),
-        same: [
-          t('Memastikan isi pesan benar-benar ditulis oleh pemilik kunci rahasia dan tidak diubah di tengah jalan.'),
-        ],
-        different: [
-          t('Surat fisik jarang datang dua kali dengan amplop identik; webhook bisa dikirim ulang otomatis (retry) atau datang dengan urutan tertukar.'),
-        ],
-      }),
-      simStep(
-        'bel-webhook',
-        t('Uji penerimaan webhook pada simulator dan bayangkan pemeriksaan header signature sebelum status berubah.'),
-      ),
       qStep(
         makeMcq({
           id: 'b06-l02-q1',
           type: 'analogy',
-          prompt: t('Dalam keamanan webhook, signature HMAC di header paling tepat diumpamakan sebagai…'),
+          prompt: t('Dalam keamanan webhook, signature HMAC di header paling mirip apa?'),
           choices: [
-            { id: 'seal', label: t('Segel lilin bercap rahasia pada surat kerajaan') },
+            { id: 'seal', label: t('Segel lilin bercap pada surat') },
             {
               id: 'env',
-              label: t('Warna amplop surat'),
-              explainWrong: t('Warna amplop tidak membuktikan pengirim memiliki kunci rahasia.'),
+              label: t('Nama pengirim yang ditulis di surat'),
+              explainWrong: t('Nama bisa ditulis siapa saja, jadi tidak membuktikan apa-apa. Signature butuh kunci rahasia.'),
             },
             {
               id: 'bell',
-              label: t('Papan nama depan rumah'),
-              explainWrong: t('Papan nama itu URL endpoint, bukan cap keaslian.'),
+              label: t('Alamat tujuan di bagian luar amplop'),
+              explainWrong: t('Alamat tujuan itu seperti URL webhook, bukan cap keaslian. Cap hanya bisa dibuat pemilik kunci.'),
             },
           ],
           answer: 'seal',
-          explainCorrect: t('Tepat. Hanya pihak yang mengetahui kunci rahasia yang dapat menghasilkan signature yang cocok.'),
+          explainCorrect: t(
+            'Hanya pemilik kunci rahasia yang bisa membuat signature yang cocok. Seperti cap segel kerajaan yang tidak bisa ditiru.',
+          ),
+          hints: [t('Pikirkan sesuatu yang tidak bisa ditiru orang lain.')],
           tags: ['signature-webhook'],
         }),
       ),
       qStep({
         id: 'b06-l02-q2',
         type: 'spotbug',
-        prompt: t('Ketuk baris yang berbahaya karena langsung melunaskan pesanan tanpa memverifikasi signature webhook:'),
+        prompt: t('Ketuk baris yang langsung melunasi pesanan tanpa memeriksa signature webhook.'),
         difficulty: 2,
         lines: [
-          'app.post("https://api.toko-rani.example/webhook", (req, res) => {',
+          'app.post("/webhook", (req, res) => {',
           '  tandaiPesananLunas(req.body.pesananId);',
           '  return res.status(200).send("OK");',
           '});',
         ],
         answer: [2],
-        explainCorrect: t('Tepat! Baris 2 langsung mempercayai req.body tanpa memeriksa header signature atau cek ulang ke API sumber.'),
+        explainCorrect: t(
+          'Baris 2 langsung mempercayai isi request. Kode ini tidak memeriksa signature atau API sumber.',
+        ),
+        hints: [t('Cari baris yang mempercayai isi request begitu saja.'), undefined],
         tags: ['signature-webhook', 'webhook'],
       }),
-      qStep({
-        id: 'b06-l02-q3',
-        type: 'match',
-        prompt: t('Pasangkan masalah webhook dengan solusi terbaiknya:'),
-        difficulty: 2,
-        left: [
-          { id: 'l1', label: t('Bel berbunyi dua kali (retry)') },
-          { id: 'l2', label: t('Pengirim menyerah karena timeout') },
-          { id: 'l3', label: t('Kabar "dikirim" datang sebelum "dibayar"') },
-          { id: 'l4', label: t('Request palsu dari orang iseng') },
+      conceptStep({
+        title: t('Idempotent dan balasan 200 cepat'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'b06', topic: 'aturan-main-webhook' },
+        alt: t('Aturan webhook: idempotent untuk kirim ulang, balas 200 cepat, jangan percaya urutan.'),
+        body: [
+          rText('Pengirim bisa mengirim ulang kalau servermu lambat menjawab. Buat penerima '),
+          rTerm('idempotent', 'idempotent', 'idempotent'),
+          rText(': simpan ID kejadian, supaya kejadian yang sama tidak diproses dua kali. Lalu balas '),
+          rCode('200 OK'),
+          rText(' secepatnya dan kerjakan tugas berat di belakang.'),
         ],
-        right: [
-          { id: 'r1', label: t('Simpan ID kejadian agar idempotent') },
-          { id: 'r2', label: t('Balas 200 secepatnya lalu proses di belakang') },
-          { id: 'r3', label: t('Cek status terbaru langsung ke API sumber') },
-          { id: 'r4', label: t('Wajib periksa signature dan gunakan HTTPS') },
-        ],
-        answer: { l1: 'r1', l2: 'r2', l3: 'r3', l4: 'r4' },
-        explainCorrect: t('Sempurna! Keempat aturan main ini membuat penerima webhook tangguh di dunia nyata.'),
-        tags: ['signature-webhook', 'idempotent', 'https'],
       }),
       qStep(
         makeMcq({
           id: 'b06-l02-q4',
           type: 'why',
           base: 'Server penerima webhook wajib membalas status 200 secepatnya sebelum melakukan pekerjaan berat seperti membuat PDF atau mengirim email.',
-          prompt: t('Mengapa balasan 200 harus cepat dikirim?'),
+          prompt: t('Mengapa balasan 200 harus dikirim cepat?'),
           choices: [
-            { id: 'timeout', label: t('Agar pengirim tidak menganggap gagal lalu mengirim ulang (retry) berulang kali') },
+            { id: 'timeout', label: t('Agar pengirim tidak mengira servermu gagal') },
             {
               id: 'size',
-              label: t('Karena status 200 hanya berlaku di bawah 100 byte'),
-              explainWrong: t('Status 200 tidak memiliki batas 100 byte.'),
+              label: t('Agar pembeli tidak menunggu di halaman bayar'),
+              explainWrong: t('Pembeli tidak menunggu webhook. Webhook berjalan antar server di belakang layar.'),
             },
             {
               id: 'json',
-              label: t('Supaya format JSON berubah menjadi XML'),
-              explainWrong: t('Kecepatan balas tidak mengubah format data.'),
+              label: t('Agar pengirim yakin signature-nya cocok'),
+              explainWrong: t('Status 200 hanya berarti kabar sudah diterima. Ia tidak membuktikan signature cocok.'),
             },
           ],
           answer: 'timeout',
-          explainCorrect: t('Benar. Jika jawaban lambat, penyedia webhook mengira servermu bermasalah dan akan melakukan retry.'),
+          explainCorrect: t('Balasan lambat membuat pengirim mengira servermu bermasalah. Ia lalu mengirim webhook yang sama lagi.'),
+          hints: [t('Apa yang dilakukan pengirim bila tidak mendapat balasan?')],
           tags: ['webhook', 'status-code'],
         }),
       ),
+      conceptStep({
+        title: t('Urutan terbalik dan uji lokal'),
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'b06', topic: 'urutan-dan-tunnel' },
+        alt: t('Menangani urutan event terbalik dan memakai tunnel saat mengembangkan di laptop.'),
+        body: [
+          rText(
+            'Jangan bergantung pada urutan kedatangan webhook, karena kabar "dikirim" bisa tiba sebelum "dibayar". Cek status terbaru ke API sumber. Saat membuat di laptop, tunnel meneruskan alamat HTTPS sementara ke laptopmu. Alat tunnel yang umum adalah ',
+          ),
+          rCode('ngrok'),
+          rText(' dan '),
+          rCode('Cloudflare Tunnel'),
+          rText('.'),
+        ],
+      }),
+      simStep(
+        'bel-webhook',
+        t('Jalankan simulator webhook dan bayangkan pemeriksaan signature sebelum status berubah.'),
+      ),
+      limitStep({
+        analogy: t('Segel lilin bercap pada surat kerajaan'),
+        riskyAnalogy: false,
+        same: [
+          t('Cap membuktikan pesan ditulis pemilik kunci rahasia dan isinya tidak diubah di jalan.'),
+        ],
+        different: [
+          t('Surat fisik jarang datang dua kali, tetapi webhook bisa dikirim ulang atau tiba dengan urutan terbalik.'),
+        ],
+      }),
+      qStep(
+        makeMcq({
+          id: 'b06-l02-q6',
+          type: 'scenario',
+          story: t(
+            'Dimas menguji webhook pembayaran di laptopnya (localhost). Payment gateway di internet tidak bisa menghubungi alamat laptopnya.',
+          ),
+          prompt: t('Apa yang sebaiknya Dimas lakukan?'),
+          choices: [
+            { id: 'tun', label: t('Menjalankan tunnel seperti ngrok') },
+            {
+              id: 'css',
+              label: t('Mengisi alamat localhost di dasbor'),
+              explainWrong: t('Alamat localhost hanya dikenal laptopmu sendiri. Layanan di internet tidak bisa menjangkaunya.'),
+            },
+            {
+              id: 'cache',
+              label: t('Mengganti port server lokal'),
+              explainWrong: t('Port lain tetap berada di jaringan laptop. Alamatnya tetap tidak terbuka untuk internet.'),
+            },
+          ],
+          answer: 'tun',
+          explainCorrect: t('Tunnel meneruskan alamat HTTPS publik sementara ke port di laptop. Webhook lalu bisa masuk ke server lokal.'),
+          hints: [t('Alamat laptop perlu bisa dijangkau dari internet.')],
+          tags: ['webhook', 'https'],
+        }),
+      ),
+      qStep({
+        id: 'b06-l02-q3',
+        type: 'match',
+        prompt: t('Pasangkan masalah webhook dengan solusi terbaiknya.'),
+        difficulty: 2,
+        left: [
+          { id: 'l1', label: t('Webhook yang sama tiba dua kali') },
+          { id: 'l2', label: t('Pengirim menyerah karena balasan lambat') },
+          { id: 'l3', label: t('Kabar "dikirim" datang sebelum "dibayar"') },
+          { id: 'l4', label: t('Request palsu dari orang iseng') },
+        ],
+        right: [
+          { id: 'r1', label: t('Simpan ID kejadian agar idempotent') },
+          { id: 'r2', label: t('Balas 200 secepatnya, kerjakan di belakang') },
+          { id: 'r3', label: t('Cek status terbaru ke API sumber') },
+          { id: 'r4', label: t('Periksa signature HMAC') },
+        ],
+        answer: { l1: 'r1', l2: 'r2', l3: 'r3', l4: 'r4' },
+        explainCorrect: t('Empat penangkal ini saling melengkapi. Misalnya, ID tersimpan mencegah kejadian yang sama diproses dua kali.'),
+        hints: [t('Mulai dari pasangan yang paling jelas dulu.'), undefined],
+        tags: ['signature-webhook', 'idempotent', 'https'],
+      }),
       qStep(
         makeMcq({
           id: 'b06-l02-q5',
           type: 'limit',
           analogy: t('Segel lilin surat kerajaan'),
-          prompt: t('Mengapa memeriksa signature saja masih perlu dilengkapi dengan cek ulang ke sumber dan penyimpanan ID kejadian?'),
+          prompt: t('Mengapa signature saja belum cukup untuk melindungi pesanan?'),
           choices: [
-            {
-              id: 'extra',
-              label: t('Karena surat bersigel asli pun bisa terkirim ganda lewat retry atau datang dengan urutan tertukar'),
-            },
+            { id: 'extra', label: t('Webhook asli pun bisa tiba dua kali atau terbalik') },
             {
               id: 'weak',
-              label: t('Karena HMAC SHA-256 tidak memakai kunci rahasia'),
-              explainWrong: t('HMAC justru memakai kunci rahasia bersama.'),
+              label: t('Signature mudah ditebak oleh pihak ketiga di internet'),
+              explainWrong: t('HMAC memakai kunci rahasia yang tidak pernah dikirim. Orang luar tidak bisa menebaknya dari pesan.'),
             },
             {
               id: 'css',
-              label: t('Karena signature hanya berlaku di browser'),
-              explainWrong: t('Signature webhook diverifikasi di server.'),
+              label: t('Signature tidak ikut memeriksa isi pesan yang dikirim'),
+              explainWrong: t('HMAC dihitung dari isi pesan, jadi isi yang diubah akan ketahuan. Masalahnya ada di pengiriman ulang dan urutan.'),
             },
           ],
           answer: 'extra',
-          explainCorrect: t('Tepat. Signature membuktikan keaslian pengirim, sedangkan idempotensi dan cek ulang melindungi logika bisnis.'),
+          explainCorrect: t(
+            'Signature hanya membuktikan pengirimnya asli. Kejadian asli tetap bisa tiba ganda atau terbalik, jadi perlu ID kejadian dan cek ulang.',
+          ),
+          hints: [t('Pikirkan apa yang tidak dicegah oleh segel.')],
           tags: ['signature-webhook', 'idempotent'],
-        }),
-      ),
-      qStep(
-        makeMcq({
-          id: 'b06-l02-q6',
-          type: 'scenario',
-          story: t('Dimas sedang menguji webhook pembayaran di laptop lokalnya (localhost), tetapi payment gateway di internet gagal menghubungi alamat laptopnya.'),
-          prompt: t('Alat apa yang membantu Dimas mendapatkan alamat publik sementara agar webhook bisa masuk ke laptop?'),
-          choices: [
-            { id: 'tun', label: t('ngrok atau Cloudflare Tunnel') },
-            {
-              id: 'css',
-              label: t('File style.css tambahan'),
-              explainWrong: t('CSS tidak memberi alamat publik untuk server lokal.'),
-            },
-            {
-              id: 'cache',
-              label: t('Hapus cache browser'),
-              explainWrong: t('Localhost tetap tidak bisa diakses server luar meski cache dihapus.'),
-            },
-          ],
-          answer: 'tun',
-          explainCorrect: t('Benar! Tunnel meneruskan URL HTTPS publik sementara langsung ke port laptop lokal.'),
-          tags: ['webhook', 'https'],
         }),
       ),
     ],
     reviewCards: [
       makeMcq({
         id: 'b06-l02-r1',
-        prompt: t('Jika header signature webhook tidak cocok dengan hasil hitungan servermu, tindakan yang tepat adalah…'),
+        prompt: t('Apa yang kamu lakukan kalau signature webhook tidak cocok?'),
         choices: [
-          { id: 'rej', label: t('Tolak request (misalnya 401) dan jangan proses datanya') },
-          { id: 'ok', label: t('Tetap proses pesanan agar pembeli tidak menunggu'), explainWrong: t('Itu membuka celah pesan palsu.') },
+          { id: 'rej', label: t('Tolak dengan 401 dan jangan proses datanya') },
+          {
+            id: 'ok',
+            label: t('Proses pesanan dulu, periksa belakangan'),
+            explainWrong: t('Memproses dulu membuka celah untuk request palsu. Pemeriksaan harus lebih dulu.'),
+          },
+          {
+            id: 'quiet',
+            label: t('Balas 200 lalu abaikan saja kabarnya'),
+            explainWrong: t('Balasan 200 memberi tahu pengirim bahwa kabarnya diterima. Tolak dengan 401 agar pengirim tahu.'),
+          },
         ],
         answer: 'rej',
-        explainCorrect: t('Jangan pernah memproses webhook yang tanda tangannya tidak cocok.'),
+        explainCorrect: t('Request yang signature-nya tidak cocok mungkin palsu. Jangan proses datanya sebelum terbukti asli.'),
+        hints: [t('Pesan yang tidak bisa dibuktikan asli tidak boleh dipercaya.')],
         tags: ['signature-webhook'],
       }),
       makeTf({
         id: 'b06-l02-r2',
-        prompt: t('Untuk transaksi bernilai uang besar, cek ulang langsung ke API sumber setelah menerima webhook seperti menelepon balik nomor resmi bank.'),
+        prompt: t('Untuk transaksi uang, cek ulang ke API sumber setelah webhook masuk.'),
         answer: true,
-        explainCorrect: t('Betul! Verifikasi ganda ke API sumber menambah lapisan keamanan ekstra.'),
-        explainWrong: t('Untuk transaksi kritis, konfirmasi langsung ke sumber sangat dianjurkan.'),
+        explainCorrect: t('Cek ulang menambah satu lapis pengaman. Seperti menelepon balik nomor resmi bank.'),
+        explainWrong: t('Webhook bisa dipalsukan atau terlambat. Konfirmasi langsung ke sumber lebih aman.'),
+        hints: [t('Uang butuh pengaman lebih dari satu lapis.')],
         tags: ['signature-webhook', 'api'],
       }),
     ],
-    recap: t('Amankan webhook dengan HTTPS, verifikasi HMAC signature, penerima idempotent, dan balasan 200 yang cepat.'),
+    recap: t('Periksa signature HMAC dan pakai HTTPS. Buat penerima idempotent dan balas 200 cepat.'),
   }),
 
   makeLesson({
@@ -783,9 +911,10 @@ export const lessons: Lesson[] = [
     title: 'Antrean dan grup pengumuman',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa membedakan nomor antrean kerja (Queue) dan grup pengumuman (Pub/Sub).',
-      'Aku bisa menjelaskan arsitektur event-driven menggunakan Message Queue dan Pub/Sub beserta perannya bagi tampilan frontend.',
+      'Aku bisa membedakan antrean kerja dan grup pengumuman.',
+      'Kamu bisa membedakan antrean pesan dan Pub/Sub, lalu menampilkan status yang jujur di layar.',
     ),
+    atWork: 'Kamu akan melihat antrean tugas dan topik Pub/Sub saat memeriksa mengapa email konfirmasi pesanan terlambat terkirim.',
     estMinutes: 5,
     introducesTerms: ['queue-pubsub'],
     usesTerms: ['webhook', 'server', 'frontend', 'websocket'],
@@ -794,112 +923,216 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('b06/antrean-bank.svg', [
         rText(
-          'Di bank, kamu ambil nomor antrean lalu duduk. Di kelas, satu pengumuman grup WA dibaca semua murid!',
-          'Dalam arsitektur berbasis kejadian (event-driven), sistem tidak saling memerintah langsung, melainkan menitipkan tugas di antrean bank atau mengumumkan kabar ke grup langganan.',
+          'Di bank, kamu mengambil nomor lalu menunggu. Di grup kelas, satu pengumuman dibaca semua murid. Bagaimana komputer meniru dua cara ini?',
+          'Setelah pembayaran lunas, Toko Rani harus mengirim email, memberi poin, dan menyiapkan barang. Bagaimana sistem membagi pekerjaan itu tanpa saling menunggu?',
         ),
       ]),
       conceptStep({
-        title: t('Nomor Antrean (Queue)', 'Message Queue'),
+        title: t('Nomor antrean di komputer', 'Message queue'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b06', topic: 'message-queue' },
-        alt: t('Pengirim menaruh pesan di antrean, lalu pekerja mengambil satu per satu.'),
+        alt: t('Pengirim menaruh pesan di antrean, lalu pekerja mengambilnya satu per satu.'),
         body: [
-          rTerm('queue-pubsub', 'Message queue', 'Message queue'),
-          rText(
-            ' seperti nomor antrean bank. Pesan dititipkan ke antrean lalu dikerjakan satu pekerja.',
-            ' menyimpan tugas seperti kirim email konfirmasi atau olah video. Satu pesan diambil satu pekerja saja (contoh alat: RabbitMQ, Amazon SQS).',
+          rTerm('queue-pubsub', 'Antrean pesan', 'Message queue'),
+          rJunior(
+            ' bekerja seperti nomor antrean di bank. Pesan menunggu dengan aman sampai satu pekerja mengambilnya. Sambil menunggu, layar toko menulis "Pembayaran sedang diperiksa".',
+          ),
+          rPro(
+            ' adalah antrean yang menyimpan tugas, misalnya mengirim email konfirmasi atau memproses video. Satu pesan diambil satu pekerja saja. Contoh alatnya RabbitMQ dan Amazon SQS.',
           ),
         ],
       }),
+      qStep(
+        makeTf({
+          id: 'b06-l03-q4',
+          prompt: t(
+            'Pekerja sedang istirahat, jadi pesan di antrean hilang.',
+            'Kalau satu pekerja berhenti sebentar, pesan di message queue langsung hilang.',
+          ),
+          answer: false,
+          explainCorrect: t(
+            'Pernyataan itu keliru: pesan tetap aman di antrean. Seperti nomor antrean yang tetap ada saat petugas bank istirahat.',
+            'Pernyataan itu keliru: antrean menyimpan pesan sampai pekerja berikutnya mengambilnya.',
+          ),
+          explainWrong: t(
+            'Antrean menyimpan pesan sampai ada yang mengambil. Nomor di bank tidak hilang saat petugas istirahat.',
+            'Antrean justru menjaga pesan tetap aman saat pekerja sibuk atau berhenti.',
+          ),
+          hints: [
+            t('Ingat nomor antrean saat petugas istirahat.', 'Pikirkan apa gunanya antrean di antara pengirim dan pekerja.'),
+          ],
+          tags: ['queue-pubsub'],
+        }),
+      ),
       conceptStep({
-        title: t('Grup Pengumuman (Pub/Sub)', 'Publish–Subscribe'),
+        title: t('Grup pengumuman', 'Pub/Sub (publish–subscribe)'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b06', topic: 'pub-sub' },
         alt: t('Satu topik pesanan.dibayar mengirim salinan ke layanan email, gudang, dan poin.'),
         body: [
-          rTerm('queue-pubsub', 'Pub/Sub', 'Pub/Sub'),
-          rText(
-            ' seperti grup pengumuman kelas. Satu kabar disiarkan ke topik agar semua pelanggan menerimanya.',
-            ' (publish–subscribe) menyiarkan event ke sebuah topik sehingga semua layanan pelanggan menerima salinan (contoh: Redis Pub/Sub, Apache Kafka, MQTT untuk IoT).',
+          rTerm('queue-pubsub', 'Grup pengumuman', 'Pub/Sub'),
+          rJunior(
+            ' di komputer mirip grup pengumuman kelas. Semua anggota grup membaca pengumuman yang sama. Admin tidak perlu tahu siapa saja yang membaca.',
+          ),
+          rPro(
+            ' (publish–subscribe) menyiarkan event ke sebuah topik. Semua layanan yang berlangganan topik itu menerima salinannya. Contoh alatnya Redis Pub/Sub, Apache Kafka, dan MQTT untuk perangkat pintar (IoT). Kafka juga menyimpan event sebagai catatan berurutan, jadi pesan lama bisa dibaca ulang. Redis Pub/Sub tidak menyimpan pesan.',
           ),
         ],
       }),
-      conceptStep({
-        title: t('Kabar Jujur di Layar', 'Pengaruh ke Frontend'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'b06', topic: 'tampilan-antrean' },
-        alt: t('Tampilan status "Pembayaran sedang diverifikasi" saat tugas menunggu di antrean.'),
-        body: [
-          rText(
-            'Saat pesan menunggu di antrean, layar aplikasi memberi tahu pengguna agar sabar menunggu sebentar.',
-            'Sebagai frontend developer, paham pola antrean membuatmu mengerti mengapa status tak langsung berubah dan menampilkan pesan seperti "Pembayaran sedang diverifikasi".',
-          ),
-        ],
-      }),
-      limitStep({
-        analogy: t('Nomor antrean bank dan grup WA kelas'),
-        same: [
-          t('Pengirim tugas tidak perlu menunggu pekerja selesai untuk melayani tamu berikutnya.'),
-          t('Di grup pengumuman, pengirim tidak perlu tahu apa reaksi setiap anggota.'),
-        ],
-        different: [
-          t('Jika listrik mati sebentar atau pekerja sibuk, antrean digital menyimpan pesan dengan aman sampai pekerja hidup lagi.'),
-          t('Sistem besar seperti Apache Kafka mencatat jutaan kejadian berurutan dan bisa memutar ulang catatan lama.'),
-        ],
-      }),
-      simStep(
-        'bel-webhook',
-        t(
-          'Lihat saat bel webhook diterima server lalu pekerja di belakang layar menandai pesanan lunas!',
-          'Amati bagaimana webhook memicu pencatatan cepat agar pekerjaan lanjutan bisa masuk ke antrean.',
-        ),
-      ),
       qStep(
         makeMcq({
           id: 'b06-l03-q1',
           type: 'analogy',
-          prompt: t('Admin kelas mengirim satu pengumuman "Besok libur" ke grup agar semua murid bereaksi masing-masing. Itu mirip dengan…'),
+          prompt: t(
+            'Toko mengirim satu kabar lunas ke gudang, email, dan poin. Itu mirip apa?',
+            'Admin kelas mengirim satu pengumuman ke grup chat. Pola mana yang bekerja seperti itu?',
+          ),
           choices: [
-            { id: 'ps', label: t('Pub/Sub (Publish–Subscribe)') },
+            {
+              id: 'ps',
+              label: t('Pengumuman di grup kelas', 'Pub/Sub: satu kejadian untuk semua pelanggan'),
+            },
             {
               id: 'mq',
-              label: t('Satu nomor antrean untuk satu teller'),
-              explainWrong: t('Nomor antrean bank hanya dikerjakan oleh satu pekerja, bukan disiarkan ke semua.'),
+              label: t('Nomor antrean di bank', 'Message queue: satu tugas untuk satu pekerja saja'),
+              explainWrong: t(
+                'Nomor antrean hanya dipanggil satu petugas. Kabar lunas ini diterima tiga bagian.',
+                'Message queue memberi satu pesan ke satu pekerja, bukan ke semua. Itu bukan siaran.',
+              ),
             },
             {
               id: 'poll',
-              label: t('Menanya teman tiap detik'),
-              explainWrong: t('Menanya berulang itu polling.'),
+              label: t('Murid bertanya ke guru terus-menerus', 'Polling: pelanggan bertanya berulang kali'),
+              explainWrong: t(
+                'Tidak ada yang bertanya di sini. Kabar datang sendiri ke semua bagian.',
+                'Polling berarti penerima bertanya berulang kali. Di Pub/Sub, pengirim menyiarkan sendiri.',
+              ),
             },
           ],
           answer: 'ps',
-          explainCorrect: t('Benar! Pada Pub/Sub, satu kejadian disiarkan ke semua pelanggan topik tersebut.'),
+          explainCorrect: t(
+            'Satu kabar sampai ke semua bagian. Seperti satu pengumuman yang dibaca seluruh grup kelas.',
+            'Pada Pub/Sub, satu kejadian disiarkan ke semua pelanggan topik. Admin tidak perlu tahu siapa pembacanya.',
+          ),
+          hints: [t('Hitung penerimanya: satu, atau banyak?', 'Siapa saja yang menerima satu pengumuman grup?')],
           tags: ['queue-pubsub'],
         }),
       ),
       qStep({
         id: 'b06-l03-q2',
         type: 'sort',
-        prompt: t('Kelompokkan contoh berikut ke Message Queue (1 pekerja) atau Pub/Sub (semua pelanggan):'),
+        prompt: t(
+          'Kelompokkan tiap contoh ke antrean kerja atau grup pengumuman.',
+          'Kelompokkan contoh ini ke Message Queue atau Pub/Sub.',
+        ),
         difficulty: 2,
         items: [
-          { id: 'i1', label: t('Antrean tugas kirim email struk satu per satu') },
-          { id: 'i2', label: t('Topik pesanan.dibayar diterima gudang, email, dan poin') },
-          { id: 'i3', label: t('Nomor antrean bank dipanggil teller') },
-          { id: 'i4', label: t('Grup pengumuman kelas WA') },
+          { id: 'i1', label: t('Tugas kirim struk, dikerjakan satu per satu', 'Antrean tugas kirim email struk satu per satu') },
+          { id: 'i2', label: t('Kabar diskon dikirim ke semua pelanggan toko', 'Topik pesanan.dibayar diterima gudang, email, dan poin') },
+          { id: 'i3', label: t('Pesanan kue dibuat oleh satu koki', 'Nomor antrean bank dipanggil teller') },
+          { id: 'i4', label: t('Bel sekolah didengar semua kelas', 'Grup pengumuman kelas di aplikasi chat') },
         ],
         bins: [
-          { id: 'mq', label: t('Message Queue') },
-          { id: 'ps', label: t('Pub/Sub') },
+          { id: 'mq', label: t('Antrean kerja', 'Message Queue'), icon: 'clock' },
+          { id: 'ps', label: t('Grup pengumuman', 'Pub/Sub'), icon: 'radio' },
         ],
         answer: { i1: 'mq', i2: 'ps', i3: 'mq', i4: 'ps' },
-        explainCorrect: t('Hebat! Queue mengantrekan satu pesan untuk satu pekerja; Pub/Sub menyiarkan ke semua pelanggan topik.'),
+        explainCorrect: t(
+          'Antrean memberi satu tugas ke satu pekerja. Grup pengumuman memberi satu kabar ke semua.',
+          'Message Queue memberi satu pesan ke satu pekerja. Pub/Sub menyiarkan salinan ke semua pelanggan topik.',
+        ),
+        hints: [
+          t('Tanyakan: satu penerima, atau semua penerima?', 'Tanyakan siapa yang menerima: satu pekerja atau semua pelanggan?'),
+          undefined,
+        ],
         tags: ['queue-pubsub'],
       }),
+      conceptStep({
+        title: t('Antrean dan status di layar'),
+        modes: ['pro'],
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'b06', topic: 'tampilan-antrean' },
+        alt: t('Tampilan status "Pembayaran sedang diverifikasi" saat tugas menunggu di antrean.'),
+        body: [
+          rPro(
+            'Karena tugas menunggu di antrean, status pesanan tidak langsung berubah. Selama menunggu, tampilkan pesan yang jujur, misalnya "Pembayaran sedang diverifikasi".',
+          ),
+        ],
+      }),
+      simStep(
+        'bel-webhook',
+        t(
+          'Lihat bel webhook berbunyi, lalu pekerja menandai pesanan lunas.',
+          'Amati cara webhook dicatat cepat, lalu pekerjaan lanjutan masuk ke antrean.',
+        ),
+      ),
+      limitStep({
+        analogy: t('Nomor antrean bank dan grup chat kelas'),
+        riskyAnalogy: false,
+        same: [
+          t(
+            'Pengirim tidak perlu menunggu pekerja selesai.',
+            'Pengirim tidak perlu menunggu penerima selesai, dan tidak perlu tahu reaksi tiap penerima.',
+          ),
+        ],
+        different: [
+          t(
+            'Bank tutup saat sore. Antrean komputer tetap menyimpan ribuan pesan sepanjang malam.',
+            'Antrean digital bisa menampung jutaan pesan, dan sistem catatan seperti Kafka bisa memutar ulang pesan lama.',
+          ),
+        ],
+      }),
+      qStep(
+        makeMcq({
+          id: 'b06-l03-q6',
+          type: 'scenario',
+          story: t(
+            'Sari membayar pesanan kue di Toko Rani. Pembayarannya masih antre 3 detik. Layar belum berubah.',
+            'Sari baru membayar pesanan kue di Toko Rani. Tugas cek pembayaran menunggu 3 detik di antrean server, jadi status belum berubah di layar.',
+          ),
+          prompt: t(
+            'Apa tulisan terbaik di layar untuk Sari?',
+            'Pesan apa yang paling baik ditampilkan frontend untuk Sari?',
+          ),
+          difficulty: 2,
+          choices: [
+            {
+              id: 'msg',
+              label: t('Menulis "Pembayaran sedang diperiksa"', 'Tampilkan "Pembayaran sedang diverifikasi" selama menunggu'),
+            },
+            {
+              id: 'freeze',
+              label: t('Membiarkan layar tanpa tulisan apa pun', 'Biarkan tombol Bayar aktif tanpa pesan apa pun'),
+              explainWrong: t(
+                'Layar kosong membuat Sari bingung. Ia mungkin menekan Bayar berkali-kali.',
+                'Tombol aktif tanpa pesan mendorong pembeli menekan Bayar berkali-kali.',
+              ),
+            },
+            {
+              id: 'fail',
+              label: t('Menulis "Pembayaran gagal"', 'Tampilkan error "Pembayaran gagal"'),
+              explainWrong: t(
+                'Pembayaran belum gagal. Pesanan hanya menunggu giliran di antrean.',
+                'Transaksi belum gagal, hanya sedang diproses di antrean.',
+              ),
+            },
+          ],
+          answer: 'msg',
+          explainCorrect: t(
+            'Tulisan yang jujur membuat Sari tenang. Seperti petugas bank yang bilang "Tunggu sebentar".',
+            'Info yang jujur membuat pembeli tenang saat pekerja antrean bekerja di belakang layar.',
+          ),
+          hints: [
+            t('Ingat petugas bank yang bilang "tunggu sebentar".', 'Statusnya belum final: jangan tampilkan sukses atau gagal.'),
+          ],
+          tags: ['queue-pubsub', 'frontend'],
+        }),
+      ),
       qStep({
         id: 'b06-l03-q3',
         type: 'match',
-        prompt: t('Pasangkan alat atau protokol dengan peran populernya:'),
+        modes: ['pro'],
+        prompt: t('Pasangkan alat atau protokol dengan peran populernya.'),
         difficulty: 2,
         left: [
           { id: 'l1', label: t('RabbitMQ / Amazon SQS') },
@@ -909,74 +1142,39 @@ export const lessons: Lesson[] = [
         ],
         right: [
           { id: 'r1', label: t('Layanan antrean pesan populer') },
-          { id: 'r2', label: t('Catatan kejadian berurutan skala raksasa') },
-          { id: 'r3', label: t('Pub/sub hemat untuk perangkat IoT') },
-          { id: 'r4', label: t('Pub/sub ringan untuk chat antar server') },
+          { id: 'r2', label: t('Catatan event berurutan yang bisa dibaca ulang') },
+          { id: 'r3', label: t('Pub/Sub hemat untuk perangkat IoT') },
+          { id: 'r4', label: t('Siaran ringan, pesan tidak disimpan') },
         ],
         answer: { l1: 'r1', l2: 'r2', l3: 'r3', l4: 'r4' },
-        explainCorrect: t('Keren! Setiap alat punya kekuatan dari antrean ringan sampai sensor IoT dan log kejadian besar.'),
+        explainCorrect: t('Setiap alat punya peran sendiri: antrean tugas, catatan kejadian besar, sensor IoT, dan siaran ringan.'),
+        hints: [t('Ingat contoh alat di kartu Pub/Sub dan Message queue.'), undefined],
         tags: ['queue-pubsub', 'websocket'],
       }),
-      qStep(
-        makeTf({
-          id: 'b06-l03-q4',
-          prompt: t('Jika satu pekerja antrean sedang istirahat atau mati sebentar, pesan di message queue langsung hilang selamanya.'),
-          answer: false,
-          explainCorrect: t('Betul, itu salah! Pesan tetap aman menunggu di antrean sampai diambil pekerja lain.'),
-          explainWrong: t('Hampir! Justru keunggulan antrean adalah menjaga pesan tetap aman saat pekerja sedang sibuk atau mati sebentar.'),
-          tags: ['queue-pubsub'],
-        }),
-      ),
       qStep(
         makeMcq({
           id: 'b06-l03-q5',
           type: 'limit',
-          analogy: t('Nomor antrean bank dan grup WA'),
-          prompt: t('Apa perbedaan yang TIDAK terjadi pada antrean kertas di bank biasa dibanding antrean pesan digital?'),
+          modes: ['pro'],
+          analogy: t('Nomor antrean bank dan grup chat kelas'),
+          prompt: t('Apa yang bisa dilakukan antrean digital, tetapi tidak bisa dilakukan antrean kertas di bank?'),
           choices: [
-            {
-              id: 'save',
-              label: t('Antrean digital bisa menyimpan ribuan pesan aman meski pekerja mati sebentar dan memutar ulang catatan lama'),
-            },
+            { id: 'save', label: t('Memutar ulang pesan lama, misalnya dengan Kafka') },
             {
               id: 'order',
-              label: t('Pelanggan mendapat giliran antrean'),
-              explainWrong: t('Keduanya sama-sama mengatur giliran.'),
+              label: t('Memberi giliran kepada setiap pelanggan yang datang'),
+              explainWrong: t('Antrean kertas juga memberi giliran. Itu kemiripan, bukan beda.'),
             },
             {
               id: 'free',
-              label: t('Pemberi nomor tidak perlu menunggu teller selesai'),
-              explainWrong: t('Ini memang persamaan antara satpam bank dan pengirim pesan.'),
+              label: t('Membiarkan pemberi nomor tidak menunggu teller selesai'),
+              explainWrong: t('Pemberi nomor di bank juga tidak menunggu teller selesai. Itu kemiripan lain.'),
             },
           ],
           answer: 'save',
-          explainCorrect: t('Tepat! Antrean pesan digital menjaga ketahanan data dan sistem seperti Kafka bisa membaca ulang riwayat.'),
+          explainCorrect: t('Nomor antrean kertas yang sudah dipanggil tidak bisa diulang. Sistem catatan seperti Kafka menyimpan riwayat pesan dan bisa membacanya ulang.'),
+          hints: [t('Cari kemampuan yang hanya dimiliki antrean digital.')],
           tags: ['queue-pubsub'],
-        }),
-      ),
-      qStep(
-        makeMcq({
-          id: 'b06-l03-q6',
-          type: 'scenario',
-          story: t('Sari baru membayar pesanan kue di Toko Rani. Karena tugas cek pembayaran masuk ke antrean server selama 3 detik, status belum langsung berubah di layar.'),
-          prompt: t('Desain pesan frontend terbaik untuk Sari adalah…'),
-          difficulty: 2,
-          choices: [
-            { id: 'msg', label: t('Tampilkan "Pembayaran sedang diverifikasi" sambil menunggu pembaruan') },
-            {
-              id: 'freeze',
-              label: t('Biarkan tombol Bayar bisa diklik berkali-kali tanpa pesan apa pun'),
-              explainWrong: t('Pengguna bisa panik dan menekan bayar berkali-kali.'),
-            },
-            {
-              id: 'fail',
-              label: t('Tampilkan layar error merah padahal masih antre'),
-              explainWrong: t('Transaksi belum gagal, hanya sedang diproses di antrean.'),
-            },
-          ],
-          answer: 'msg',
-          explainCorrect: t('Tepat! Info jujur membuat pengalaman pengguna nyaman sementara pekerja antrean bekerja di belakang.'),
-          tags: ['queue-pubsub', 'frontend'],
         }),
       ),
       qStep({
@@ -984,47 +1182,92 @@ export const lessons: Lesson[] = [
         type: 'type',
         modes: ['pro'],
         difficulty: 2,
-        prompt: t('Tulis nama protokol pub/sub yang sangat hemat dan cocok untuk sensor suhu atau lampu pintar IoT:'),
+        prompt: t('Ketik nama protokol Pub/Sub yang hemat daya untuk sensor suhu atau lampu pintar.'),
         accept: ['MQTT', 'mqtt'],
-        explainCorrect: t('Tepat! MQTT dirancang ringan dan hemat daya untuk perangkat IoT di jaringan lemah.'),
+        explainCorrect: t('MQTT dirancang ringan dan hemat daya, jadi cocok untuk perangkat di jaringan yang lemah.'),
+        hints: [t('Cari nama protokol IoT di kartu Pub/Sub.'), undefined],
         tags: ['queue-pubsub'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'b06-l03-r1',
-        prompt: t('Pola apa yang mengirim satu pesan kepada SATU pekerja saja untuk diproses?'),
+        prompt: t(
+          'Pola mana yang memberi satu pesan ke satu pekerja?',
+          'Pola mana yang memberi satu pesan ke satu pekerja saja?',
+        ),
         choices: [
-          { id: 'mq', label: t('Message Queue') },
-          { id: 'ps', label: t('Pub/Sub'), explainWrong: t('Pub/Sub mengirim salinan ke semua pelanggan topik.') },
+          { id: 'mq', label: t('Antrean kerja', 'Message Queue') },
+          {
+            id: 'ps',
+            label: t('Grup pengumuman', 'Pub/Sub'),
+            explainWrong: t(
+              'Grup pengumuman memberi kabar ke semua anggota. Bukan ke satu orang saja.',
+              'Pub/Sub mengirim salinan ke semua pelanggan topik.',
+            ),
+          },
+          {
+            id: 'poll',
+            label: t('Bertanya berulang kali', 'Polling'),
+            explainWrong: t(
+              'Bertanya berulang kali itu cara lama. Antrean tidak perlu ditanya terus.',
+              'Polling berarti penerima bertanya berulang kali, bukan antrean tugas.',
+            ),
+          },
         ],
         answer: 'mq',
-        explainCorrect: t('Message Queue bekerja seperti nomor antrean bank: satu tugas dikerjakan satu pekerja.'),
+        explainCorrect: t(
+          'Antrean kerja memberi satu tugas ke satu pekerja. Seperti nomor antrean bank.',
+          'Message queue memberi satu tugas ke satu pekerja, seperti nomor antrean bank.',
+        ),
+        hints: [t('Ingat nomor antrean bank.')],
         tags: ['queue-pubsub'],
       }),
       makeMcq({
         id: 'b06-l03-r2',
-        prompt: t('Ketika satu event "pesanan.dibayar" harus memicu layanan email, gudang, dan poin sekaligus, pola yang dipakai adalah…'),
+        prompt: t(
+          'Satu kabar lunas harus sampai ke gudang, email, dan poin. Pola mana yang cocok?',
+          'Satu event "pesanan.dibayar" harus sampai ke layanan email, gudang, dan poin. Pola mana yang cocok?',
+        ),
         choices: [
-          { id: 'ps', label: t('Pub/Sub') },
-          { id: 'css', label: t('Box Model CSS'), explainWrong: t('Box model untuk jarak elemen layar.') },
+          { id: 'ps', label: t('Grup pengumuman', 'Pub/Sub') },
+          {
+            id: 'css',
+            label: t('Antrean kerja', 'Message Queue'),
+            explainWrong: t(
+              'Antrean memberi tugas ke satu pekerja saja. Tiga bagian itu perlu menerima kabar yang sama.',
+              'Message queue memberi satu pesan ke satu pekerja. Layanan lain tidak ikut menerimanya.',
+            ),
+          },
+          {
+            id: 'poll',
+            label: t('Bertanya berulang kali', 'Polling'),
+            explainWrong: t(
+              'Bertanya berulang kali itu cara lama. Pengumuman datang sendiri ke semua anggota.',
+              'Polling membuat tiap layanan bertanya sendiri. Pub/Sub menyiarkan kabar ke semuanya.',
+            ),
+          },
         ],
         answer: 'ps',
-        explainCorrect: t('Pub/Sub menyiarkan event ke topik sehingga semua layanan berlangganan dapat bereaksi sendiri.'),
+        explainCorrect: t(
+          'Satu kabar sampai ke semua anggota grup. Gudang, email, dan poin menerimanya sama-sama.',
+          'Pub/Sub menyiarkan event ke topik, jadi tiap layanan pelanggan bereaksi sendiri.',
+        ),
+        hints: [t('Ingat grup pengumuman kelas.')],
         tags: ['queue-pubsub'],
       }),
     ],
     recap: t(
-      'Antrean (Queue) membagi pekerjaan ke satu pekerja; Pub/Sub menyiarkan kabar ke banyak penerima sekaligus.',
-      'Event-driven memisahkan pengirim dan pemroses lewat Message Queue (satu pekerja) serta Pub/Sub (banyak pelanggan topik).',
+      'Antrean memberi tugas ke satu pekerja, grup pengumuman ke semua anggota.',
+      'Message queue memberi satu tugas ke satu pekerja. Pub/Sub menyiarkan satu kejadian ke banyak pelanggan.',
     ),
     companion: {
       talkPrompts: [
-        'Apa bedanya nomor antrean puskesmas dengan pengumuman pengeras suara di sekolah?',
-        'Kenapa layar kasir perlu memberi tulisan "Sedang diproses" saat antrean di dapur ramai?',
+        'Apa beda nomor antrean puskesmas dengan pengumuman lewat pengeras suara?',
+        'Mengapa layar kasir menulis "Sedang diproses" saat dapur ramai?',
       ],
       offlineActivity:
-        'Buat kertas nomor antrean 1-3 dan satu kertas pengumuman "Bel istirahat berbunyi!". Bandingkan mana yang hanya diambil satu petugas (Queue) dan mana yang diikuti semua orang (Pub/Sub).',
+        'Buat kertas nomor antrean 1 sampai 3 dan satu kertas pengumuman "Bel istirahat berbunyi!". Bandingkan: mana yang hanya diambil satu petugas (antrean), dan mana yang diikuti semua orang (grup pengumuman)?',
     },
   }),
 ];

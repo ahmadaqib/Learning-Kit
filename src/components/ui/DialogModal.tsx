@@ -11,6 +11,8 @@ interface DialogModalProps {
 }
 
 /**
+ * Entrance and exit are in motion.css (M08): dialog fades and scales .96 to 1 in 200 ms, the sheet rises in 280 ms,
+ * with no overshoot, and closing is same-frame. `data-rm="fade"` keeps the 120 ms cross-fade under reduced motion.
  * Menggunakan elemen native <dialog> + showModal() + closedby="any" (dengan fallback Safari)
  * sesuai panduan modern-web-guidance: dialog & light-dismiss-a-dialog.
  */
@@ -90,10 +92,11 @@ export const DialogModal: React.FC<DialogModalProps> = ({
       ref={dialogRef}
       className={dialogClass}
       aria-labelledby={titleId}
+      data-rm="fade"
       {...({ closedby: lightDismiss ? 'any' : 'closerequest' } as Record<string, string>)}
     >
       {variant === 'sheet' && (
-        <div className="mx-auto mt-2.5 h-1.5 w-12 rounded-full bg-[var(--line)]" aria-hidden="true" />
+        <div className="mx-auto mt-2.5 h-1.5 w-12 rounded-full bg-[var(--line-strong)] opacity-60" aria-hidden="true" />
       )}
       <div className="flex items-center justify-between border-b border-[var(--line)] px-5 py-3.5 sm:px-6">
         <h2 id={titleId} className="pw-h3">
@@ -103,7 +106,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
           type="button"
           onClick={() => dialogRef.current?.close()}
           aria-label="Tutup jendela"
-          className="pw-pressable flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)] text-[var(--ink-2)] hover:bg-[var(--cream)] hover:text-[var(--ink)] cursor-pointer"
+          className="pw-pressable flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-[var(--line)] text-[var(--ink-2)] hover:bg-[var(--paper-2)] hover:text-[var(--ink)] cursor-pointer"
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>

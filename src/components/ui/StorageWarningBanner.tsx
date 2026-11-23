@@ -9,15 +9,18 @@ export const StorageWarningBanner: React.FC = () => {
   return (
     <div
       role="alert"
-      className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-md)] border-2 border-[var(--warn-500)] bg-[var(--warn-50)] px-4 py-3 text-[var(--ink)]"
+      className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-[var(--radius-md)] border-2 border-dashed border-[var(--warn-500)] bg-[var(--warn-50)] px-4 py-2 text-[var(--ink)]"
     >
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2.5 py-1">
         <AlertTriangle className="h-5 w-5 flex-shrink-0 text-[var(--warn-700)]" aria-hidden="true" />
-        <p className="pw-small font-semibold">
-          Progres tidak bisa disimpan otomatis di browser ini. Gunakan Ekspor progres secara berkala.
+        <p className="pw-small m-0 font-semibold">
+          Progres belum bisa disimpan di browser ini. Ekspor progresmu secara berkala.
         </p>
       </div>
-      <Link to="/profil" className="pw-small font-extrabold text-[var(--world-700)] underline">
+      <Link
+        to="/profil"
+        className="pw-small inline-flex min-h-[var(--touch-min)] items-center rounded-[var(--radius-xs)] font-extrabold text-[var(--world-700)] underline underline-offset-4"
+      >
         Ke Profil →
       </Link>
     </div>

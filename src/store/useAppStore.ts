@@ -1,3 +1,4 @@
+import { clearLessonNotes } from '@/engine/lessonNotes';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import {
@@ -238,6 +239,7 @@ export const useAppStore = create<AppStore>()(
         if (!state.profiles[profileId]) return;
         const nextProfiles = { ...state.profiles };
         delete nextProfiles[profileId];
+        clearLessonNotes(profileId);
         const remainingIds = Object.keys(nextProfiles);
         set({
           profiles: nextProfiles,
@@ -250,6 +252,7 @@ export const useAppStore = create<AppStore>()(
         const state = get();
         const cur = state.profiles[state.activeProfileId];
         if (!cur) return;
+        clearLessonNotes(cur.id);
         const fresh = createNewProfile({
           id: cur.id,
           nickname: cur.nickname,

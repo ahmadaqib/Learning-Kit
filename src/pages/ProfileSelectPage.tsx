@@ -1,14 +1,24 @@
 import React, { useEffect } from 'react';
-import { Plus, UserCheck } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { levelLabel, MODE_LABEL } from '@/app/modeConfig';
 import { Bito } from '@/components/mascot/Bito';
 import { AVATAR_MAP, CharacterAvatar } from '@/components/mascot/CharacterAvatar';
-import { Button } from '@/components/ui/Button';
 import { StorageWarningBanner } from '@/components/ui/StorageWarningBanner';
 import { getLevelFromXp } from '@/engine/scoring';
+import { stickerTilt } from '@/motion/tokens';
 import { MAX_PROFILES, useAppStore } from '@/store/useAppStore';
 
 export { AVATAR_MAP };
+
+/** Profile deal-in start times (M42): 0, 60, 110, 150 ms, then +30 ms per card up to 240 ms. */
+function dealStart(index: number): number {
+  const first = [0, 60, 110, 150];
+  return index < first.length ? first[index] : Math.min(150 + (index - 3) * 30, 240);
+}
+
+const dealStyle = (index: number, extra?: Record<string, string>) =>
+  ({ '--at': `${dealStart(index)}ms`, ...extra }) as React.CSSProperties;
 
 export const ProfileSelectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,52 +37,65 @@ export const ProfileSelectPage: React.FC = () => {
   }, [profileList.length, activeProfileId, navigate]);
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] max-w-[600px] flex-col justify-center px-5 py-8">
+    <div className="mx-auto flex min-h-[100dvh] max-w-[600px] flex-col justify-center px-[var(--screen-pad,1.25rem)] py-8">
       <StorageWarningBanner />
-      <div className="mb-6 flex flex-col items-center text-center">
-        <Bito expression="wave" size={96} />
+      <div className="mb-[var(--gap-group,1.5rem)] flex flex-col items-center text-center">
+        <Bito expression="idle" size={96} idle />
         <h1 className="pw-h1 mt-3">Siapa yang mau belajar?</h1>
         <p className="pw-small mt-1 text-[var(--ink-2)]">
-          Semua kemajuan tersimpan aman di perangkat ini saja (maksimal 4 profil).
+          Semua kemajuan tersimpan aman di perangkat ini saja (paling banyak {MAX_PROFILES} profil).
         </p>
       </div>
 
-      <div className="space-y-3">
-        {profileList.map((p) => {
+      {/* The only entrance on this screen: the route wrapper adds none here (M42) */}
+      <ul className="grid list-none grid-cols-1 gap-[var(--gap-stack)] p-0 min-[360px]:grid-cols-2">
+        {profileList.map((p, i) => {
           const lvl = getLevelFromXp(p.xp, p.mode);
           return (
-            <button
+            <li
               key={p.id}
-              type="button"
-              onClick={() => {
-                selectProfile(p.id);
-                navigate('/beranda');
-              }}
-              className="pw-card pw-pressable flex min-h-[76px] w-full items-center justify-between gap-4 p-4 text-left hover:border-[var(--world-600)] cursor-pointer"
+              data-enter="deal"
+              className="pw-enter pw-sticker bg-[var(--paper)]"
+              style={dealStyle(i, { '--tilt': `${stickerTilt(i)}deg` })}
             >
-              <div className="flex items-center gap-3.5">
-                <CharacterAvatar avatarId={p.avatar} size={52} />
-                <div>
-                  <div className="pw-h3">{p.nickname || 'Petualang'}</div>
-                  <div className="pw-small text-[var(--ink-2)]">
-                    Mode {p.mode === 'junior' ? 'Junior' : 'Pro'} · Lv {lvl.level} ({p.xp} XP)
-                  </div>
-                </div>
-              </div>
-              <UserCheck className="h-5 w-5 text-[var(--world-700)]" aria-hidden="true" />
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  selectProfile(p.id);
+                  navigate('/beranda');
+                }}
+                data-press="lg"
+                className="pw-pressable flex min-h-[var(--touch-min)] w-full cursor-pointer flex-col items-center gap-2 rounded-[inherit] p-[var(--space-card)] text-center"
+              >
+                <CharacterAvatar avatarId={p.avatar} size={72} />
+                <span className="pw-h3 max-w-full break-words">{p.nickname || MODE_LABEL.junior}</span>
+                <span className="pw-small text-[var(--ink-2)]">
+                  {MODE_LABEL[p.mode]} · {levelLabel(lvl.level, p.mode)}
+                </span>
+              </button>
+            </li>
           );
         })}
-      </div>
 
-      {profileList.length < MAX_PROFILES && (
-        <div className="mt-6">
-          <Button variant="primary" fullWidth onClick={() => navigate('/mulai')}>
-            <Plus className="h-5 w-5" aria-hidden="true" />
-            Tambah Profil Baru ({profileList.length}/{MAX_PROFILES})
-          </Button>
-        </div>
-      )}
+        {profileList.length < MAX_PROFILES && (
+          <li data-enter="deal" className="pw-enter" style={dealStyle(profileList.length)}>
+            <button
+              type="button"
+              onClick={() => navigate('/mulai')}
+              data-press="lg"
+              className="pw-pressable pw-t-colors flex h-full min-h-[11rem] w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--line-strong)] p-[var(--space-card)] text-center text-[var(--ink-2)] hover:border-[var(--world-600)] hover:text-[var(--ink)]"
+            >
+              <span className="grid h-12 w-12 place-items-center rounded-full border-2 border-dashed border-[var(--line-strong)]">
+                <Plus className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <span className="pw-h3">Tambah profil</span>
+              <span className="pw-small">
+                {profileList.length} dari {MAX_PROFILES}
+              </span>
+            </button>
+          </li>
+        )}
+      </ul>
     </div>
   );
 };
