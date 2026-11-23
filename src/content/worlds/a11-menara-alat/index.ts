@@ -26,7 +26,7 @@ export const world: World = {
   order: 11,
   title: 'Menara Alat',
   tagline: t(
-    'Kenali perkakas pembuat web. Simpan kerjamu seperti titik simpan game. Lalu pasang ke internet.',
+    'Kenali perkakas pembuat web. Simpan hasil kerjamu seperti titik simpan di game. Lalu pasang halamanmu di internet.',
     'Kamu bisa memilih framework dan alat yang tepat, lalu membawa proyek dari Git sampai tayang.',
   ),
   color: '#2F6FED',
@@ -388,7 +388,7 @@ export const lessons: Lesson[] = [
   makeLesson({
     id: 'a11-l01',
     worldId: 'a11',
-    title: 'Library vs framework',
+    title: 'Library atau framework',
     modes: ['junior', 'pro'],
     objective: t(
       'Aku bisa membedakan library dan framework.',

@@ -24,8 +24,15 @@ export const testingBasics: Lesson = {
     qStep(testQuestion('q2', 'Apa hasil aktual untuk 100000 saat kode memakai total > 100000?', ['0', '8000', '100000'], 1,
       ['Nilai yang sama belum memenuhi tanda lebih besar.', 'Perbandingan bernilai salah. Fungsi memilih tarif 8000.', 'Fungsi mengembalikan tarif, bukan total belanja.'], 'Bandingkan dua angka yang sama.')),
     conceptStep({
-      title: pro('Jaga kedua sisi batas'), visualName: 'DiagramConcept',
-      visualProps: { worldId: 'a11', topic: 'Nilai batas' }, alt: pro('Ilustrasi Menara Alat'),
+      title: pro('Jaga kedua sisi batas'), visualName: 'BoundaryTest',
+      visualProps: {
+        worldId: 'a11',
+        cases: [
+          { total: 99999, expected: 8000, actual: 8000 },
+          { total: 100000, expected: 0, actual: 8000 },
+        ],
+      },
+      alt: pro('Ongkos kirim yang dijanjikan toko dibanding hasil kode awal untuk dua total belanja.'),
       body: [rPro('Ganti > dengan >= agar tepat di batas juga gratis. Uji harga sedikit di bawah batas serta harga tepat di batas. Jalankan tes lagi setelah memperbaiki kode.')],
       code: { lang: 'js', code: 'import { expect, test } from "vitest";\nconst ongkir = total => total >= 100000 ? 0 : 8000;\ntest("tarif di sekitar batas", () => {\n  expect(ongkir(99999)).toBe(8000);\n  expect(ongkir(100000)).toBe(0);\n});' },
     }),
@@ -67,8 +74,15 @@ export const deploySite: Lesson = {
     qStep(deployQuestion('q2', 'Preview di laptop berhasil. Apa yang sudah diperiksa?', ['Alamat publik pelanggan', 'Proses unggah jarak jauh', 'Hasil build lokal'], 2,
       ['Alamat publik perlu dibuka setelah penerbitan.', 'Perintah preview tidak mengunggah berkas.', 'Preview menyajikan hasil build melalui layanan lokal.'], 'Tentukan komputer yang melayani permintaan.')),
     conceptStep({
-      title: pro('Periksa alamat yang dibuka pelanggan'), visualName: 'DiagramConcept',
-      visualProps: { worldId: 'a11', topic: 'Rilis publik' }, alt: pro('Ilustrasi Menara Alat'),
+      title: pro('Periksa alamat yang dibuka pelanggan'), visualName: 'DeploymentFlow',
+      visualProps: {
+        worldId: 'a11',
+        buildCommand: 'npm run build',
+        outputFolder: 'dist',
+        previewCommand: 'npm run preview',
+        publicUrl: 'https://rani.example',
+      },
+      alt: pro('Build menghasilkan dist untuk ditayangkan. Folder yang sama dapat diperiksa dengan preview lokal.'),
       body: [rPro('Pada layanan hosting statis, unggah seluruh isi dist atau pilih dist sebagai folder keluaran. Buka alamat publik. Periksa judul, gambar, dan tautan. Simpan rilis sebelumnya agar bisa dipulihkan saat perlu.')],
     }),
     qStep(deployQuestion('q3', 'Sesudah rilis, teks tampil tetapi gambar hilang. Pemeriksaan mana paling langsung?', ['Buka alamat gambar publik', 'Ganti nama aplikasi', 'Hapus riwayat pesanan'], 0,

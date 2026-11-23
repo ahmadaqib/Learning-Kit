@@ -12,6 +12,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { LESSON_STUBS, WORLD_STUBS } from '@/components/map/MapPath';
 import { Annot } from '@/components/fx/Annot';
 import { BossCard } from '@/components/world/BossCard';
+import { PetLauncher } from '@/components/pet/PetLauncher';
 import { LessonTrail, type TrailRow, type TrailSideQuest } from '@/components/world/LessonTrail';
 import { Button } from '@/components/ui/Button';
 import { Poster, PosterHeading } from '@/components/ui/Poster';
@@ -41,7 +42,7 @@ export const WorldDetailPage: React.FC = () => {
     return (
       <div className="mx-auto max-w-[640px] space-y-4 p-6 text-center">
         <h1 className="pw-h1">Dunia tidak ditemukan</h1>
-        <Button variant="primary" onClick={() => navigate('/peta/A')}>
+        <Button variant="primary" data-sfx="back" onClick={() => navigate('/peta/A')}>
           Kembali ke Peta
         </Button>
       </div>
@@ -116,11 +117,13 @@ const WorldDetailContent: React.FC<{ profile: Profile; worldId: string; chunkErr
       <div className="mb-4 flex items-center justify-between">
         <Link
           to={`/peta/${meta.track}`}
+          data-sfx="back"
           className="pw-pressable -ml-2 inline-flex min-h-[var(--touch-min)] items-center gap-2 rounded-[var(--radius-md)] px-2 font-bold text-[var(--ink)]"
         >
           <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           <span>Peta Jalur {meta.track}</span>
         </Link>
+        <PetLauncher context={{ surface: 'world' }} />
       </div>
 
       {chunkError && (

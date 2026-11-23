@@ -7,6 +7,7 @@ interface DialogModalProps {
   title: string;
   variant?: 'dialog' | 'sheet';
   lightDismiss?: boolean;
+  soundless?: boolean;
   children: React.ReactNode;
 }
 
@@ -22,6 +23,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
   title,
   variant = 'dialog',
   lightDismiss = true,
+  soundless = false,
   children,
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -93,6 +95,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
       className={dialogClass}
       aria-labelledby={titleId}
       data-rm="fade"
+      data-sfx={soundless ? 'off' : undefined}
       {...({ closedby: lightDismiss ? 'any' : 'closerequest' } as Record<string, string>)}
     >
       {variant === 'sheet' && (

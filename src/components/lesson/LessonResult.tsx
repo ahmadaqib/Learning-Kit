@@ -282,6 +282,7 @@ export const LessonResult: React.FC<LessonResultProps> = (props) => {
       variant={variant}
       fullWidth
       soundEnabled={soundEnabled}
+      data-sfx={hasNextLesson ? undefined : 'back'}
       onClick={hasNextLesson ? onNext : onWorld}
     >
       {hasNextLesson ? 'Pelajaran berikutnya →' : `Kembali ke ${worldTitle} →`}

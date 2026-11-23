@@ -59,9 +59,8 @@ export const npmAndVite = makeLesson({
     })),
     conceptStep({
       title: t('Jalankan skrip Vite'),
-      visualName: 'DiagramConcept',
-      visualProps: { worldId: 'a11', topic: 'Skrip Vite' },
-      alt: t('Pulau Menara Alat dengan gedung kecil.'),
+      visualName: 'NpmViteWorkshopVisual',
+      alt: t('npm run dev membuka situs lokal. npm run build membuat dist untuk preview.'),
       code: {
         lang: 'json',
         code: '{\n  "scripts": {\n    "dev": "vite",\n    "build": "vite build",\n    "preview": "vite preview"\n  }\n}',
@@ -249,9 +248,8 @@ export const browserDevTools = makeLesson({
     }),
     conceptStep({
       title: t('Baca jejak di Network'),
-      visualName: 'DiagramConcept',
-      visualProps: { worldId: 'a11', topic: 'Baca status HTTP' },
-      alt: t('Pulau Menara Alat dengan gedung kecil.'),
+      visualName: 'DevToolsWorkshopVisual',
+      alt: t('Perbandingan status permintaan produk 7 dan 999 di Network.'),
       code: { lang: 'http', code: 'GET /produk/999 HTTP/1.1\n\nHTTP/1.1 404 Not Found' },
       body: [
         rText('Buka Network terlebih dahulu, lalu ulangi tindakan yang gagal. Pilih baris panggilannya. Di '),

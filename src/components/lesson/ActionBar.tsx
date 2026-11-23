@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { Lightbulb, Square, Volume2 } from 'lucide-react';
 import type { Mode } from '@/content/schema';
 import { Button, type ButtonVariant } from '@/components/ui/Button';
@@ -21,6 +21,7 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({ mode, speaking
     return (
       <button
         type="button"
+        data-sfx="off"
         onClick={onToggle}
         aria-label={speaking ? 'Berhenti membaca' : 'Bacakan'}
         aria-pressed={speaking}
@@ -33,6 +34,7 @@ export const ReadAloudButton: React.FC<ReadAloudButtonProps> = ({ mode, speaking
   return (
       <button
         type="button"
+      data-sfx="off"
         onClick={onToggle}
         aria-pressed={speaking}
         className={`pw-pressable inline-flex min-h-[var(--touch-min)] flex-shrink-0 items-center gap-2 rounded-[var(--radius-full)] border-2 border-[var(--line)] bg-[var(--paper)] px-4 font-bold text-[var(--ink)] cursor-pointer ${className}`}
@@ -84,6 +86,19 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   focusKey,
 }) => {
   const barRef = useRef<HTMLDivElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const bar = barRef.current;
+    const spacer = spacerRef.current;
+    if (!bar || !spacer) return;
+    const reserveSpace = () => {
+      spacer.style.height = `calc(${bar.getBoundingClientRect().height}px + 0.75rem)`;
+    };
+    reserveSpace();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(reserveSpace);
+    observer?.observe(bar);
+    return () => observer?.disconnect();
+  }, []);
   useEffect(() => {
     if (focusKey === undefined || covered) return;
     const active = document.activeElement;
@@ -93,22 +108,22 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
   return (
     <>
-      <div aria-hidden="true" className="h-[calc(6.5rem+env(safe-area-inset-bottom))] flex-shrink-0" />
+      <div ref={spacerRef} aria-hidden="true" className="h-[calc(6.5rem+env(safe-area-inset-bottom))] flex-shrink-0" />
       <div
         ref={barRef}
         inert={covered || undefined}
         className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line)] bg-[var(--paper-raised)] shadow-[var(--elev-up)] pw-safe-bottom"
       >
-        <div className="mx-auto flex max-w-[1080px] items-center gap-3 px-4 pt-3 sm:px-6">
+        <div className="mx-auto flex max-w-[1080px] flex-wrap items-center gap-x-3 gap-y-2 px-4 pt-3 sm:px-6">
           {onHint && (
-            <div className="flex flex-shrink-0 items-center gap-2">
+            <div className="flex max-w-full items-center gap-2">
               <button
                 type="button"
                 onClick={onHint}
                 aria-label="Petunjuk"
                 className="pw-pressable inline-flex min-h-[var(--touch-min)] min-w-[var(--touch-min)] items-center justify-center gap-2 rounded-[var(--radius-full)] border-2 border-[var(--line)] bg-[var(--paper)] px-3 font-bold text-[var(--warn-700)] cursor-pointer"
               >
-                <Lightbulb className="h-5 w-5" aria-hidden="true" />
+                <Lightbulb className="h-5 w-5 shrink-0" aria-hidden="true" />
                 <span>Petunjuk</span>
               </button>
               {hintOffer && mode === 'junior' && (
@@ -120,12 +135,11 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           )}
           <Button
             variant={primaryVariant}
-            fullWidth
             disabled={primaryDisabled}
             soundEnabled={soundEnabled}
             onClick={onPrimary}
             data-primary="true"
-            className="min-w-0 flex-1"
+            className="min-w-0 flex-[1_1_7rem] [overflow-wrap:anywhere]"
           >
             {primaryLabel}
           </Button>

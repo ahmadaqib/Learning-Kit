@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Layers, Sparkles } from 'lucide-react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Layers, Sparkles } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { WORLDS_BY_ID, ALL_LESSONS } from '@/content/curriculum';
 import { resolveTxt, type Mode, type Question } from '@/content/schema';
@@ -26,6 +26,7 @@ import { ActionBar, ReadAloudButton } from '@/components/lesson/ActionBar';
 import { FeedbackSheet, feedbackTitle } from '@/components/lesson/FeedbackSheet';
 import { LevelUpBanner, detectLevelUp } from '@/components/lesson/LessonResult';
 import { Bito } from '@/components/mascot/Bito';
+import { PetLauncher } from '@/components/pet/PetLauncher';
 import {
   ALMOST_RATIO,
   QuestionIntro,
@@ -152,6 +153,10 @@ export const ReviewBoxPage: React.FC = () => {
 
   useEffect(() => () => timerRef.current?.dispose(), []);
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeSession, sessionDone]);
+
   if (!profile) return null;
 
   const boxes = getBoxDistribution(Object.fromEntries(Object.entries(profile.leitner).filter(([id]) => library.cards.has(id))));
@@ -195,6 +200,15 @@ export const ReviewBoxPage: React.FC = () => {
   /* ---- A card ---- */
   if (activeSession && current) {
     const cur = current;
+
+    const leaveSession = () => {
+      reader.stop();
+      timerRef.current?.dispose();
+      timerRef.current = null;
+      setAnswerVal(undefined);
+      setFeedback(null);
+      setActiveSession(false);
+    };
 
     const checkCard = () => {
       reader.stop();
@@ -254,7 +268,11 @@ export const ReviewBoxPage: React.FC = () => {
       cur.q.type === 'order';
 
     return (
-      <div className="mx-auto flex min-h-[85dvh] max-w-[680px] flex-col px-4 py-6">
+      <div data-review-in-progress className="mx-auto flex min-h-[85dvh] w-full max-w-[680px] flex-col px-4 py-6">
+        <Button variant="ghost" data-sfx="back" onClick={leaveSession} className="mb-3 self-start">
+          <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>Kembali ke Kotak Ulang</span>
+        </Button>
         <div className="mb-4 flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <ProgressBar value={(idx / sessionCards.length) * 100} label="Kemajuan Kotak Ulang" />
@@ -346,9 +364,9 @@ export const ReviewBoxPage: React.FC = () => {
   /* ---- Landing ---- */
   return (
     <div className="mx-auto max-w-[720px] space-y-6 px-4 py-6 sm:px-6">
-      <header className="flex items-center gap-3">
+      <header className="flex flex-wrap items-center gap-3">
         <Layers className="h-7 w-7 flex-shrink-0 text-[var(--world-700)]" aria-hidden="true" />
-        <div>
+        <div className="min-w-[min(100%,12rem)] flex-1">
           <h1 className="pw-h1">Kotak Ulang</h1>
           <p className="pw-small m-0 text-[var(--ink-2)]">
             {sessionSize > 0
@@ -359,6 +377,7 @@ export const ReviewBoxPage: React.FC = () => {
             <p className="pw-small m-0 mt-1 text-[var(--ink-2)]">Soal lama muncul lagi di sini supaya kamu tidak lupa.</p>
           )}
         </div>
+        <PetLauncher context={{ surface: 'review' }} />
       </header>
 
       <div className="pw-card p-5">
@@ -518,7 +537,7 @@ const ReviewDone: React.FC<{
         </div>
       )}
 
-      <Button variant="primary" fullWidth soundEnabled={soundEnabled} onClick={() => onNavigate(nextRoute ?? '/beranda')}>
+      <Button variant="primary" fullWidth soundEnabled={soundEnabled} data-sfx={nextRoute ? undefined : 'back'} onClick={() => onNavigate(nextRoute ?? '/beranda')}>
         {nextRoute ? 'Lanjut ke pelajaran →' : 'Kembali ke Beranda'}
       </Button>
     </div>

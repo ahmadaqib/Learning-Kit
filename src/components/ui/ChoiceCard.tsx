@@ -126,7 +126,7 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
           {icon}
         </span>
       )}
-      <span className="flex-1 pw-body leading-snug">
+      <span className="pw-body min-w-0 flex-1 leading-snug [overflow-wrap:anywhere]">
         {prefixLabel && (
           <span className="mr-2 inline-block rounded-[var(--radius-xs)] bg-[var(--paper-2)] px-2 py-0.5 text-xs font-extrabold text-[var(--ink-2)]">
             {prefixLabel}

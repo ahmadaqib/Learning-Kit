@@ -19,6 +19,7 @@ import { Annot } from '@/components/fx/Annot';
 import { Doodle } from '@/components/fx/Doodle';
 import { Bito } from '@/components/mascot/Bito';
 import { CharacterAvatar } from '@/components/mascot/CharacterAvatar';
+import { PetLauncher } from '@/components/pet/PetLauncher';
 import { Button } from '@/components/ui/Button';
 import { Poster, PosterHeading } from '@/components/ui/Poster';
 import { StorageWarningBanner } from '@/components/ui/StorageWarningBanner';
@@ -314,29 +315,32 @@ const HomeContent: React.FC = () => {
             <p className="pw-small m-0 text-[var(--ink-2)]">{levelInfo.title}</p>
           </div>
         </div>
-        <Link
-          to="/profil"
-          className={`pw-pressable inline-flex min-h-[44px] flex-col justify-center gap-1 rounded-[var(--radius-md)] border-2 border-[var(--line)] bg-[var(--paper)] px-3.5 py-1.5 font-extrabold text-[var(--ink)] hover:border-[var(--world-600)] ${
-            junior ? '' : 'font-mono tabular-nums'
-          }`}
-        >
-          <span className="pw-small font-extrabold">
-            {junior ? levelLabel(levelInfo.level, 'junior') : `${levelLabel(levelInfo.level, 'pro')} · ${profile.xp} ${xpWord('pro')}`}
-          </span>
-          {!junior && (
-            <span aria-hidden="true" className="block h-1 w-full overflow-hidden rounded-full bg-[var(--line)]">
-              <span
-                className="pw-fill block h-full w-full rounded-full bg-[var(--star)]"
-                style={{ '--p': levelInfo.progressRatio } as React.CSSProperties}
-              />
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/profil"
+            className={`pw-pressable inline-flex min-h-[44px] flex-col justify-center gap-1 rounded-[var(--radius-md)] border-2 border-[var(--line)] bg-[var(--paper)] px-3.5 py-1.5 font-extrabold text-[var(--ink)] hover:border-[var(--world-600)] ${
+              junior ? '' : 'font-mono tabular-nums'
+            }`}
+          >
+            <span className="pw-small font-extrabold">
+              {junior ? levelLabel(levelInfo.level, 'junior') : `${levelLabel(levelInfo.level, 'pro')} · ${profile.xp} ${xpWord('pro')}`}
             </span>
-          )}
-          {!junior && (
-            <span className="text-xs font-bold text-[var(--ink-2)]">
-              {levelInfo.nextLevelXp - levelInfo.currentXp} XP lagi ke {levelLabel(levelInfo.level + 1, 'pro')}
-            </span>
-          )}
-        </Link>
+            {!junior && (
+              <span aria-hidden="true" className="block h-1 w-full overflow-hidden rounded-full bg-[var(--line)]">
+                <span
+                  className="pw-fill block h-full w-full rounded-full bg-[var(--star)]"
+                  style={{ '--p': levelInfo.progressRatio } as React.CSSProperties}
+                />
+              </span>
+            )}
+            {!junior && (
+              <span className="text-xs font-bold text-[var(--ink-2)]">
+                {levelInfo.nextLevelXp - levelInfo.currentXp} XP lagi ke {levelLabel(levelInfo.level + 1, 'pro')}
+              </span>
+            )}
+          </Link>
+          <PetLauncher context={{ surface: 'home' }} />
+        </div>
       </header>
 
       {/* Compact: one column. Expanded (>= 1024 px): poster on the left, the rest on the right. */}

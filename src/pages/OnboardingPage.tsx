@@ -458,7 +458,7 @@ export const OnboardingPage: React.FC = () => {
           </Button>
         )}
         {step > 1 && (
-          <Button variant="ghost" fullWidth soundEnabled onClick={() => setStep((step - 1) as 1 | 2)}>
+          <Button variant="ghost" fullWidth soundEnabled data-sfx="back" onClick={() => setStep((step - 1) as 1 | 2)}>
             ← Kembali
           </Button>
         )}

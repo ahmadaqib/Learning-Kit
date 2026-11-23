@@ -583,8 +583,11 @@
 
 .pw-choices-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--gap-stack);
+  /* Keep the answer pulse inside the page while leaving room for focus outlines. */
+  overflow-x: clip;
+  overflow-clip-margin: 12px;
 }
 
 @container (min-width: 560px) {
@@ -619,17 +622,14 @@
 }
 
 .pw-bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
+  position: sticky;
   bottom: 0;
   z-index: 30;
   background-color: var(--paper-raised);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   box-shadow: var(--elev-up);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 6px 8px max(6px, env(safe-area-inset-bottom));
 }
 
@@ -637,7 +637,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  min-width: 0;
+  padding-bottom: 8px;
 }
 
 @media (min-width: 1024px), (max-height: 499px) and (min-width: 600px) {
@@ -653,6 +654,7 @@
     height: 100dvh;
     width: 104px;
     flex-shrink: 0;
+    overflow-y: auto;
     background-color: var(--paper-raised);
     border-right: 1.5px solid var(--line);
     display: flex;
@@ -668,6 +670,16 @@
   .pw-main-with-nav {
     padding-bottom: 32px;
   }
+}
+
+/* The review lobby and result retain the shell. The active session has its own controls. */
+.pw-shell:has([data-review-in-progress]) > :is(.pw-bottom-nav, .pw-side-rail),
+.pw-main-with-nav:has([data-review-in-progress]) > footer {
+  display: none;
+}
+
+.pw-main-with-nav:has([data-review-in-progress]) {
+  padding-bottom: 0;
 }
 
 @media (max-height: 499px) and (min-width: 600px) {

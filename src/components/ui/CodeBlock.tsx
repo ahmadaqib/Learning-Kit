@@ -3,13 +3,14 @@ import type { CodeSnippet } from '@/content/schema';
 
 interface CodeBlockProps {
   snippet: CodeSnippet;
+  wrapLines?: boolean;
 }
 
 /**
  * A code block is a dark surface in both themes (`--boss` and `--on-boss`), like an editor. The highlighted
  * line is also bold, so it never depends on colour alone.
  */
-export const CodeBlock: React.FC<CodeBlockProps> = ({ snippet }) => {
+export const CodeBlock: React.FC<CodeBlockProps> = ({ snippet, wrapLines = false }) => {
   const lines = snippet.code.split('\n');
   const highlightSet = new Set(snippet.highlight ?? []);
 
@@ -44,7 +45,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ snippet }) => {
                 >
                   {lineNum}
                 </span>
-                <span className="whitespace-pre">{line}</span>
+                <span className={wrapLines ? 'min-w-0 whitespace-pre-wrap wrap-anywhere' : 'whitespace-pre'}>{line}</span>
               </div>
             );
           })}

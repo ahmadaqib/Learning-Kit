@@ -23,7 +23,7 @@ export const world: World = {
   order: 6,
   title: 'Lonceng Kejadian',
   tagline: t(
-    'Bel pintu berbunyi saat pesanan lunas. Tugasnya antre, lalu pekerja mengambilnya satu per satu.',
+    'Bel pintu berbunyi saat pesanan lunas. Kabar itu antre, lalu pekerja mengambilnya satu per satu.',
     'Kamu bisa menerima kabar dari sistem lain lewat webhook dan memprosesnya dengan antrean pesan.',
   ),
   color: '#2BA84A',
