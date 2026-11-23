@@ -1,0 +1,1481 @@
+/*
+ * motion.css - the whole motion contract of the playful redesign.
+ * Spec: docs/superpowers/specs/2026-11-22-playful-redesign-design.md, sections 5.3 and 5.9 (v2 wins).
+ *
+ * Rules every effect here follows:
+ *  - transform / opacity only (stroke-dashoffset for drawn strokes). Never box-shadow, filter, backdrop-filter.
+ *  - A duration is calc(<ms> * var(--motion-scale)). A start time is the custom property --at
+ *    (set it on the element; a time with a unit, e.g. style={{ '--at': '120ms' }}). The delay is
+ *    calc(var(--at, 0ms) * var(--motion-scale)). --fx-dur overrides the default duration of a class
+ *    (also a time with a unit, set on the same element).
+ *  - No transition: all, no accelerating built-in easing keyword, nothing enters from scale(0), no keyframe outside this file.
+ *  - Every keyframe animation ends in the element's resting state, so "0.01ms, one iteration"
+ *    (reduced-motion contract, bottom of the file) lands on the right final frame.
+ *  - Entrance containers use fill-mode `backwards` (not `both`): a finished animation must not leave
+ *    a transform behind, because a transformed ancestor becomes the containing block of position:fixed children.
+ *  - Nothing here sets will-change. The browser promotes transform/opacity animations by itself, and a
+ *    permanent will-change is not allowed (spec 9.4).
+ */
+
+@property --at {
+  syntax: '<time>';
+  inherits: false;
+  initial-value: 0ms;
+}
+
+@property --stamp-from {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1.9;
+}
+
+/* ------------------------------------------------------------------ keyframes */
+
+@keyframes pw-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pw-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Entrances (M11, M12, M13, M42, pop) */
+@keyframes pw-enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-enter-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-enter-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-enter-deal {
+  from {
+    opacity: 0;
+    transform: translateY(16px) rotate(-4deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-enter-retry {
+  from {
+    opacity: 0;
+    transform: translateY(12px) rotate(-1.5deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Strokes (M05) */
+@keyframes pw-draw {
+  from {
+    stroke-dashoffset: var(--draw-from, 1);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Dialog and sheet (M08) */
+@keyframes pw-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* Kinetic headline (M06) */
+@keyframes pw-kt-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em) rotate(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-kt-boil-a {
+  0% {
+    transform: rotate(0.6deg) translateY(0.5px);
+  }
+  50% {
+    transform: rotate(-0.6deg) translateY(-0.5px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pw-kt-boil-b {
+  0% {
+    transform: rotate(-0.6deg) translateY(-0.5px);
+  }
+  50% {
+    transform: rotate(0.6deg) translateY(0.5px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Answer feedback (M19, M20, M23) */
+@keyframes pw-fx-correct {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-ring {
+  from {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes pw-fx-almost {
+  0% {
+    transform: translateX(0);
+    animation-timing-function: var(--ease-out);
+  }
+  25% {
+    transform: translateX(-4px);
+    animation-timing-function: var(--ease-out);
+  }
+  55% {
+    transform: translateX(3px);
+    animation-timing-function: var(--ease-out);
+  }
+  80% {
+    transform: translateX(-1px);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-bump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(var(--bump, 1.18));
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Impact (M27, M30, M33, 5.9.5 B, C) */
+@keyframes pw-fx-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(var(--stamp-from, 1.9)) rotate(-14deg);
+    animation-timing-function: var(--ease-impact);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.92) rotate(2deg);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-slap {
+  0% {
+    opacity: 0;
+    transform: scale(1.5) rotate(-13deg);
+    animation-timing-function: var(--ease-impact);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.96) rotate(1deg);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-thump {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-sheen {
+  from {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  to {
+    transform: translateX(120%) skewX(-20deg);
+  }
+}
+
+/* Small moves */
+@keyframes pw-fx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-hop {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-hit {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(0.92) rotate(-4deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-grow {
+  from {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-reveal-l {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-reveal-r {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Halfway note (M50). Uses the individual rotate and scale properties, so it composes with .pw-hand */
+@keyframes pw-fx-note {
+  from {
+    opacity: 0;
+    scale: 0.9;
+    rotate: -5deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: -2deg;
+  }
+}
+
+@keyframes pw-fx-settle {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-flash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pw-fx-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Overlays (5.9.5 C, D, E) */
+@keyframes pw-fx-roll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes pw-fx-lock {
+  0% {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(calc(var(--side, 1) * -6deg));
+  }
+  30% {
+    opacity: 1;
+    transform: rotate(calc(var(--side, 1) * 6deg));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--side, 1) * 18px), 12px) rotate(calc(var(--side, 1) * 24deg));
+  }
+}
+
+@keyframes pw-fx-peel {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) rotate(-10deg);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pw-fx-gate {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(var(--side, 1) * 100%));
+  }
+}
+
+/* Confetti (M28). Every keyframe lists translate, scale and rotate, so they interpolate per function */
+@keyframes pw-confetti {
+  0% {
+    opacity: 1;
+    transform: translate(0px, 0px) scale(0.6) rotate(0deg);
+    animation-timing-function: var(--ease-out);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(calc(var(--dx, 0px) * 0.7), var(--peak, -140px)) scale(1)
+      rotate(calc(var(--rot, 360deg) * 0.4));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.55);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 0px), var(--fall, 320px)) scale(1) rotate(var(--rot, 360deg));
+  }
+}
+
+/* Sparks and dust (Burst) */
+@keyframes pw-burst {
+  from {
+    opacity: 1;
+    transform: rotate(var(--a, 0deg)) translateY(calc(var(--r, 18px) * -1));
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--a, 0deg)) translateY(calc((var(--r, 18px) + var(--travel, 14px)) * -1));
+  }
+}
+
+/* Progress glint (M24) */
+@keyframes pw-glint {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Loader (M14) */
+@keyframes pw-loader-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pw-loader-dash {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+/* Bito (M44, M45, M47) */
+@keyframes pw-bito-hold {
+  from,
+  to {
+    transform: none;
+  }
+}
+
+@keyframes pw-bito-hop {
+  0% {
+    transform: translateY(0) scale(1, 1);
+    animation-timing-function: var(--ease-out);
+  }
+  25% {
+    transform: translateY(0) scale(1.06, 0.92);
+    animation-timing-function: var(--ease-out);
+  }
+  55% {
+    transform: translateY(-8px) scale(0.96, 1.05);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pw-bito-hop2 {
+  0%,
+  45%,
+  100% {
+    transform: translateY(0);
+  }
+  22%,
+  72% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pw-bito-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  17%,
+  50%,
+  83% {
+    transform: rotate(-18deg);
+  }
+  33%,
+  67% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pw-bito-arm-up-l {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20%,
+  80% {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes pw-bito-arm-up-r {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20%,
+  80% {
+    transform: rotate(24deg);
+  }
+}
+
+@keyframes pw-bito-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  35%,
+  65% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes pw-bito-wow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes pw-bito-eyes-wow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes pw-bito-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pw-bito-antenna-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes pw-bito-antenna-bounce {
+  0% {
+    transform: rotate(0deg) scaleY(1);
+  }
+  25% {
+    transform: rotate(-14deg) scaleY(0.9);
+  }
+  55% {
+    transform: rotate(10deg) scaleY(1.06);
+  }
+  80% {
+    transform: rotate(-4deg) scaleY(1);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* One blink (140 ms) at the start of each 6 s cycle, and one antenna swing (1200 ms) with it */
+@keyframes pw-bito-blink {
+  0% {
+    transform: scaleY(1);
+  }
+  1.2% {
+    transform: scaleY(0.1);
+  }
+  2.35% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pw-bito-sway {
+  0% {
+    transform: rotate(0deg);
+  }
+  5% {
+    transform: rotate(4deg);
+  }
+  15% {
+    transform: rotate(-4deg);
+  }
+  20%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* ------------------------------------------------------------------ entrances (M07, M11, M12, M13, M42) */
+
+@layer components {
+  .pw-enter {
+    animation-fill-mode: backwards;
+  }
+
+  .pw-enter[data-enter='rise'] {
+    animation: pw-enter-rise calc(var(--fx-dur, var(--dur-base)) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  .pw-enter[data-enter='right'] {
+    animation: pw-enter-right calc(var(--fx-dur, var(--dur-base)) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  .pw-enter[data-enter='fade'],
+  .pw-enter[data-enter='left'] {
+    animation: pw-fade-in 120ms var(--ease-out) calc(var(--at, 0ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  .pw-enter[data-enter='pop'] {
+    animation: pw-enter-pop calc(var(--fx-dur, var(--dur-pop)) * var(--motion-scale)) var(--ease-pop)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  .pw-enter[data-enter='deal'] {
+    animation: pw-enter-deal calc(260ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  .pw-enter[data-enter='retry'] {
+    animation: pw-enter-retry calc(var(--fx-dur, var(--dur-pop)) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  /* M07: a stagger by position. Starts 0, 50, 90, 120, 145, 165 ms, every later child 180 ms.
+     A child can set its own --at inline. */
+  .pw-stagger > * {
+    animation: pw-enter-rise calc(var(--fx-dur, var(--dur-pop)) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 backwards;
+    --at: 180ms;
+  }
+  .pw-stagger > :nth-child(1) {
+    --at: 0ms;
+  }
+  .pw-stagger > :nth-child(2) {
+    --at: 50ms;
+  }
+  .pw-stagger > :nth-child(3) {
+    --at: 90ms;
+  }
+  .pw-stagger > :nth-child(4) {
+    --at: 120ms;
+  }
+  .pw-stagger > :nth-child(5) {
+    --at: 145ms;
+  }
+  .pw-stagger > :nth-child(6) {
+    --at: 165ms;
+  }
+
+  /* Profile Select deal-in (M42): 0, 60, 110, 150, then +30 ms per card up to 240 ms */
+  .pw-stagger[data-stagger='deal'] > * {
+    animation-name: pw-enter-deal;
+    animation-duration: calc(260ms * var(--motion-scale));
+    --at: 240ms;
+  }
+  .pw-stagger[data-stagger='deal'] > :nth-child(1) {
+    --at: 0ms;
+  }
+  .pw-stagger[data-stagger='deal'] > :nth-child(2) {
+    --at: 60ms;
+  }
+  .pw-stagger[data-stagger='deal'] > :nth-child(3) {
+    --at: 110ms;
+  }
+  .pw-stagger[data-stagger='deal'] > :nth-child(4) {
+    --at: 150ms;
+  }
+  .pw-stagger[data-stagger='deal'] > :nth-child(5) {
+    --at: 180ms;
+  }
+  .pw-stagger[data-stagger='deal'] > :nth-child(6) {
+    --at: 210ms;
+  }
+
+  /* ---------------------------------------------------------------- strokes and text */
+
+  .pw-draw {
+    stroke-dasharray: 1;
+    animation: pw-draw calc(var(--fx-dur, var(--dur-draw)) * var(--motion-scale)) var(--ease-out-expo)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* KineticText (M06): letters pop in (260 ms, start min(i x 24, 360) ms), then boil three cycles of 700 ms.
+     Odd and even letters use opposite frames, half a cycle apart. */
+  .pw-kt-letter {
+    display: inline-block;
+    white-space: pre;
+    animation: pw-kt-pop calc(260ms * var(--motion-scale)) var(--ease-spring)
+      calc((var(--at, 0ms) + min(var(--i, 0) * 24, 360) * 1ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  .pw-boil .pw-kt-letter {
+    animation:
+      pw-kt-pop calc(260ms * var(--motion-scale)) var(--ease-spring)
+        calc((var(--at, 0ms) + min(var(--i, 0) * 24, 360) * 1ms) * var(--motion-scale)) 1 backwards,
+      pw-kt-boil-a calc(700ms * var(--motion-scale)) steps(1, end)
+        calc((var(--at, 0ms) + 640ms) * var(--motion-scale)) 3 backwards;
+  }
+
+  .pw-boil .pw-kt-letter:nth-child(even) {
+    animation:
+      pw-kt-pop calc(260ms * var(--motion-scale)) var(--ease-spring)
+        calc((var(--at, 0ms) + min(var(--i, 0) * 24, 360) * 1ms) * var(--motion-scale)) 1 backwards,
+      pw-kt-boil-b calc(700ms * var(--motion-scale)) steps(1, end)
+        calc((var(--at, 0ms) + 640ms) * var(--motion-scale)) 3 backwards;
+  }
+
+  /* ---------------------------------------------------------------- answer feedback (M19, M20, M23) */
+
+  .pw-fx-correct {
+    animation: pw-fx-correct calc(var(--fx-dur, 220ms) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-almost {
+    animation: pw-fx-almost calc(240ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-bump {
+    animation: pw-fx-bump calc(var(--fx-dur, 200ms) * var(--motion-scale)) var(--ease-pop)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* Ring: a pseudo-element, so no box-shadow is animated. Colour via --ring-color.
+     data-ring="2": two 600 ms pulses, then a static ring (::before) stays. */
+  .pw-fx-ring {
+    position: relative;
+  }
+  .pw-fx-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 3px solid var(--ring-color, var(--ok-500));
+    pointer-events: none;
+    animation: pw-fx-ring calc(360ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+  .pw-fx-ring[data-ring='2']::after {
+    animation-duration: calc(600ms * var(--motion-scale));
+    animation-iteration-count: 2;
+  }
+  .pw-fx-ring[data-ring='2']::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--ring-color, var(--ok-500));
+    pointer-events: none;
+    animation: pw-fade-in calc(200ms * var(--motion-scale)) var(--ease-out)
+      calc((var(--at, 0ms) + 1200ms) * var(--motion-scale)) 1 backwards;
+  }
+
+  /* Ring pulse that is also a compatibility class: .pw-anim-pulse (two pulses) */
+  .pw-anim-pulse {
+    position: relative;
+  }
+  .pw-anim-pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 3px solid var(--ring-color, var(--world-600));
+    pointer-events: none;
+    animation: pw-fx-ring calc(600ms * var(--motion-scale)) var(--ease-out) 2 both;
+  }
+
+  /* ---------------------------------------------------------------- impact (M27, M30, M33, 5.9.5 B) */
+
+  .pw-fx-stamp {
+    animation: pw-fx-stamp calc(var(--fx-dur, 300ms) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-slap {
+    animation: pw-fx-slap calc(380ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-thump {
+    animation: pw-fx-thump calc(140ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* A stripe that sweeps across its parent once. The parent needs position: relative and overflow: hidden.
+     data-tone="gold" tints it with --star. */
+  .pw-fx-sheen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 38%,
+      color-mix(in srgb, var(--sheen-color, #fff) 60%, transparent) 50%,
+      transparent 62%
+    );
+    transform: translateX(-120%) skewX(-20deg);
+    animation: pw-fx-sheen calc(520ms * var(--motion-scale)) var(--ease-in-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+  .pw-fx-sheen[data-tone='gold'] {
+    --sheen-color: var(--star);
+  }
+
+  /* ---------------------------------------------------------------- small moves */
+
+  .pw-fx-rise {
+    animation: pw-fx-rise calc(var(--fx-dur, 220ms) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-fade {
+    animation: pw-fade-in calc(var(--fx-dur, 200ms) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-out {
+    animation: pw-fade-out calc(140ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-hop {
+    animation: pw-fx-hop calc(240ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-hit {
+    animation: pw-fx-hit calc(240ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-grow {
+    transform-origin: bottom center;
+    animation: pw-fx-grow calc(var(--fx-dur, 360ms) * var(--motion-scale)) var(--ease-spring)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* Hint offer (M25) and limit-card reveal (M26): data-from="left" (4 px) or "right" (12 px) */
+  .pw-fx-reveal {
+    animation: pw-fx-reveal-r calc(200ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+  .pw-fx-reveal[data-from='left'] {
+    animation-name: pw-fx-reveal-l;
+  }
+
+  /* Halfway note (M50). Put it on an element that also has .pw-hand (rotate -2deg at rest) */
+  .pw-fx-note {
+    animation: pw-fx-note calc(260ms * var(--motion-scale)) var(--ease-spring)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* Arrow-button reorder (M18): the moved row plays scale(1.02 to 1) */
+  .pw-fx-settle {
+    animation: pw-fx-settle calc(160ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+
+  /* Drop-target flash (M18): a pseudo-element ring, opacity 1 to 0 */
+  .pw-fx-flash {
+    position: relative;
+  }
+  .pw-fx-flash::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--ring-color, var(--world-600));
+    pointer-events: none;
+    animation: pw-fx-flash calc(300ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+
+  /* Empty state (M46): 4 s, three cycles. Fixed */
+  .pw-fx-breathe {
+    animation: pw-fx-breathe 4s var(--ease-in-out) 3 both;
+  }
+
+  /* ---------------------------------------------------------------- overlays */
+
+  /* Level digit roll: a clipped box holding a strip of old and new digit (each 1em high) */
+  .pw-fx-roll-box {
+    display: inline-block;
+    overflow: hidden;
+    height: 1em;
+    line-height: 1;
+    vertical-align: bottom;
+  }
+  .pw-fx-roll {
+    display: block;
+    animation: pw-fx-roll calc(420ms * var(--motion-scale)) var(--ease-in-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+  .pw-fx-roll > * {
+    display: block;
+    height: 1em;
+    line-height: 1;
+  }
+
+  .pw-fx-lock {
+    animation: pw-fx-lock calc(320ms * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+  .pw-fx-lock[data-side='l'],
+  .pw-fx-gate[data-side='l'] {
+    --side: -1;
+  }
+  .pw-fx-lock[data-side='r'],
+  .pw-fx-gate[data-side='r'] {
+    --side: 1;
+  }
+
+  .pw-fx-peel {
+    animation: pw-fx-peel calc(480ms * var(--motion-scale)) var(--ease-spring)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  .pw-fx-gate {
+    animation: pw-fx-gate calc(520ms * var(--motion-scale)) var(--ease-in-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* ---------------------------------------------------------------- particles */
+
+  /* ConfettiBurst places each piece at the centre of its origin element. Per piece, by index:
+     --dx -160..160px, --peak -80..-220px, --fall 240..420px, --rot +-540deg, --dur 1000..1300ms, --at 0..90ms,
+     --c a colour token. Pro is capped at 800 ms and is not scaled. */
+  .pw-confetti-piece {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 12px;
+    margin: -6px 0 0 -4px;
+    border-radius: 2px;
+    background-color: var(--c, var(--star));
+    pointer-events: none;
+    animation: pw-confetti var(--dur, 1200ms) linear calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+  .pw-confetti-piece[data-shape='dot'] {
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+  }
+  .pw-confetti-piece[data-shape='spark'] {
+    width: 3px;
+    height: 12px;
+    margin: -6px 0 0 -1.5px;
+    border-radius: 2px;
+  }
+  :root[data-mode='pro'] .pw-confetti-piece {
+    animation-duration: min(var(--dur, 800ms), 800ms);
+  }
+
+  /* Burst (sparks and dust): strokes that leave a centre point along their own angle */
+  .pw-burst {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    color: var(--star);
+  }
+  .pw-burst-s {
+    position: absolute;
+    left: -1.5px;
+    top: -5px;
+    width: 3px;
+    height: 10px;
+    border-radius: 2px;
+    background-color: currentColor;
+    animation: pw-burst calc(var(--fx-dur, 320ms) * var(--motion-scale)) var(--ease-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* ---------------------------------------------------------------- progress, loader */
+
+  /* Progress fill (M24): a transition on scaleX, origin left. Set --p (0..1) on the fill element. */
+  .pw-fill {
+    transform-origin: left center;
+    transform: scaleX(var(--p, 0));
+    transition: transform calc(240ms * var(--motion-scale)) var(--ease-out);
+  }
+
+  /* Glint: a pseudo-element that slides once across its parent. Add the class when the bar reaches 100%
+     (or 50% with the halfway note). Parent needs position: relative and overflow: hidden. */
+  .pw-fx-glint {
+    position: relative;
+    overflow: hidden;
+  }
+  .pw-fx-glint::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transform: translateX(-100%);
+    animation: pw-glint calc(500ms * var(--motion-scale)) var(--ease-in-out)
+      calc(var(--at, 0ms) * var(--motion-scale)) 1 both;
+  }
+
+  /* PageLoader (M14): nothing for 150 ms, then a 120 ms fade. Bob 900 ms, dashes 600 ms. Fixed */
+  .pw-loader {
+    animation: pw-fade-in 120ms var(--ease-out) 150ms 1 backwards;
+  }
+  .pw-loader-bob {
+    animation: pw-loader-bob 900ms var(--ease-in-out) infinite;
+  }
+  .pw-loader-dash {
+    stroke-dasharray: 8 8;
+    animation: pw-loader-dash 600ms linear infinite;
+  }
+  /* After 3 s of waiting the loops stop and the text changes (PageLoader sets data-slow). */
+  .pw-loader[data-slow] .pw-loader-bob,
+  .pw-loader[data-slow] .pw-loader-dash {
+    animation: none;
+  }
+
+  /* ---------------------------------------------------------------- Bito (5.7, M44, M45, M47) */
+
+  .bito {
+    overflow: visible;
+  }
+  .bito g {
+    transform-box: fill-box;
+  }
+  .bito .bito-antenna {
+    transform-origin: 50% 100%;
+  }
+  .bito .bito-arm-l {
+    transform-origin: 100% 50%;
+  }
+  .bito .bito-arm-r {
+    transform-origin: 0% 50%;
+  }
+  .bito .bito-eyes {
+    transform-origin: 50% 50%;
+  }
+  .bito .bito-body {
+    transform-origin: 50% 100%;
+  }
+
+  /* Bito.tsx sets data-react on the root <svg> and removes it when the root's animationend fires.
+     Every reaction therefore has one root animation that lasts the whole reaction. */
+  .bito[data-react='wave'] {
+    animation: pw-bito-hold calc(900ms * var(--motion-scale)) linear 1 both;
+  }
+  .bito[data-react='wave'] .bito-arm-l {
+    animation: pw-bito-wave calc(900ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+
+  .bito[data-react='happy'] {
+    animation: pw-bito-hop calc(420ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+  .bito[data-react='happy'] .bito-antenna {
+    animation: pw-bito-antenna-pulse calc(420ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+
+  .bito[data-react='cheer'] {
+    animation: pw-bito-hop2 calc(900ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+  .bito[data-react='cheer'] .bito-arm-l {
+    animation: pw-bito-arm-up-l calc(900ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+  .bito[data-react='cheer'] .bito-arm-r {
+    animation: pw-bito-arm-up-r calc(900ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+
+  .bito[data-react='think'] {
+    animation: pw-bito-tilt calc(600ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+
+  .bito[data-react='wow'] {
+    animation: pw-bito-wow calc(420ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+  .bito[data-react='wow'] .bito-eyes {
+    animation: pw-bito-eyes-wow calc(420ms * var(--motion-scale)) var(--ease-out) 1 both;
+  }
+
+  .bito[data-react='spin'] {
+    animation: pw-bito-spin calc(600ms * var(--motion-scale)) var(--ease-in-out) 1 both;
+  }
+
+  .bito[data-react='bounce'] {
+    animation: pw-bito-hold calc(420ms * var(--motion-scale)) linear 1 both;
+  }
+  .bito[data-react='bounce'] .bito-antenna {
+    animation: pw-bito-antenna-bounce calc(420ms * var(--motion-scale)) var(--ease-spring) 1 both;
+  }
+
+  /* Idle (M44): first blink at 2.5 s, then every 6 s, four cycles, then rest. Fixed. */
+  .bito[data-idle='on'] .bito-eyes {
+    animation: pw-bito-blink 6s linear 2500ms 4 backwards;
+  }
+  .bito[data-idle='on'] .bito-antenna {
+    animation: pw-bito-sway 6s linear 2500ms 4 backwards;
+  }
+
+  /* ---------------------------------------------------------------- flip (M31) */
+
+  .pw-flip {
+    perspective: 800px;
+  }
+  .pw-flip-inner {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform calc(280ms * var(--motion-scale)) var(--ease-in-out);
+  }
+  .pw-flip[aria-pressed='true'] .pw-flip-inner {
+    transform: rotateY(180deg);
+  }
+  .pw-flip-face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .pw-flip-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+  }
+
+  /* ---------------------------------------------------------------- dialog and sheet (M08) */
+
+  dialog.pw-dialog[open] {
+    animation: pw-dialog-in 200ms var(--ease-out) both;
+  }
+  dialog.pw-sheet[open] {
+    animation: pw-sheet-in 280ms var(--ease-drawer) both;
+  }
+  dialog.pw-dialog[open]::backdrop,
+  dialog.pw-sheet[open]::backdrop {
+    animation: pw-fade-in 160ms var(--ease-out) both;
+  }
+
+  /* ---------------------------------------------------------------- transitions for the constant tier */
+
+  /* Named-property transitions: use these instead of transition-all */
+  .pw-t-colors {
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease;
+  }
+  .pw-t-move {
+    transition: transform 160ms var(--ease-out);
+  }
+  .pw-t-opacity {
+    transition: opacity 140ms ease;
+  }
+
+  /* Drag (M18): lift scale(1.03) in 120 ms, drop back in 200 ms --ease-pop. Set data-dragging on the item */
+  .pw-drag-item {
+    position: relative;
+    transition: transform 200ms var(--ease-pop);
+  }
+  .pw-drag-item[data-dragging='true'] {
+    transform: scale(1.03);
+    z-index: 2;
+    transition: transform 120ms var(--ease-out);
+  }
+  .pw-drag-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: var(--elev-2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+  }
+  .pw-drag-item[data-dragging='true']::after {
+    opacity: 1;
+  }
+
+  /* Sheen follow (M03): useSheen moves .pw-sheen-blob with style.transform. No custom property on the parent. */
+  .pw-sheen-host {
+    position: relative;
+    overflow: hidden;
+  }
+  .pw-sheen-blob {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.9), transparent 65%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  .pw-sheen-host[data-sheen='on'] .pw-sheen-blob {
+    opacity: 0.35;
+    transition-duration: 140ms;
+    will-change: transform;
+  }
+
+  /* ---------------------------------------------------------------- compatibility (until Packages 1 to 4 migrate) */
+
+  .pw-anim-slide-up {
+    animation: pw-enter-rise calc(var(--dur-base) * var(--motion-scale)) var(--ease-out) backwards;
+  }
+  .pw-anim-pop {
+    animation: pw-enter-pop calc(var(--dur-pop) * var(--motion-scale)) var(--ease-pop) backwards;
+  }
+  .pw-anim-star {
+    animation: pw-fx-stamp calc(300ms * var(--motion-scale)) var(--ease-out) both;
+  }
+  .pw-anim-shake {
+    animation: pw-fx-almost calc(240ms * var(--motion-scale)) var(--ease-out) both;
+  }
+  /* .pw-squish-pop and .pw-float are no-ops */
+  .pw-squish-pop,
+  .pw-float {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ keyboard input (5.9.6)
+   Transitional entrances are off while the learner uses the keyboard. Feedback (M19, M20, M23)
+   and the rare sequences still play, because they answer the action instead of delaying it. */
+
+:root[data-input='keyboard'] .pw-enter[data-enter='rise'],
+:root[data-input='keyboard'] .pw-enter[data-enter='right'],
+:root[data-input='keyboard'] .pw-enter[data-enter='retry'],
+:root[data-input='keyboard'] dialog.pw-dialog[open],
+:root[data-input='keyboard'] dialog.pw-sheet[open],
+:root[data-input='keyboard'] dialog.pw-dialog[open]::backdrop,
+:root[data-input='keyboard'] dialog.pw-sheet[open]::backdrop,
+:root[data-input='keyboard'] .pw-anim-slide-up {
+  animation: none;
+}
+
+/* ------------------------------------------------------------------ effect tiers */
+
+:root[data-fx-tier='lite'] .pw-sheen-blob {
+  display: none;
+}
+
+:root[data-fx-tier='off'] .pw-confetti-piece,
+:root[data-fx-tier='off'] .pw-burst,
+:root[data-fx-tier='off'] .pw-fx-sheen,
+:root[data-fx-tier='off'] .pw-sheen-blob {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ skipping a sequence (5.9.6)
+   runSequence() sets data-seq="done" on the container: every element inside lands on its last frame. */
+
+.pw-seq[data-seq='done'],
+.pw-seq[data-seq='done'] *,
+.pw-seq[data-seq='done'] *::before,
+.pw-seq[data-seq='done'] *::after {
+  animation-delay: 0ms !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-delay: 0ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+.pw-seq[data-seq='done'] .pw-confetti-piece,
+.pw-seq[data-seq='done'] .pw-burst {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------------ reduced motion contract (5.3)
+   Must be the last rules in the file. Two triggers, one result: the OS setting and the in-app
+   "Kurangi animasi". Every keyframe above ends in its resting state, so 0.01 ms lands there.
+   Add data-rm="fade" to a container that should still cross-fade in 120 ms. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Colour and opacity only: no movement, so a short fade stays readable. */
+  .pw-t-colors,
+  .pw-t-opacity {
+    transition-duration: 120ms !important;
+  }
+  [data-rm='fade'],
+  dialog.pw-dialog[open],
+  dialog.pw-sheet[open] {
+    animation: pw-fade-in 120ms linear both !important;
+  }
+  .pw-pressable:active:not(:disabled) {
+    transform: none !important;
+    opacity: 0.85;
+  }
+  .pw-flip-inner {
+    transform: none !important;
+  }
+  .pw-flip-face {
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    transition: opacity 120ms linear !important;
+  }
+  .pw-flip-back {
+    transform: none;
+    opacity: 0;
+  }
+  .pw-flip[aria-pressed='true'] .pw-flip-front {
+    opacity: 0;
+  }
+  .pw-flip[aria-pressed='true'] .pw-flip-back {
+    opacity: 1;
+  }
+  .pw-confetti-piece,
+  .pw-burst,
+  .pw-fx-sheen,
+  .pw-sheen-blob {
+    display: none !important;
+  }
+}
+
+:root[data-reduced-motion='always'] *,
+:root[data-lesson-focus] *,
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) *::before,
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-t-colors,
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-t-opacity {
+  transition-duration: 120ms !important;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) [data-rm='fade'],
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) dialog.pw-dialog[open],
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) dialog.pw-sheet[open] {
+  animation: pw-fade-in 120ms linear both !important;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-pressable:active:not(:disabled) {
+  transform: none !important;
+  opacity: 0.85;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-flip-inner {
+  transform: none !important;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-flip-face {
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+  transition: opacity 120ms linear !important;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-flip-back {
+  transform: none;
+  opacity: 0;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-flip[aria-pressed='true'] .pw-flip-front {
+  opacity: 0;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-flip[aria-pressed='true'] .pw-flip-back {
+  opacity: 1;
+}
+
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-confetti-piece,
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-burst,
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-fx-sheen,
+:root:is([data-reduced-motion='always'], [data-lesson-focus]) .pw-sheen-blob {
+  display: none !important;
+}

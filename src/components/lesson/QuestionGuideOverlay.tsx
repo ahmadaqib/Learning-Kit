@@ -75,10 +75,8 @@ export const QuestionGuideOverlay: React.FC<QuestionGuideOverlayProps> = ({
     <DialogModal open={open} onClose={onClose} title={guide.title} variant="dialog">
       <div className="space-y-4">
         <div className="flex items-center gap-3 rounded-[var(--radius-md)] bg-[var(--world-50)] p-3 text-[var(--world-700)]">
-          <Hand className="h-7 w-7 animate-bounce flex-shrink-0" aria-hidden="true" />
-          <p className="pw-small font-bold">
-            Tipe soal baru! Begini cara memainkannya:
-          </p>
+          <Hand className="h-7 w-7 flex-shrink-0" aria-hidden="true" />
+          <p className="pw-small m-0 font-bold">Tipe soal baru. Begini cara memainkannya.</p>
         </div>
         <ol className="list-decimal space-y-2 pl-5 pw-body">
           {guide.steps.map((s, idx) => (

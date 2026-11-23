@@ -8,13 +8,18 @@ import {
   qStep,
   rBold,
   rCode,
+  rJunior,
+  rPro,
   rTerm,
   rText,
   simStep,
   storyStep,
   t,
 } from '@/content/lessonHelpers';
-import type { Lesson, World } from '@/content/schema';
+import type { Lesson, Rich, World } from '@/content/schema';
+
+/** Teks tebal yang hanya tampil di Pro (istilah teknis yang tidak dipakai di jalur Petualang). */
+const proBold = (text: string): Rich => ({ t: 'bold', v: { pro: text }, modes: ['pro'] });
 
 export const world: World = {
   id: 'b04',
@@ -22,8 +27,8 @@ export const world: World = {
   order: 4,
   title: 'Peta Jenis API',
   tagline: t(
-    'Mengenal perpustakaan REST, pelayan pribadi GraphQL, dan keluarga API.',
-    'Membandingkan REST, pagination/versioning, GraphQL, gRPC, SOAP, JSON-RPC, dan tRPC.',
+    'Kenali perpustakaan dan pelayan pribadi. Keduanya cara aplikasi meminta data.',
+    'Kamu bisa membandingkan REST dan GraphQL, lalu memilih yang cocok untuk satu kasus.',
   ),
   color: '#6C5CE7',
   illustration: 'b04-peta-jenis-api',
@@ -34,8 +39,8 @@ export const world: World = {
   boss: {
     title: 'Tantangan Penjaga Persimpangan',
     greeting: t(
-      'Selamat datang di persimpangan jenis API! Bisakah kamu memilih jalur REST, GraphQL, atau lainnya dengan tepat?',
-      'Uji penguasaanmu tentang tiga keluarga API, desain REST, pagination/versioning, GraphQL, gRPC, dan variasi RPC.',
+      'Selamat datang di persimpangan jenis API! Ayo pilih jalur yang tepat.',
+      'Uji pilihanmu antara REST, GraphQL, gRPC, dan varian RPC lain. Soalnya diambil dari seluruh pelajaran di dunia ini.',
     ),
     guardianName: 'Penjaga Persimpangan',
     junior: { count: 8, pool: 'world' },
@@ -46,138 +51,310 @@ export const world: World = {
     junior: [
       makeAnchorMcq({
         id: 'b04-anc-j1',
-        prompt: t('Keluarga API mana yang selalu menunggu client bertanya lebih dulu sebelum server menjawab?'),
+        prompt: t(
+          'Keluarga API mana yang menunggu kamu bertanya dulu?',
+          'Keluarga API mana yang selalu menunggu client bertanya sebelum server menjawab?',
+        ),
         choices: [
-          { id: 'rr', label: t('Keluarga Tanya-Jawab (seperti REST dan GraphQL)') },
-          { id: 'ev', label: t('Keluarga Bel Pintu Kejadian'), explainWrong: t('Keluarga Kejadian mengabari otomatis saat ada peristiwa terjadi.') },
-          { id: 'rt', label: t('Keluarga Siaran Radio'), explainWrong: t('Siaran radio mengirim kabar mengalir tanpa ditanya ulang.') },
+          {
+            id: 'rr',
+            label: t('Tanya-Jawab, seperti memesan makanan', 'Tanya-Jawab (seperti REST dan GraphQL)'),
+          },
+          {
+            id: 'ev',
+            label: t('Bel Pintu, seperti kurir memencet bel', 'Berbasis Kejadian (seperti bel pintu)'),
+            explainWrong: t(
+              'Bel pintu berbunyi sendiri saat ada kejadian. Ia tidak menunggu kamu bertanya.',
+              'Keluarga Berbasis Kejadian mengabari sendiri saat peristiwa terjadi, tanpa menunggu client bertanya.',
+            ),
+          },
+          {
+            id: 'rt',
+            label: t('Siaran Radio, seperti mendengar radio', 'Realtime (seperti siaran radio)'),
+            explainWrong: t(
+              'Radio terus bersuara. Kamu tidak perlu bertanya lebih dulu.',
+              'Keluarga Realtime mengirim kabar yang mengalir tanpa ditanya ulang.',
+            ),
+          },
         ],
         answer: 'rr',
-        explainCorrect: t('Tepat! Pada keluarga Tanya-Jawab, client bertanya lalu server menjawab seperti memesan di restoran.'),
+        explainCorrect: t(
+          'Kamu bertanya, lalu dapur menjawab. Seperti memesan makanan di restoran.',
+          'Pada keluarga Tanya-Jawab, client bertanya lebih dulu, lalu server menjawab. Seperti memesan di restoran.',
+        ),
         tags: ['api'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-j2',
-        prompt: t('Menurut aturan penulisan REST yang rapi, bagian URL seharusnya berisi…'),
+        prompt: t(
+          'Di perpustakaan REST, label rak berisi apa?',
+          'Dalam penulisan REST yang rapi, bagian URL seharusnya berisi apa?',
+        ),
         choices: [
-          { id: 'noun', label: t('Kata benda nama datanya, seperti /produk atau /pesanan') },
-          { id: 'verb', label: t('Kata kerja panjang seperti /ambilSemuaProduk'), explainWrong: t('Kata kerja sudah diwakili oleh method HTTP, bukan di URL.') },
-          { id: 'clr', label: t('Nama warna tombol layar'), explainWrong: t('Warna tombol diatur CSS, bukan endpoint REST.') },
+          {
+            id: 'noun',
+            label: t('Nama benda, seperti buku', 'Kata benda yang mewakili kumpulan data, seperti /produk'),
+          },
+          {
+            id: 'verb',
+            label: t('Kata kerja, seperti pinjam', 'Kata kerja, seperti /ambilSemuaProduk'),
+            explainWrong: t(
+              'Kata kerja ditulis di kartu perintah. Label rak cukup berisi nama benda.',
+              'Kata kerja sudah diwakili method HTTP, jadi URL tidak perlu memuatnya.',
+            ),
+          },
+          {
+            id: 'clr',
+            label: t('Kata sifat, seperti murah', 'Nama method, seperti /get-produk'),
+            explainWrong: t(
+              'Label rak tidak menjelaskan sifat benda. Ia hanya menyebut nama bendanya.',
+              'Method HTTP, seperti GET, dikirim terpisah dari URL dan tidak ditulis di dalamnya.',
+            ),
+          },
         ],
         answer: 'noun',
-        explainCorrect: t('Benar! URL REST berisi kata benda, sementara kata kerjanya memakai GET, POST, PATCH, DELETE.'),
+        explainCorrect: t(
+          'Label rak berisi nama benda. Kata kerja ditulis di kartu perintah.',
+          'URL REST berisi kata benda. Kata kerjanya diwakili method seperti GET, POST, PATCH, dan DELETE.',
+        ),
         tags: ['rest', 'endpoint'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-j3',
-        prompt: t('Dalam REST, sifat "stateless" berarti setiap permintaan harus lengkap karena…'),
+        prompt: t(
+          'Pelayan pelupa tidak ingat pesananmu tadi. Apa yang kamu lakukan?',
+          'Pada REST yang stateless, mengapa setiap request harus lengkap?',
+        ),
         choices: [
-          { id: 'forget', label: t('Server tidak mengingat pesanan sebelumnya seperti pelayan pelupa') },
-          { id: 'slow', label: t('Server hanya boleh melayani satu tamu setiap jam'), explainWrong: t('Justru sifat pelupa memungkinkan pelayan mana pun melayani ribuan tamu.') },
-          { id: 'nocode', label: t('Request tidak memakai method HTTP'), explainWrong: t('REST tetap memakai method HTTP standar.') },
+          {
+            id: 'forget',
+            label: t('Menyebut pesanan lengkap setiap kali', 'Server tidak mengingat request sebelumnya'),
+          },
+          {
+            id: 'slow',
+            label: t('Meminta pelayan menghafal namamu', 'Server menyimpan sesi setiap client di memorinya'),
+            explainWrong: t(
+              'Pelayan pelupa tidak bisa menghafal. Kamu harus menyebut semuanya lagi.',
+              'Justru server stateless tidak menyimpan sesi client, jadi server mana pun bisa melayani.',
+            ),
+          },
+          {
+            id: 'nocode',
+            label: t('Memesan satu kali saja dalam sehari', 'Client hanya boleh mengirim satu request per sesi'),
+            explainWrong: t(
+              'Kamu boleh memesan kapan saja. Hanya tiap pesanan harus lengkap.',
+              'Jumlah request tidak dibatasi oleh sifat stateless. Yang wajib hanyalah isi request yang lengkap.',
+            ),
+          },
         ],
         answer: 'forget',
-        explainCorrect: t('Betul! Karena pelayan tidak menyimpan ingatan percakapan lama, server mana saja bisa langsung melayani.'),
+        explainCorrect: t(
+          'Pelayan pelupa tidak menyimpan ingatan. Jadi setiap pesanan harus lengkap, seperti menyebut meja dan menu.',
+          'Server tidak menyimpan ingatan percakapan lama. Karena itu server mana pun bisa langsung melayani.',
+        ),
         tags: ['rest'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-j4',
-        prompt: t('Kalau kamu cuma butuh nama dan foto profil tanpa 20 kolom lain yang tidak terpakai, API mana yang paling pas?'),
+        prompt: t(
+          'Kamu hanya mau nama dan foto. Pelayan mana yang paling pas?',
+          'Layar profil hanya butuh nama dan foto, padahal datanya punya 30 kolom. API mana yang paling pas?',
+        ),
         choices: [
-          { id: 'gql', label: t('GraphQL (pelayan pribadi sesuai daftar)') },
-          { id: 'big', label: t('Paket tetap berisi 25 kolom sekaligus'), explainWrong: t('Itu justru kelebihan data (over-fetching).') },
-          { id: 'css', label: t('Aturan CSS Grid'), explainWrong: t('CSS Grid menata posisi kotak di layar.') },
+          {
+            id: 'gql',
+            label: t('Pelayan pribadi, membawa sesuai daftarmu', 'GraphQL, meminta kolom sesuai kebutuhan'),
+          },
+          {
+            id: 'big',
+            label: t('Pelayan menu tetap, membawa semuanya', 'REST dengan paket tetap 30 kolom'),
+            explainWrong: t(
+              'Paket tetap membawa semuanya. Itu terlalu banyak untuk kamu.',
+              'Paket tetap 30 kolom justru menyebabkan over-fetching, yaitu data berlebih.',
+            ),
+          },
+          {
+            id: 'css',
+            label: t('Pelayan radio, membawa kabar terus-menerus', 'SOAP dengan amplop XML yang lengkap'),
+            explainWrong: t(
+              'Radio hanya mengirim kabar. Ia tidak membawa daftar pesananmu.',
+              'SOAP membungkus data dalam amplop XML yang panjang, jadi kolom berlebih tetap ikut terkirim.',
+            ),
+          },
         ],
         answer: 'gql',
-        explainCorrect: t('Tepat! Pelayan pribadi GraphQL membawakan tepat kolom yang kamu minta di daftar.'),
+        explainCorrect: t(
+          'Pelayan pribadi hanya membawa yang kamu tulis. Seperti hanya mengambil nasi dan telur.',
+          'GraphQL membawa tepat kolom yang diminta di query. Tidak ada kolom lain yang ikut terkirim.',
+        ),
         tags: ['graphql'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-j5',
-        prompt: t('Dalam GraphQL, operasi untuk mengubah atau menambah data ke server disebut…'),
+        prompt: t(
+          'Pelayan pribadi punya tugas mengganti isi pesanan. Apa nama tugas itu?',
+          'Di GraphQL, operasi mana yang dipakai untuk menambah atau mengubah data?',
+        ),
         choices: [
-          { id: 'mut', label: t('mutation') },
-          { id: 'qry', label: t('query'), explainWrong: t('query dipakai untuk membaca/mengambil data.') },
-          { id: 'del', label: t('HTML div'), explainWrong: t('<div> adalah elemen kerangka HTML.') },
+          { id: 'mut', label: t('Mengubah', 'mutation') },
+          {
+            id: 'qry',
+            label: t('Membaca', 'query'),
+            explainWrong: t(
+              'Membaca hanya melihat isi. Ia tidak mengganti apa pun.',
+              'query dipakai untuk membaca data, bukan mengubahnya.',
+            ),
+          },
+          {
+            id: 'del',
+            label: t('Kabar langsung', 'subscription'),
+            explainWrong: t(
+              'Kabar langsung datang sendiri saat pesanan siap. Ia tidak mengganti isi pesanan.',
+              'subscription dipakai untuk menerima pembaruan realtime.',
+            ),
+          },
         ],
         answer: 'mut',
-        explainCorrect: t('Benar! mutation adalah padanan POST/PUT/PATCH/DELETE di GraphQL.'),
+        explainCorrect: t(
+          'Mengubah berarti mengganti isi. Seperti menukar teh dengan jus di daftar pesanan.',
+          'mutation adalah padanan POST, PUT, PATCH, dan DELETE di GraphQL.',
+        ),
         tags: ['graphql'],
       }),
     ],
     pro: [
       makeAnchorMcq({
         id: 'b04-anc-p1',
-        prompt: t('Manakah pasangan yang tepat membedakan istilah gaya arsitektur, protokol, dan format data?'),
+        prompt: t('Pasangan mana yang membedakan gaya arsitektur, protokol, dan format data dengan benar?'),
         choices: [
-          { id: 'ok', label: t('REST = gaya arsitektur, HTTP = protokol pengirim, JSON = format teks datanya') },
-          { id: 'rev', label: t('JSON = protokol jaringan, HTTP = format tulisan, REST = tag HTML'), explainWrong: t('Urutan kategorinya tertukar.') },
-          { id: 'same', label: t('GraphQL, Protobuf, dan HTTPS adalah nama database backend'), explainWrong: t('Ketiganya bukan nama database.') },
+          { id: 'ok', label: t('REST gaya arsitektur, HTTP protokol, JSON format data') },
+          {
+            id: 'rev',
+            label: t('REST protokol, HTTP format data, JSON gaya arsitektur'),
+            explainWrong: t('REST bukan protokol, dan JSON bukan gaya arsitektur. Peran ketiganya tertukar.'),
+          },
+          {
+            id: 'same',
+            label: t('REST format data, HTTP gaya arsitektur, JSON protokol'),
+            explainWrong: t('HTTP bukan gaya arsitektur, dan REST bukan format data. Peran ketiganya tertukar.'),
+          },
         ],
         answer: 'ok',
-        explainCorrect: t('Tepat. Membedakan gaya rancangan, protokol transport, dan format data membantu membaca spesifikasi API.'),
+        explainCorrect: t(
+          'REST adalah gaya rancangan, HTTP protokol pengiriman, dan JSON format datanya. Membedakan ketiganya membantu membaca dokumentasi API.',
+        ),
         tags: ['rest', 'json'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-p2',
-        prompt: t('Mengapa Cursor Pagination lebih stabil untuk feed media sosial (infinite scroll) dibanding Offset/Page Pagination?'),
+        prompt: t(
+          'Mengapa cursor pagination lebih stabil dari offset untuk feed yang di-scroll tanpa batas?',
+        ),
         choices: [
-          { id: 'cur', label: t('Cursor memakai penanda posisi data terakhir sehingga item tidak bergeser saat data baru masuk') },
-          { id: 'jump', label: t('Cursor bisa melompat langsung ke halaman 50 dengan angka halaman'), explainWrong: t('Melompat ke halaman acak justru keunggulan offset/page, bukan cursor.') },
-          { id: 'nohttp', label: t('Cursor tidak membutuhkan endpoint API'), explainWrong: t('Cursor tetap dikirim lewat query parameter ke endpoint.') },
+          { id: 'cur', label: t('Cursor menandai posisi item terakhir, jadi isinya tidak bergeser') },
+          {
+            id: 'jump',
+            label: t('Cursor bisa langsung melompat ke halaman 50'),
+            explainWrong: t('Melompat ke halaman acak justru keunggulan offset, bukan cursor.'),
+          },
+          {
+            id: 'nohttp',
+            label: t('Cursor menyimpan seluruh daftar di browser'),
+            explainWrong: t('Cursor tetap mengambil data dari server, bukan menyimpan seluruh daftar di browser.'),
+          },
         ],
         answer: 'cur',
-        explainCorrect: t('Benar! Offset bergeser saat ada kiriman baru masuk, sedangkan cursor bertahan di pembatas buku item terakhir.'),
+        explainCorrect: t(
+          'Offset bergeser saat kiriman baru masuk. Cursor bertahan di item terakhir, seperti pembatas buku.',
+        ),
         tags: ['pagination', 'rest'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-p3',
-        prompt: t('Praktik REST yang dianggap keliru (anti-pattern) saat menangani validasi gagal adalah…'),
+        prompt: t('Mana praktik error REST yang dianggap keliru (anti-pattern)?'),
         choices: [
-          { id: 'bad', label: t('Mengirim kode status 200 OK lalu menulis {"sukses": false} di dalam body JSON') },
-          { id: 'good', label: t('Mengirim status 422 dengan objek error terstruktur berisi kode dan detail kolom'), explainWrong: t('Ini justru praktik error REST yang sangat baik.') },
-          { id: 'rfc', label: t('Mengikuti format Problem Details RFC 9457'), explainWrong: t('RFC 9457 adalah standar format error REST yang resmi.') },
+          { id: 'bad', label: t('Membalas 200 OK, lalu menulis "sukses": false di body') },
+          {
+            id: 'good',
+            label: t('Membalas 422 dengan objek error berisi kode dan detail'),
+            explainWrong: t('Status 422 dengan objek error terstruktur adalah praktik yang baik.'),
+          },
+          {
+            id: 'rfc',
+            label: t('Mengikuti format Problem Details (RFC 9457)'),
+            explainWrong: t('RFC 9457 adalah standar resmi untuk format error REST.'),
+          },
         ],
         answer: 'bad',
-        explainCorrect: t('Tepat. Selalu pakai kode status HTTP yang semestinya (4xx/5xx) agar logika error di frontend konsisten.'),
+        explainCorrect: t(
+          'Pakai status HTTP yang tepat, yaitu 4xx atau 5xx untuk error. Dengan begitu logika error di frontend tetap seragam.',
+        ),
         tags: ['rest', 'status-code', 'pagination'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-p4',
-        prompt: t('Pada definisi schema GraphQL "type Produk { id: ID! nama: String! diskon: Int }", arti tanda seru (!) adalah…'),
+        prompt: t('Pada schema GraphQL, apa arti tanda seru (!) di "nama: String!"?'),
         choices: [
-          { id: 'req', label: t('Kolom wajib ada nilainya (non-nullable / tidak boleh null)') },
-          { id: 'sec', label: t('Kolom bersifat rahasia dan tidak boleh dibaca'), explainWrong: t('Tanda ! menandakan non-nullable, bukan rahasia.') },
-          { id: 'arr', label: t('Kolom berupa daftar array'), explainWrong: t('Array ditandai dengan kurung siku [...].') },
+          { id: 'req', label: t('Kolom wajib punya nilai, tidak boleh null') },
+          {
+            id: 'sec',
+            label: t('Kolom rahasia yang tidak boleh dibaca'),
+            explainWrong: t('Tanda seru menandakan non-nullable, bukan kolom rahasia.'),
+          },
+          {
+            id: 'arr',
+            label: t('Kolom berisi daftar (array)'),
+            explainWrong: t('Daftar array ditandai dengan kurung siku, misalnya [String].'),
+          },
         ],
         answer: 'req',
-        explainCorrect: t('Benar. Tanda ! menjamin nilai field tersebut tidak akan bernilai null.'),
+        explainCorrect: t('Tanda seru menjamin kolom itu tidak akan bernilai null. Client boleh mengandalkan isinya.'),
         tags: ['graphql'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-p5',
-        prompt: t('Mengapa gRPC sangat digemari untuk komunikasi antar layanan backend internal (microservices)?'),
+        prompt: t('Mengapa gRPC populer untuk komunikasi antar layanan backend internal?'),
         choices: [
-          { id: 'fast', label: t('Berjalan di atas HTTP/2 dengan muatan biner Protobuf dan kontrak .proto yang ketat serta cepat') },
-          { id: 'html', label: t('Karena browser lama bisa memanggil gRPC mentah langsung dari tag <a>'), explainWrong: t('Browser justru butuh proxy gRPC-Web karena tidak mengekspos HTTP/2 frame mentah.') },
-          { id: 'xml', label: t('Karena memakai amplop XML panjang seperti SOAP'), explainWrong: t('gRPC memakai biner Protobuf, bukan XML.') },
+          { id: 'fast', label: t('Memakai HTTP/2 dan Protobuf biner dengan kontrak ketat') },
+          {
+            id: 'html',
+            label: t('Semua browser bisa memanggilnya langsung tanpa proxy'),
+            explainWrong: t('Browser butuh proxy gRPC-Web karena tidak membuka akses ke frame HTTP/2 mentah.'),
+          },
+          {
+            id: 'xml',
+            label: t('Memakai amplop XML panjang seperti SOAP'),
+            explainWrong: t('gRPC memakai pesan biner Protobuf, bukan XML.'),
+          },
         ],
         answer: 'fast',
-        explainCorrect: t('Tepat. Kombinasi HTTP/2 dan biner Protobuf memberikan throughput tinggi dan latensi rendah antar server.'),
+        explainCorrect: t(
+          'HTTP/2 dan Protobuf biner membuat pesan kecil dan cepat. Kontrak .proto menjaga kedua sisi tetap cocok.',
+        ),
         tags: ['grpc', 'protobuf'],
       }),
       makeAnchorMcq({
         id: 'b04-anc-p6',
         type: 'limit',
         analogy: t('REST seperti restoran paket tetap dan GraphQL seperti pelayan pribadi sesuai daftar'),
-        prompt: t('Kelebihan REST apa yang justru menjadi kelemahan atau kerumitan tambahan saat memakai GraphQL?'),
+        prompt: t('Apa kelebihan REST yang justru menjadi kerumitan baru di GraphQL?'),
         choices: [
-          { id: 'cache', label: t('Caching HTTP bawaan browser/CDN jauh lebih mudah di URL GET REST dibanding satu endpoint POST /graphql') },
-          { id: 'over', label: t('GraphQL memaksa klien menerima semua 50 kolom tanpa bisa memilih'), explainWrong: t('Memilih kolom tepat adalah kekuatan GraphQL, bukan kelemahannya.') },
-          { id: 'type', label: t('GraphQL tidak memiliki schema atau dokumentasi tipe data'), explainWrong: t('GraphQL justru memiliki schema sangat ketat.') },
+          { id: 'cache', label: t('Caching HTTP lebih mudah di URL GET milik REST') },
+          {
+            id: 'over',
+            label: t('REST memilih kolom lebih tepat daripada GraphQL'),
+            explainWrong: t('Memilih kolom dengan tepat adalah kekuatan GraphQL, bukan kelemahannya.'),
+          },
+          {
+            id: 'type',
+            label: t('REST punya schema yang lebih ketat dari GraphQL'),
+            explainWrong: t('GraphQL justru punya schema yang sangat ketat.'),
+          },
         ],
         answer: 'cache',
-        explainCorrect: t('Benar! Karena REST memakai endpoint GET unik per resource, caching HTTP dan CDN bekerja alami, sedangkan GraphQL butuh strategi cache khusus.'),
+        explainCorrect: t(
+          'Karena REST memakai URL GET unik untuk tiap resource, caching HTTP dan CDN bekerja alami. GraphQL butuh strategi cache khusus.',
+        ),
         tags: ['rest', 'graphql', 'cookie-cache'],
       }),
     ],
@@ -191,90 +368,118 @@ export const lessons: Lesson[] = [
     title: 'Tiga keluarga besar API',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa mengelompokkan jenis API ke keluarga Tanya-Jawab, Realtime, atau Berbasis Kejadian.',
-      'Aku bisa membedakan gaya/protokol/format serta mengelompokkan jenis API memakai dua pertanyaan kunci.',
+      'Aku bisa mengelompokkan API ke tiga keluarga besar.',
+      'Kamu bisa membedakan gaya, protokol, dan format, lalu mengelompokkan API dengan dua pertanyaan.',
     ),
-    estMinutes: 5,
+    atWork:
+      'Kamu akan memilih jenis API untuk fitur baru, misalnya katalog, chat, atau notifikasi pembayaran di toko online.',
+    estMinutes: 7,
     introducesTerms: [],
     usesTerms: ['api', 'json', 'protobuf'],
     warmupFrom: 'b03-l04',
     steps: [
       storyStep('b04/peta-api.svg', [
         rText(
-          'Bayangkan sebuah peta wilayah API. Ada jalur restoran untuk tanya-jawab, jalur menara radio untuk kabar langsung, dan jalur bel pintu saat ada kejadian!',
-          'Nama seperti REST, GraphQL, gRPC, SSE, WebSocket, dan Webhook sering terdengar sekaligus. Sebelum mendalami satu per satu, mari lihat peta besarnya agar tidak tersesat.',
+          'Bayangkan peta dengan tiga jalur. Ada jalur restoran, jalur radio, dan jalur bel pintu. Jalur mana yang cocok untuk tiap tugas?',
+          'Di rapat tim, orang menyebut REST, gRPC, dan Webhook dalam satu kalimat. Peta ini membantu kamu membedakannya.',
         ),
       ]),
       conceptStep({
-        title: t('Dua Pertanyaan Kunci', 'Gaya, Protokol, Format & Dua Pertanyaan'),
+        title: t('Dua pertanyaan kunci'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'dua-pertanyaan' },
         alt: t('Dua pertanyaan kunci: siapa memulai pembicaraan dan berapa arah pembicaraannya.'),
         body: [
           rText(
-            'Ada dua pertanyaan untuk membedakan jenis API. Siapa yang mulai bicara? Dan berapa arah obrolannya?',
-            'REST/GraphQL adalah gaya rancangan, HTTP/WebSocket adalah protokol, dan JSON/Protobuf adalah format. Bedakan semua lewat dua tanya: siapa memulai dan berapa arahnya?',
+            'Ada dua pertanyaan untuk memilih jalur. Siapa yang mulai bicara? Berapa arah obrolannya, satu atau dua?',
+            'REST dan GraphQL adalah gaya rancangan: aturan cara menyusun API. HTTP dan WebSocket adalah protokol, yaitu aturan cara data dikirim. JSON dan Protobuf adalah format, yaitu bentuk isi data. Dua pertanyaan membedakan jenis API: siapa yang memulai, dan berapa arah komunikasinya?',
           ),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'b04-l01-q3',
+          prompt: t(
+            'Dua pertanyaan mana yang membantu mengenali jenis API?',
+            'Dua pertanyaan mana yang membedakan hampir semua jenis API?',
+          ),
+          choices: [
+            { id: 'two', label: t('Siapa yang mulai bicara, dan berapa arahnya') },
+            {
+              id: 'clr',
+              label: t('Seberapa cepat jalurnya, dan seberapa besar datanya'),
+              explainWrong: t(
+                'Kecepatan penting, tetapi tidak menunjukkan jalurnya. Jalur ditentukan oleh siapa yang mulai bicara.',
+                'Kecepatan dan ukuran data penting, tetapi tidak membedakan keluarga API. Dua pertanyaan kunci menyangkut siapa memulai dan berapa arah.',
+              ),
+            },
+            {
+              id: 'os',
+              label: t('Bahasa apa yang dipakai, dan siapa pembuatnya'),
+              explainWrong: t(
+                'Bahasa dan pembuat tidak menentukan jalur. Yang menentukan adalah siapa yang mulai bicara.',
+                'Bahasa pemrograman dan pembuat tidak menentukan keluarga API. Yang menentukan adalah siapa memulai dan berapa arah.',
+              ),
+            },
+          ],
+          answer: 'two',
+          explainCorrect: t(
+            'Dua jawaban itu langsung menunjukkan jalurnya. Seperti memilih antara bertanya, mendengar radio, atau menunggu bel.',
+            'Siapa yang memulai dan berapa arahnya sudah cukup untuk memetakan hampir semua jenis API.',
+          ),
+          hints: [
+            t('Ingat jalur restoran, radio, dan bel pintu.', 'Ingat dua pertanyaan kunci pada peta.'),
+          ],
+          tags: ['api'],
+        }),
+      ),
       conceptStep({
-        title: t('Tanya-Jawab & Realtime', 'Keluarga 1 (Tanya-Jawab) & 2 (Realtime)'),
+        title: t('Tiga jalur API', 'Keluarga Tanya-Jawab dan Realtime'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'tanya-jawab-realtime' },
-        alt: t('Keluarga Tanya-Jawab seperti REST/GraphQL/gRPC dan Realtime seperti SSE/WebSocket.'),
+        alt: t(
+          'Jalur restoran untuk bertanya, radio untuk kabar, bel pintu untuk kejadian.',
+          'Peta keluarga Tanya-Jawab dan keluarga Realtime, lengkap dengan contoh tiap jenis.',
+        ),
         body: [
           rText(
-            'Pertama, keluarga Tanya-Jawab seperti REST dan GraphQL. Kedua, keluarga Realtime seperti radio SSE dan telepon WebSocket.',
-            '1) Tanya-Jawab (REST, GraphQL, gRPC, SOAP, tRPC): client bertanya lalu server menjawab. 2) Realtime (Polling, SSE, WebSocket, WebRTC): kabar baru datang tanpa ditanya ulang.',
+            'Jalur restoran: kamu bertanya, dapur menjawab. Jalur radio: kabar datang terus, seperti siaran radio atau obrolan telepon. Jalur bel pintu: kabar datang saat ada kejadian.',
+            'Keluarga Tanya-Jawab berisi REST, GraphQL, dan gRPC. Client bertanya, lalu server menjawab. Keluarga Realtime mengirim kabar baru tanpa ditanya ulang, misalnya lewat SSE atau WebSocket.',
           ),
         ],
       }),
       conceptStep({
-        title: t('Keluarga Kejadian & Campuran', 'Keluarga 3 (Kejadian) & Kombinasi'),
+        title: t('Keluarga Kejadian dan Kombinasi'),
+        modes: ['pro'],
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'kejadian-kombinasi' },
-        alt: t('Keluarga Kejadian seperti bel pintu Webhook dan papan pengumuman Pub/Sub.'),
+        alt: t(
+          'Bel pintu memberi kabar saat ada kejadian.',
+          'Keluarga Berbasis Kejadian seperti Webhook dan Pub/Sub, dengan contoh gabungan.',
+        ),
         body: [
           rText(
-            'Ketiga, keluarga Berbasis Kejadian seperti bel pintu Webhook. Satu aplikasi besar bisa memakai beberapa jenis API sekaligus.',
-            '3) Berbasis Kejadian (Webhook, Pub/Sub, Queue): mengabari saat peristiwa terjadi. Satu aplikasi nyata sering menggabungkan REST untuk katalog, WebSocket untuk chat, dan Webhook untuk pembayaran.',
+            'Keluarga Berbasis Kejadian mengabari saat sebuah peristiwa terjadi, misalnya lewat Webhook atau Pub/Sub. Satu aplikasi sering memakai ketiganya sekaligus: REST untuk katalog, WebSocket untuk chat, Webhook untuk pembayaran.',
           ),
         ],
       }),
-      limitStep({
-        analogy: t('Peta kota berisi tiga distrik: Restoran, Radio/Telepon, dan Bel Pintu'),
-        same: [
-          t('Membantu memilih kendaraan komunikasi yang pas untuk setiap kebutuhan fitur.'),
-        ],
-        different: [
-          t('Di dunia nyata satu aplikasi tidak dipaksa tinggal di satu distrik saja—semua jenis API bisa dipakai bersama dalam satu produk!'),
-          t('Tidak ada jenis API yang "paling hebat untuk semua hal"; yang ada hanyalah yang paling cocok.'),
-        ],
-      }),
-      simStep(
-        'pelayan-graphql',
-        t(
-          'Lihat cara memilih data pada simulator pelayan pribadi sebelum membandingkan REST dan GraphQL!',
-          'Coba pilih kolom data pada simulator untuk merasakan salah satu gaya Tanya-Jawab modern.',
-        ),
-      ),
       qStep({
         id: 'b04-l01-q1',
         type: 'sort',
-        prompt: t('Kelompokkan jenis API berikut ke keluarga besarnya masing-masing:'),
+        prompt: t('Kelompokkan tiap contoh ke jalurnya.', 'Kelompokkan jenis API ini ke keluarga besarnya.'),
         difficulty: 2,
         items: [
-          { id: 'r', label: t('REST & GraphQL') },
-          { id: 's', label: t('Siaran radio SSE') },
-          { id: 'w', label: t('Telepon WebSocket') },
-          { id: 'wh', label: t('Bel pintu Webhook') },
-          { id: 'g', label: t('gRPC') },
-          { id: 'ps', label: t('Papan info Pub/Sub') },
+          { id: 'r', label: t('Kamu memesan, lalu pelayan menjawab', 'REST dan GraphQL') },
+          { id: 's', label: t('Berita cuaca terus terdengar sepanjang hari', 'SSE') },
+          { id: 'w', label: t('Mengobrol dengan nenek lewat telepon', 'WebSocket') },
+          { id: 'wh', label: t('Kamu dikabari saat kurir tiba', 'Webhook') },
+          { id: 'g', label: t('Kamu bertanya harga es krim, penjual menjawab', 'gRPC') },
+          { id: 'ps', label: t('Alarm berbunyi saat kue matang', 'Pub/Sub') },
         ],
         bins: [
-          { id: 'qa', label: t('1. Tanya-Jawab') },
-          { id: 'rt', label: t('2. Realtime') },
-          { id: 'ev', label: t('3. Berbasis Kejadian') },
+          { id: 'qa', label: t('Jalur restoran', '1. Tanya-Jawab'), icon: 'utensils' },
+          { id: 'rt', label: t('Jalur radio', '2. Realtime'), icon: 'radio' },
+          { id: 'ev', label: t('Bel pintu', '3. Berbasis Kejadian'), icon: 'bell' },
         ],
         answer: {
           r: 'qa',
@@ -284,51 +489,84 @@ export const lessons: Lesson[] = [
           wh: 'ev',
           ps: 'ev',
         },
-        explainCorrect: t('Hebat! Kamu sudah menguasai peta tiga keluarga besar API.'),
+        explainCorrect: t(
+          'Tiap contoh cocok dengan satu jalur di peta. Restoran menunggu pertanyaan, radio terus bersuara, bel berbunyi saat ada kejadian.',
+          'Tanya-Jawab menunggu client bertanya. Realtime mengirim kabar tanpa ditanya, dan Berbasis Kejadian mengabari saat peristiwa terjadi.',
+        ),
+        hints: [
+          t('Pikirkan siapa yang membawa kabar lebih dulu.', 'Tanyakan siapa yang memulai, dan berapa arahnya.'),
+        undefined,
+        ],
         tags: ['api'],
       }),
+      limitStep({
+        analogy: t(
+          'Peta dengan tiga jalur: restoran, radio, dan bel pintu.',
+          'Peta kota berisi tiga distrik: Restoran, Radio/Telepon, dan Bel Pintu',
+        ),
+        same: [
+          t(
+            'Tiap jalur cocok untuk satu keperluan.',
+            'Peta membantu memilih jenis API yang cocok untuk setiap fitur.',
+          ),
+        ],
+        different: [
+          t(
+            'Satu aplikasi boleh memakai ketiga jalur sekaligus.',
+            'Satu aplikasi boleh memakai semua jenis API. Tidak ada jenis yang paling hebat untuk semua hal.',
+          ),
+        ],
+        riskyAnalogy: true,
+      }),
+      simStep(
+        'pelayan-graphql',
+        t(
+          'Centang nama, harga, atau stok, lalu lihat jawaban pelayan.',
+          'Pilih kolom data di simulator untuk merasakan satu gaya Tanya-Jawab modern.',
+        ),
+      ),
       qStep({
         id: 'b04-l01-q2',
         type: 'match',
-        prompt: t('Pasangkan jenis API berikut dengan perumpamaan singkatnya:'),
+        prompt: t('Pasangkan tiap jalur dengan tugasnya.', 'Pasangkan jenis API dengan perumpamaan singkatnya.'),
         difficulty: 1,
         left: [
-          { id: 'rest', label: t('REST') },
-          { id: 'gql', label: t('GraphQL') },
-          { id: 'sse', label: t('SSE') },
-          { id: 'wh', label: t('Webhook') },
+          { id: 'rest', label: t('Restoran menu tetap', 'REST') },
+          { id: 'gql', label: t('Pelayan pribadi', 'GraphQL') },
+          { id: 'sse', label: t('Siaran radio', 'SSE') },
+          { id: 'wh', label: t('Bel pintu', 'Webhook') },
         ],
         right: [
-          { id: 'a_sse', label: t('Mendengarkan siaran radio satu arah') },
-          { id: 'a_wh', label: t('Kurir memencet bel saat paket tiba') },
-          { id: 'a_rest', label: t('Restoran dengan banyak loket paket tetap') },
-          { id: 'a_gql', label: t('Satu pelayan pribadi membawa kertas daftarmu') },
+          { id: 'a_sse', label: t('Kabar terus datang tanpa kamu minta', 'Mendengarkan siaran radio satu arah') },
+          { id: 'a_wh', label: t('Kabar datang saat ada kejadian', 'Kurir memencet bel saat paket tiba') },
+          { id: 'a_rest', label: t('Pilihannya sudah ditentukan', 'Restoran dengan banyak loket paket tetap') },
+          { id: 'a_gql', label: t('Kamu menulis daftar maumu sendiri', 'Satu pelayan pribadi membawa kertas daftarmu') },
         ],
         answer: { rest: 'a_rest', gql: 'a_gql', sse: 'a_sse', wh: 'a_wh' },
-        explainCorrect: t('Tepat sekali! Analogi ini menjadi kompas utama saat mempelajari bab-bab berikutnya.'),
+        explainCorrect: t(
+          'Tiap perumpamaan punya cara kerja sendiri. Restoran dan pelayan menunggu pesananmu, radio dan bel mengirim kabar.',
+          'REST dan GraphQL menunggu request dari client. SSE mengalirkan kabar satu arah, dan Webhook mengabari saat kejadian.',
+        ),
+        hints: [t('Pikirkan siapa yang bicara lebih dulu.', 'Tanyakan siapa yang memulai pembicaraan.'), undefined],
         tags: ['api'],
       }),
       qStep(
-        makeMcq({
-          id: 'b04-l01-q3',
-          prompt: t('Manakah yang merupakan DUA pertanyaan kunci untuk membedakan hampir semua jenis API?'),
-          choices: [
-            { id: 'two', label: t('Siapa yang memulai pembicaraan dan berapa arah pembicaraannya') },
-            { id: 'clr', label: t('Apa warna tombolnya dan berapa ukuran hurufnya'), explainWrong: t('Warna dan ukuran huruf adalah urusan desain UI.') },
-            { id: 'os', label: t('Merek laptop dan harganya'), explainWrong: t('Jenis API tidak bergantung pada merek laptop.') },
-          ],
-          answer: 'two',
-          explainCorrect: t('Benar! Menjawab siapa yang memulai dan berapa arahnya langsung memetakan tipe API.'),
-          tags: ['api'],
-        }),
-      ),
-      qStep(
         makeTf({
           id: 'b04-l01-q4',
-          prompt: t('Sebuah aplikasi belanja besar hanya boleh memilih satu jenis API saja dan dilarang mencampur REST dengan WebSocket.'),
+          prompt: t(
+            'Satu aplikasi hanya boleh memakai satu jalur API.',
+            'Aplikasi belanja besar hanya boleh memakai satu jenis API dan dilarang mencampur REST dengan WebSocket.',
+          ),
           answer: false,
-          explainCorrect: t('Benar, pernyataan itu salah! Aplikasi nyata lazim memakai REST untuk katalog, WebSocket untuk chat, dan Webhook untuk pembayaran.'),
-          explainWrong: t('Hampir! Setiap bagian fitur boleh memakai jenis API yang paling pas.'),
+          explainCorrect: t(
+            'Satu aplikasi boleh pakai banyak jalur. Restoran untuk daftar, bel pintu untuk kabar bayar.',
+            'Pernyataan itu keliru: satu aplikasi boleh memadukan beberapa jenis API. Toko online memakai REST untuk katalog, WebSocket untuk chat, dan Webhook untuk pembayaran.',
+          ),
+          explainWrong: t(
+            'Setiap tugas boleh memakai jalur yang paling pas. Satu aplikasi tidak dikunci pada satu jalur.',
+            'Setiap fitur boleh memakai jenis API yang paling cocok. Tidak ada aturan satu produk satu jenis API.',
+          ),
+          hints: [t('Ingat peta dengan tiga jalur.', 'Ingat contoh toko online dengan banyak fitur.')],
           tags: ['api'],
         }),
       ),
@@ -336,16 +574,28 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-l01-q5',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('Peta jenis API yang membagi semua jenis API ke tiga kotak terpisah'),
-          prompt: t('Mengapa dalam praktik nyata kita tidak selalu bisa membandingkan REST, HTTP, dan JSON secara sejajar sebagai barang yang sama?'),
+          prompt: t('Mengapa REST, HTTP, dan JSON tidak sejajar untuk dibandingkan?'),
           difficulty: 2,
           choices: [
-            { id: 'layer', label: t('Karena REST adalah gaya arsitektur, HTTP adalah protokol pengiriman, dan JSON adalah format datanya') },
-            { id: 'old', label: t('Karena HTTP sudah tidak dipakai oleh REST'), explainWrong: t('REST justru berjalan di atas protokol HTTP.') },
-            { id: 'bin', label: t('Karena JSON adalah gaya tata letak CSS'), explainWrong: t('JSON adalah format data teks.') },
+            { id: 'layer', label: t('Gaya rancangan, protokol, dan format ada di lapisan berbeda') },
+            {
+              id: 'old',
+              label: t('HTTP sudah diganti REST di semua API modern'),
+              explainWrong: t('REST justru berjalan di atas protokol HTTP. Keduanya tidak saling menggantikan.'),
+            },
+            {
+              id: 'bin',
+              label: t('REST dan JSON adalah dua protokol yang saling bersaing di API modern'),
+              explainWrong: t('JSON adalah format data, bukan protokol. REST sendiri adalah gaya rancangan.'),
+            },
           ],
           answer: 'layer',
-          explainCorrect: t('Tepat! Ketiganya berada di lapisan berbeda, walau sehari-hari sering disebut bersama saat membahas jenis API.'),
+          explainCorrect: t(
+            'Gaya, protokol, dan format menjawab pertanyaan yang berbeda. REST berjalan di atas HTTP, dan datanya biasanya berupa JSON.',
+          ),
+          hints: [t('Tanyakan: ini gaya, protokol, atau format?')],
           tags: ['api', 'json'],
         }),
       ),
@@ -353,16 +603,54 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-l01-q6',
           type: 'scenario',
-          story: t('Rani sedang membangun aplikasi belanja yang punya fitur daftar katalog barang, chat langsung pembeli–penjual, dan kabar otomatis saat pembayaran lunas.'),
-          prompt: t('Bagaimana kombinasi keluarga API yang paling tepat untuk aplikasi Rani?'),
+          story: t(
+            'Rani membuat aplikasi toko. Aplikasinya punya daftar barang, chat dengan penjual, dan kabar pembayaran lunas.',
+            'Rani membangun aplikasi belanja dengan katalog barang, chat pembeli dan penjual, dan kabar otomatis saat pembayaran lunas.',
+          ),
+          prompt: t(
+            'Urut dari daftar barang, chat, lalu kabar lunas. Jalur mana yang cocok?',
+            'Kombinasi keluarga API mana yang paling tepat untuk aplikasi Rani?',
+          ),
           difficulty: 3,
           choices: [
-            { id: 'mix', label: t('Tanya-Jawab untuk katalog, Realtime dua arah untuk chat, dan Berbasis Kejadian untuk pembayaran') },
-            { id: 'one', label: t('Memakai siaran radio satu arah untuk semua fitur termasuk chat'), explainWrong: t('Siaran radio satu arah tidak bisa mengirim pesan balasan dari pembeli.') },
-            { id: 'none', label: t('Menghapus API agar semua kode ditulis di HTML saja'), explainWrong: t('HTML tidak dapat menyimpan pembayaran dan chat antarpengguna.') },
+            {
+              id: 'mix',
+              label: t(
+                'Restoran, telepon, dan bel pintu',
+                'Tanya-Jawab untuk katalog, Realtime dua arah untuk chat, Kejadian untuk pembayaran',
+              ),
+            },
+            {
+              id: 'one',
+              label: t(
+                'Radio, restoran, dan bel pintu',
+                'Realtime satu arah, seperti siaran radio, untuk semua fitur termasuk chat dan pembayaran',
+              ),
+              explainWrong: t(
+                'Daftar barang butuh tanya-jawab, jadi pakai restoran. Chat butuh dua arah, jadi pakai telepon.',
+                'Siaran satu arah tidak bisa menerima balasan dari pembeli, jadi chat tidak bisa berjalan.',
+              ),
+            },
+            {
+              id: 'none',
+              label: t(
+                'Restoran, telepon, dan restoran',
+                'Tanya-Jawab saja untuk semua fitur, termasuk chat dan pembayaran',
+              ),
+              explainWrong: t(
+                'Restoran hanya menjawab saat ditanya. Ia tidak mengabari saat pembayaran lunas.',
+                'Tanya-Jawab hanya menjawab saat client bertanya, jadi kabar pembayaran lunas tidak datang sendiri.',
+              ),
+            },
           ],
           answer: 'mix',
-          explainCorrect: t('Benar! Setiap fitur memilih keluarga API yang paling sesuai dengan arah dan waktu komunikasinya.'),
+          explainCorrect: t(
+            'Tiap tugas cocok dengan jalur yang berbeda. Daftar barang seperti memesan, chat seperti menelepon, pembayaran seperti bel pintu.',
+            'Setiap fitur memakai keluarga API yang sesuai dengan arah dan waktu komunikasinya.',
+          ),
+          hints: [
+            t('Pikirkan arah kabar untuk tiap tugas.', 'Tanyakan siapa yang memulai dan berapa arahnya untuk tiap fitur.'),
+          ],
           tags: ['api'],
         }),
       ),
@@ -370,31 +658,64 @@ export const lessons: Lesson[] = [
     reviewCards: [
       makeMcq({
         id: 'b04-l01-r1',
-        prompt: t('Keluarga API mana yang cocok saat server perlu mengabari kejadian "pembayaran sudah lunas" ke server lain?'),
+        prompt: t(
+          'Toko ingin memberi kabar saat pembayaran lunas. Jalur mana yang cocok?',
+          'Keluarga API mana yang cocok untuk mengabari server lain bahwa pembayaran sudah lunas?',
+        ),
         choices: [
-          { id: 'ev', label: t('Berbasis Kejadian (seperti Webhook / Pub/Sub)') },
-          { id: 'qa', label: t('Tanya-Jawab saja tanpa pemberitahuan'), explainWrong: t('Tanya-Jawab menunggu client bertanya terlebih dahulu.') },
+          { id: 'ev', label: t('Jalur bel pintu', 'Berbasis Kejadian, seperti bel pintu') },
+          {
+            id: 'qa',
+            label: t('Jalur restoran', 'Tanya-Jawab, menunggu client bertanya'),
+            explainWrong: t(
+              'Restoran menunggu kamu bertanya. Ia tidak mengabari sendiri.',
+              'Tanya-Jawab menunggu client bertanya lebih dulu, jadi kabar tidak datang sendiri.',
+            ),
+          },
+          {
+            id: 'rt',
+            label: t('Jalur radio', 'Realtime, mengalir seperti radio'),
+            explainWrong: t(
+              'Radio bersuara terus-menerus. Bel berbunyi hanya saat ada kejadian.',
+              'Realtime mengalirkan kabar terus-menerus, bukan hanya saat satu peristiwa terjadi.',
+            ),
+          },
         ],
         answer: 'ev',
-        explainCorrect: t('Keluarga Berbasis Kejadian bekerja seperti bel pintu saat peristiwa terjadi.'),
+        explainCorrect: t(
+          'Bel pintu berbunyi saat ada kejadian. Seperti kurir memencet bel saat paket tiba.',
+          'Keluarga Berbasis Kejadian mengabari saat peristiwa terjadi, tanpa menunggu ditanya.',
+        ),
+        hints: [t('Pikirkan siapa yang memberi kabar lebih dulu.')],
         tags: ['api'],
       }),
       makeTf({
         id: 'b04-l01-r2',
-        prompt: t('Tidak ada satu jenis API yang "paling bagus" untuk semua situasi; pilihannya bergantung pada kebutuhan fitur.'),
+        prompt: t(
+          'Tidak ada satu jalur API yang paling bagus untuk semua tugas.',
+          'Tidak ada satu jenis API yang paling bagus untuk semua situasi, karena pilihan bergantung pada kebutuhan fitur.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! Kuncinya adalah mencocokkan kebutuhan arah dan kecepatan komunikasi dengan jenis API yang tepat.'),
-        explainWrong: t('Setiap jenis API memiliki kelebihan dan batas masing-masing sesuai kasusnya.'),
+        explainCorrect: t(
+          'Tiap jalur punya tugas yang paling cocok. Radio bagus untuk kabar, restoran untuk bertanya.',
+          'Pilihan bergantung pada arah dan waktu komunikasi fitur itu. Cocokkan kebutuhan dengan jenis API yang tepat.',
+        ),
+        explainWrong: t(
+          'Tiap jalur punya kelebihan dan batas. Tidak ada yang cocok untuk semua tugas.',
+          'Setiap jenis API punya kelebihan dan batas sendiri, sesuai kasusnya.',
+        ),
+        hints: [t('Ingat peta dengan tiga jalur.')],
         tags: ['api'],
       }),
     ],
     recap: t(
-      'Semua jenis API terbagi ke tiga keluarga: Tanya-Jawab, Realtime, dan Berbasis Kejadian.',
-      'Membedakan gaya, protokol, dan format serta menggunakan dua pertanyaan kunci memetakan API ke Tanya-Jawab, Realtime, atau Event-Driven.',
+      'Ada tiga jalur API. Restoran untuk bertanya, radio untuk kabar, bel pintu untuk kejadian.',
+      'Dua pertanyaan, yaitu siapa memulai dan berapa arahnya, memetakan API ke Tanya-Jawab, Realtime, atau Berbasis Kejadian.',
     ),
     companion: {
-      talkPrompts: ['Kalau aplikasi chat keluarga sama aplikasi jadwal cuaca, mana yang butuh obrolan dua arah dan mana yang cukup tanya-jawab?'],
-      offlineActivity: 'Kelompokkan mainan atau kartu tugas di rumah menjadi 3 tumpukan: Tanya-Jawab (pesan makan), Radio/Telepon (ngobrol langsung), dan Bel Pintu (paket datang).',
+      talkPrompts: ['Aplikasi chat keluarga butuh jalur apa, dan jadwal cuaca jalur apa?'],
+      offlineActivity:
+        'Kelompokkan mainan atau kartu tugas di rumah menjadi 3 tumpukan: restoran (pesan makan), radio atau telepon (mengobrol langsung), dan bel pintu (paket datang).',
     },
   }),
 
@@ -404,9 +725,11 @@ export const lessons: Lesson[] = [
     title: 'REST: perpustakaan dan rak bernomor',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa merancang URL REST pakai kata benda dan menjelaskan arti pelayan pelupa (stateless).',
-      'Aku bisa menerapkan aturan penamaan resource REST, nested resource, dan enam prinsip dasar REST.',
+      'Aku bisa menjelaskan alamat kata benda dan pelayan pelupa.',
+      'Kamu bisa menulis URL REST yang rapi dan menyebutkan prinsip dasar REST, termasuk stateless.',
     ),
+    atWork:
+      'Kamu akan menamai alamat seperti /produk/12/ulasan saat merancang endpoint baru bersama tim backend.',
     estMinutes: 6,
     introducesTerms: ['rest'],
     usesTerms: ['api', 'endpoint', 'http-method', 'url', 'cookie-cache'],
@@ -415,74 +738,61 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('b04/perpustakaan-rest.svg', [
         rText(
-          'Bayangkan perpustakaan rapi dengan rak bernomor! Setiap buku punya alamat rak jelas seperti /produk/12. Kamu tinggal pakai kata kerja pinjam, tambah, ubah, atau hapus!',
-          'REST (REpresentational State Transfer) adalah gaya merancang API di atas HTTP yang memandang semua data sebagai resource (benda) beralamat jelas dan dikelola lewat method HTTP.',
+          'Perpustakaan punya rak bernomor. Setiap rak berlabel nama benda, seperti "buku". Lalu bagaimana kamu meminjam, menambah, atau menghapus buku?',
+          'Tim mobile Toko Rani meminta alamat API yang mudah ditebak untuk data produk. Gaya REST menjawabnya: tiap benda (resource) punya alamat sendiri, dan aksinya lewat method HTTP.',
         ),
       ]),
       conceptStep({
-        title: t('Kata Benda, Bukan Kata Kerja', 'Resource pada URL REST'),
+        title: t('Kata benda, bukan kata kerja'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'perpustakaan-rest' },
-        alt: t('URL REST memakai kata benda jamak /produk, sedangkan kata kerjanya adalah GET/POST/DELETE.'),
+        alt: t(
+          'Rak berlabel benda, kata kerja pinjam dan hapus ditulis di kartu perintah.',
+          'URL REST memakai kata benda untuk kumpulan data, seperti /produk, dan kata kerjanya adalah GET, POST, atau DELETE.',
+        ),
         code: {
-          lang: 'http',
-          code: '// BUKAN REST: POST /hapusProduk?id=12\n// GAYA REST : DELETE /produk/12',
+          lang: 'text',
+          code: 'BUKAN REST: POST /hapusProduk?id=12\nGAYA REST : DELETE /produk/12',
           highlight: [2],
         },
         body: [
           rTerm('rest', 'REST', 'REST'),
-          rText(
-            ' adalah cara merancang API yang paling terkenal. Alamat URL memakai kata benda, sedangkan kata kerjanya adalah method HTTP.',
-            ' mewajibkan URL berisi kata benda jamak (misal /produk, huruf kecil pakai tanda hubung), sementara aksinya diwakili method HTTP.',
+          rJunior(
+            ' adalah cara menata API seperti rak perpustakaan. Label rak memakai nama benda. Kata kerja, seperti pinjam, ditulis di kartu perintah.',
           ),
+          rPro(' adalah gaya merancang API. Setiap data (resource) punya alamat berupa kata benda yang menamai kumpulan data, seperti '),
+          rCode('/produk', ['pro']),
+          rPro(' (di API berbahasa Inggris: /products). Aksinya ditentukan method HTTP, bukan kata kerja di URL.'),
         ],
       }),
-      conceptStep({
-        title: t('Pola CRUD & Resource Bersarang', 'Pola CRUD dan Nested Resource'),
-        visualName: 'DiagramConcept',
-        visualProps: { worldId: 'b04', topic: 'crud-rest' },
-        alt: t('GET /produk, POST /produk, PATCH /produk/12, DELETE /produk/12 dan /pengguna/5/pesanan.'),
-        body: [
-          rText(
-            'Pakai GET untuk baca dan POST untuk buat. Pakai PATCH ubah, DELETE hapus.',
-            'Untuk data milik data lain, gunakan nested maksimal dua tingkat seperti /pengguna/5/pesanan. Hindari penamaan campur bahasa di satu API.',
-          ),
+      qStep({
+        id: 'b04-l02-q1j',
+        type: 'sort',
+        modes: ['junior'],
+        prompt: t('Kelompokkan kata-kata ini ke tempat yang tepat.'),
+        difficulty: 1,
+        items: [
+          { id: 'buku', label: t('Buku') },
+          { id: 'pinjam', label: t('Meminjam') },
+          { id: 'rak', label: t('Rak') },
+          { id: 'hapus', label: t('Menghapus') },
         ],
-      }),
-      conceptStep({
-        title: t('Pelayan Pelupa: Stateless', 'Enam Prinsip Ringan & Stateless'),
-        visualName: 'RestoranDiagram',
-        visualProps: { worldId: 'b04', topic: 'stateless-rest' },
-        alt: t('Pelayan stateless tidak mengingat tamu sebelumnya sehingga setiap request membawa info lengkap.'),
-        body: [
-          rText(
-            'Pelayan REST itu stateless (pelupa). Ia tidak mengingat pesanan sebelumnya, sehingga setiap permintaan harus membawa info lengkap.',
-            'Prinsip REST meliputi Client–Server terpisah, Stateless (tiap request membawa info & bukti login lengkap), Cacheable, Antarmuka seragam, dan Berlapis (CDN/load balancer).',
-          ),
+        bins: [
+          { id: 'benda', label: t('Nama benda'), icon: 'box' },
+          { id: 'aksi', label: t('Kata kerja'), icon: 'zap' },
         ],
-      }),
-      limitStep({
-        analogy: t('REST seperti perpustakaan dengan rak bernomor dan pelayan yang pelupa'),
-        same: [
-          t('Setiap benda punya alamat rak tetap dan dikelola kata kerja yang seragam.'),
-          t('Pelayan pelupa membuat restoran mudah menambah banyak pelayan baru saat ramai.'),
-        ],
-        different: [
-          t('Di perpustakaan kamu membawa pulang buku fisik, di REST browser menerima salinan data.'),
-          t('Kadang aplikasi tetap butuh satu endpoint khusus aksi seperti POST /pesanan/88/bayar bila tidak pas dipaksakan jadi kata benda murni.'),
-        ],
-      }),
-      simStep(
-        'pelayan-graphql',
-        t(
-          'Lihat contoh bagaimana paket data tetap bisa dibedakan dengan permintaan per kolom di simulator!',
-          'Bandingkan paket tetap bergaya REST dengan pengambilan kolom selektif pada simulator.',
+        answer: { buku: 'benda', pinjam: 'aksi', rak: 'benda', hapus: 'aksi' },
+        explainCorrect: t(
+          'Label rak memakai nama benda. Kata kerja ditulis di tempat lain.',
         ),
-      ),
+        hints: [t('Ingat label rak di perpustakaan.'), undefined],
+        tags: ['rest', 'url'],
+      }),
       qStep({
         id: 'b04-l02-q1',
         type: 'sort',
-        prompt: t('Kelompokkan alamat endpoint berikut menjadi Gaya REST yang Rapi atau Bukan Gaya REST:'),
+        modes: ['pro'],
+        prompt: t('Kelompokkan alamat endpoint ini menjadi Gaya REST yang rapi atau Bukan REST.'),
         difficulty: 2,
         items: [
           { id: 'ok1', label: t('GET /produk') },
@@ -491,49 +801,219 @@ export const lessons: Lesson[] = [
           { id: 'bad2', label: t('POST /hapusProduk?id=12') },
         ],
         bins: [
-          { id: 'rest', label: t('Gaya REST (Kata Benda + Method)') },
-          { id: 'not', label: t('Bukan REST (Kata Kerja di URL)') },
+          { id: 'rest', label: t('Gaya REST (kata benda dan method)') },
+          { id: 'not', label: t('Bukan REST (kata kerja di URL)') },
         ],
         answer: { ok1: 'rest', bad1: 'not', ok2: 'rest', bad2: 'not' },
-        explainCorrect: t('Hebat! URL REST memakai kata benda (/produk), bukan kata kerja (/ambilSemuaProduk).'),
+        explainCorrect: t(
+          'URL REST memakai kata benda seperti /produk. Kata kerjanya ada di method, bukan di URL seperti /ambilSemuaProduk.',
+        ),
+        hints: [t('Cari URL yang memuat kata kerja.'), undefined],
         tags: ['rest', 'endpoint', 'http-method'],
+      }),
+      conceptStep({
+        title: t('Pola CRUD dan Nested Resource'),
+        modes: ['pro'],
+        visualName: 'DiagramConcept',
+        visualProps: { worldId: 'b04', topic: 'crud-rest' },
+        alt: t('GET /produk, POST /produk, PATCH /produk/12, DELETE /produk/12 dan /pembeli/5/pesanan.'),
+        body: [
+          rPro(
+            'Pakai GET untuk membaca, POST untuk membuat, PATCH untuk mengubah, dan DELETE untuk menghapus data. Untuk data milik data lain, pakai nested resource (data di dalam data lain) maksimal dua tingkat, seperti ',
+          ),
+          rCode('/pembeli/5/pesanan', ['pro']),
+          rPro('. Pakai satu bahasa untuk semua nama di satu API.'),
+        ],
+      }),
+      conceptStep({
+        title: t('Pelayan pelupa', 'Stateless dan prinsip REST'),
+        visualName: 'RestoranDiagram',
+        visualProps: { worldId: 'b04', topic: 'stateless-rest' },
+        alt: t(
+          'Pelayan pelupa tidak ingat tamu, jadi tiap pesanan ditulis lengkap.',
+          'Server stateless tidak mengingat client, jadi setiap request membawa info lengkap.',
+        ),
+        body: [
+          rText(
+            'Pelayan REST itu pelupa. Ia tidak ingat pesananmu yang tadi. Jadi setiap pesanan harus lengkap.',
+            'Stateless berarti server tidak mengingat request sebelumnya, jadi setiap request membawa semua info yang dibutuhkan, termasuk bukti login. Prinsip lain: client dan server terpisah, respons bisa di-cache, interface seragam, dan sistem berlapis.',
+          ),
+        ],
       }),
       qStep(
         makeMcq({
           id: 'b04-l02-q2',
           type: 'analogy',
-          prompt: t('Mengapa prinsip "stateless" pada REST diumpamakan sebagai pelayan restoran yang pelupa?'),
+          prompt: t(
+            'Mengapa pelayan pelupa cocok untuk menggambarkan REST?',
+            'Mengapa prinsip stateless pada REST diumpamakan pelayan restoran yang pelupa?',
+          ),
+          difficulty: 2,
           choices: [
-            { id: 'full', label: t('Karena setiap permintaan harus membawa data dan identitas lengkap tanpa berharap server ingat obrolan lalu') },
-            { id: 'bad', label: t('Karena server sering lupa menyimpan database barang'), explainWrong: t('Database tetap menyimpan data; yang tidak disimpan adalah ingatan sesi percakapan di tiap server.') },
-            { id: 'slow', label: t('Karena pelayan tidak mau mengantar pesanan'), explainWrong: t('Pelayan tetap sigap mengantar pesanan selama pesanannya lengkap.') },
+            {
+              id: 'full',
+              label: t(
+                'Pesanan harus lengkap tanpa mengandalkan ingatan',
+                'Setiap request harus lengkap, tanpa mengandalkan ingatan server',
+              ),
+            },
+            {
+              id: 'bad',
+              label: t(
+                'Pelayan sering lupa mengantar pesanan ke meja',
+                'Server sering lupa menyimpan data barang di database setelah restart',
+              ),
+              explainWrong: t(
+                'Pelayan tetap mengantar pesanan. Yang ia lupa hanyalah percakapan lama.',
+                'Database tetap menyimpan data. Yang tidak disimpan adalah ingatan sesi percakapan di tiap server.',
+              ),
+            },
+            {
+              id: 'slow',
+              label: t(
+                'Pelayan menolak melayani tamu yang sudah pernah datang',
+                'Server menolak melayani client yang pernah mengirim request sebelumnya',
+              ),
+              explainWrong: t(
+                'Pelayan pelupa tetap melayani tamu lama. Tamu hanya perlu menyebut pesanan lengkap.',
+                'Server stateless tetap melayani client lama, selama setiap request-nya lengkap.',
+              ),
+            },
           ],
           answer: 'full',
-          explainCorrect: t('Benar! Sifat stateless membuat server mana pun yang sedang kosong bisa langsung melayani permintaan.'),
+          explainCorrect: t(
+            'Pelayan pelupa tidak menyimpan ingatan. Pelayan mana pun yang kosong bisa langsung melayani.',
+            'Karena stateless, server mana pun yang sedang kosong bisa langsung melayani request.',
+          ),
+          hints: [
+            t('Ingat pelayan yang tidak ingat pesananmu tadi.', 'Tanyakan: apa yang tidak disimpan server?'),
+          ],
+          tags: ['rest'],
+        }),
+      ),
+      limitStep({
+        analogy: t('REST seperti perpustakaan dengan rak bernomor dan pelayan yang pelupa'),
+        same: [
+          t('Setiap benda punya alamat rak tetap dan dikelola kata kerja yang seragam.'),
+          t('Pelayan pelupa membuat restoran mudah menambah pelayan baru saat ramai.'),
+        ],
+        different: [
+          t(
+            'Di perpustakaan kamu membawa pulang bukunya. Di aplikasi, kamu hanya melihat salinannya.',
+            'Di perpustakaan kamu membawa pulang buku fisik. Di REST, browser menerima salinan data.',
+          ),
+          t(
+            'Kadang ada tugas yang sulit diberi nama benda, seperti membayar.',
+            'Kadang aplikasi tetap butuh alamat aksi, seperti /pesanan/88/bayar, karena prosesnya tidak cocok dipaksa jadi kata benda.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
+      simStep(
+        'pelayan-graphql',
+        t(
+          'Ini pelayan pribadi. Ia berbeda dari pelayan pelupa. Centang nama, harga, atau stok, lalu lihat yang ia bawa.',
+          'Pilih kolom di simulator, lalu bandingkan dengan paket tetap bergaya REST yang berisi semua kolom.',
+        ),
+      ),
+      qStep(
+        makeMcq({
+          id: 'b04-l02-q3j',
+          type: 'scenario',
+          modes: ['junior'],
+          story: t('Kamu duduk di restoran dengan pelayan pelupa. Kamu mau menambah 1 nasi.'),
+          prompt: t('Apa yang kamu katakan?'),
+          difficulty: 2,
+          choices: [
+            { id: 'full', label: t('Tambah 1 nasi untuk meja 5') },
+            {
+              id: 'tadi',
+              label: t('Tambah 1 nasi untuk pesananku yang tadi'),
+              explainWrong: t('Pelayan pelupa tidak tahu pesananmu yang tadi. Sebut meja dan menu lagi.'),
+            },
+            {
+              id: 'ingat',
+              label: t('Kamu ingat pesananku tadi, kan?'),
+              explainWrong: t('Pelayan pelupa tidak ingat apa pun. Kamu harus menyebut semuanya.'),
+            },
+          ],
+          answer: 'full',
+          explainCorrect: t('Pesananmu lengkap, jadi pelayan bisa bekerja. Seperti surat beralamat lengkap.'),
+          hints: [t('Ingat pelayan yang tidak ingat pesananmu tadi.')],
           tags: ['rest'],
         }),
       ),
       qStep(
         makeTf({
           id: 'b04-l02-q3',
-          prompt: t('Dalam perancangan URL REST, menyusun nested resource sedalam lima tingkat seperti /toko/1/rak/2/produk/3/ulasan/4/balasan sangat dianjurkan.'),
+          modes: ['pro'],
+          prompt: t(
+            'Menyusun nested resource sampai lima tingkat, seperti /toko/1/rak/2/produk/3/ulasan/4/balasan, sangat dianjurkan.',
+          ),
           answer: false,
-          explainCorrect: t('Benar, itu keliru! Nested resource sebaiknya maksimal dua tingkat agar URL tetap ringkas dan mudah dipahami.'),
-          explainWrong: t('Hampir! URL REST yang bersarang terlalu dalam menyulitkan penggunaannya; cukup 1–2 tingkat saja.'),
+          difficulty: 2,
+          explainCorrect: t(
+            'Pernyataan itu keliru: nested resource sebaiknya maksimal dua tingkat. URL tetap ringkas dan mudah dipahami.',
+          ),
+          explainWrong: t('URL yang bersarang terlalu dalam menyulitkan pemakaiannya. Cukup satu atau dua tingkat.'),
+          hints: [t('Hitung berapa tingkat yang masih mudah dibaca.')],
           tags: ['rest', 'url'],
         }),
       ),
       qStep(
         makeMcq({
-          id: 'b04-l02-q4',
-          prompt: t('Penulisan URL REST mana yang mengikuti kebiasaan penamaan terbaik (jamak, huruf kecil, tanda hubung, satu bahasa)?'),
+          id: 'b04-l02-q4j',
+          type: 'mcq',
+          modes: ['junior'],
+          prompt: t('Mengapa banyak pelayan pelupa membantu saat restoran ramai?'),
+          difficulty: 2,
           choices: [
-            { id: 'good', label: t('GET /kategori-produk?urut=-harga') },
-            { id: 'mix1', label: t('GET /Kategori_Product/ambil'), explainWrong: t('Jangan mencampur kata kerja (ambil), huruf kapital, garis bawah, atau dua bahasa.') },
-            { id: 'mix2', label: t('GET /categories-produk/LIST'), explainWrong: t('Hindari mencampur Inggris–Indonesia dan kata kerja kapital di URL.') },
+            { id: 'any', label: t('Pelayan mana pun bisa melayani tamu') },
+            {
+              id: 'one',
+              label: t('Satu pelayan harus melayani semua tamu'),
+              explainWrong: t('Justru banyak pelayan yang melayani. Setiap pelayan bisa menerima tamu siapa saja.'),
+            },
+            {
+              id: 'no',
+              label: t('Tamu tidak perlu memesan lagi'),
+              explainWrong: t('Tamu tetap memesan. Hanya saja pesanannya harus lengkap setiap kali.'),
+            },
+          ],
+          answer: 'any',
+          explainCorrect: t('Pelayan pelupa tidak butuh ingatan, jadi pelayan mana pun bisa melayani.'),
+          hints: [t('Ingat: pelayan pelupa tidak menyimpan ingatan tamu.')],
+          tags: ['rest'],
+        }),
+      ),
+      qStep(
+        makeMcq({
+          id: 'b04-l02-q4',
+          modes: ['pro'],
+          prompt: t('Penulisan URL REST mana yang mengikuti kebiasaan penamaan terbaik?'),
+          difficulty: 2,
+          choices: [
+            { id: 'good', label: t('GET /jenis-produk?urut=-harga') },
+            {
+              id: 'mix1',
+              label: t('GET /Jenis_Product/ambil'),
+              explainWrong: t(
+                'URL ini mencampur huruf kapital, garis bawah, dua bahasa, dan kata kerja. Penamaan REST memilih huruf kecil dan satu bahasa.',
+              ),
+            },
+            {
+              id: 'mix2',
+              label: t('GET /categories-produk/LIST?urut=harga'),
+              explainWrong: t(
+                'URL ini mencampur bahasa Inggris dan Indonesia, lalu memakai kata kerja kapital. Pilih satu bahasa dan kata benda.',
+              ),
+            },
           ],
           answer: 'good',
-          explainCorrect: t('Tepat! Huruf kecil semua, tanda hubung (-), konsisten satu bahasa, dan filter di query parameter.'),
+          explainCorrect: t(
+            'Huruf kecil semua, tanda hubung (-), dan satu bahasa. Urutan ditaruh di query parameter, dan tanda minus di -harga berarti urut dari harga tertinggi.',
+          ),
+          hints: [t('Cari URL yang konsisten: huruf kecil, satu bahasa, tanpa kata kerja.')],
           tags: ['rest', 'url'],
         }),
       ),
@@ -541,16 +1021,28 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-l02-q5',
           type: 'limit',
+          modes: ['pro'],
           analogy: t('REST seperti perpustakaan yang semua alamatnya harus kata benda'),
-          prompt: t('Pada aplikasi nyata, kapan tim pengembang kadang tetap memakai alamat aksi seperti POST /pesanan/88/bayar?'),
+          prompt: t('Kapan tim kadang tetap memakai alamat aksi seperti POST /pesanan/88/bayar?'),
           difficulty: 2,
           choices: [
-            { id: 'act', label: t('Saat sebuah proses transaksi seperti pembayaran atau pembatalan tidak natural bila dipaksakan sebagai kata benda saja') },
-            { id: 'never', label: t('Tidak pernah, browser akan memblokir URL yang mengandung kata kerja'), explainWrong: t('Browser tidak memblokirnya; REST adalah gaya konvensi perancangan.') },
-            { id: 'css', label: t('Agar warna tombol bayar otomatis berubah hijau'), explainWrong: t('URL endpoint tidak mengatur warna CSS tombol.') },
+            { id: 'act', label: t('Saat proses seperti pembayaran tidak natural kalau dipaksa jadi kata benda') },
+            {
+              id: 'never',
+              label: t('Tidak pernah, karena browser memblokir semua URL yang memuat kata kerja di dalamnya'),
+              explainWrong: t('Browser tidak memblokirnya. REST adalah kebiasaan merancang, bukan aturan yang dipaksakan browser.'),
+            },
+            {
+              id: 'css',
+              label: t('Saat tim ingin URL lebih panjang agar terlihat lengkap'),
+              explainWrong: t('Panjang URL bukan alasan teknis. Aksi dipakai karena prosesnya lebih cocok sebagai aksi.'),
+            },
           ],
           answer: 'act',
-          explainCorrect: t('Benar! REST adalah panduan agar konsisten, bukan penjara kaku bila sebuah proses bisnis lebih jelas sebagai aksi.'),
+          explainCorrect: t(
+            'REST adalah pedoman agar konsisten, bukan penjara kaku. Proses bisnis yang lebih cocok sebagai aksi boleh memakai alamat aksi.',
+          ),
+          hints: [t('Pikirkan proses yang sulit dijadikan satu benda.')],
           tags: ['rest', 'endpoint'],
         }),
       ),
@@ -558,16 +1050,28 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-l02-q6',
           type: 'scenario',
-          story: t('Raka ingin mengambil semua ulasan milik produk bernomor 12 di Toko Rani menggunakan gaya REST.'),
-          prompt: t('Susunan method dan URL nested resource mana yang paling tepat?'),
+          modes: ['pro'],
+          story: t('Raka ingin mengambil semua ulasan milik produk nomor 12 di Toko Rani dengan gaya REST.'),
+          prompt: t('Susunan method dan URL mana yang paling tepat?'),
           difficulty: 2,
           choices: [
             { id: 'ok', label: t('GET /produk/12/ulasan') },
-            { id: 'bad1', label: t('POST /lihatUlasan?produk=12'), explainWrong: t('Membaca data memakai GET, dan URL memakai kata benda.') },
-            { id: 'bad2', label: t('DELETE /ulasan/produk/12'), explainWrong: t('DELETE akan menghapus data, bukan mengambil daftar ulasan.') },
+            {
+              id: 'bad1',
+              label: t('POST /lihatUlasan?produk=12'),
+              explainWrong: t('Membaca data memakai GET, dan URL memakai kata benda, bukan kata kerja seperti lihat.'),
+            },
+            {
+              id: 'bad2',
+              label: t('DELETE /ulasan/produk/12'),
+              explainWrong: t('DELETE akan menghapus data, bukan mengambil daftar ulasan.'),
+            },
           ],
           answer: 'ok',
-          explainCorrect: t('Tepat! /produk/12/ulasan mengekspresikan ulasan milik produk nomor 12 dengan method GET.'),
+          explainCorrect: t(
+            '/produk/12/ulasan menunjukkan ulasan milik produk nomor 12, dan GET dipakai untuk membaca.',
+          ),
+          hints: [t('Susun dari benda terbesar: produk, lalu ulasan di dalamnya.')],
           tags: ['rest', 'http-method'],
         }),
       ),
@@ -575,41 +1079,77 @@ export const lessons: Lesson[] = [
         id: 'b04-l02-q7',
         type: 'type',
         modes: ['pro'],
-        prompt: t('Ketik nama prinsip REST yang berarti "server tidak menyimpan ingatan request sebelumnya sehingga tiap request harus lengkap":'),
+        prompt: t(
+          'Ketik nama prinsip REST yang berarti server tidak menyimpan ingatan request sebelumnya, jadi tiap request harus lengkap.',
+        ),
         difficulty: 2,
         accept: ['stateless'],
-        explainCorrect: t('Benar! Stateless memungkinkan skala server backend mudah diperbanyak.'),
+        explainCorrect: t('Stateless membuat server backend mudah diperbanyak, karena server mana pun bisa melayani.'),
+        hints: [t('Ingat kata untuk pelayan pelupa.'), undefined],
         tags: ['rest'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'b04-l02-r1',
-        prompt: t('Untuk menghapus produk nomor 12 pada gaya REST, kombinasi yang tepat adalah…'),
+        prompt: t(
+          'Di REST, kata kerja "hapus" ditulis di mana?',
+          'Untuk menghapus produk nomor 12 pada gaya REST, kombinasi mana yang tepat?',
+        ),
         choices: [
-          { id: 'del', label: t('DELETE /produk/12') },
-          { id: 'get', label: t('GET /hapusProduk/12'), explainWrong: t('GET tidak boleh menghapus data, dan URL REST memakai kata benda.') },
+          { id: 'del', label: t('Di kartu perintah terpisah', 'DELETE /produk/12') },
+          {
+            id: 'get',
+            label: t('Di label rak, sebelum nama benda', 'GET /hapusProduk/12'),
+            explainWrong: t(
+              'Label rak hanya berisi nama benda. Kata kerja ditulis di kartu perintah.',
+              'GET tidak boleh menghapus data, dan URL REST memakai kata benda.',
+            ),
+          },
+          {
+            id: 'post',
+            label: t('Di nomor rak, setelah nama benda', 'POST /produk/12/hapus'),
+            explainWrong: t(
+              'Nomor rak hanya menunjuk bendanya. Kata kerja tidak ditulis di sana.',
+              'Menghapus sudah punya method khusus, yaitu DELETE. Alamat aksi seperti /hapus tidak diperlukan di sini.',
+            ),
+          },
         ],
         answer: 'del',
-        explainCorrect: t('Kata kerjanya di HTTP method (DELETE), sedangkan URL hanya kata benda (/produk/12).'),
+        explainCorrect: t(
+          'Kata kerja ditulis di kartu perintah, dan label rak hanya menyebut benda.',
+          'Kata kerjanya ada di method (DELETE), dan URL hanya berisi kata benda (/produk/12).',
+        ),
+        hints: [t('Ingat label rak hanya berisi nama benda.')],
         tags: ['rest', 'http-method'],
       }),
       makeTf({
         id: 'b04-l02-r2',
-        prompt: t('Karena sifat REST yang stateless, server tidak mengingat permintaan sebelumnya sehingga tiap request membawa info yang dibutuhkan.'),
+        prompt: t(
+          'Pelayan pelupa tidak ingat pesananmu, jadi setiap pesanan harus lengkap.',
+          'Karena REST stateless, server tidak mengingat request sebelumnya, jadi tiap request membawa info yang dibutuhkan.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! Sifat stateless membuat layanan mudah dibesarkan saat pengguna bertambah.'),
-        explainWrong: t('Hampir! Stateless memang berarti server tidak bergantung pada ingatan request sebelumnya.'),
+        explainCorrect: t(
+          'Pelayan pelupa tidak menyimpan ingatan. Karena itu pesanan harus lengkap setiap kali.',
+          'Stateless membuat layanan mudah dibesarkan saat pemakai bertambah.',
+        ),
+        explainWrong: t(
+          'Pelayan pelupa memang tidak ingat pesanan lama. Kamu harus menyebut semuanya lagi.',
+          'Stateless memang berarti server tidak bergantung pada ingatan request sebelumnya.',
+        ),
+        hints: [t('Ingat pelayan yang tidak ingat pesananmu tadi.')],
         tags: ['rest'],
       }),
     ],
     recap: t(
-      'REST memakai kata benda untuk alamat URL dan method HTTP sebagai kata kerja, dengan pelayan stateless yang tidak mengingat pesan lama.',
-      'REST merancang API di atas HTTP berbasiskan resource kata benda, method CRUD seragam, nested ringkas, dan prinsip stateless.',
+      'REST memakai kata benda untuk alamat, dan pelayannya pelupa.',
+      'REST memberi alamat berupa kata benda, aksinya lewat method HTTP, dan servernya stateless.',
     ),
     companion: {
-      talkPrompts: ['Kalau rak perpustakaan memakai nomor /rak/3/buku/12, kenapa lebih gampang daripada /ambilBukuDiRak3Nomor12?'],
-      offlineActivity: 'Beri label nama benda di 3 rak atau kotak di rumah (misal /buku, /mainan), lalu main tebak perintah GET, POST, PATCH, dan DELETE pada kotak tersebut.',
+      talkPrompts: ['Mengapa label rak "buku" lebih mudah dipahami daripada kalimat panjang?'],
+      offlineActivity:
+        'Beri label nama benda di 3 kotak di rumah, seperti "buku" dan "mainan". Lalu mainkan tebak kata kerja: ambil, tambah, ubah, hapus.',
     },
   }),
 
@@ -618,19 +1158,22 @@ export const lessons: Lesson[] = [
     worldId: 'b04',
     title: 'Pagination, error, versioning',
     modes: ['pro'],
-    objective: t('Aku bisa memilih offset vs cursor pagination, merancang format error REST konsisten, serta memahami versioning dan batas REST.'),
-    estMinutes: 5,
+    objective: t(
+      'Kamu bisa memilih offset atau cursor pagination, merancang format error seragam, dan menjelaskan versioning.',
+    ),
+    atWork: 'Kamu akan memilih pagination dan versi /v2 saat tim mobile meminta daftar produk yang panjang.',
+    estMinutes: 6,
     introducesTerms: ['pagination'],
     usesTerms: ['rest', 'api', 'kontrak-api', 'status-code', 'json', 'cookie-cache'],
     warmupFrom: 'b04-l02',
     steps: [
       storyStep('b04/pagination-versi.svg', [
         rText(
-          'Saat toko punya 50.000 produk, mengirim semuanya dalam satu paket JSON akan melumpuhkan jaringan. Selain itu, saat buku menu restoran perlu ganti format besar, pelanggan pemegang menu lama tetap harus dilayani agar tidak mendadak bingung.',
+          'Toko Rani punya 50.000 produk, dan satu paket JSON berisi semuanya membuat jaringan macet. Versi baru API juga tidak boleh mematahkan aplikasi lama.',
         ),
       ]),
       conceptStep({
-        title: t('Pagination: Offset vs Cursor'),
+        title: t('Pagination: offset dan cursor'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'offset-cursor' },
         alt: t('Perbandingan offset pagination (?halaman=3) dengan cursor pagination (?setelah=token).'),
@@ -641,15 +1184,39 @@ export const lessons: Lesson[] = [
         },
         body: [
           rTerm('pagination', 'Pagination'),
-          rText(' memecah daftar besar. '),
+          rText(' adalah cara membagi daftar besar menjadi halaman kecil. '),
           rBold('Offset/page'),
-          rText(' seperti nomor halaman buku—bisa lompat ke halaman 50, tetapi bisa bergeser jika ada data baru masuk. '),
+          rText(' memakai nomor halaman: bisa lompat ke halaman 50, tetapi isinya bergeser saat data baru masuk. '),
           rBold('Cursor'),
-          rText(' seperti pembatas buku untuk infinite scroll yang stabil meski data terus bertambah.'),
+          rText(
+            ' memakai penanda posisi item terakhir, jadi stabil untuk infinite scroll (daftar tanpa halaman) meski data terus bertambah.',
+          ),
         ],
       }),
+      qStep({
+        id: 'b04-l03-q1',
+        type: 'sort',
+        prompt: t('Kelompokkan ciri ini ke Offset Pagination atau Cursor Pagination.'),
+        difficulty: 2,
+        items: [
+          { id: 'o1', label: t('Bisa langsung melompat ke halaman 50') },
+          { id: 'c1', label: t('Stabil saat ada data baru masuk di feed') },
+          { id: 'o2', label: t('Isi halaman bisa bergeser atau ganda saat data baru masuk') },
+          { id: 'c2', label: t('Cocok untuk infinite scroll ("lanjutkan dari sini")') },
+        ],
+        bins: [
+          { id: 'off', label: t('Offset / Page Pagination') },
+          { id: 'cur', label: t('Cursor Pagination') },
+        ],
+        answer: { o1: 'off', c1: 'cur', o2: 'off', c2: 'cur' },
+        explainCorrect: t(
+          'Offset cocok untuk lompat ke nomor halaman tabel. Cursor lebih stabil untuk infinite scroll yang datanya terus bertambah.',
+        ),
+        hints: [t('Tanyakan: ciri ini soal nomor halaman atau penanda posisi?'), undefined],
+        tags: ['pagination', 'rest'],
+      }),
       conceptStep({
-        title: t('Format Error Konsisten & Versioning'),
+        title: t('Format error dan versioning'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'error-versioning' },
         alt: t('Format error terstruktur status 422 dan versi endpoint /v1/produk vs /v2/produk.'),
@@ -659,73 +1226,43 @@ export const lessons: Lesson[] = [
           highlight: [1, 2],
         },
         body: [
-          rText('Error juga bagian dari kontrak (misal format '),
-          rCode('error.kode'),
-          rText(' atau '),
-          rBold('Problem Details RFC 9457'),
-          rText('). Jangan membalas 200 lalu menulis '),
+          rText('Pakai format error yang seragam, misalnya '),
+          rBold('Problem Details'),
+          rText(' (RFC 9457). Jangan membalas status 200 lalu menulis '),
           rCode('"sukses": false'),
-          rText('! Untuk perubahan besar, buat versi '),
+          rText(' di body. Untuk perubahan besar, buat versi '),
           rCode('/v2/'),
           rText(' dan beri masa '),
           rBold('deprecation'),
-          rText(' sebelum /v1/ dimatikan.'),
+          rText(' (pemberitahuan bahwa versi lama akan dimatikan) sebelum '),
+          rCode('/v1/'),
+          rText(' dihentikan.'),
         ],
       }),
       conceptStep({
-        title: t('HATEOAS, Kelebihan & Kekurangan REST'),
+        title: t('HATEOAS, kelebihan, dan kekurangan REST'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'kelebihan-kekurangan-rest' },
         alt: t('HATEOAS links langkah berikutnya serta masalah over-fetching dan under-fetching di REST.'),
         body: [
           rBold('HATEOAS'),
-          rText(' menyertakan kolom '),
+          rText(' adalah kolom '),
           rCode('links'),
-          rText(' untuk langkah berikutnya seperti struk ATM. Kelebihan REST: sederhana, ramah '),
+          rText(
+            ' di response yang menunjuk langkah berikutnya, seperti struk ATM yang menawarkan menu lanjutan. Kelebihan REST: sederhana, cocok dengan ',
+          ),
           rTerm('cookie-cache', 'cache HTTP'),
-          rText(', dan kaya alat bantu. Kekurangannya: rentan '),
+          rText(', dan banyak alatnya. Kekurangannya: '),
           rBold('over-fetching'),
-          rText(' (data berlebih) dan '),
+          rText(' (data berlebih yang ikut terkirim) dan '),
           rBold('under-fetching'),
-          rText(' (perlu banyak panggilan untuk satu layar).'),
+          rText(' (butuh banyak panggilan untuk satu layar).'),
         ],
-      }),
-      limitStep({
-        analogy: t('Offset pagination seperti nomor halaman buku, dan deprecation seperti masa ganti buku menu restoran'),
-        same: [
-          t('Membantu pengguna berpindah halaman atau menyesuaikan diri saat kontrak menu lama diganti.'),
-        ],
-        different: [
-          t('Halaman buku kertas tidak pernah bertambah di tengah-tengah saat kamu membaca, sedangkan tabel database terus menerima baris baru sehingga offset bisa menampilkan item duplikat.'),
-        ],
-      }),
-      simStep(
-        'pelayan-graphql',
-        t('Amati bagaimana memilih field tertentu di simulator mengatasi paket data berlebih (over-fetching) yang sering terjadi di REST.'),
-      ),
-      qStep({
-        id: 'b04-l03-q1',
-        type: 'sort',
-        prompt: t('Kelompokkan ciri dan kecocokan berikut ke Offset Pagination atau Cursor Pagination:'),
-        difficulty: 2,
-        items: [
-          { id: 'o1', label: t('Bisa langsung melompat ke halaman 50') },
-          { id: 'c1', label: t('Stabil saat ada data baru masuk di feed media sosial') },
-          { id: 'o2', label: t('Isi halaman bisa bergeser/duplikat bila ada data baru masuk') },
-          { id: 'c2', label: t('Cocok untuk infinite scroll ("lanjutkan dari sini")') },
-        ],
-        bins: [
-          { id: 'off', label: t('Offset / Page Pagination') },
-          { id: 'cur', label: t('Cursor Pagination') },
-        ],
-        answer: { o1: 'off', c1: 'cur', o2: 'off', c2: 'cur' },
-        explainCorrect: t('Tepat! Offset bagus untuk lompat nomor halaman tabel, sedangkan cursor unggul untuk infinite scroll dinamis.'),
-        tags: ['pagination', 'rest'],
       }),
       qStep({
         id: 'b04-l03-q2',
         type: 'spotbug',
-        prompt: t('Ketuk baris pada respons error REST berikut yang melanggar praktik kontrak API yang baik:'),
+        prompt: t('Ketuk dua baris yang melanggar praktik error REST yang baik.'),
         difficulty: 2,
         lines: [
           'HTTP/1.1 200 OK',
@@ -736,30 +1273,63 @@ export const lessons: Lesson[] = [
           '}',
         ],
         answer: [1, 4],
-        explainCorrect: t('Benar! Mengirim 200 OK padahal gagal lalu menyelipkan "sukses": false mengacaukan kode frontend. Seharusnya memakai status 422.'),
+        explainCorrect: t(
+          'Status 200 berarti sukses, tetapi isinya gagal. Seharusnya status 422, dan kegagalan tidak ditulis sebagai "sukses": false.',
+        ),
+        hints: [t('Cocokkan kode status di baris pertama dengan isi pesannya.'), undefined],
         tags: ['rest', 'status-code', 'pagination'],
       }),
+      limitStep({
+        analogy: t('Offset pagination seperti nomor halaman buku, dan deprecation seperti masa ganti buku menu restoran'),
+        same: [
+          t(
+            'Nomor halaman buku membantu kamu berpindah halaman, dan masa ganti menu memberi waktu untuk beralih.',
+          ),
+        ],
+        different: [
+          t(
+            'Halaman buku kertas tidak bertambah di tengah bacaan. Tabel database terus menerima baris baru, jadi offset bisa menampilkan item ganda.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
+      simStep(
+        'pelayan-graphql',
+        t('Pilih kolom di simulator untuk melihat cara GraphQL menghindari data berlebih (over-fetching) yang sering terjadi di REST.'),
+      ),
       qStep(
         makeMcq({
           id: 'b04-l03-q3',
-          prompt: t('Dalam versioning API, pengumuman jauh-jauh hari bahwa endpoint /v1/produk akan dihentikan pada akhir bulan disebut…'),
+          prompt: t('Apa nama pengumuman bahwa endpoint /v1/produk akan dihentikan pada akhir bulan?'),
           choices: [
             { id: 'dep', label: t('Deprecation') },
-            { id: 'cur', label: t('Cursor pagination'), explainWrong: t('Cursor pagination adalah teknik memecah daftar data.') },
-            { id: 'hat', label: t('HATEOAS'), explainWrong: t('HATEOAS adalah penyertaan tautan langkah berikutnya pada response.') },
+            {
+              id: 'cur',
+              label: t('Cursor pagination'),
+              explainWrong: t('Cursor pagination adalah teknik memecah daftar data, bukan pengumuman versi.'),
+            },
+            {
+              id: 'hat',
+              label: t('HATEOAS'),
+              explainWrong: t('HATEOAS adalah tautan langkah berikutnya di response, bukan pengumuman versi.'),
+            },
           ],
           answer: 'dep',
-          explainCorrect: t('Tepat! Deprecation memberi waktu aplikasi client lama beralih ke versi baru (/v2/) tanpa mendadak rusak.'),
+          explainCorrect: t(
+            'Deprecation memberi waktu bagi aplikasi lama untuk pindah ke /v2/. Seperti pengumuman masa ganti buku menu restoran.',
+          ),
           tags: ['kontrak-api', 'pagination'],
         }),
       ),
       qStep(
         makeTf({
           id: 'b04-l03-q4',
-          prompt: t('Standar resmi Problem Details (RFC 9457) untuk format error REST menggunakan kolom seperti type, title, status, dan detail.'),
+          prompt: t('Problem Details (RFC 9457) memakai kolom type, title, status, dan detail untuk format error.'),
           answer: true,
-          explainCorrect: t('Betul! RFC 9457 membuat bentuk pesan error antarlayanan REST seragam dan mudah diproses frontend.'),
-          explainWrong: t('RFC 9457 memang mendefinisikan kolom standar type, title, status, dan detail untuk error HTTP API.'),
+          explainCorrect: t(
+            'RFC 9457 membuat bentuk pesan error seragam antar layanan REST. Frontend jadi mudah memprosesnya.',
+          ),
+          explainWrong: t('RFC 9457 memang mendefinisikan kolom standar type, title, status, dan detail untuk error HTTP.'),
           tags: ['rest', 'pagination'],
         }),
       ),
@@ -768,15 +1338,26 @@ export const lessons: Lesson[] = [
           id: 'b04-l03-q5',
           type: 'limit',
           analogy: t('Offset pagination (?halaman=3) seperti nomor halaman buku cetak'),
-          prompt: t('Mengapa analogi nomor halaman buku cetak gagal menjaga kestabilan saat dipakai di daftar berita yang terus bertambah?'),
+          prompt: t('Mengapa nomor halaman buku gagal menjaga isi tetap stabil di daftar berita yang terus bertambah?'),
           difficulty: 2,
           choices: [
-            { id: 'shift', label: t('Karena penambahan data baru menggeser posisi seluruh item berikutnya sehingga item lama muncul lagi di halaman berikut') },
-            { id: 'num', label: t('Karena query parameter tidak bisa menerima angka halaman'), explainWrong: t('Query parameter ?halaman=3 sangat mudah menerima angka.') },
-            { id: 'json', label: t('Karena JSON tidak mendukung daftar array'), explainWrong: t('JSON mendukung array data dengan sangat baik.') },
+            { id: 'shift', label: t('Data baru menggeser item, jadi item lama muncul lagi') },
+            {
+              id: 'num',
+              label: t('Nomor halaman tidak bisa dikirim lewat query parameter atau URL'),
+              explainWrong: t('Nomor halaman mudah dikirim lewat query parameter, misalnya ?halaman=3.'),
+            },
+            {
+              id: 'json',
+              label: t('Server menolak daftar yang punya lebih dari seratus halaman'),
+              explainWrong: t('Server tidak menolak daftar panjang. Masalahnya ada pada posisi item yang bergeser.'),
+            },
           ],
           answer: 'shift',
-          explainCorrect: t('Benar! Penambahan baris baru menggeser posisi offset sehingga pembatas cursor jauh lebih aman untuk data real-time.'),
+          explainCorrect: t(
+            'Baris baru menggeser posisi offset. Pembatas cursor lebih aman untuk data yang terus bertambah.',
+          ),
+          hints: [t('Bayangkan buku yang halamannya bertambah saat kamu membaca.')],
           tags: ['pagination'],
         }),
       ),
@@ -784,16 +1365,27 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-l03-q6',
           type: 'scenario',
-          story: t('Tim Toko Rani perlu mengubah nama kolom "harga_diskon" menjadi struktur objek harga baru di API tanpa memutus aplikasi Android versi lama yang masih dipakai pembeli.'),
-          prompt: t('Strategi versioning terbaik agar pembaruan kontrak aman adalah…'),
+          story: t(
+            'Tim Toko Rani mengubah kolom "harga_diskon" menjadi objek harga baru. Aplikasi Android lama masih dipakai pembeli.',
+          ),
+          prompt: t('Strategi versioning mana yang menjaga aplikasi lama tetap jalan?'),
           difficulty: 2,
           choices: [
-            { id: 'ver', label: t('Meluncurkan endpoint /v2/produk dengan struktur baru sambil mempertahankan /v1/produk selama masa deprecation') },
-            { id: 'del', label: t('Langsung mengganti /produk saat tengah malam tanpa versi'), explainWrong: t('Aplikasi Android yang belum diperbarui pengguna akan langsung crash.') },
-            { id: 'stat', label: t('Mengganti status 200 menjadi 500 di aplikasi lama'), explainWrong: t('Itu hanya membuat semua pengguna lama melihat error server.') },
+            { id: 'ver', label: t('Luncurkan /v2/produk dan pertahankan /v1/produk saat masa transisi') },
+            {
+              id: 'del',
+              label: t('Ganti /produk langsung di tengah malam tanpa versi'),
+              explainWrong: t('Aplikasi Android yang belum diperbarui akan langsung error.'),
+            },
+            {
+              id: 'stat',
+              label: t('Minta semua pembeli memperbarui aplikasi sebelum perubahan dirilis ke server'),
+              explainWrong: t('Pembeli yang belum memperbarui akan langsung melihat error, karena kontrak lama sudah hilang.'),
+            },
           ],
           answer: 'ver',
-          explainCorrect: t('Tepat! Versioning /v1 dan /v2 menjaga kontrak klien lama tetap jalan selama masa transisi.'),
+          explainCorrect: t('Versi /v1 dan /v2 berjalan bersamaan, jadi aplikasi lama tetap jalan selama masa transisi.'),
+          hints: [t('Cari cara yang tidak memutus aplikasi lama.')],
           tags: ['kontrak-api', 'rest', 'pagination'],
         }),
       ),
@@ -803,26 +1395,44 @@ export const lessons: Lesson[] = [
         id: 'b04-l03-r1',
         prompt: t('Kapan sebaiknya memilih Cursor Pagination dibanding Offset Pagination?'),
         choices: [
-          { id: 'inf', label: t('Untuk feed infinite scroll dengan data yang sering bertambah baru') },
-          { id: 'jmp', label: t('Saat pengguna wajib bisa klik lompat langsung ke halaman 47'), explainWrong: t('Lompat ke nomor halaman acak cocok dengan offset pagination.') },
+          { id: 'inf', label: t('Untuk feed infinite scroll yang sering menerima data baru') },
+          {
+            id: 'jmp',
+            label: t('Saat pembaca wajib bisa lompat ke halaman 47'),
+            explainWrong: t('Lompat ke nomor halaman acak cocok dengan offset pagination.'),
+          },
+          {
+            id: 'tiny',
+            label: t('Untuk daftar kecil yang hanya punya satu halaman'),
+            explainWrong: t('Daftar kecil tidak butuh pagination sama sekali, jadi tidak ada alasan memilih cursor.'),
+          },
         ],
         answer: 'inf',
-        explainCorrect: t('Cursor pagination stabil terhadap masuknya data baru sehingga cocok untuk infinite scroll.'),
+        explainCorrect: t('Cursor stabil terhadap masuknya data baru, jadi cocok untuk infinite scroll.'),
         tags: ['pagination'],
       }),
       makeMcq({
         id: 'b04-l03-r2',
         prompt: t('Apa maksud istilah HATEOAS pada REST API?'),
         choices: [
-          { id: 'lnk', label: t('Response menyertakan tautan (links) ke langkah berikutnya yang dapat dilakukan') },
-          { id: 'enc', label: t('Cara mengenkripsi file foto di FormData'), explainWrong: t('HATEOAS berkaitan dengan hypermedia/links pada response.') },
+          { id: 'lnk', label: t('Response menyertakan tautan ke langkah berikutnya') },
+          {
+            id: 'enc',
+            label: t('Cara membagi daftar besar menjadi halaman kecil'),
+            explainWrong: t('Itu pagination. HATEOAS berkaitan dengan tautan di response.'),
+          },
+          {
+            id: 'ver',
+            label: t('Cara memberi nomor versi pada endpoint'),
+            explainWrong: t('Itu versioning. HATEOAS berkaitan dengan tautan di response.'),
+          },
         ],
         answer: 'lnk',
-        explainCorrect: t('Seperti kolom links: { berikutnya: "/produk?halaman=4" } pada response pagination.'),
+        explainCorrect: t('Seperti kolom links yang berisi alamat halaman berikutnya pada response pagination.'),
         tags: ['rest', 'pagination'],
       }),
     ],
-    recap: t('REST skala besar membagi data lewat offset/cursor pagination, memakai format error konsisten, serta menjaga kontrak lewat versioning /v1–/v2.'),
+    recap: t('Bagi daftar besar dengan offset atau cursor, balas error dengan format seragam, dan jaga aplikasi lama lewat versi.'),
   }),
 
   makeLesson({
@@ -831,134 +1441,186 @@ export const lessons: Lesson[] = [
     title: 'GraphQL: pelayan pribadi',
     modes: ['junior', 'pro'],
     objective: t(
-      'Aku bisa menjelaskan mengapa GraphQL seperti pelayan pribadi dan membedakan tiga aksinya.',
-      'Aku bisa menjelaskan over-fetching/under-fetching, operasi query/mutation/subscription, serta schema dan resolver GraphQL.',
+      'Aku bisa menjelaskan pelayan pribadi dan tiga tugasnya.',
+      'Kamu bisa menjelaskan over-fetching dan under-fetching, tiga operasi GraphQL, serta schema dan resolver.',
     ),
+    atWork: 'Kamu akan menulis query GraphQL agar layar profil hanya mengambil nama dan foto.',
     estMinutes: 6,
     introducesTerms: ['graphql'],
     usesTerms: ['api', 'rest', 'endpoint', 'json', 'cookie-cache'],
     stickerId: 'pelayan-pribadi',
-    warmupFrom: 'b04-l03',
+    warmupFrom: 'b04-l02',
     steps: [
       storyStep('b04/pelayan-pribadi.svg', [
         rText(
-          'Di restoran biasa kamu dapat paket menu tetap: padahal tidak suka sayur, tetap ikut terbawa! Dengan pelayan pribadi GraphQL, kamu tulis persis daftar maumu di kertas, ia ambilkan tepat sesuai daftar!',
-          'REST ibarat paket menu tetap yang sering memberi data berlebih atau memaksamu bolak-balik ke beberapa loket. GraphQL hadir sebagai pelayan pribadi satu pintu yang membawa persis kolom yang kamu minta.',
+          'Di restoran biasa, pelayan membawa paket menu tetap. Kamu tidak suka sayur, tetapi sayur ikut terbawa. Bagaimana kalau kamu menulis daftar maumu sendiri?',
+          'Layar profil Toko Rani hanya butuh nama dan foto, tetapi REST mengirim 30 kolom lewat 2 panggilan. GraphQL adalah cara meminta persis kolom yang dibutuhkan lewat satu pintu.',
         ),
       ]),
       conceptStep({
-        title: t('Masalah Paket Terlalu Penuh atau Kurang', 'Over-fetching dan Under-fetching'),
+        title: t('Paket terlalu penuh atau kurang', 'Over-fetching dan Under-fetching'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'over-under-fetching' },
-        alt: t('Over-fetching membeli paket sembako padahal cuma butuh telur; under-fetching belanja ke tiga toko.'),
+        alt: t(
+          'Satu paket sembako padahal hanya butuh telur, atau belanja ke tiga toko.',
+          'Over-fetching seperti membeli paket sembako padahal hanya butuh telur. Under-fetching seperti belanja ke tiga toko.',
+        ),
         body: [
-          rBold('Over-fetching', 'Over-fetching'),
-          rText(
-            ' itu membeli satu paket sembako padahal cuma mau telur. ',
-            ' terjadi saat menerima data jauh lebih banyak dari kebutuhan. ',
+          rJunior(
+            'Kamu hanya mau telur, tetapi dapat satu paket sembako. Itu disebut data kebanyakan. Kalau harus ke tiga toko, itu data kurang.',
           ),
-          rBold('Under-fetching', 'Under-fetching'),
-          rText(
-            ' harus bolak-balik ke banyak toko.',
-            ' terjadi saat satu endpoint belum cukup sehingga harus bolak-balik beberapa kali.',
-          ),
+          proBold('Over-fetching'),
+          rPro(' (data berlebih) terjadi saat aplikasi menerima jauh lebih banyak data daripada kebutuhan. '),
+          proBold('Under-fetching'),
+          rPro(' (data kurang) terjadi saat satu endpoint belum cukup, jadi aplikasi memanggil beberapa kali.'),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'b04-l04-q1',
+          type: 'analogy',
+          prompt: t(
+            'Kamu hanya mau telur, tetapi dapat satu paket sembako. Apa masalahnya?',
+            'Membeli satu paket sembako padahal hanya butuh telur menggambarkan masalah apa?',
+          ),
+          choices: [
+            { id: 'over', label: t('Data kebanyakan', 'Over-fetching (data berlebih)') },
+            {
+              id: 'under',
+              label: t('Data datang terlambat', 'Latensi tinggi karena jaringan lambat'),
+              explainWrong: t(
+                'Cepat atau lambat tidak ditanyakan. Masalahnya ada pada isi paket yang kebanyakan.',
+                'Kecepatan jaringan tidak disebut di cerita. Masalahnya ada pada kolom berlebih yang ikut terkirim.',
+              ),
+            },
+            {
+              id: 'mut',
+              label: t('Data kurang', 'Under-fetching (data kurang)'),
+              explainWrong: t(
+                'Data kurang berarti harus ke tiga toko. Kamu justru dapat terlalu banyak.',
+                'Under-fetching berarti harus memanggil beberapa kali. Di sini data yang datang justru terlalu banyak.',
+              ),
+            },
+          ],
+          answer: 'over',
+          explainCorrect: t(
+            'Kamu membawa pulang banyak yang tidak dipakai. Itu disebut data kebanyakan.',
+            'Over-fetching berarti server mengirim kolom yang tidak dipakai layar. Seperti membeli satu paket sembako untuk satu telur.',
+          ),
+          hints: [t('Ingat paket sembako yang tidak habis dipakai.')],
+          tags: ['graphql'],
+        }),
+      ),
       conceptStep({
-        title: t('Satu Pintu, Bentuk Sama Persis', 'Satu Endpoint & Bentuk Query'),
+        title: t('Satu pintu, bentuk sama', 'Satu Endpoint dan Bentuk Query'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'pelayan-pribadi' },
-        alt: t('Query GraphQL meminta nama, foto, dan 3 judul postingan; server menjawab persis struktur itu.'),
+        alt: t(
+          'Kamu menulis daftar nama dan foto, pelayan membawa persis itu.',
+          'GraphQL meminta nama, foto, dan 3 judul postingan, lalu jawabannya berstruktur sama.',
+        ),
         code: {
-          lang: 'json',
-          code: '// Query GraphQL:\nquery {\n  pengguna(id: 5) {\n    nama\n    foto\n    postingan(batas: 3) { judul }\n  }\n}',
+          lang: 'text',
+          code: '# Query GraphQL\nquery {\n  pengguna(id: 5) {\n    nama\n    foto\n    postingan(batas: 3) { judul }\n  }\n}',
           highlight: [3, 4, 5],
         },
         body: [
           rTerm('graphql', 'GraphQL', 'GraphQL'),
-          rText(
-            ' hanya punya satu alamat seperti /graphql. Kamu menulis daftar kolom yang dimau, lalu server mengirim persis itu.',
-            ' umumnya memakai satu endpoint POST /graphql. Client menulis kerangka kolom yang dibutuhkan, lalu server menjawab dengan bentuk JSON yang sama persis.',
+          rJunior(
+            ' adalah pelayan pribadi. Kamu menulis daftar yang kamu mau, dan ia membawa persis itu. Tugasnya ada tiga: membaca, mengubah, dan memberi kabar langsung.',
           ),
+          rPro(' umumnya memakai satu endpoint, yaitu '),
+          rCode('POST /graphql', ['pro']),
+          rPro('. Client menulis kolom yang dibutuhkan, lalu server menjawab dengan JSON berbentuk sama.'),
         ],
       }),
       conceptStep({
-        title: t('Tiga Aksi, Schema, dan Resolver', 'Operasi, Schema, dan Resolver'),
+        title: t('Operasi, Schema, dan Resolver'),
+        modes: ['pro'],
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'schema-resolver' },
         alt: t('Operasi query, mutation, subscription serta schema menu ketat dan resolver per kolom.'),
         body: [
           rText(
-            'GraphQL punya tiga aksi. query untuk baca, mutation ubah data, subscription kabar langsung.',
-            'Tiga operasinya: query (baca), mutation (ubah), subscription (realtime). Schema menjadi buku menu ketat (tanda ! wajib tidak null), sedangkan resolver adalah koki pengambil tiap kolom.',
+            'GraphQL punya tiga operasi: query untuk membaca, mutation untuk mengubah, dan subscription untuk pembaruan realtime. Schema adalah buku menu yang ketat, dengan tanda seru (!) untuk kolom wajib. Resolver adalah koki yang mengambil nilai tiap kolom.',
           ),
         ],
       }),
+      qStep({
+        id: 'b04-l04-q2',
+        type: 'match',
+        prompt: t(
+          'Pasangkan tiga tugas pelayan pribadi dengan artinya.',
+          'Pasangkan tiga operasi GraphQL dengan padanannya di REST atau WebSocket.',
+        ),
+        difficulty: 2,
+        left: [
+          { id: 'q', label: t('Membaca', 'query') },
+          { id: 'm', label: t('Mengubah', 'mutation') },
+          { id: 's', label: t('Kabar langsung', 'subscription') },
+        ],
+        right: [
+          { id: 'r_m', label: t('Mengganti isi pesanan', 'POST, PUT, PATCH, DELETE (mengubah data)') },
+          { id: 'r_s', label: t('Dapat kabar saat pesanan siap', 'Realtime (biasanya lewat WebSocket)') },
+          { id: 'r_q', label: t('Melihat isi menu', 'GET (membaca data)') },
+        ],
+        answer: { q: 'r_q', m: 'r_m', s: 'r_s' },
+        explainCorrect: t(
+          'Membaca hanya melihat isi. Mengubah mengganti isi, dan kabar langsung datang sendiri.',
+          'Query membaca data, mutation mengubahnya, dan subscription mengirim pembaruan realtime.',
+        ),
+        hints: [
+          t('Ingat tiga tugas pelayan pribadi.', 'Cocokkan kata kerja REST dengan operasi GraphQL yang sepadan.'),
+        undefined,
+        ],
+        tags: ['graphql', 'rest'],
+      }),
       limitStep({
-        analogy: t('GraphQL seperti pelayan pribadi yang membawakan tepat daftar pesananmu'),
+        analogy: t(
+          'GraphQL seperti pelayan pribadi yang membawa persis daftarmu',
+          'GraphQL seperti pelayan pribadi yang membawakan tepat daftar pesananmu',
+        ),
         same: [
-          t('Kamu mendapat persis kolom data yang diminta tanpa sisa atau kekurangan dalam satu kali pesan.'),
+          t(
+            'Kamu mendapat persis yang kamu minta, tanpa sisa.',
+            'Kamu mendapat persis kolom yang diminta, tanpa sisa dan tanpa kekurangan, dalam satu kali pesan.',
+          ),
         ],
         different: [
-          t('Karena biasanya memakai satu endpoint POST /graphql, caching HTTP bawaan browser/CDN tidak semudah URL GET unik milik REST.'),
-          t('Untuk aplikasi CRUD sederhana atau file upload, GraphQL bisa terasa lebih rumit dibanding REST (serta butuh penjagaan kueri terlalu dalam dan masalah N+1 di server).'),
+          t(
+            'Pelayan melayani 1 meja. GraphQL melayani banyak aplikasi.',
+            'Satu alamat POST /graphql membuat caching HTTP lebih sulit daripada URL GET milik REST. Untuk CRUD sederhana atau unggah file, GraphQL juga bisa lebih rumit.',
+          ),
         ],
+        riskyAnalogy: true,
       }),
       simStep(
         'pelayan-graphql',
         t(
-          'Centang dan hapus centang kolom nama, harga, atau stok untuk melihat jawaban pelayan GraphQL berubah persis!',
-          'Uji langsung di simulator Pelayan GraphQL bagaimana perubahan checklist kolom langsung mengubah query dan JSON response.',
+          'Centang nama, harga, atau stok, lalu lihat jawaban pelayan berubah.',
+          'Uji di simulator bagaimana centang kolom mengubah query dan jawabannya.',
         ),
       ),
       qStep(
-        makeMcq({
-          id: 'b04-l04-q1',
-          type: 'analogy',
-          prompt: t('Membeli satu paket sembako besar padahal hanya butuh telur menggambarkan masalah…'),
-          choices: [
-            { id: 'over', label: t('Over-fetching (menerima data berlebih)') },
-            { id: 'under', label: t('Under-fetching (kurang data)'), explainWrong: t('Under-fetching ibarat harus belanja ke tiga toko berbeda.') },
-            { id: 'mut', label: t('Mutation'), explainWrong: t('Mutation adalah operasi mengubah data di GraphQL.') },
-          ],
-          answer: 'over',
-          explainCorrect: t('Tepat! Over-fetching berarti server mengirim banyak kolom yang tidak dipakai di layar.'),
-          tags: ['graphql'],
-        }),
-      ),
-      qStep({
-        id: 'b04-l04-q2',
-        type: 'match',
-        prompt: t('Pasangkan tiga jenis operasi GraphQL dengan padanannya di REST/WebSocket:'),
-        difficulty: 2,
-        left: [
-          { id: 'q', label: t('query') },
-          { id: 'm', label: t('mutation') },
-          { id: 's', label: t('subscription') },
-        ],
-        right: [
-          { id: 'r_m', label: t('POST, PUT, PATCH, DELETE (mengubah data)') },
-          { id: 'r_s', label: t('Realtime (biasanya lewat WebSocket)') },
-          { id: 'r_q', label: t('GET (membaca data)') },
-        ],
-        answer: { q: 'r_q', m: 'r_m', s: 'r_s' },
-        explainCorrect: t('Mantap! query membaca, mutation mengubah, dan subscription berlangganan kabar realtime.'),
-        tags: ['graphql', 'rest'],
-      }),
-      qStep(
         makeTf({
           id: 'b04-l04-q3',
-          prompt: t('Di GraphQL, client bebas meminta kolom rahasia apa saja walaupun nama kolom tersebut tidak tertulis di schema server.'),
+          modes: ['pro'],
+          prompt: t('Client GraphQL boleh meminta kolom apa saja, walau kolom itu tidak ada di schema server.'),
           answer: false,
-          explainCorrect: t('Benar, itu keliru! Schema adalah buku menu ketat; client hanya bisa meminta kolom yang terdaftar di schema.'),
-          explainWrong: t('Hampir! Client memang bebas memilih kolom, tetapi tetap harus ada di dalam daftar buku menu schema.'),
+          difficulty: 2,
+          explainCorrect: t(
+            'Pernyataan itu keliru: schema adalah buku menu yang ketat. Client hanya bisa meminta kolom yang terdaftar di sana.',
+          ),
+          explainWrong: t('Client bebas memilih kolom, tetapi hanya dari daftar di schema.'),
+          hints: [t('Ingat buku menu: apa yang boleh dipesan?')],
           tags: ['graphql'],
         }),
       ),
       qStep({
         id: 'b04-l04-q4',
         type: 'hotspot',
-        prompt: t('Ketuk bagian yang berperan sebagai "koki per kolom" yang tahu cara mengambil nilai tiap field di server GraphQL:'),
+        modes: ['pro'],
+        prompt: t('Ketuk bagian yang bertugas mengambil nilai tiap kolom di server GraphQL.'),
         difficulty: 2,
         image: 'b04-hotspot',
         regions: [
@@ -967,27 +1629,68 @@ export const lessons: Lesson[] = [
           { id: 'r3', shape: 'rect', coords: [10, 70, 320, 110], label: 'Endpoint POST /graphql (pintu masuk)' },
         ],
         answer: 'r2',
-        explainCorrect: t('Benar! Resolver adalah fungsi di server yang mengambil nilai untuk masing-masing kolom.'),
+        explainCorrect: t(
+          'Resolver adalah fungsi di server yang mengambil nilai untuk setiap kolom. Ia berperan seperti koki per kolom.',
+        ),
         explainIncorrect: {
-          r1: t('Schema adalah daftar aturan buku menunya, bukan koki pengolahnya.'),
-          r3: t('POST /graphql hanyalah pintu masuk tunggal untuk permintaan GraphQL.'),
+          r1: t('Schema adalah daftar aturan, seperti buku menu. Ia tidak memasak.'),
+          r3: t('Alamat POST /graphql hanyalah pintu masuk. Ia menerima query lalu meneruskannya.'),
         },
+        hints: [t('Cari bagian yang berupa fungsi, bukan daftar atau alamat.'), undefined],
         tags: ['graphql'],
       }),
       qStep(
         makeMcq({
           id: 'b04-l04-q5',
           type: 'limit',
-          analogy: t('GraphQL sebagai pelayan pribadi yang jauh lebih cerdas dari paket menu REST'),
-          prompt: t('Kapan justru lebih sederhana dan menguntungkan tetap memakai REST dibanding GraphQL?'),
+          analogy: t(
+            'GraphQL sebagai pelayan pribadi yang membawa persis daftarmu',
+            'GraphQL sebagai pelayan pribadi yang jauh lebih fleksibel dari paket menu REST',
+          ),
+          prompt: t(
+            'Kamu selalu memesan menu yang sama. Pelayan mana yang paling mudah?',
+            'Kapan REST justru lebih sederhana dan menguntungkan daripada GraphQL?',
+          ),
           difficulty: 2,
           choices: [
-            { id: 'sim', label: t('Untuk CRUD sederhana atau data katalog publik yang ingin mengandalkan caching URL HTTP/CDN dengan mudah') },
-            { id: 'mob', label: t('Saat layar HP butuh 1 panggilan gabungan profil + 3 postingan tanpa kolom sisa'), explainWrong: t('Kasus ini justru kekuatan utama GraphQL.') },
-            { id: 'no', label: t('Saat proyek tidak ingin memakai format JSON sama sekali'), explainWrong: t('Baik REST maupun GraphQL umumnya sama-sama mengembalikan JSON.') },
+            {
+              id: 'sim',
+              label: t(
+                'Menu tetap dari pelayan biasa',
+                'CRUD sederhana atau katalog publik dengan cache URL',
+              ),
+            },
+            {
+              id: 'mob',
+              label: t(
+                'Pelayan pribadi dengan daftar baru tiap hari',
+                'Layar HP butuh profil dan 3 postingan dalam 1 panggilan',
+              ),
+              explainWrong: t(
+                'Menulis daftar baru tiap hari merepotkan kalau pesananmu sama terus.',
+                'Kasus ini justru kekuatan utama GraphQL, yaitu menggabungkan beberapa data dalam satu panggilan.',
+              ),
+            },
+            {
+              id: 'no',
+              label: t(
+                'Pelayan baru yang tidak tahu menumu',
+                'Proyek perlu bentuk data yang berubah di setiap layar',
+              ),
+              explainWrong: t(
+                'Pelayan baru justru butuh daftar yang lengkap. Menu tetap sudah cukup untuk pesanan yang sama.',
+                'Bentuk data yang berubah-ubah justru cocok dengan GraphQL, karena kolom dipilih per layar.',
+              ),
+            },
           ],
           answer: 'sim',
-          explainCorrect: t('Tepat! Untuk aplikasi CRUD sederhana dengan cache URL yang kuat, REST lebih ringkas tanpa beban setup schema/resolver.'),
+          explainCorrect: t(
+            'Kalau pesananmu selalu sama, menu tetap paling mudah. Tidak perlu menulis daftar setiap kali.',
+            'Untuk CRUD sederhana dengan cache yang kuat, REST lebih ringkas tanpa beban schema dan resolver.',
+          ),
+          hints: [
+            t('Pikirkan pesanan yang tidak pernah berubah.', 'Pikirkan kasus yang tidak butuh memilih kolom.'),
+          ],
           tags: ['graphql', 'rest', 'cookie-cache'],
         }),
       ),
@@ -995,16 +1698,42 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-l04-q6',
           type: 'scenario',
-          story: t('Di aplikasi HP Toko Rani, layar profil hanya butuh nama pengguna, foto, dan 3 judul pesanan terakhir. Dengan REST lama, aplikasi harus menembak 2 endpoint berbeda dan menerima 30 kolom tak terpakai.'),
-          prompt: t('Dua masalah apakah yang langsung teratasi jika tim beralih ke satu query GraphQL?'),
+          story: t(
+            'Kamu hanya mau nasi dan telur. Pelayan biasa membawa satu nampan penuh. Banyak yang tidak kamu makan.',
+            'Layar profil Toko Rani hanya butuh nama, foto, dan 3 judul postingan terakhir. Dengan REST, aplikasi memanggil 2 endpoint dan menerima 30 kolom, padahal hanya beberapa yang dipakai.',
+          ),
+          prompt: t('Apa untungnya punya pelayan pribadi?', 'Dua masalah apa yang teratasi dengan satu query GraphQL?'),
           difficulty: 2,
           choices: [
-            { id: 'both', label: t('Over-fetching dan under-fetching sekaligus') },
-            { id: 'css', label: t('Kesalahan warna kontras dan ukuran font'), explainWrong: t('Warna dan font adalah urusan CSS.') },
-            { id: 'dns', label: t('Kesalahan ejaan alamat domain'), explainWrong: t('DNS tidak dipengaruhi oleh pemilihan REST atau GraphQL.') },
+            {
+              id: 'both',
+              label: t('Kamu dapat persis yang kamu minta', 'Over-fetching dan under-fetching sekaligus'),
+            },
+            {
+              id: 'css',
+              label: t('Kamu dapat semua menu sekaligus di nampan', 'Hanya over-fetching, under-fetching tetap ada'),
+              explainWrong: t(
+                'Semua menu sekaligus adalah nampan penuh. Pelayan pribadi justru membawa lebih sedikit.',
+                'Satu query GraphQL juga menggabungkan beberapa sumber, jadi under-fetching ikut teratasi.',
+              ),
+            },
+            {
+              id: 'dns',
+              label: t('Kamu tidak perlu memesan lagi', 'Hanya under-fetching, over-fetching tetap ada'),
+              explainWrong: t(
+                'Kamu tetap menulis daftar. Pelayan pribadi hanya membawa sesuai daftar itu.',
+                'Query yang memilih kolom juga menghapus data berlebih, jadi over-fetching ikut teratasi.',
+              ),
+            },
           ],
           answer: 'both',
-          explainCorrect: t('Benar! Satu query GraphQL mengambil tepat kolom yang diminta dari banyak bagian data dalam sekali jalan.'),
+          explainCorrect: t(
+            'Pelayan pribadi hanya membawa yang kamu sebut. Tidak lebih, tidak kurang.',
+            'Satu query meminta tepat kolom yang dibutuhkan dari beberapa sumber. Data berlebih dan panggilan tambahan sama-sama hilang.',
+          ),
+          hints: [
+            t('Ingat nampan penuh yang tidak habis dimakan.', 'Hitung jumlah panggilan dan jumlah kolom yang terpakai.'),
+          ],
           tags: ['graphql', 'rest'],
         }),
       ),
@@ -1012,43 +1741,78 @@ export const lessons: Lesson[] = [
         id: 'b04-l04-q7',
         type: 'fill',
         modes: ['pro'],
-        prompt: t('Lengkapi tiga jenis operasi utama di GraphQL sesuai perannya:'),
+        prompt: t('Lengkapi tiga operasi utama GraphQL sesuai perannya.'),
         difficulty: 2,
-        template: 'Untuk membaca data pakai ___, untuk membuat/mengubah data pakai ___, dan untuk pembaruan realtime pakai ___.',
+        template:
+          'Untuk membaca data pakai ___, untuk membuat atau mengubah data pakai ___, dan untuk pembaruan realtime pakai ___.',
         bank: ['query', 'mutation', 'subscription', 'resolver'],
         answer: ['query', 'mutation', 'subscription'],
-        explainCorrect: t('Sempurna! query (baca), mutation (ubah), subscription (realtime).'),
+        explainCorrect: t('Query membaca data, mutation mengubah data, dan subscription mengirim pembaruan realtime.'),
+        hints: [t('Ingat tiga peran: baca, ubah, realtime.'), undefined],
         tags: ['graphql'],
       }),
     ],
     reviewCards: [
       makeMcq({
         id: 'b04-l04-r1',
-        prompt: t('Masalah menerima data lebih banyak daripada yang dibutuhkan oleh tampilan layar disebut…'),
+        prompt: t(
+          'Kamu menerima lebih banyak daripada yang kamu butuhkan. Apa namanya?',
+          'Apa nama masalah saat aplikasi menerima data lebih banyak daripada yang dibutuhkan layar?',
+        ),
         choices: [
-          { id: 'ov', label: t('Over-fetching') },
-          { id: 'un', label: t('Under-fetching'), explainWrong: t('Under-fetching berarti satu panggilan tidak cukup sehingga harus memanggil lagi.') },
+          { id: 'ov', label: t('Data kebanyakan', 'Over-fetching') },
+          {
+            id: 'un',
+            label: t('Data kurang', 'Under-fetching'),
+            explainWrong: t(
+              'Data kurang berarti satu pesanan tidak cukup. Kamu harus memesan lagi.',
+              'Under-fetching berarti satu panggilan tidak cukup, jadi harus memanggil lagi.',
+            ),
+          },
+          {
+            id: 'sl',
+            label: t('Data terlambat', 'Latensi'),
+            explainWrong: t(
+              'Terlambat artinya lambat sampai. Di sini isinya yang kebanyakan.',
+              'Latensi adalah jeda waktu jaringan. Di sini masalahnya ada pada jumlah data.',
+            ),
+          },
         ],
         answer: 'ov',
-        explainCorrect: t('Over-fetching membuang kuota karena membawa kolom-kolom yang tidak terpakai.'),
+        explainCorrect: t(
+          'Data kebanyakan terbuang, seperti sayur yang tidak dimakan.',
+          'Over-fetching membuang kuota karena membawa kolom yang tidak terpakai.',
+        ),
+        hints: [t('Ingat paket sembako yang tidak habis dipakai.')],
         tags: ['graphql'],
       }),
       makeTf({
         id: 'b04-l04-r2',
-        prompt: t('Bentuk struktur JSON jawaban dari GraphQL selalu mengikuti persis kerangka kolom yang diminta di dalam query.'),
+        prompt: t(
+          'Pelayan pribadi selalu membawa persis yang ada di daftarmu.',
+          'Bentuk JSON jawaban GraphQL selalu mengikuti persis kolom yang diminta.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! "Apa yang kamu minta, itu yang kamu dapat" adalah ciri khas GraphQL.'),
-        explainWrong: t('Hampir! Jawaban GraphQL memang mencerminkan persis daftar field yang diminta query.'),
+        explainCorrect: t(
+          'Apa yang kamu tulis, itu yang dibawa pelayan.',
+          '"Apa yang kamu minta, itu yang kamu dapat" adalah ciri khas GraphQL.',
+        ),
+        explainWrong: t(
+          'Pelayan pribadi memang membawa persis sesuai daftarmu. Tidak lebih, tidak kurang.',
+          'Jawaban GraphQL memang mencerminkan persis daftar kolom yang diminta query.',
+        ),
+        hints: [t('Ingat pelayan yang membaca daftarmu.')],
         tags: ['graphql', 'json'],
       }),
     ],
     recap: t(
-      'GraphQL seperti pelayan pribadi satu pintu: minta tepat kolom yang butuh tanpa kelebihan atau kekurangan.',
-      'GraphQL mengatasi over-fetching dan under-fetching dengan satu endpoint POST /graphql, schema ketat, resolver, dan query/mutation/subscription.',
+      'Pelayan pribadi membawa persis yang kamu minta, tidak lebih dan tidak kurang.',
+      'GraphQL mengatasi over-fetching dan under-fetching. Satu query meminta kolom persis, dan schema menjaga bentuknya.',
     ),
     companion: {
-      talkPrompts: ['Lebih pilih menu paket nasi kotak yang isinya selalu sama, atau pesan persis lauk yang kamu mau saja? Kenapa?'],
-      offlineActivity: 'Tulis daftar menu makan malam keluarga dengan hanya memilih 3 lauk persis yang disukai, lalu bandingkan dengan paket komplit isi 8 jenis.',
+      talkPrompts: ['Mengapa memilih lauk sendiri lebih hemat daripada nasi kotak tetap?'],
+      offlineActivity:
+        'Tulis daftar menu makan malam keluarga dengan memilih 3 lauk yang paling kamu suka, lalu bandingkan dengan paket komplet isi 8 jenis.',
     },
   }),
 
@@ -1057,8 +1821,11 @@ export const lessons: Lesson[] = [
     worldId: 'b04',
     title: 'gRPC: interkom berkode',
     modes: ['pro'],
-    objective: t('Aku bisa menjelaskan cara kerja gRPC di atas HTTP/2 dan Protobuf serta kapan gRPC unggul dibanding REST.'),
-    estMinutes: 5,
+    objective: t(
+      'Kamu bisa menjelaskan cara kerja gRPC di atas HTTP/2 dan Protobuf serta kapan gRPC unggul dibanding REST.',
+    ),
+    atWork: 'Kamu akan melihat gRPC saat layanan Pesanan memanggil layanan Gudang di backend Toko Rani.',
+    estMinutes: 6,
     introducesTerms: ['grpc'],
     usesTerms: ['api', 'protobuf', 'server', 'browser', 'kontrak-api'],
     stickerId: 'interkom-grpc',
@@ -1066,25 +1833,55 @@ export const lessons: Lesson[] = [
     steps: [
       storyStep('b04/interkom-grpc.svg', [
         rText(
-          'Jika REST dan GraphQL ibarat berbicara dengan pelanggan di ruang depan lewat bahasa surat JSON yang ramah manusia, antar ruangan dapur di gedung kantor memakai interkom khusus berkode singkatan super cepat: gRPC.',
+          'Di backend Toko Rani, layanan Pesanan memanggil layanan Gudang 1.000 kali per detik. Untuk jalur sepadat ini, interkom berkode yang disebut gRPC biasanya lebih cepat daripada REST. Pesannya berupa biner Protobuf yang ringkas.',
         ),
       ]),
       conceptStep({
         title: t('Apa itu gRPC?'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'interkom-grpc' },
-        alt: t('Dua server internal berkomunikasi lewat gRPC memakai kontrak .proto dan biner Protobuf.'),
+        alt: t('Dua layanan internal berkomunikasi lewat gRPC memakai kontrak .proto.'),
         body: [
           rTerm('grpc', 'gRPC'),
-          rText(' adalah kerangka RPC (Remote Procedure Call) berkinerja tinggi buatan Google. Alih-alih JSON lewat HTTP/1.1, gRPC memakai '),
-          rBold('HTTP/2'),
-          rText(' dan format biner '),
+          rText(' adalah cara satu server memanggil fungsi di server lain (RPC, Remote Procedure Call). Pesannya memakai format biner (bukan teks) bernama '),
           rTerm('protobuf', 'Protobuf'),
-          rText(' agar ukuran pesan mungil dan sangat cepat.'),
+          rText(', jadi lebih kecil daripada JSON. gRPC berjalan di atas '),
+          rBold('HTTP/2'),
+          rText('.'),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'b04-l05-q1',
+          type: 'analogy',
+          prompt: t('Mengapa gRPC diumpamakan interkom berkode antar ruangan di satu gedung?'),
+          choices: [
+            { id: 'int', label: t('Sangat cepat dan ringkas untuk panggilan antar layanan') },
+            {
+              id: 'pub',
+              label: t('Pesan binernya mudah dibaca langsung oleh browser'),
+              explainWrong: t(
+                'Browser justru butuh proxy gRPC-Web, dan pesan biner tidak terbaca manusia.',
+              ),
+            },
+            {
+              id: 'css',
+              label: t('Pesannya berupa teks panjang yang mudah diaudit manusia'),
+              explainWrong: t(
+                'Teks panjang adalah ciri SOAP atau JSON. gRPC memakai pesan biner yang ringkas.',
+              ),
+            },
+          ],
+          answer: 'int',
+          explainCorrect: t(
+            'gRPC mengutamakan kecepatan antar layanan internal, bukan keterbacaan. Seperti interkom berkode yang hanya dimengerti rekan satu gedung.',
+          ),
+          hints: [t('Ingat siapa yang memakai interkom: rekan satu gedung.')],
+          tags: ['grpc', 'protobuf'],
+        }),
+      ),
       conceptStep({
-        title: t('Kontrak .proto dan Empat Mode Streaming'),
+        title: t('Kontrak .proto dan mode streaming'),
         visualName: 'SequenceDiagram',
         visualProps: { worldId: 'b04', topic: 'streaming-grpc' },
         alt: t('Kontrak file .proto mendefinisikan layanan RPC serta mode unary dan streaming HTTP/2.'),
@@ -1094,58 +1891,32 @@ export const lessons: Lesson[] = [
           highlight: [2],
         },
         body: [
-          rText('Kontrak ditulis ketat dalam berkas '),
+          rText('Kontrak gRPC ditulis dalam berkas '),
           rCode('.proto'),
-          rText(', lalu menghasilkan kode client/server otomatis. Berkat HTTP/2, gRPC mendukung panggilan tunggal (unary) maupun streaming satu arah dan dua arah sekaligus.'),
+          rText(
+            ', lalu menghasilkan kode client dan server otomatis. Berkat HTTP/2, gRPC mendukung panggilan tunggal (unary) dan streaming satu arah maupun dua arah.',
+          ),
         ],
       }),
       conceptStep({
-        title: t('Kapan Pakai gRPC dan Keterbatasannya di Browser'),
+        title: t('Kapan pakai gRPC, dan batasnya di browser'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'grpc-microservices' },
-        alt: t('gRPC unggul untuk komunikasi antar server microservices, tetapi browser butuh gRPC-Web proxy.'),
+        alt: t('gRPC unggul untuk komunikasi antar layanan internal, tetapi browser butuh proxy gRPC-Web.'),
         body: [
-          rText('gRPC paling ideal untuk komunikasi cepat antar '),
+          rText('gRPC paling cocok untuk panggilan cepat antar '),
           rTerm('server', 'server'),
-          rText(' internal (microservices). Namun '),
-          rTerm('browser', 'browser'),
-          rText(' tidak bisa memanggil gRPC mentah langsung tanpa perantara proxy '),
+          rText(' internal. '),
+          rTerm('browser', 'Browser'),
+          rText(' tidak bisa memanggil gRPC mentah, jadi butuh proxy '),
           rCode('gRPC-Web'),
-          rText(', dan payload binernya tidak terbaca mata tanpa kamus.'),
+          rText('. Isi pesan biner juga tidak terbaca mata tanpa alat bantu.'),
         ],
       }),
-      limitStep({
-        analogy: t('gRPC seperti interkom berkode singkatan antar ruangan dapur'),
-        same: [
-          t('Mengorbankan kemudahan dibaca orang luar demi kecepatan dan efisiensi komunikasi antar rekan internal.'),
-        ],
-        different: [
-          t('Interkom kantor hanya membawa suara secara langsung, sedangkan gRPC tetap menghasilkan kode klien otomatis berbagai bahasa pemrograman dari satu berkas kontrak .proto.'),
-        ],
-      }),
-      simStep(
-        'pelayan-graphql',
-        t('Bandingkan fleksibilitas query teks JSON di simulator dengan konsep pesan biner berstruktur tetap pada gRPC.'),
-      ),
-      qStep(
-        makeMcq({
-          id: 'b04-l05-q1',
-          type: 'analogy',
-          prompt: t('Mengapa gRPC diumpamakan sebagai interkom berkode singkatan antar ruangan di dalam satu gedung?'),
-          choices: [
-            { id: 'int', label: t('Karena sangat cepat dan ringkas untuk komunikasi internal antar server dengan kamus kode tetap') },
-            { id: 'pub', label: t('Karena pesan binernya dirancang agar mudah dibaca langsung oleh browser umum'), explainWrong: t('Browser justru perlu proxy gRPC-Web dan format binernya tidak terbaca manusia langsung.') },
-            { id: 'css', label: t('Karena bertugas mengirim gaya CSS antar halaman'), explainWrong: t('gRPC untuk memanggil layanan/prosedur jarak jauh antar layanan.') },
-          ],
-          answer: 'int',
-          explainCorrect: t('Tepat! gRPC mengutamakan kecepatan dan efisiensi antar layanan internal daripada keterbacaan teks di browser.'),
-          tags: ['grpc', 'protobuf'],
-        }),
-      ),
       qStep({
         id: 'b04-l05-q2',
         type: 'match',
-        prompt: t('Pasangkan komponen pembentuk gRPC dengan perannya:'),
+        prompt: t('Pasangkan komponen gRPC dengan perannya.'),
         difficulty: 2,
         left: [
           { id: 'p', label: t('Protobuf') },
@@ -1153,21 +1924,40 @@ export const lessons: Lesson[] = [
           { id: 'c', label: t('Berkas .proto') },
         ],
         right: [
-          { id: 'rc', label: t('Kontrak skema ketat penghasil kode otomatis') },
-          { id: 'rp', label: t('Format serialisasi biner yang mungil dan cepat') },
-          { id: 'rh', label: t('Protokol transport yang mendukung multiplexing dan streaming') },
+          { id: 'rc', label: t('Kontrak ketat yang menghasilkan kode otomatis') },
+          { id: 'rp', label: t('Format biner yang kecil dan cepat') },
+          { id: 'rh', label: t('Protokol yang mengirim banyak pesan dalam satu koneksi') },
         ],
         answer: { p: 'rp', h: 'rh', c: 'rc' },
-        explainCorrect: t('Benar! Tiga pilar gRPC adalah Protobuf, HTTP/2, dan kontrak berkas .proto.'),
+        explainCorrect: t('Protobuf mengemas data, HTTP/2 mengirimnya, dan berkas .proto menjadi kontraknya.'),
+        hints: [t('Satu komponen adalah format, satu protokol, satu kontrak.'), undefined],
         tags: ['grpc', 'protobuf', 'kontrak-api'],
       }),
+      limitStep({
+        analogy: t('gRPC seperti interkom berkode singkatan antar ruangan dapur'),
+        same: [
+          t('Keduanya mengorbankan keterbacaan bagi orang luar demi kecepatan antar rekan internal.'),
+        ],
+        different: [
+          t(
+            'Interkom hanya membawa suara. gRPC juga menghasilkan kode client otomatis dalam banyak bahasa dari satu berkas .proto.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
+      simStep(
+        'pelayan-graphql',
+        t('Di simulator ini permintaan ditulis sebagai teks yang bisa dibaca. Pilih beberapa kolom, lalu bayangkan pesan yang sama dikirim gRPC sebagai biner yang ringkas dan tidak terbaca manusia.'),
+      ),
       qStep(
         makeTf({
           id: 'b04-l05-q3',
-          prompt: t('Frontend browser biasa dapat langsung memanggil gRPC mentah lewat fetch tanpa bantuan proxy atau adaptor apa pun.'),
+          prompt: t('Browser biasa bisa memanggil gRPC mentah tanpa proxy atau adaptor apa pun.'),
           answer: false,
-          explainCorrect: t('Benar, itu keliru! Browser tidak memberi akses langsung ke frame HTTP/2 mentah sehingga butuh perantara gRPC-Web proxy.'),
-          explainWrong: t('Browser membutuhkan perantara seperti gRPC-Web atau API gateway REST/GraphQL di depannya.'),
+          explainCorrect: t(
+            'Pernyataan itu keliru: browser tidak membuka akses ke frame HTTP/2 mentah. Karena itu proxy gRPC-Web dibutuhkan.',
+          ),
+          explainWrong: t('Browser butuh penghubung seperti proxy gRPC-Web atau gateway REST di depannya.'),
           tags: ['grpc', 'browser'],
         }),
       ),
@@ -1176,15 +1966,26 @@ export const lessons: Lesson[] = [
           id: 'b04-l05-q4',
           type: 'why',
           base: 'Kontrak layanan gRPC ditulis dalam file .proto sebelum menulis kode fungsi di tiap layanan.',
-          prompt: t('Apa keuntungan utama pendekatan contract-first dengan berkas .proto?'),
+          prompt: t('Apa keuntungan utama menulis kontrak .proto lebih dulu?'),
           difficulty: 2,
           choices: [
-            { id: 'gen', label: t('Kode client dan server untuk berbagai bahasa (Go, Node, Python) dapat digenerate otomatis dan tipe datanya dijamin cocok') },
-            { id: 'nocode', label: t('Aplikasi tidak membutuhkan server lagi'), explainWrong: t('gRPC tetap berjalan di antara client dan server.') },
-            { id: 'html', label: t('File .proto langsung berubah menjadi tampilan antarmuka HTML'), explainWrong: t('.proto mendefinisikan struktur pesan dan fungsi layanan, bukan HTML.') },
+            { id: 'gen', label: t('Kode client dan server dibuat otomatis, tipenya pasti cocok') },
+            {
+              id: 'nocode',
+              label: t('Browser bisa memanggil layanan langsung tanpa proxy tambahan'),
+              explainWrong: t('Browser tetap butuh proxy gRPC-Web. Kontrak .proto tidak mengubah hal itu.'),
+            },
+            {
+              id: 'html',
+              label: t('Panggilan jaringan menjadi tidak diperlukan lagi'),
+              explainWrong: t('gRPC tetap berjalan lewat jaringan di antara client dan server.'),
+            },
           ],
           answer: 'gen',
-          explainCorrect: t('Tepat! Generator kode dari .proto memastikan pengirim dan penerima tidak pernah salah mengetik nama kolom.'),
+          explainCorrect: t(
+            'Generator kode memakai .proto sebagai sumber tunggal. Pengirim dan penerima tidak pernah salah mengetik nama kolom.',
+          ),
+          hints: [t('Pikirkan apa yang bisa dibuat otomatis dari satu kontrak.')],
           tags: ['grpc', 'kontrak-api'],
         }),
       ),
@@ -1193,15 +1994,26 @@ export const lessons: Lesson[] = [
           id: 'b04-l05-q5',
           type: 'limit',
           analogy: t('gRPC sebagai interkom kantor yang jauh lebih cepat dari surat REST'),
-          prompt: t('Kapan memilih gRPC untuk API publik eksternal justru menjadi pilihan yang kurang praktis dibanding REST JSON?'),
+          prompt: t('Kapan gRPC kurang praktis dibanding REST untuk layanan publik?'),
           difficulty: 3,
           choices: [
-            { id: 'pub', label: t('Ketika API ditujukan untuk banyak pengembang luar dan browser yang butuh kemudahan uji coba langsung dengan teks JSON') },
-            { id: 'ms', label: t('Ketika dua microservice internal di pusat data bertukar ribuan data per detik'), explainWrong: t('Ini justru kondisi di mana gRPC sangat bersinar.') },
-            { id: 'str', label: t('Ketika butuh streaming data biner antarlayaanan secara terus-menerus'), explainWrong: t('Streaming dua arah di atas HTTP/2 adalah keunggulan gRPC.') },
+            { id: 'pub', label: t('Saat developer luar ingin mencoba API dengan teks JSON') },
+            {
+              id: 'ms',
+              label: t('Saat dua layanan internal bertukar 1.000 pesan per detik'),
+              explainWrong: t('Ini justru kondisi tempat gRPC bersinar, karena pesan biner sangat ringan.'),
+            },
+            {
+              id: 'str',
+              label: t('Saat layanan butuh streaming biner terus-menerus antar server'),
+              explainWrong: t('Streaming dua arah di atas HTTP/2 adalah keunggulan gRPC.'),
+            },
           ],
           answer: 'pub',
-          explainCorrect: t('Benar! Untuk API publik dan konsumsi langsung browser, REST + JSON jauh lebih ramah, mudah di-debug, dan universal.'),
+          explainCorrect: t(
+            'Untuk layanan publik yang dipanggil browser, REST dengan JSON lebih ramah dan mudah di-debug.',
+          ),
+          hints: [t('Pikirkan siapa yang memanggil API dan alat apa yang mereka punya.')],
           tags: ['grpc', 'rest'],
         }),
       ),
@@ -1209,16 +2021,29 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-l05-q6',
           type: 'scenario',
-          story: t('Arsitektur Toko Rani dipecah menjadi layanan Pesanan, Gudang, dan Ongkir di backend internal. Layanan Pesanan harus memanggil layanan Gudang ribuan kali per detik dengan latensi minimal.'),
-          prompt: t('Pilihan komunikasi antar layanan internal manakah yang paling tepat?'),
+          story: t(
+            'Toko Rani memecah backend menjadi layanan Pesanan, Gudang, dan Ongkir. Layanan Pesanan memanggil Gudang 1.000 kali per detik dengan jeda sekecil mungkin.',
+          ),
+          prompt: t('Komunikasi antar layanan internal mana yang paling tepat?'),
           difficulty: 2,
           choices: [
             { id: 'grpc', label: t('gRPC dengan Protobuf di atas HTTP/2') },
-            { id: 'soap', label: t('SOAP dengan amplop XML yang berat'), explainWrong: t('XML berukuran jauh lebih besar dan lambat di-parse dibanding Protobuf.') },
-            { id: 'html', label: t('Mengirim halaman HTML penuh antar server'), explainWrong: t('Server internal bertukar data terstruktur, bukan HTML.') },
+            {
+              id: 'soap',
+              label: t('REST dengan JSON untuk setiap panggilan'),
+              explainWrong: t('JSON berbentuk teks lebih besar dan lebih lambat diproses daripada Protobuf.'),
+            },
+            {
+              id: 'html',
+              label: t('GraphQL dengan satu endpoint untuk semua layanan'),
+              explainWrong: t('GraphQL cocok untuk layar yang memilih kolom, bukan untuk panggilan cepat antar server.'),
+            },
           ],
           answer: 'grpc',
-          explainCorrect: t('Tepat! gRPC adalah standar emas untuk komunikasi berkecepatan tinggi antar microservice internal.'),
+          explainCorrect: t(
+            'gRPC adalah pilihan umum untuk komunikasi cepat antar microservice internal, karena pesannya biner dan ringan.',
+          ),
+          hints: [t('Cari pilihan yang paling ringan untuk panggilan antar server.')],
           tags: ['grpc', 'server'],
         }),
       ),
@@ -1226,25 +2051,36 @@ export const lessons: Lesson[] = [
     reviewCards: [
       makeMcq({
         id: 'b04-l05-r1',
-        prompt: t('Dua teknologi inti yang menjadi dasar kecepatan gRPC adalah…'),
+        prompt: t('Dua teknologi inti apa yang membuat gRPC cepat?'),
         choices: [
           { id: 'p', label: t('HTTP/2 dan format biner Protobuf') },
-          { id: 'x', label: t('HTML5 dan dokumen XML panjang'), explainWrong: t('gRPC memakai HTTP/2 dan biner Protobuf, bukan HTML/XML.') },
+          {
+            id: 'x',
+            label: t('HTTP/1.1 dan JSON berbentuk teks'),
+            explainWrong: t('Itu kombinasi yang umum di REST. gRPC memakai HTTP/2 dan biner Protobuf.'),
+          },
+          {
+            id: 'y',
+            label: t('HTTP/2 dan JSON yang dikompres'),
+            explainWrong: t('Pesan gRPC berformat biner, bukan JSON yang dikompres.'),
+          },
         ],
         answer: 'p',
-        explainCorrect: t('HTTP/2 memberi multiplexing dan streaming, sementara Protobuf memadatkan muatan data ke biner.'),
+        explainCorrect: t('HTTP/2 mengirim banyak pesan sekaligus, dan Protobuf memadatkan data menjadi biner.'),
         tags: ['grpc', 'protobuf'],
       }),
       makeTf({
         id: 'b04-l05-r2',
-        prompt: t('gRPC sangat cocok dipakai antar layanan backend internal (microservices), sedangkan untuk browser langsung biasanya memakai REST/GraphQL atau gRPC-Web proxy.'),
+        prompt: t(
+          'gRPC cocok untuk layanan backend internal. Browser biasanya memakai REST atau proxy gRPC-Web.',
+        ),
         answer: true,
-        explainCorrect: t('Betul! Banyak sistem menggabungkan REST/GraphQL di pintu depan dan gRPC di jalur antar server internal.'),
-        explainWrong: t('Browser memang tidak mendukung gRPC mentah secara langsung tanpa proxy gRPC-Web.'),
+        explainCorrect: t('Banyak sistem memakai REST di pintu depan dan gRPC di jalur antar layanan internal.'),
+        explainWrong: t('Browser memang tidak mendukung gRPC mentah tanpa proxy gRPC-Web.'),
         tags: ['grpc', 'browser'],
       }),
     ],
-    recap: t('gRPC memakai HTTP/2, biner Protobuf, dan kontrak .proto untuk komunikasi antar server super cepat seperti interkom berkode.'),
+    recap: t('gRPC memakai HTTP/2, pesan biner Protobuf, dan kontrak .proto untuk komunikasi cepat antar layanan internal.'),
   }),
 
   makeLesson({
@@ -1253,31 +2089,59 @@ export const lessons: Lesson[] = [
     title: 'SOAP, JSON-RPC, tRPC',
     modes: ['pro'],
     isSideQuest: true,
-    objective: t('Aku bisa membedakan saudara API Tanya-Jawab: SOAP, JSON-RPC, dan tRPC beserta kapan masing-masing ditemui.'),
+    objective: t('Kamu bisa membedakan SOAP, JSON-RPC, dan tRPC, serta tahu di mana masing-masing dipakai.'),
+    atWork:
+      'Kamu akan menemui SOAP saat menghubungkan toko ke sistem bank lama, atau tRPC di proyek TypeScript satu repositori.',
     estMinutes: 5,
     introducesTerms: ['trpc-soap'],
     usesTerms: ['api', 'json', 'rest', 'grpc', 'kontrak-api'],
     steps: [
       storyStep('b04/saudara-rpc.svg', [
         rText(
-          'Selain REST, GraphQL, dan gRPC, di keluarga Tanya-Jawab masih ada tiga saudara penting yang kerap muncul di dunia kerja: surat dinas resmi SOAP di perbankan, SMS perintah singkat JSON-RPC, dan pemanggil fungsi TypeScript murni bernama tRPC.',
+          'Tiga varian lain sering muncul, yaitu SOAP di sistem bank, JSON-RPC untuk perintah singkat, dan tRPC di proyek TypeScript. Ketiganya termasuk keluarga Tanya-Jawab.',
         ),
       ]),
       conceptStep({
-        title: t('SOAP: Surat Dinas Resmi'),
+        title: t('SOAP: surat dinas resmi'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'soap-xml' },
-        alt: t('Amplop XML SOAP dengan Envelope, Header, Body, dan kontrak WSDL.'),
+        alt: t('Amplop XML SOAP berlapis dengan kontrak WSDL.'),
         body: [
           rTerm('trpc-soap', 'SOAP'),
-          rText(' memakai format XML sangat terstruktur (Envelope, Header, Body) dengan kontrak ketat WSDL. Ibarat surat dinas berkop dan stempel resmi: kaku dan berat, tetapi masih bertahan di sistem perbankan, asuransi, dan pemerintahan.'),
+          rText(
+            ' adalah gaya pemanggilan yang memakai format XML dan kontrak ketat bernama WSDL. Ibarat surat dinas berkop dan stempel, SOAP kaku dan berat, tetapi masih dipakai di perbankan, asuransi, dan pemerintahan.',
+          ),
         ],
       }),
+      qStep(
+        makeMcq({
+          id: 'b04-sq1-q2',
+          prompt: t('Di sektor mana API gaya SOAP masih paling sering ditemui?'),
+          choices: [
+            { id: 'bank', label: t('Sistem bank lama, asuransi, dan pemerintahan') },
+            {
+              id: 'game',
+              label: t('Aplikasi chat dan video call modern yang butuh sambungan langsung'),
+              explainWrong: t('Chat dan video call butuh sambungan langsung dua arah. SOAP tidak dirancang untuk itu.'),
+            },
+            {
+              id: 'chat',
+              label: t('Startup TypeScript yang baru dibangun bersama tim kecil'),
+              explainWrong: t('Startup TypeScript baru lebih sering memilih REST, GraphQL, atau tRPC yang lebih ringan.'),
+            },
+          ],
+          answer: 'bank',
+          explainCorrect: t(
+            'Banyak bank dan instansi pemerintah masih memakai kontrak SOAP dan WSDL yang ketat. Sistem itu dibangun sebelum REST populer.',
+          ),
+          tags: ['trpc-soap'],
+        }),
+      ),
       conceptStep({
-        title: t('JSON-RPC: SMS Perintah Singkat'),
+        title: t('JSON-RPC: SMS perintah singkat'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'json-rpc' },
-        alt: t('Contoh payload JSON-RPC berisi method, params, dan id.'),
+        alt: t('Contoh isi JSON-RPC berisi method, params, dan id.'),
         code: {
           lang: 'json',
           code: '{\n  "jsonrpc": "2.0",\n  "method": "hitungOngkir",\n  "params": { "kota": "Makassar", "berat": 2 },\n  "id": 1\n}',
@@ -1285,42 +2149,31 @@ export const lessons: Lesson[] = [
         },
         body: [
           rBold('JSON-RPC'),
-          rText(' memanggil prosedur/fungsi di server memakai teks JSON super ringkas berisi '),
+          rText(' memanggil fungsi jarak jauh lewat pesan singkat berisi '),
           rCode('method'),
           rText(', '),
           rCode('params'),
           rText(', dan '),
           rCode('id'),
-          rText('. Ibarat SMS perintah singkat: langsung memanggil nama aksi tanpa memusingkan desain URL resource REST.'),
+          rText('. Ibarat SMS perintah singkat: kamu langsung menyebut nama aksi tanpa merancang URL resource ala REST.'),
         ],
       }),
       conceptStep({
-        title: t('tRPC: Keamanan Tipe Ujung-ke-Ujung'),
+        title: t('tRPC: tipe aman dari ujung ke ujung'),
         visualName: 'DiagramConcept',
         visualProps: { worldId: 'b04', topic: 'trpc-typescript' },
-        alt: t('Frontend dan backend TypeScript berbagi tipe data otomatis lewat tRPC.'),
+        alt: t('Dua sisi TypeScript berbagi tipe data otomatis lewat tRPC.'),
         body: [
           rBold('tRPC'),
-          rText(' populer di tim full-stack TypeScript (seperti Next.js monorepo). Tanpa menulis file schema terpisah atau generator kode, frontend memanggil prosedur backend seperti fungsi biasa lengkap dengan autocomplete dan pengecekan error tipe instan.'),
+          rText(
+            ' populer di tim full-stack TypeScript, misalnya proyek Next.js dalam satu repositori. Tanpa file schema atau generator kode, frontend memanggil fungsi backend seperti fungsi biasa, lengkap dengan autocomplete dan pengecekan tipe.',
+          ),
         ],
       }),
-      limitStep({
-        analogy: t('SOAP seperti surat dinas resmi, JSON-RPC seperti SMS perintah, tRPC seperti menelepon rekan satu bahasa'),
-        same: [
-          t('Semuanya masuk keluarga Tanya-Jawab, namun fokus pada gaya panggilan aksi atau prosedur, bukan resource URL ala REST.'),
-        ],
-        different: [
-          t('tRPC sangat nyaman jika frontend dan backend sama-sama memakai TypeScript dalam satu repositori, tetapi tidak cocok untuk API publik yang dipanggil bahasa lain seperti Python, Go, atau Swift.'),
-        ],
-      }),
-      simStep(
-        'pelayan-graphql',
-        t('Bandingkan pengalaman memanggil endpoint dengan skema eksplisit pada simulator dengan cara tRPC/JSON-RPC memanggil fungsi langsung.'),
-      ),
       qStep({
         id: 'b04-sq1-q1',
         type: 'match',
-        prompt: t('Pasangkan ketiga varian API berikut dengan analogi yang paling tepat:'),
+        prompt: t('Pasangkan varian API dengan perumpamaan yang paling tepat.'),
         difficulty: 2,
         left: [
           { id: 'soap', label: t('SOAP') },
@@ -1328,35 +2181,40 @@ export const lessons: Lesson[] = [
           { id: 'trpc', label: t('tRPC') },
         ],
         right: [
-          { id: 'a_jrpc', label: t('SMS perintah singkat memanggil nama fungsi & parameter JSON') },
-          { id: 'a_trpc', label: t('Memanggil fungsi server langsung di monorepo TypeScript dengan autocomplete') },
+          { id: 'a_jrpc', label: t('SMS perintah singkat yang menyebut nama fungsi dan parameter') },
+          { id: 'a_trpc', label: t('Memanggil fungsi server langsung di proyek TypeScript dengan autocomplete') },
           { id: 'a_soap', label: t('Surat dinas XML resmi lengkap dengan kop dan kontrak WSDL') },
         ],
         answer: { soap: 'a_soap', jrpc: 'a_jrpc', trpc: 'a_trpc' },
-        explainCorrect: t('Mantap! Ketiga saudara Tanya-Jawab ini punya ceruk penggunaan yang sangat jelas.'),
+        explainCorrect: t('Ketiga saudara Tanya-Jawab ini punya tempat pemakaian sendiri: bank lama, perintah singkat, dan proyek TypeScript.'),
+        hints: [t('Cocokkan kata kunci: XML, parameter, dan TypeScript.'), undefined],
         tags: ['trpc-soap', 'json'],
       }),
-      qStep(
-        makeMcq({
-          id: 'b04-sq1-q2',
-          prompt: t('Di sektor manakah kamu masih paling sering menjumpai API bergaya SOAP berbasis XML?'),
-          choices: [
-            { id: 'bank', label: t('Sistem perbankan lama, asuransi, dan integrasi pemerintahan') },
-            { id: 'game', label: t('Animasi CSS di halaman toko kecil'), explainWrong: t('Animasi berjalan lokal di CSS/JS, bukan lewat SOAP.') },
-            { id: 'chat', label: t('Video call langsung peer-to-peer'), explainWrong: t('Video call memakai WebRTC, bukan SOAP.') },
-          ],
-          answer: 'bank',
-          explainCorrect: t('Benar! Banyak institusi finansial dan pemerintahan masih mengandalkan kontrak SOAP/WSDL yang ketat dan mapan.'),
-          tags: ['trpc-soap'],
-        }),
+      limitStep({
+        analogy: t('SOAP seperti surat dinas resmi, JSON-RPC seperti SMS perintah, tRPC seperti menelepon rekan satu bahasa'),
+        same: [
+          t('Ketiganya masuk keluarga Tanya-Jawab, tetapi memanggil aksi atau fungsi, bukan alamat resource seperti REST.'),
+        ],
+        different: [
+          t(
+            'tRPC nyaman bila kedua sisi memakai TypeScript. Untuk API publik yang dipanggil Python, Go, atau Swift, tRPC tidak cocok.',
+          ),
+        ],
+        riskyAnalogy: false,
+      }),
+      simStep(
+        'pelayan-graphql',
+        t('Di simulator ini kamu memilih kolom lewat query. Coba pilih beberapa kolom. Ingat, tRPC tidak memakai query. Client memanggil fungsi server secara langsung.'),
       ),
       qStep(
         makeTf({
           id: 'b04-sq1-q3',
-          prompt: t('tRPC sangat tepat dipakai untuk membuka Public API umum yang akan dipanggil oleh developer Android Kotlin, iOS Swift, dan Python.'),
+          prompt: t('tRPC cocok untuk API publik yang dipanggil developer Kotlin, Swift, dan Python.'),
           answer: false,
-          explainCorrect: t('Benar, itu keliru! Kekuatan tRPC bergantung pada kesamaan bahasa TypeScript antara frontend dan backend.'),
-          explainWrong: t('Untuk API publik lintas bahasa, REST atau GraphQL jauh lebih cocok daripada tRPC.'),
+          explainCorrect: t(
+            'Pernyataan itu keliru: kekuatan tRPC bergantung pada TypeScript di kedua sisi. API publik lintas bahasa lebih cocok memakai REST atau GraphQL.',
+          ),
+          explainWrong: t('Developer Kotlin, Swift, dan Python tidak berbagi tipe TypeScript. Mereka lebih mudah memakai REST atau GraphQL.'),
           tags: ['trpc-soap'],
         }),
       ),
@@ -1365,15 +2223,26 @@ export const lessons: Lesson[] = [
           id: 'b04-sq1-q4',
           type: 'limit',
           analogy: t('tRPC membuat panggilan API semudah memanggil fungsi lokal biasa'),
-          prompt: t('Hal apa yang tetap harus diingat developer saat memakai tRPC agar tidak terjebak ilusi fungsi lokal?'),
+          prompt: t('Apa yang tetap perlu diingat developer saat memakai tRPC?'),
           difficulty: 2,
           choices: [
-            { id: 'net', label: t('Di balik layar panggilan itu tetap melewati jaringan HTTP sehingga bisa lambat, gagal, dan butuh validasi otorisasi server') },
-            { id: 'json', label: t('tRPC tidak bisa mengirim angka atau teks sama sekali'), explainWrong: t('tRPC mendukung pengiriman JSON dan tipe kompleks dengan sangat baik.') },
-            { id: 'xml', label: t('tRPC memaksa seluruh kode ditulis dalam XML'), explainWrong: t('tRPC bekerja dengan TypeScript, bukan XML.') },
+            { id: 'net', label: t('Panggilannya tetap lewat jaringan: bisa lambat, gagal, dan butuh cek izin') },
+            {
+              id: 'json',
+              label: t('Panggilannya selalu berhasil karena tipe datanya sudah dicek di editor kode'),
+              explainWrong: t('Tipe yang cocok tidak menjamin jaringan stabil. Panggilan tetap bisa lambat atau gagal.'),
+            },
+            {
+              id: 'xml',
+              label: t('Validasi izin di server tidak lagi diperlukan'),
+              explainWrong: t('Server tetap harus memeriksa izin. Panggilan tRPC bisa dikirim siapa saja.'),
+            },
           ],
           answer: 'net',
-          explainCorrect: t('Tepat! Walau terasa seperti memanggil fungsi lokal, ia tetap panggilan jaringan yang butuh state loading, error handling, dan keamanan.'),
+          explainCorrect: t(
+            'Walau terasa seperti fungsi lokal, tRPC tetap panggilan jaringan. Kamu butuh state loading, penanganan error, dan keamanan.',
+          ),
+          hints: [t('Pikirkan apa yang terjadi di antara frontend dan backend.')],
           tags: ['trpc-soap', 'kontrak-api'],
         }),
       ),
@@ -1381,16 +2250,27 @@ export const lessons: Lesson[] = [
         makeMcq({
           id: 'b04-sq1-q5',
           type: 'scenario',
-          story: t('Sebuah tim startup kecil membangun web Toko Rani memakai TypeScript penuh di frontend React dan backend Node.js dalam satu repositori agar cepat meluncur tanpa repot menulis dokumen OpenAPI manual.'),
-          prompt: t('Teknologi manakah yang memberi keamanan tipe otomatis dari backend ke frontend untuk kasus ini?'),
+          story: t(
+            'Startup kecil membangun web Toko Rani dengan React dan Node.js dalam satu repositori TypeScript. Mereka tidak mau menulis dokumen OpenAPI manual.',
+          ),
+          prompt: t('Teknologi mana yang memberi keamanan tipe otomatis dari backend ke frontend?'),
           difficulty: 2,
           choices: [
             { id: 'trpc', label: t('tRPC') },
-            { id: 'soap', label: t('SOAP berbasis XML'), explainWrong: t('SOAP jauh lebih berat dan bertele-tele untuk startup TypeScript modern.') },
-            { id: 'css', label: t('Tailwind CSS'), explainWrong: t('Tailwind CSS adalah framework styling tampilan, bukan lapisan API.') },
+            {
+              id: 'soap',
+              label: t('GraphQL dengan schema terpisah'),
+              explainWrong: t('GraphQL butuh schema yang ditulis dan dijaga terpisah, padahal tim ingin menghindari file kontrak.'),
+            },
+            {
+              id: 'css',
+              label: t('REST dengan dokumen kontrak manual'),
+              explainWrong: t('Dokumen kontrak manual justru yang ingin dihindari tim ini.'),
+            },
           ],
           answer: 'trpc',
-          explainCorrect: t('Benar! tRPC membagi tipe data TypeScript langsung dari router backend ke kode frontend secara instan.'),
+          explainCorrect: t('tRPC membagikan tipe TypeScript dari backend ke kode layar secara langsung.'),
+          hints: [t('Cari yang tidak butuh file schema atau dokumen kontrak.')],
           tags: ['trpc-soap'],
         }),
       ),
@@ -1398,24 +2278,35 @@ export const lessons: Lesson[] = [
     reviewCards: [
       makeMcq({
         id: 'b04-sq1-r1',
-        prompt: t('Protokol yang mengirim perintah pemanggilan fungsi lewat JSON dengan kolom method, params, dan id adalah…'),
+        prompt: t('Protokol mana yang mengirim perintah lewat JSON dengan kolom method, params, dan id?'),
         choices: [
           { id: 'jrpc', label: t('JSON-RPC') },
-          { id: 'soap', label: t('SOAP'), explainWrong: t('SOAP berbasis XML dengan Envelope/Header/Body.') },
+          {
+            id: 'soap',
+            label: t('SOAP'),
+            explainWrong: t('SOAP memakai amplop XML yang berlapis.'),
+          },
+          {
+            id: 'trpc',
+            label: t('tRPC'),
+            explainWrong: t('tRPC memanggil fungsi TypeScript dan tidak memakai kolom method, params, dan id.'),
+          },
         ],
         answer: 'jrpc',
-        explainCorrect: t('JSON-RPC adalah protokol RPC ringan berbasis JSON (misal dipakai di node blockchain atau Language Server).'),
+        explainCorrect: t('JSON-RPC adalah protokol panggilan ringan berbasis JSON, misalnya dipakai di node blockchain.'),
         tags: ['trpc-soap', 'json'],
       }),
       makeTf({
         id: 'b04-sq1-r2',
-        prompt: t('SOAP menggunakan format data XML yang sangat terstruktur dan sering memiliki dokumen kontrak WSDL.'),
+        prompt: t('SOAP memakai format XML yang terstruktur dan sering punya dokumen kontrak WSDL.'),
         answer: true,
-        explainCorrect: t('Betul! Struktur amplop XML dan WSDL menjadi ciri khas SOAP.'),
-        explainWrong: t('SOAP memang berbasis XML dengan struktur Envelope/Header/Body dan kontrak WSDL.'),
+        explainCorrect: t('Amplop XML dan WSDL menjadi ciri khas SOAP.'),
+        explainWrong: t('SOAP memang memakai amplop XML berlapis dan kontrak WSDL.'),
         tags: ['trpc-soap'],
       }),
     ],
-    recap: t('SOAP (surat dinas XML), JSON-RPC (SMS perintah JSON), dan tRPC (panggilan fungsi aman tipe di TypeScript) melengkapi keluarga API Tanya-Jawab.'),
+    recap: t(
+      'SOAP adalah surat dinas resmi, JSON-RPC adalah SMS perintah, dan tRPC adalah panggilan fungsi aman tipe di TypeScript.',
+    ),
   }),
 ];

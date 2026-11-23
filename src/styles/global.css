@@ -1,10 +1,13 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source(none);
+@import './motion.css';
+@source '../';
+@source '../../index.html';
 
 @layer base {
   html {
     font-family: var(--font-sans);
     font-size: calc(16px * var(--text-scale));
-    background-color: var(--cream);
+    background-color: var(--surface-page);
     color: var(--ink);
     -webkit-text-size-adjust: 100%;
   }
@@ -12,7 +15,7 @@
   body {
     margin: 0;
     min-height: 100dvh;
-    background-color: var(--cream);
+    background-color: var(--surface-page);
     color: var(--ink);
     line-height: 1.6;
     overflow-x: clip;
@@ -30,6 +33,7 @@
     font-size: max(16px, 1rem);
   }
 
+  /* Static 3 px ring (spec 10.2). Never removed and never animated. */
   :where(a:any-link, button, input, select, textarea, [tabindex]):focus-visible {
     outline: 3px solid var(--world-700);
     outline-offset: 3px;
@@ -37,6 +41,8 @@
 }
 
 @layer components {
+  /* ------------------------------------------------------------------ text (4.4) */
+
   .pw-prose {
     max-width: 60ch;
   }
@@ -45,6 +51,7 @@
     font-size: var(--fs-display);
     line-height: 1.1;
     font-weight: 800;
+    letter-spacing: -0.02em;
     margin: 0;
   }
 
@@ -52,6 +59,7 @@
     font-size: var(--fs-h1);
     line-height: 1.2;
     font-weight: 800;
+    letter-spacing: -0.02em;
     margin: 0;
   }
 
@@ -59,6 +67,7 @@
     font-size: var(--fs-h2);
     line-height: 1.25;
     font-weight: 800;
+    letter-spacing: -0.01em;
     margin: 0;
   }
 
@@ -66,6 +75,16 @@
     font-size: var(--fs-h3);
     line-height: 1.3;
     font-weight: 700;
+    margin: 0;
+  }
+
+  /* The question prompt: the text that matters most on a question screen */
+  .pw-prompt {
+    font-size: var(--fs-h2);
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: 0;
+    max-width: 60ch;
     margin: 0;
   }
 
@@ -86,6 +105,7 @@
     line-height: 1.5;
   }
 
+  /* Pro: uppercase and tracked. Junior: sentence case, see the mode rule below. */
   .pw-kicker {
     font-size: var(--fs-kicker);
     line-height: 1.2;
@@ -95,70 +115,321 @@
     color: var(--world-700);
   }
 
+  :root[data-mode='junior'] .pw-kicker {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: max(var(--fs-kicker), 0.875rem);
+  }
+
   .pw-code {
     font-family: var(--font-mono);
     font-size: 0.875rem;
     line-height: 1.55;
   }
 
+  /* Bito's handwriting. Annotations only, five words at most (spec 4.4). inline-block so rotate applies. */
+  .pw-hand {
+    display: inline-block;
+    font-family: var(--font-hand);
+    font-size: max(var(--fs-hand), 1.125rem);
+    line-height: 1.15;
+    rotate: -2deg;
+    color: var(--ink-2);
+  }
+
+  /* The annotation slot (Annot). Junior: handwriting. Pro: a code comment. */
+  .pw-note {
+    display: inline-block;
+    font-family: var(--font-hand);
+    font-size: max(var(--fs-hand), 1.125rem);
+    line-height: 1.15;
+    rotate: -2deg;
+    color: var(--ink-2);
+  }
+
+  :root[data-mode='junior'] .pw-note {
+    font-size: max(var(--fs-hand), 1.25rem);
+  }
+
+  :root[data-mode='pro'] .pw-note {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    rotate: 0deg;
+    color: var(--ink-3);
+  }
+
+  :root[data-mode='pro'] .pw-note::before {
+    content: '// ';
+  }
+
+  /* Highlighter under one key phrase */
+  .pw-mark {
+    background: linear-gradient(transparent 58%, var(--marker) 58% 92%, transparent 92%);
+    padding-inline: 0.1em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* ------------------------------------------------------------------ surfaces (4.1, 4.6, 4.7) */
+
   .pw-card {
-    background-color: var(--paper);
+    background-color: var(--surface-card);
     border: 1.5px solid var(--line);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--elev-1);
   }
 
-  /* Efek stretch & squish taktil untuk tombol, kartu, dan menu */
+  .pw-card-raised {
+    background-color: var(--paper-raised);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--elev-2);
+  }
+
+  /* Sunken: wells, inline notes, drop zones */
+  .pw-well {
+    background-color: var(--surface-well);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elev-inset);
+    padding: var(--gap-stack) var(--space-card);
+  }
+
+  /* The tinted area that holds an illustration. The one texture of the system. Never behind text. */
+  .pw-stage {
+    position: relative;
+    background-color: var(--surface-stage);
+    background-image: radial-gradient(
+      color-mix(in srgb, var(--world), transparent 78%) 1.2px,
+      transparent 1.3px
+    );
+    background-size: 18px 18px;
+    border-radius: var(--radius-xl);
+    contain: layout paint;
+  }
+
+  /* The one saturated block of a screen. Text on it is always --on-poster at full opacity. */
+  .pw-poster {
+    position: relative;
+    background-color: var(--surface-poster);
+    color: var(--on-poster);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--elev-1);
+  }
+
+  .pw-poster :where(.pw-kicker, .pw-hand, .pw-note) {
+    color: var(--on-poster);
+  }
+
+  .pw-poster :where(a:any-link, button, input, select, textarea, [tabindex]):focus-visible {
+    outline-color: var(--on-poster);
+  }
+
+  /* Boss surfaces and code blocks */
+  .pw-boss {
+    background-color: var(--boss);
+    color: var(--on-boss);
+    border-radius: var(--radius-xl);
+  }
+
+  .pw-boss :where(.pw-kicker) {
+    color: var(--star);
+  }
+
+  .pw-boss :where(a:any-link, button, input, select, textarea, [tabindex]):focus-visible {
+    outline-color: var(--star);
+  }
+
+  /* Die-cut sticker. The tilt is on the individual rotate property so .pw-pressable can still use transform.
+     Set --tilt per item (cycle -3deg, 2deg, -1.5deg, 3deg by index; never random). Pro halves it. */
+  .pw-sticker {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--elev-sticker);
+    rotate: calc(var(--tilt, -3deg) * var(--tilt-scale, 1));
+  }
+
+  .pw-sticker[data-finish='gold'] {
+    box-shadow:
+      0 0 0 3px var(--star),
+      0 2px 0 3px rgba(31, 35, 64, 0.12),
+      0 10px 18px -8px rgba(31, 35, 64, 0.4);
+  }
+
+  /* Locked or unowned: flat, no tilt, dashed outline */
+  .pw-sticker[data-locked='true'] {
+    rotate: 0deg;
+    box-shadow: none;
+    background-color: transparent;
+    border: 2px dashed var(--line-strong);
+  }
+
+  /* Collection card (StickerCard). Pro: an upright concept card, no die-cut outline. */
+  :root[data-mode='pro'] .pw-sticker.pw-sticker-card {
+    rotate: 0deg;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--line);
+    box-shadow: var(--elev-1);
+  }
+
+  :root[data-mode='pro'] .pw-sticker.pw-sticker-card[data-finish='gold'] {
+    border-color: var(--star);
+    box-shadow:
+      var(--elev-1),
+      0 0 0 1.5px var(--star);
+  }
+
+  :root[data-mode='pro'] .pw-sticker.pw-sticker-card[data-locked='true'] {
+    border: 2px dashed var(--line-strong);
+    box-shadow: none;
+  }
+
+  /* ------------------------------------------------------------------ pressables (M01, M02) */
+
+  /* Flat pressables (tiles, nav items, icon buttons, sticker cards): scale(0.97) in 120 ms. */
   .pw-pressable {
     transition:
-      transform 200ms var(--ease-spring),
-      border-color 140ms var(--ease-out),
-      background-color 140ms var(--ease-out),
-      filter 140ms var(--ease-out);
+      transform 120ms var(--ease-out),
+      background-color 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease;
     transform-origin: center center;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .pw-pressable:hover:not(:disabled) {
-      transform: translateY(-2px) scale(1.018, 0.985);
-    }
   }
 
   .pw-pressable:active:not(:disabled) {
-    transform: translateY(2px) scale(1.045, 0.925);
+    transform: scale(0.97);
   }
 
-  .pw-btn-primary {
-    min-block-size: var(--touch-min);
-    min-inline-size: var(--touch-min);
-    background-color: var(--world-600);
-    color: var(--world-btn-text);
-    border: 0;
-    border-radius: var(--radius-md);
-    box-shadow: 0 4px 0 var(--world-700);
-    font-weight: 800;
-    font-size: var(--fs-body);
-    line-height: 1.25;
-    text-align: center;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition:
-      transform 200ms var(--ease-spring),
-      filter 140ms var(--ease-out);
-    transform-origin: center center;
+  /* Anything wider than 240 px presses less */
+  .pw-pressable[data-press='lg']:active:not(:disabled) {
+    transform: scale(0.985);
   }
 
+  /* Hover lift (M02): tiles, world nodes and sticker cards only. The raised shadow is a pseudo-element
+     whose opacity changes, never an animated box-shadow. Uses the individual translate property so it
+     composes with the press scale. */
   @media (hover: hover) and (pointer: fine) {
-    .pw-btn-primary:hover:not(:disabled) {
-      filter: brightness(1.06);
-      transform: translateY(-2px) scale(1.02, 0.985);
-      box-shadow: 0 6px 0 var(--world-700);
+    .pw-lift {
+      position: relative;
+      isolation: isolate;
+      transition:
+        transform 120ms var(--ease-out),
+        translate 140ms var(--ease-out);
+    }
+    .pw-lift::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      box-shadow: var(--elev-2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms ease;
+    }
+    .pw-lift:hover:not(:disabled) {
+      translate: 0 -2px;
+    }
+    .pw-lift:hover:not(:disabled)::after {
+      opacity: 1;
     }
   }
 
-  .pw-btn-primary:active:not(:disabled) {
-    transform: translateY(3px) scale(1.045, 0.91);
-    box-shadow: 0 1px 0 var(--world-700);
+  /* Edge pressables (buttons, choice cards): a solid bottom edge. On :active the face moves down by the
+     edge height and the edge collapses to 1 px in the SAME frame. No transition on transform or
+     box-shadow in either direction: a transition on one with a snap on the other makes the edge jump. */
+  .pw-edge,
+  .pw-btn-primary,
+  .pw-btn-secondary,
+  .pw-btn-danger,
+  .pw-btn-inverse {
+    --hl: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow:
+      var(--hl),
+      0 var(--edge) 0 var(--edge-color, var(--line));
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .pw-edge:active:not(:disabled),
+  .pw-btn-primary:active:not(:disabled),
+  .pw-btn-secondary:active:not(:disabled),
+  .pw-btn-danger:active:not(:disabled),
+  .pw-btn-inverse:active:not(:disabled) {
+    transform: translateY(calc(var(--edge) - 1px));
+    box-shadow:
+      var(--hl),
+      0 1px 0 var(--edge-color, var(--line));
+  }
+
+  .pw-btn-primary,
+  .pw-btn-secondary,
+  .pw-btn-danger,
+  .pw-btn-inverse {
+    min-block-size: var(--touch-min);
+    min-inline-size: var(--touch-min);
+    border-radius: var(--radius-md);
+    font-size: var(--fs-body);
+    line-height: 1.25;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .pw-btn-primary {
+    --edge-color: var(--world-700);
+    background-color: var(--world-600);
+    color: var(--world-btn-text);
+    border: 0;
+    font-weight: 800;
+    padding: 10px 20px;
+  }
+
+  .pw-btn-secondary {
+    --edge-color: var(--line);
+    --hl: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    background-color: var(--paper);
+    color: var(--ink);
+    border: 2px solid var(--line);
+    font-weight: 700;
+    padding: 10px 18px;
+  }
+
+  /* White on --err-500 is 4.77:1 in both themes (--err-600 turns light in dark mode, so it is not used) */
+  .pw-btn-danger {
+    --edge-color: color-mix(in srgb, var(--err-500), #000 30%);
+    background-color: var(--err-500);
+    color: #fff;
+    border: 0;
+    font-weight: 800;
+    padding: 10px 20px;
+  }
+
+  /* On a poster: paper face, --world-700 text, edge in the poster's own dark shade */
+  .pw-btn-inverse {
+    --edge-color: var(--world-700);
+    background-color: var(--paper-raised);
+    color: var(--world-700);
+    border: 0;
+    font-weight: 800;
+    padding: 10px 20px;
+  }
+
+  /* Hover changes colour only. Edge buttons never lift (spec 5.9.4 M02). */
+  @media (hover: hover) and (pointer: fine) {
+    .pw-btn-primary:hover:not(:disabled) {
+      background-color: color-mix(in srgb, var(--world-600), #fff 10%);
+    }
+    .pw-btn-secondary:hover:not(:disabled) {
+      border-color: var(--world-600);
+      background-color: var(--world-50);
+    }
+    .pw-btn-danger:hover:not(:disabled) {
+      background-color: color-mix(in srgb, var(--err-500), #fff 10%);
+    }
+    .pw-btn-inverse:hover:not(:disabled) {
+      background-color: var(--world-50);
+    }
   }
 
   .pw-btn-primary:disabled {
@@ -168,42 +439,9 @@
     cursor: not-allowed;
   }
 
-  .pw-btn-secondary {
-    min-block-size: var(--touch-min);
-    min-inline-size: var(--touch-min);
-    background-color: var(--paper);
-    color: var(--ink);
-    border: 2px solid var(--line);
-    border-radius: var(--radius-md);
-    box-shadow: 0 3px 0 var(--line);
-    font-weight: 700;
-    font-size: var(--fs-body);
-    line-height: 1.25;
-    text-align: center;
-    padding: 10px 18px;
-    cursor: pointer;
-    transition:
-      transform 200ms var(--ease-spring),
-      background-color 140ms var(--ease-out),
-      border-color 140ms var(--ease-out);
-    transform-origin: center center;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .pw-btn-secondary:hover:not(:disabled) {
-      border-color: var(--world-600);
-      background-color: var(--world-50);
-      transform: translateY(-2px) scale(1.02, 0.985);
-      box-shadow: 0 4px 0 color-mix(in srgb, var(--world-600), transparent 55%);
-    }
-  }
-
-  .pw-btn-secondary:active:not(:disabled) {
-    transform: translateY(2px) scale(1.045, 0.92);
-    box-shadow: 0 1px 0 var(--line);
-  }
-
-  .pw-btn-secondary:disabled {
+  .pw-btn-secondary:disabled,
+  .pw-btn-danger:disabled,
+  .pw-btn-inverse:disabled {
     opacity: 0.55;
     box-shadow: none;
     cursor: not-allowed;
@@ -222,50 +460,48 @@
     padding: 8px 14px;
     cursor: pointer;
     transition:
-      transform 200ms var(--ease-spring),
-      background-color 140ms var(--ease-out),
-      color 140ms var(--ease-out);
+      transform 120ms var(--ease-out),
+      background-color 140ms ease,
+      color 140ms ease;
   }
 
   @media (hover: hover) and (pointer: fine) {
     .pw-btn-ghost:hover:not(:disabled) {
-      background-color: var(--cream);
+      background-color: var(--paper-2);
       color: var(--ink);
-      transform: scale(1.02, 0.985);
     }
   }
 
   .pw-btn-ghost:active:not(:disabled) {
-    transform: scale(1.04, 0.92);
+    transform: scale(0.97);
   }
 
-  /* Native <dialog> modal rules per modern-web-guidance */
+  /* ------------------------------------------------------------------ dialog and sheet (M08) */
+
+  /* Native <dialog> modal rules. Their entrance keyframes live in motion.css. */
   dialog.pw-dialog {
     position: fixed;
     inset: 0;
     margin: auto;
     border: 1.5px solid var(--line);
     border-radius: var(--radius-lg);
-    background-color: var(--paper);
+    background-color: var(--paper-raised);
     color: var(--ink);
     padding: 0;
     max-width: min(560px, calc(100vw - 24px));
     width: 100%;
     max-height: 85dvh;
-    box-shadow: 0 24px 60px rgba(15, 18, 36, 0.3);
-  }
-
-  dialog.pw-dialog[open] {
-    animation: pw-pop-elastic 240ms var(--ease-out) both;
+    box-shadow: var(--elev-3);
   }
 
   dialog.pw-dialog:modal {
     overscroll-behavior: contain;
   }
 
-  dialog.pw-dialog::backdrop {
-    background-color: rgba(20, 22, 42, 0.55);
-    backdrop-filter: blur(3px);
+  /* A solid scrim. No backdrop-filter anywhere (spec 9.2). */
+  dialog.pw-dialog::backdrop,
+  dialog.pw-sheet::backdrop {
+    background-color: var(--scrim);
     overflow: hidden;
     overscroll-behavior: contain;
   }
@@ -277,30 +513,67 @@
     margin-block: auto 0;
     border: 1.5px solid var(--line);
     border-bottom: 0;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    background-color: var(--paper);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    background-color: var(--paper-raised);
     color: var(--ink);
     padding: 0;
     max-width: min(640px, 100vw);
     width: 100%;
     max-height: 72dvh;
-    box-shadow: 0 -12px 44px rgba(15, 18, 36, 0.25);
-  }
-
-  dialog.pw-sheet[open] {
-    animation: pw-sheet-spring 280ms var(--ease-drawer) both;
+    box-shadow: var(--elev-up);
   }
 
   dialog.pw-sheet:modal {
     overscroll-behavior: contain;
   }
+}
 
-  dialog.pw-sheet::backdrop {
-    background-color: rgba(20, 22, 42, 0.45);
-    backdrop-filter: blur(2px);
-    overflow: hidden;
-    overscroll-behavior: contain;
-  }
+/* ------------------------------------------------------------------ reading comfort (4.4) */
+
+/* "Teks nyaman dibaca": wider letter and word spacing, taller lines, no tilt, no all-caps, no jitter.
+   Independent of "Kurangi animasi". */
+:root[data-reading='comfort'] body {
+  letter-spacing: 0.02em;
+  word-spacing: 0.08em;
+  line-height: 1.6;
+}
+
+:root[data-reading='comfort'] :where(.pw-body, .pw-body-l, .pw-small, .pw-prompt, .pw-prose) {
+  letter-spacing: 0.02em;
+  word-spacing: 0.08em;
+  line-height: 1.6;
+}
+
+:root[data-reading='comfort'] :where(.pw-display, .pw-h1, .pw-h2) {
+  letter-spacing: 0;
+}
+
+:root[data-reading='comfort'] :where(.pw-code, code, pre) {
+  letter-spacing: 0;
+  word-spacing: 0;
+}
+
+:root[data-reading='comfort'] .pw-kicker {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+:root[data-reading='comfort'] :where(.pw-hand, .pw-note) {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  rotate: 0deg;
+}
+
+:root[data-reading='comfort'] .pw-kt-letter {
+  animation: none;
+}
+
+/* Where the XP chip clone flies (src/motion/waapi.ts flyTo). Never intercepts input. */
+#fx-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
 }
 
 /* Container queries untuk ChoiceCard dan kartu adaptif (§10.10) */
@@ -311,7 +584,7 @@
 .pw-choices-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: var(--gap-stack);
 }
 
 @container (min-width: 560px) {
@@ -334,213 +607,6 @@
   padding-top: max(8px, env(safe-area-inset-top));
 }
 
-/* Animations */
-@keyframes pw-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pw-jelly-press {
-  0% {
-    transform: scale(1, 1);
-  }
-  30% {
-    transform: scale(1.06, 0.92) translateY(2px);
-  }
-  60% {
-    transform: scale(0.96, 1.04) translateY(-2px);
-  }
-  82% {
-    transform: scale(1.02, 0.99);
-  }
-  100% {
-    transform: scale(1, 1) translateY(0);
-  }
-}
-
-@keyframes pw-pop-elastic {
-  0% {
-    opacity: 0;
-    transform: scale(0.88, 0.84) translateY(14px);
-  }
-  62% {
-    opacity: 1;
-    transform: scale(1.03, 0.97) translateY(-2px);
-  }
-  84% {
-    transform: scale(0.99, 1.01);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1, 1) translateY(0);
-  }
-}
-
-@keyframes pw-sheet-spring {
-  0% {
-    opacity: 0;
-    transform: translateY(100%) scaleY(0.94);
-  }
-  68% {
-    opacity: 1;
-    transform: translateY(-4px) scaleY(1.015);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scaleY(1);
-  }
-}
-
-@keyframes pw-float-gentle {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes pw-shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-6px);
-  }
-  75% {
-    transform: translateX(6px);
-  }
-}
-
-@keyframes pw-pulse-ring {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--world), transparent 55%);
-  }
-  50% {
-    box-shadow: 0 0 0 10px color-mix(in srgb, var(--world), transparent 100%);
-  }
-}
-
-@keyframes pw-star-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(1.15);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.pw-anim-slide-up {
-  animation: pw-slide-up 240ms var(--ease-drawer) both;
-}
-
-.pw-squish-pop {
-  animation: pw-jelly-press 280ms var(--ease-spring);
-}
-
-.pw-anim-pop {
-  animation: pw-pop-elastic 240ms var(--ease-out) both;
-}
-
-.pw-float {
-  animation: pw-float-gentle 3.4s ease-in-out infinite;
-}
-
-.pw-anim-shake {
-  animation: pw-shake 200ms ease-in-out;
-}
-
-.pw-anim-pulse {
-  animation: pw-pulse-ring 2.2s ease-in-out infinite;
-}
-
-.pw-anim-star {
-  animation: pw-star-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-/* Reduced motion support (§10.8) */
-@media (prefers-reduced-motion: reduce) {
-  .pw-anim-slide-up,
-  .pw-anim-star,
-  .pw-squish-pop,
-  .pw-anim-pop,
-  dialog.pw-dialog[open],
-  dialog.pw-sheet[open] {
-    animation: none;
-    transition: opacity 120ms linear;
-  }
-  .pw-anim-shake,
-  .pw-anim-pulse,
-  .pw-float {
-    animation: none;
-  }
-  .pw-pressable,
-  .pw-btn-primary,
-  .pw-btn-secondary,
-  .pw-btn-ghost {
-    transition: background-color 120ms linear, border-color 120ms linear;
-  }
-  .pw-pressable:hover:not(:disabled),
-  .pw-pressable:active:not(:disabled),
-  .pw-btn-primary:hover:not(:disabled),
-  .pw-btn-primary:active:not(:disabled),
-  .pw-btn-secondary:hover:not(:disabled),
-  .pw-btn-secondary:active:not(:disabled),
-  .pw-btn-ghost:hover:not(:disabled),
-  .pw-btn-ghost:active:not(:disabled) {
-    transform: none;
-  }
-}
-
-:root[data-reduced-motion='always'] .pw-anim-slide-up,
-:root[data-reduced-motion='always'] .pw-anim-star,
-:root[data-reduced-motion='always'] .pw-squish-pop,
-:root[data-reduced-motion='always'] .pw-anim-pop,
-:root[data-reduced-motion='always'] dialog.pw-dialog[open],
-:root[data-reduced-motion='always'] dialog.pw-sheet[open] {
-  animation: none;
-  transition: opacity 120ms linear;
-}
-
-:root[data-reduced-motion='always'] .pw-anim-shake,
-:root[data-reduced-motion='always'] .pw-anim-pulse,
-:root[data-reduced-motion='always'] .pw-float {
-  animation: none;
-}
-
-:root[data-reduced-motion='always'] .pw-pressable,
-:root[data-reduced-motion='always'] .pw-btn-primary,
-:root[data-reduced-motion='always'] .pw-btn-secondary,
-:root[data-reduced-motion='always'] .pw-btn-ghost {
-  transition: background-color 120ms linear, border-color 120ms linear;
-}
-
-:root[data-reduced-motion='always'] .pw-pressable:hover:not(:disabled),
-:root[data-reduced-motion='always'] .pw-pressable:active:not(:disabled),
-:root[data-reduced-motion='always'] .pw-btn-primary:hover:not(:disabled),
-:root[data-reduced-motion='always'] .pw-btn-primary:active:not(:disabled),
-:root[data-reduced-motion='always'] .pw-btn-secondary:hover:not(:disabled),
-:root[data-reduced-motion='always'] .pw-btn-secondary:active:not(:disabled),
-:root[data-reduced-motion='always'] .pw-btn-ghost:hover:not(:disabled),
-:root[data-reduced-motion='always'] .pw-btn-ghost:active:not(:disabled) {
-  transform: none;
-}
-
 /* App shell layout classes (Compact / Medium / Expanded / Pendek) (§10.10) */
 .pw-shell {
   min-height: 100dvh;
@@ -558,8 +624,9 @@
   right: 0;
   bottom: 0;
   z-index: 30;
-  background-color: var(--paper);
-  border-top: 1.5px solid var(--line);
+  background-color: var(--paper-raised);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--elev-up);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -586,7 +653,7 @@
     height: 100dvh;
     width: 104px;
     flex-shrink: 0;
-    background-color: var(--paper);
+    background-color: var(--paper-raised);
     border-right: 1.5px solid var(--line);
     display: flex;
     flex-direction: column;

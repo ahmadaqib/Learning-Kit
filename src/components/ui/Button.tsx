@@ -1,7 +1,7 @@
 import React from 'react';
 import { markUserInteraction, playSound } from '@/engine/sound';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'inverse';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -9,6 +9,18 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   soundEnabled?: boolean;
 }
+
+/**
+ * Variants map to the `.pw-btn-*` classes in global.css. Press (M01) is a same-frame swap of face and edge,
+ * with no transition on transform or box-shadow, so nothing here animates on tap. `inverse` is for posters.
+ */
+const VARIANT_CLASS: Record<ButtonVariant, string> = {
+  primary: 'pw-btn-primary',
+  secondary: 'pw-btn-secondary',
+  ghost: 'pw-btn-ghost',
+  danger: 'pw-btn-danger',
+  inverse: 'pw-btn-inverse',
+};
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
@@ -22,14 +34,6 @@ export const Button: React.FC<ButtonProps> = ({
   type = 'button',
   ...rest
 }) => {
-  const variantClasses: Record<ButtonVariant, string> = {
-    primary: 'pw-btn-primary',
-    secondary: 'pw-btn-secondary',
-    ghost: 'pw-btn-ghost',
-    danger:
-      'pw-pressable min-block-size-[var(--touch-min)] min-inline-size-[var(--touch-min)] rounded-[var(--radius-md)] border-0 bg-[var(--err-500)] px-5 py-2.5 font-extrabold text-white shadow-[0_3px_0_var(--err-600)] cursor-pointer hover:brightness-105 disabled:opacity-50 disabled:shadow-none',
-  };
-
   return (
     <button
       type={type}
@@ -40,15 +44,23 @@ export const Button: React.FC<ButtonProps> = ({
         if (soundEnabled) playSound('tap', true);
         onClick?.(e);
       }}
-      className={`inline-flex items-center justify-center gap-2 ${variantClasses[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      className={`relative inline-flex items-center justify-center gap-2 ${VARIANT_CLASS[variant]} ${fullWidth ? 'w-full' : ''} ${className}`.trim()}
       {...rest}
     >
       {loading ? (
-        <span aria-hidden="true" className="inline-flex gap-1">
-          <span className="h-2 w-2 animate-bounce rounded-full bg-current" />
-          <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:100ms]" />
-          <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:200ms]" />
-        </span>
+        <>
+          {/* The label keeps its width while loading, so the button does not jump. Screen readers still read it. */}
+          <span className="inline-flex items-center justify-center gap-2 opacity-0">{children}</span>
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            viewBox="0 0 40 8"
+            fill="none"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-2 w-10 -translate-x-1/2 -translate-y-1/2"
+          >
+            <path className="pw-loader-dash" d="M3 4 H37" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          </svg>
+        </>
       ) : (
         children
       )}

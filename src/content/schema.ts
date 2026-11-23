@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CONTENT_ICONS } from './icons';
 
 export type Mode = 'junior' | 'pro';
 
@@ -8,25 +9,27 @@ export const TxtSchema = z.object({
 });
 export type Txt = z.infer<typeof TxtSchema>;
 
+const RichModesSchema = z.array(z.enum(['junior', 'pro'])).optional();
+
 export const RichSchema = z.discriminatedUnion('t', [
-  z.object({ t: z.literal('text'), v: TxtSchema }),
-  z.object({ t: z.literal('bold'), v: TxtSchema }),
-  z.object({ t: z.literal('term'), termId: z.string().min(1), v: TxtSchema }),
-  z.object({ t: z.literal('code'), v: z.string().min(1) }),
+  z.object({ t: z.literal('text'), v: TxtSchema, modes: RichModesSchema }),
+  z.object({ t: z.literal('bold'), v: TxtSchema, modes: RichModesSchema }),
+  z.object({ t: z.literal('term'), termId: z.string().min(1), v: TxtSchema, modes: RichModesSchema }),
+  z.object({ t: z.literal('code'), v: z.string().min(1), modes: RichModesSchema }),
 ]);
 export type Rich = z.infer<typeof RichSchema>;
 
 export const ChoiceSchema = z.object({
   id: z.string().min(1),
   label: TxtSchema,
-  icon: z.string().optional(),
+  icon: z.enum(CONTENT_ICONS).optional(),
 });
 export type Choice = z.infer<typeof ChoiceSchema>;
 
 export const ItemSchema = z.object({
   id: z.string().min(1),
   label: TxtSchema,
-  icon: z.string().optional(),
+  icon: z.enum(CONTENT_ICONS).optional(),
 });
 export type Item = z.infer<typeof ItemSchema>;
 
@@ -34,6 +37,7 @@ export const BinSchema = z.object({
   id: z.string().min(1),
   label: TxtSchema,
   color: z.string().optional(),
+  icon: z.enum(CONTENT_ICONS).optional(),
 });
 export type Bin = z.infer<typeof BinSchema>;
 
@@ -208,6 +212,7 @@ export const LessonSchema = z.object({
   steps: z.array(StepSchema).min(4),
   reviewCards: z.array(QuestionSchema).min(2),
   recap: TxtSchema,
+  atWork: z.string().min(1).optional(),
   companion: z
     .object({
       talkPrompts: z.array(z.string()).min(1),
