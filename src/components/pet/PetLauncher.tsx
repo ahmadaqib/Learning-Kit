@@ -3,31 +3,36 @@ import { CircleHelp, Square, Volume2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { DialogModal } from '@/components/ui/DialogModal';
-import { PET_AI_TIP_IDS, type PetAiTipId, type PetHintCue, type PetHintRequest, type PetId, type PetPersonality } from '@/content/petContract';
+import { PET_AI_TIP_IDS, type PetHintCue, type PetHintRequest, type PetHintResponse, type PetId, type PetPersonality } from '@/content/petContract';
 import { getExtraPetTip, getPetId, getPetPersonality, getPetTip, PET_DETAILS, type PetContext } from '@/content/petTips';
 import type { Mode } from '@/content/schema';
 import { canSpeakCompanion, isQueuePlaying, speakCompanion, stopCompanionSpeaking } from '@/engine/readAloud';
 import type { PetOffer } from '@/engine/usePetLessonOffer';
-import { getMotionPrefs } from '@/motion/prefs';
-import { fx } from '@/motion/waapi';
 import { useAppStore } from '@/store/useAppStore';
 import { PetPortrait } from './PetPortrait';
+import type { PetMotion } from './usePetMotion';
 
 interface PetLauncherProps {
   context: PetContext;
+  studyGuide?: string;
+  studyExercise?: string;
   compact?: boolean;
   offer?: PetOffer;
+  arrival?: PetMotion['arrival'];
+  pauseMotion?: boolean;
   onLaunch?: () => void;
   onQuestionHint?: () => void;
 }
 
-type AiState = 'idle' | 'loading' | 'unavailable' | PetAiTipId;
+type AiState = 'idle' | 'loading' | 'unavailable' | PetHintResponse;
 
 const AI_TIMEOUT_MS = 23_000;
 
-function parseTipId(payload: unknown): PetAiTipId | undefined {
+function parseTip(payload: unknown): PetHintResponse | undefined {
   if (!payload || typeof payload !== 'object' || !('tipId' in payload)) return undefined;
-  return PET_AI_TIP_IDS.find((id) => id === payload.tipId);
+  const tipId = PET_AI_TIP_IDS.find((id) => id === payload.tipId);
+  if (!tipId || !('source' in payload) || (payload.source !== 'live' && payload.source !== 'prepared')) return undefined;
+  return { tipId, source: payload.source };
 }
 
 export function PetLauncher(props: PetLauncherProps) {
@@ -51,8 +56,12 @@ export function PetLauncher(props: PetLauncherProps) {
 
 function PetPanel({
   context,
+  studyGuide,
+  studyExercise,
   compact = false,
   offer,
+  arrival = 'greet',
+  pauseMotion = false,
   onLaunch,
   onQuestionHint,
   mode,
@@ -73,8 +82,6 @@ function PetPanel({
   const request = useRef<AbortController | null>(null);
   const speakingHere = useRef(false);
   const openedFrom = useRef<PetHintCue>('requested');
-  const portrait = useRef<HTMLSpanElement>(null);
-  const posed = useRef(false);
   const name = PET_DETAILS[petId].name;
 
   const stopSpeech = useCallback(() => {
@@ -89,18 +96,6 @@ function PetPanel({
     pending?.abort();
     stopSpeech();
   }, [stopSpeech]);
-
-  useEffect(() => {
-    if (!offer || posed.current || !portrait.current) return;
-    posed.current = true;
-    if (getMotionPrefs().reduced) return;
-    const pose = fx(portrait.current, [
-      { transform: 'translateY(0) rotate(0deg)' },
-      { transform: 'translateY(-2px) rotate(-8deg)' },
-      { transform: 'translateY(0) rotate(0deg)' },
-    ], { duration: 280, easing: 'ease-out' });
-    return () => pose?.cancel();
-  }, [offer]);
 
   const close = () => {
     const pending = request.current;
@@ -118,9 +113,9 @@ function PetPanel({
   };
 
   const localTip = getPetTip(context, mode, personality);
-  const tipId = PET_AI_TIP_IDS.find((id) => id === ai);
+  const tipId = typeof ai === 'object' ? ai.tipId : undefined;
   const extraTip = context.surface === 'lesson' && tipId ? getExtraPetTip(context.stepKind, tipId) : undefined;
-  const spokenTip = extraTip ?? localTip;
+  const spokenTip = extraTip ?? studyExercise ?? localTip;
   const canSpeak = !muted && canSpeakCompanion(spokenTip);
   const canAskAi = mode === 'pro' && context.surface === 'lesson';
 
@@ -169,7 +164,7 @@ function PetPanel({
         signal: controller.signal,
         body: JSON.stringify(body),
       });
-      const id = response.ok ? parseTipId(await response.json()) : undefined;
+      const id = response.ok ? parseTip(await response.json()) : undefined;
       if (request.current === controller) setAi(id ?? 'unavailable');
     } catch {
       if (request.current === controller) setAi('unavailable');
@@ -192,13 +187,15 @@ function PetPanel({
           onLaunch?.();
           setOpen(true);
         }}
-        className={`pw-pressable no-print inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border bg-[var(--paper)] text-[var(--ink)] hover:border-[var(--world-700)] ${offer ? 'border-[var(--world-700)]' : 'border-[var(--line-strong)]'} ${compact ? 'w-11' : 'py-1 pl-1.5 pr-3'}`}
+        className={`pw-pressable no-print pointer-events-auto inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center rounded-full border bg-[var(--paper)] text-[var(--ink)] hover:border-[var(--world-700)] ${offer ? 'border-[var(--world-700)]' : 'border-[var(--line-strong)]'} ${compact ? 'w-12' : 'pr-3'}`}
       >
         <span className="relative grid place-items-center">
-          <span ref={portrait} className="grid place-items-center">
-            <PetPortrait petId={petId} size={compact ? 30 : 32} />
-          </span>
-          {offer && <CircleHelp aria-hidden="true" size={17} className="absolute -right-1 -top-1 rounded-full bg-[var(--paper)] text-[var(--world-700)]" />}
+          <PetPortrait
+            petId={petId}
+            size={compact ? 46 : 52}
+            motion={{ arrival, reaction: offer ? 'offer' : undefined, ambient: true, suspended: open || pauseMotion }}
+          />
+          {offer && <CircleHelp aria-hidden="true" size={16} className="pointer-events-none absolute right-0 top-0 rounded-full bg-[var(--paper)] text-[var(--world-700)]" />}
         </span>
         {!compact && <span className="pw-small font-extrabold">{name}</span>}
       </button>
@@ -208,9 +205,14 @@ function PetPanel({
         {open && (
           <div className="space-y-4">
             <div className="flex items-start gap-3 sm:gap-4">
-              <PetPortrait petId={petId} size={56} />
+              <PetPortrait petId={petId} size={86} motion={{ arrival: 'engage', reaction: speaking ? 'talk' : undefined }} />
               <p className="pw-body m-0 min-w-0">{localTip}</p>
             </div>
+
+            {studyGuide && <div className="space-y-1">
+              <p className="pw-small m-0 font-extrabold">Coba di kartu ini</p>
+              <p className="pw-body m-0">{studyGuide}</p>
+            </div>}
 
             {context.surface === 'question' && context.hasHint && onQuestionHint && (
               <Button
@@ -227,7 +229,7 @@ function PetPanel({
             {canAskAi && (
               <div className="space-y-2 border-t border-[var(--line)] pt-3">
                 <p className="pw-small m-0 text-[var(--ink-2)]">
-                  Saat kamu meminta petunjuk, TokenPortal menerima judul pelajaran, jenis kartu, gaya pendamping, dan alasan bantuan ditawarkan.
+                  Untuk memilih strategi, pet dapat mengirim judul pelajaran, jenis kartu, gaya pet, dan alasan bantuan ke TokenPortal.
                 </p>
                 <Button
                   variant="secondary"
@@ -241,7 +243,7 @@ function PetPanel({
                 <div role="status" className="space-y-1">
                   {extraTip && (
                     <>
-                      <p className="pw-small m-0 font-extrabold">Petunjuk pilihan AI</p>
+                      <p className="pw-small m-0 font-extrabold">{typeof ai === 'object' && ai.source === 'prepared' ? 'Pilihan AI untuk materi ini · tersimpan' : 'Petunjuk pilihan AI'}</p>
                       <p className="pw-body m-0">{extraTip}</p>
                     </>
                   )}

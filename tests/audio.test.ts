@@ -167,11 +167,13 @@ const audioPlayers: FakeAudio[] = [];
 
 class FakeAudio {
   src = '';
+  currentTime = 0;
   volume = 1;
   defaultPlaybackRate = 1;
   playbackRate = 1;
   onended: (() => void) | null = null;
   onerror: (() => void) | null = null;
+  onplaying: (() => void) | null = null;
   play = vi.fn(() => Promise.resolve());
   pause = vi.fn();
   removeAttribute = vi.fn();
@@ -221,6 +223,44 @@ describe('recorded speech', () => {
     expect(utterances[0].text).toBe('Ayo belajar.');
     utterances[0].onend?.();
     expect(done).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it('lets a late-loading studio clip finish at the slowest playback speed', () => {
+    vi.useFakeTimers();
+    try {
+      configureSpeech({ ...createDefaultSettings('junior'), speechRate: 0.75 });
+      const done = vi.fn();
+      const fallback = vi.fn();
+      playRecordedSpeech(['/long-recording.mp3'], done, 'companion', fallback);
+      const player = audioPlayers[0];
+
+      vi.advanceTimersByTime(19_000);
+      player.onplaying?.();
+      vi.advanceTimersByTime(19_000);
+      player.currentTime = 14.25;
+      vi.advanceTimersByTime(3_000);
+      expect(fallback).not.toHaveBeenCalled();
+      expect(done).not.toHaveBeenCalled();
+
+      player.onended?.();
+      expect(done).toHaveBeenCalledExactlyOnceWith(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('uses fallback when a recording makes no playback progress', () => {
+    vi.useFakeTimers();
+    try {
+      const done = vi.fn();
+      const fallback = vi.fn(() => false);
+      playRecordedSpeech(['/stalled.mp3'], done, 'companion', fallback);
+      vi.advanceTimersByTime(20_000);
+      expect(fallback).toHaveBeenCalledOnce();
+      expect(done).toHaveBeenCalledExactlyOnceWith(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('can use studio speech with no system voices and gives an active lesson priority', () => {
