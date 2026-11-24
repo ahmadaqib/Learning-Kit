@@ -34,8 +34,8 @@ const GUIDE_MAP: Record<Question['type'], { title: string; steps: string[] }> = 
     steps: ['Perhatikan bagian yang ditanyakan.', 'Ketuk langsung area atau label yang dimaksud pada diagram.', 'Tekan Periksa.'],
   },
   spotbug: {
-    title: 'Cara Menemukan Kesalahan',
-    steps: ['Baca tiap baris dengan teliti.', 'Ketuk baris yang menurutmu salah atau berbahaya.', 'Tekan Periksa.'],
+    title: 'Cara Memilih Baris Kode',
+    steps: ['Baca tiap baris dengan teliti.', 'Ketuk setiap baris yang sesuai dengan pertanyaan.', 'Tekan Periksa.'],
   },
   fill: {
     title: 'Cara Mengisi Bagian Kosong',
