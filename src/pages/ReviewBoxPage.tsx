@@ -276,7 +276,7 @@ export const ReviewBoxPage: React.FC = () => {
       cur.q.type === 'order';
 
     return (
-      <div data-review-in-progress className="mx-auto flex min-h-[85dvh] w-full max-w-[680px] flex-col px-4 py-6">
+      <div key="review-session" data-review-in-progress className="mx-auto flex min-h-[85dvh] w-full max-w-[680px] flex-col px-4 py-6">
         <Button variant="ghost" data-sfx="back" onClick={leaveSession} className="mb-3 self-start">
           <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>Kembali ke Kotak Ulang</span>
