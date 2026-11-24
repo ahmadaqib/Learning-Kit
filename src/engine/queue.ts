@@ -92,6 +92,23 @@ export function advanceQuizSession(
   };
 }
 
+type OrderQuestion = Extract<Question, { type: 'order' }>;
+
+export function getInitialOrder(question: OrderQuestion): string[] {
+  return question.items.map(({ id }) => id);
+}
+
+export function getOrderSequence(question: OrderQuestion, value: unknown): string[] | null {
+  if (value === undefined) return getInitialOrder(question);
+  if (!Array.isArray(value) || value.length !== question.items.length) return null;
+
+  const remaining = new Set(getInitialOrder(question));
+  for (const id of value) {
+    if (!remaining.delete(id)) return null;
+  }
+  return value;
+}
+
 export function evaluateQuestionAnswer(q: Question, userAnswer: unknown): boolean {
   switch (q.type) {
     case 'mcq':
@@ -117,8 +134,8 @@ export function evaluateQuestionAnswer(q: Question, userAnswer: unknown): boolea
       return q.answer.every((ans, idx) => userAnswer[idx] === ans);
     }
     case 'order': {
-      if (!Array.isArray(userAnswer) || userAnswer.length !== q.answer.length) return false;
-      return q.answer.every((ans, idx) => userAnswer[idx] === ans);
+      const order = getOrderSequence(q, userAnswer);
+      return order !== null && order.length === q.answer.length && q.answer.every((ans, idx) => order[idx] === ans);
     }
     case 'spotbug': {
       if (!Array.isArray(userAnswer)) return false;

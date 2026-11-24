@@ -17,6 +17,7 @@ import {
   snapshotFromSession,
   type CardStep,
 } from '@/engine/lessonSession';
+import { getAnswerExplanation } from '@/engine/answerFeedback';
 import { advanceQuizSession, createQuizSession, evaluateQuestionAnswer, type QuizSessionState } from '@/engine/queue';
 import {
   buildReadQueue,
@@ -351,7 +352,7 @@ const BonusChallenge: React.FC<{
     stopQueue();
     const correct = evaluateQuestionAnswer(question, answer);
     playSound(correct ? 'correct' : 'incorrect', soundEnabled);
-    const base = resolveTxt(question.explainCorrect, 'pro');
+    const base = getAnswerExplanation(question, answer, correct, 'pro');
     if (correct) markSeen(profileId, `bonus:${lessonId}`);
     const result = {
       correct,
@@ -961,13 +962,9 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
     const isCorrect = evaluateQuestionAnswer(activeQuestion, answerVal);
     petOffer.recordAttempt(isCorrect);
 
-    // The title already carries the verdict, so the fallback explanation is just the explanation
-    let explanation = resolveTxt(activeQuestion.explainCorrect, mode);
-    if (!isCorrect) {
-      const wrongKey = typeof answerVal === 'string' || typeof answerVal === 'boolean' ? String(answerVal) : '';
-      const specific = wrongKey && activeQuestion.explainIncorrect?.[wrongKey];
-      if (specific) explanation = resolveTxt(specific, mode);
-      if (inQuiz) recordQuestionMistake(
+    const explanation = getAnswerExplanation(activeQuestion, answerVal, isCorrect, mode);
+    if (!isCorrect && inQuiz) {
+      recordQuestionMistake(
         activeQuestion.tags,
         activeQuestion.type === 'limit',
         activeQuestion.type === 'limit' ? lesson.id : undefined,

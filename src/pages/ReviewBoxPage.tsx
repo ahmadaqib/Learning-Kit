@@ -2,9 +2,10 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { ArrowLeft, Layers, Sparkles } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { WORLDS_BY_ID, ALL_LESSONS } from '@/content/curriculum';
-import { resolveTxt, type Mode, type Question } from '@/content/schema';
+import type { Mode, Question } from '@/content/schema';
 import { visibleReviewCards } from '@/content/reviewCards';
 import { WARMUP_CAP, xpWord } from '@/app/modeConfig';
+import { getAnswerExplanation } from '@/engine/answerFeedback';
 import { celebrate } from '@/engine/celebrations';
 import { formatLocalDate } from '@/engine/date';
 import { getBoxDistribution, getDueLeitnerCards } from '@/engine/leitner';
@@ -115,6 +116,7 @@ export const ReviewBoxPage: React.FC = () => {
   const [elapsed, setElapsed] = useState(0);
   const timerRef = useRef<VisibleTimer | null>(null);
   const correctRef = useRef(0);
+  const promptRef = useRef<HTMLHeadingElement>(null);
 
   const mode: Mode = profile?.mode ?? 'junior';
   const current = activeSession ? sessionCards[idx] : undefined;
@@ -154,8 +156,14 @@ export const ReviewBoxPage: React.FC = () => {
   useEffect(() => () => timerRef.current?.dispose(), []);
 
   useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activeSession, sessionDone]);
+    const prompt = promptRef.current;
+    if (!prompt) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    prompt.focus({ preventScroll: true });
+    prompt.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }, [activeSession, idx, sessionDone]);
 
   if (!profile) return null;
 
@@ -224,7 +232,7 @@ export const ReviewBoxPage: React.FC = () => {
       const almost = !ok && judged.partial && judged.total > 0 && judged.right / judged.total >= ALMOST_RATIO;
 
       playSound(ok ? 'correct' : 'incorrect', profile.settings.soundEnabled);
-      setFeedback({ correct: ok, almost, explanation: resolveTxt(cur.q.explainCorrect, mode) });
+      setFeedback({ correct: ok, almost, explanation: getAnswerExplanation(cur.q, answerVal, ok, mode) });
     };
 
     const nextCard = () => {
@@ -237,7 +245,7 @@ export const ReviewBoxPage: React.FC = () => {
       }
 
       const xpBefore = profile.xp;
-      const xpEarned = isFreePractice ? 10 : completeLeitnerSession(sessionCards.length);
+      const xpEarned = isFreePractice ? 0 : completeLeitnerSession(sessionCards.length);
 
       let kilatResult: SessionDone['kilat'] = null;
       if (timerRef.current) {
@@ -298,6 +306,7 @@ export const ReviewBoxPage: React.FC = () => {
             mode={mode}
             kicker={`Soal ${idx + 1} dari ${sessionCards.length}`}
             as="h1"
+            headingRef={promptRef}
             reading={reader.reading}
             eyebrow={<p className="pw-small m-0 text-[var(--ink-3)]">Dari {cur.originLabel}</p>}
             action={
@@ -336,6 +345,7 @@ export const ReviewBoxPage: React.FC = () => {
           isFirstTry={false}
           explanation={feedback?.explanation ?? ''}
           mode={mode}
+          showRepeat={!isFreePractice}
           onContinue={nextCard}
           canSpeak={reader.canSpeak}
           speaking={reader.speaking}
