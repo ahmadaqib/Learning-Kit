@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ListChecks, Shield, Star, Target, X } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { WORLD_METAS } from '@/content/worldMeta';
@@ -109,6 +109,7 @@ export const BossQuizPage: React.FC = () => {
   const [judged, setJudged] = useState<Record<string, boolean>>({});
   const [shieldHit, setShieldHit] = useState(0);
   const [finishedResult, setFinishedResult] = useState<BossFinish | null>(null);
+  const promptRef = useRef<HTMLHeadingElement>(null);
 
   const mode: Mode = profile?.mode ?? 'junior';
 
@@ -158,6 +159,13 @@ export const BossQuizPage: React.FC = () => {
   }, [duniaId, mode]);
 
   const currentEntry = bank[currentIdx];
+  useLayoutEffect(() => {
+    const prompt = promptRef.current;
+    if (!prompt) return;
+    prompt.focus({ preventScroll: true });
+    prompt.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }, [started, currentIdx, currentEntry, finishedResult]);
+
   const reader = useQuestionReader({
     mode,
     autoRead: Boolean(profile?.settings.autoReadAloud),
@@ -384,6 +392,7 @@ export const BossQuizPage: React.FC = () => {
             question={currentEntry.q}
             mode={mode}
             kicker={`${world.boss.guardianName} · soal ${currentIdx + 1}`}
+            headingRef={promptRef}
             reading={reader.reading}
             action={reader.canSpeak ? <ReadAloudButton mode={mode} speaking={reader.speaking} onToggle={reader.toggle} /> : undefined}
           />
