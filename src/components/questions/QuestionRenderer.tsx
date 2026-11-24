@@ -17,7 +17,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { resolveTxt, type Choice, type Mode, type Question } from '@/content/schema';
-import { evaluateQuestionAnswer } from '@/engine/queue';
+import { evaluateQuestionAnswer, getInitialOrder, getOrderSequence } from '@/engine/queue';
 import {
   buildReadQueue,
   playQueue,
@@ -92,10 +92,9 @@ export function judgeParts(q: Question, value: unknown): PartsJudgement {
       return { right, total: q.items.length, partial: true, verdicts };
     }
     case 'order': {
-      const current =
-        Array.isArray(value) && value.length === q.items.length ? (value as string[]) : q.items.map((i) => i.id);
+      const current = getOrderSequence(q, value);
       let right = 0;
-      current.forEach((id, idx) => {
+      current?.forEach((id, idx) => {
         const ok = q.answer[idx] === id;
         verdicts[id] = v(ok);
         if (ok) right += 1;
@@ -265,7 +264,7 @@ const TYPE_CHIP: Record<Question['type'], { label: string; Icon: LucideIcon }> =
   order: { label: 'Urutkan', Icon: ArrowDownUp },
   match: { label: 'Pasangkan', Icon: Link2 },
   hotspot: { label: 'Ketuk bagian yang tepat', Icon: Crosshair },
-  spotbug: { label: 'Ketuk baris yang salah', Icon: Bug },
+  spotbug: { label: 'Pilih baris kode', Icon: Bug },
   fill: { label: 'Lengkapi', Icon: TextCursorInput },
   type: { label: 'Ketik jawaban', Icon: Keyboard },
 };
@@ -336,6 +335,8 @@ interface QuestionIntroProps {
   reading?: ReadingMark | null;
   /** The heading level of the prompt. Default h2. */
   as?: 'h1' | 'h2' | 'h3';
+  /** Lets the page move focus to the prompt when a new question appears. */
+  headingRef?: React.Ref<HTMLHeadingElement>;
   /** Text shown above the kicker, for example where the card comes from. */
   eyebrow?: React.ReactNode;
 }
@@ -349,6 +350,7 @@ export const QuestionIntro: React.FC<QuestionIntroProps> = ({
   action,
   reading,
   as: Tag = 'h2',
+  headingRef,
   eyebrow,
 }) => (
   <div className="space-y-3">
@@ -363,7 +365,7 @@ export const QuestionIntro: React.FC<QuestionIntroProps> = ({
     </div>
     <QuestionTypeChip type={question.type} />
     <QuestionContext question={question} mode={mode} reading={reading} />
-    <Tag className="pw-prompt">
+    <Tag ref={headingRef} tabIndex={headingRef ? -1 : undefined} className="pw-prompt scroll-mt-[max(12px,env(safe-area-inset-top))]">
       <MarkedText text={resolveTxt(question.prompt, mode)} activePart={partOf(reading, 'prompt')} />
     </Tag>
   </div>
@@ -513,7 +515,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       <OrderInteractive
         question={question}
         mode={mode}
-        value={Array.isArray(value) ? (value as string[]) : question.items.map((i) => i.id)}
+        value={getOrderSequence(question, value) ?? getInitialOrder(question)}
         onChange={onChange}
         disabled={disabled}
         judged={judged}
@@ -563,7 +565,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
     };
     return (
       <div className="space-y-2">
-        <p className="pw-small m-0 text-[var(--ink-2)]">Ketuk baris yang menurutmu bermasalah.</p>
+        <p className="pw-small m-0 text-[var(--ink-2)]">Ketuk baris yang sesuai dengan pertanyaan.</p>
         <div className="overflow-hidden rounded-[var(--radius-md)] border-2 border-[var(--line)] bg-[var(--boss)] p-2 text-[var(--on-boss)]">
           {question.lines.map((line, idx) => {
             const num = idx + 1;
@@ -823,14 +825,11 @@ const OrderInteractive: React.FC<
     onChange: (val: string[]) => void;
     disabled: boolean;
   } & JudgedProps
-> = ({ question, mode, value, onChange, disabled, judged, isCorrect, reading }) => {
+> = ({ question, mode, value: currentOrder, onChange, disabled, judged, isCorrect, reading }) => {
   const itemMap = useMemo(
     () => Object.fromEntries(question.items.map((it) => [it.id, it])),
     [question.items],
   );
-
-  // Pastikan initial value selalu tersinkronisasi saat pertama kali render
-  const currentOrder = value.length === question.items.length ? value : question.items.map((i) => i.id);
 
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const [moved, setMoved] = useState<{ id: string; n: number; dir: -1 | 1 } | null>(null);

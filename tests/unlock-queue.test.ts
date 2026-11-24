@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { judgeParts } from '../src/components/questions/QuestionRenderer';
 import { advanceQuizSession, createQuizSession, evaluateQuestionAnswer } from '../src/engine/queue';
 import type { Question } from '../src/content/schema';
 
@@ -28,6 +29,20 @@ const sampleQuestions: Question[] = [
   },
 ];
 
+const orderQuestion: Extract<Question, { type: 'order' }> = {
+  id: 'order',
+  type: 'order',
+  prompt: { pro: 'Urutkan langkah.' },
+  difficulty: 1,
+  items: [
+    { id: 'first', label: { pro: 'Langkah pertama' } },
+    { id: 'last', label: { pro: 'Langkah terakhir' } },
+  ],
+  answer: ['first', 'last'],
+  explainCorrect: { pro: 'Langkah pertama mendahului langkah terakhir.' },
+  tags: ['order'],
+};
+
 describe('quiz queue & mastery learning', () => {
   it('memasukkan soal salah ke akhir antrean dan baru selesai jika semua benar (§5.2, F3)', () => {
     let session = createQuizSession(sampleQuestions);
@@ -56,5 +71,30 @@ describe('quiz queue & mastery learning', () => {
     expect(evaluateQuestionAnswer(sampleQuestions[0], 'a')).toBe(true);
     expect(evaluateQuestionAnswer(sampleQuestions[0], 'b')).toBe(false);
     expect(evaluateQuestionAnswer(sampleQuestions[1], false)).toBe(true);
+  });
+
+  it('menilai urutan awal yang dikirim tanpa memindahkan item', () => {
+    expect(evaluateQuestionAnswer(orderQuestion, undefined)).toBe(true);
+    expect(judgeParts(orderQuestion, undefined).verdicts).toEqual({ first: 'right', last: 'right' });
+  });
+
+  it('menolak urutan awal yang berbeda dari kunci', () => {
+    const question = { ...orderQuestion, items: [...orderQuestion.items].reverse() };
+    expect(evaluateQuestionAnswer(question, undefined)).toBe(false);
+  });
+
+  it('menilai urutan yang dipilih pemain', () => {
+    expect(evaluateQuestionAnswer(orderQuestion, ['last', 'first'])).toBe(false);
+    const question = { ...orderQuestion, items: [...orderQuestion.items].reverse() };
+    expect(evaluateQuestionAnswer(question, ['first', 'last'])).toBe(true);
+  });
+
+  it.each([
+    ['tidak lengkap', ['first']],
+    ['berisi duplikat', ['first', 'first']],
+    ['berisi item asing', ['first', 'unknown']],
+  ])('menolak urutan eksplisit yang %s', (_case, answer) => {
+    expect(evaluateQuestionAnswer(orderQuestion, answer)).toBe(false);
+    expect(judgeParts(orderQuestion, answer).verdicts).toEqual({});
   });
 });
