@@ -30,8 +30,12 @@ const proLessons = WORLD_METAS.flatMap((world) => [...world.lessons, ...world.si
   .map((lesson) => ({ ...lesson, world })));
 const lessonById = new Map(proLessons.map((lesson) => [lesson.id, lesson]));
 
+// Every Pro lesson title by world (about 520 words), so the model can tell what the curriculum covers.
 const CURRICULUM = WORLD_METAS
-  .map((world) => `${world.title} (jalur ${world.track}): ${world.tagline.pro}`)
+  .map((world) => `${world.title} (jalur ${world.track}): ` + [...world.lessons, ...world.sideQuests]
+    .filter((lesson) => lesson.modes.includes('pro'))
+    .map((lesson) => lesson.title)
+    .join('; '))
   .join('\n');
 
 /**
