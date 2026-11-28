@@ -508,9 +508,12 @@ export const LessonPlayerPage: React.FC = () => {
   const meta = LESSON_STUBS[pelajaranId];
   if (meta) {
     const world = WORLD_STUBS.find((w) => w.id === meta.worldId);
-    const lockedWorkshop = meta.isSideQuest && !profile.lessons[meta.id]?.completedAt &&
-      (!world || !profile.assessments[meta.worldId]?.pre || !isLessonUnlocked(meta.id, world, LESSON_STUBS, profile, WORLD_STUBS));
-    if (!meta.modes.includes(profile.mode) || lockedWorkshop) return <Navigate replace to={`/dunia/${meta.worldId}`} />;
+    const done = Boolean(profile.lessons[meta.id]?.completedAt);
+    const unlocked = Boolean(world && isLessonUnlocked(meta.id, world, LESSON_STUBS, profile, WORLD_STUBS));
+    const lockedWorkshop = meta.isSideQuest && !done && (!profile.assessments[meta.worldId]?.pre || !unlocked);
+    // Junior keeps the linear path (PRD §4.2); Pro may jump ahead from the glossary. Finished lessons stay replayable.
+    const lockedForJunior = profile.mode === 'junior' && !done && !unlocked;
+    if (!meta.modes.includes(profile.mode) || lockedWorkshop || lockedForJunior) return <Navigate replace to={`/dunia/${meta.worldId}`} />;
   }
   return <LessonPlayer key={`${profile.id}:${profile.mode}:${pelajaranId}`} pelajaranId={pelajaranId} profileId={profile.id} />;
 };
