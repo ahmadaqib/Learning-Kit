@@ -1364,7 +1364,7 @@ export const lessons: Lesson[] = [
         answer: { mo: 'rmo', an: 'ran', co: 'rco', tr: 'rtr' },
         explainCorrect: t(
           'Setiap resep punya kesan sendiri: aman, lembut, menonjol, atau ceria. Pilih sesuai tujuanmu.',
-          'Keempat skema ini paling sering dipakai desainer. Masing-masing punya kesan dan fungsi sendiri.',
+          'Monokromatik memakai satu hue, analog warna bersebelahan, komplementer dua warna berseberangan, dan triadik tiga warna berjarak sama.',
         ),
         hints: [t('Ingat resep baju: satu warna, tetangga, seberang.'), undefined],
         tags: ['skema-warna'],
@@ -1657,7 +1657,7 @@ export const lessons: Lesson[] = [
         answer: { p60: 'r60', p30: 'r30', p10: 'r10' },
         explainCorrect: t(
           'Latar netral paling luas, kartu sedang, tombol paling kecil. Seperti baju, jaket, dan syal.',
-          'Takaran ini memberi keseimbangan warna yang profesional. Aksen yang kecil menjadi pusat perhatian.',
+          'Latar 60% menjadi dasar dan kartu 30% memberi struktur. Aksen 10% yang kecil menarik mata ke tombol.',
         ),
         hints: [t('Ingat baju netral paling banyak.'), undefined],
         tags: ['aturan-60-30-10'],
@@ -2760,7 +2760,7 @@ export const lessons: Lesson[] = [
           { id: 'rhs', label: t('HSL: paling mudah diubah terang-gelapnya') },
         ],
         answer: { hx: 'rhx', rg: 'rrg', ra: 'rra', hs: 'rhs' },
-        explainCorrect: t('Keempat format ini sering ditemui di file desain dan file CSS.'),
+        explainCorrect: t('HEX dan RGB menyimpan jumlah merah, hijau, dan biru. RGBA menambah alpha, dan HSL memakai hue, saturation, lightness.'),
         hints: [t('Cari format yang punya angka keempat.'), undefined],
         tags: ['hex-rgb', 'hsl'],
       }),
@@ -2945,8 +2945,8 @@ export const lessons: Lesson[] = [
         ],
         answer: { se: 'rse', sa: 'rsa', mo: 'rmo', di: 'rdi' },
         explainCorrect: t(
-          'Setiap jenis huruf punya tugas sendiri. Pilih yang cocok untuk tulisanmu.',
-          'Keluarga huruf yang tepat menentukan suasana dan kenyamanan baca.',
+          'Huruf tanpa kaki enak dibaca di layar. Huruf sama lebar membuat angka berjajar rapi.',
+          'Serif terasa klasik, sans-serif nyaman di layar, monospace menyejajarkan kode, dan Display cocok untuk judul.',
         ),
         hints: [t('Ingat huruf mana yang cocok untuk judul poster.'), undefined],
         tags: ['tipografi'],
@@ -3045,7 +3045,7 @@ export const lessons: Lesson[] = [
           analogy: t('Tata letak buku dan majalah kertas'),
           prompt: t(
             'Mengapa paragraf di layar HP sebaiknya rata kiri?',
-            'Mengapa rata kanan-kiri (justify) dari buku cetak sebaiknya dihindari pada paragraf web di layar sempit?',
+            'Mengapa rata kanan-kiri, yang biasa di buku cetak, sebaiknya dihindari pada paragraf web di layar sempit?',
           ),
           difficulty: 2,
           choices: [
@@ -3150,7 +3150,7 @@ export const lessons: Lesson[] = [
             {
               id: 'ten',
               label: t('Sebanyak yang dibutuhkan setiap bagian halaman'),
-              explainWrong: t('Huruf yang konsisten adalah kunci keterbacaan.'),
+              explainWrong: t('Tanpa batas, halaman mudah berantakan. Satu atau dua keluarga huruf sudah cukup.'),
             },
           ],
           answer: 'two',
@@ -3376,7 +3376,7 @@ export const lessons: Lesson[] = [
           { id: 'rch', label: t('Batas panjang baris sekitar 65 karakter') },
         ],
         answer: { lh: 'rlh', ls: 'rls', fw: 'rfw', ch: 'rch' },
-        explainCorrect: t('Empat pengaturan ini dan satuan ch memberi kendali penuh atas teks.'),
+        explainCorrect: t('line-height mengatur jarak antarbaris, letter-spacing antarhuruf, dan font-weight ketebalan. Satuan ch membatasi panjang baris.'),
         hints: [t('Vertikal berarti antarbaris, horizontal berarti antarhuruf.'), undefined],
         tags: ['type-scale', 'tipografi'],
       }),
@@ -3430,7 +3430,7 @@ export const lessons: Lesson[] = [
           story: t(
             'Situs portofolio Nadia lambat dimuat. Ia memuat 9 ketebalan font (100 sampai 900), padahal hanya memakai Regular (400) dan Bold (700).',
           ),
-          prompt: t('Bagaimana cara mengoptimalkan pemuatan web font Nadia?'),
+          prompt: t('Bagaimana cara mempercepat pemuatan web font Nadia?'),
           difficulty: 2,
           choices: [
             { id: 'woff', label: t('Muat hanya ketebalan 400 dan 700 dalam format woff2') },

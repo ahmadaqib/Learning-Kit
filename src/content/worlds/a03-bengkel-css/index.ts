@@ -188,7 +188,7 @@ export const world: World = {
         id: 'a03-anc-j5',
         prompt: t(
           'Kotak punya 4 lapis. Mana urutan dari paling dalam ke paling luar?',
-          'Urutan lapisan box model dari paling dalam ke paling luar adalah?',
+          'Bagaimana urutan lapisan box model, dari paling dalam ke paling luar?',
         ),
         choices: [
           {
@@ -1751,7 +1751,7 @@ export const lessons: Lesson[] = [
           ),
           explainWrong: t(
             'Keduanya boleh dipakai bersama. Seperti rak kecil di dalam kotak bekal.',
-            'Keduanya saling melengkapi dan paling kuat bila digabungkan.',
+            'Keduanya boleh dipakai bersama. Grid menyusun kerangka, Flexbox menata isi di dalamnya.',
           ),
           hints: [t('Ingat kotak bekal besar yang berisi rak kecil.')],
           tags: ['flexbox', 'grid-css'],
@@ -1999,7 +1999,7 @@ export const lessons: Lesson[] = [
     reviewCards: [
       makeMcq({
         id: 'a03-l06-r1',
-        prompt: t('Urutan kekuatan selector dari paling kuat ke paling lemah adalah?'),
+        prompt: t('Bagaimana urutan kekuatan selector, dari paling kuat ke paling lemah?'),
         choices: [
           { id: 'ok', label: t('id, class, tag') },
           {

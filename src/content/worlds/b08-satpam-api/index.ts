@@ -189,7 +189,7 @@ export const world: World = {
       }),
       makeAnchorMcq({
         id: 'b08-anc-p3',
-        prompt: t('Apa tujuan jitter, yaitu waktu acak kecil, pada jadwal retry exponential backoff?'),
+        prompt: t('Pada retry dengan jeda makin panjang, apa tujuan jitter, yaitu waktu acak kecil?'),
         choices: [
           { id: 'thund', label: t('Mencegah banyak klien mencoba ulang di detik yang sama') },
           {
@@ -370,7 +370,7 @@ export const lessons: Lesson[] = [
       qStep({
         id: 'b08-l01-q2',
         type: 'order',
-        prompt: t('Urutkan langkah browser saat mengirim DELETE /produk/12 ke API di origin lain.'),
+        prompt: t('Urutkan langkah saat browser mengirim DELETE /produk/12 ke API di origin lain.'),
         difficulty: 2,
         items: [
           { id: 's3', label: t('Browser mengirim permintaan DELETE /produk/12 yang sebenarnya') },
@@ -411,7 +411,7 @@ export const lessons: Lesson[] = [
         id: 'b08-l01-q3',
         type: 'spotbug',
         difficulty: 2,
-        prompt: t('Ketuk baris yang membuat server API pembayaran ber-login terlalu longgar.'),
+        prompt: t('Ketuk baris yang membuat izin CORS API pembayaran ini terlalu longgar.'),
         lines: [
           'app.use((req, res, next) => {',
           '  res.setHeader("Access-Control-Allow-Origin", "*");',
@@ -421,7 +421,7 @@ export const lessons: Lesson[] = [
         ],
         answer: [2],
         explainCorrect: t(
-          'Baris 2 mengizinkan semua origin dengan tanda *. Untuk API ber-login, izinkan origin tertentu saja, misalnya https://toko-rani.example sendiri.',
+          'Baris 2 mengizinkan semua origin dengan tanda *. Untuk API yang memakai login, izinkan origin tertentu saja, misalnya https://toko-rani.example sendiri.',
         ),
         hints: [t('Cari header yang menentukan siapa boleh masuk.'), undefined],
         tags: ['cors', 'server'],
@@ -444,7 +444,7 @@ export const lessons: Lesson[] = [
           id: 'b08-l01-q5',
           type: 'limit',
           analogy: t('Satpam apartemen browser'),
-          prompt: t('Apa batas penting dari satpam CORS?'),
+          prompt: t('Apa batas satpam CORS?'),
           choices: [
             { id: 'notsec', label: t('CORS hanya menahan browser, bukan alat seperti curl') },
             {
@@ -1147,7 +1147,7 @@ export const lessons: Lesson[] = [
         type: 'fill',
         modes: ['pro'],
         difficulty: 2,
-        prompt: t('Lengkapi pasangan strategi ketahanan request di frontend:'),
+        prompt: t('Lengkapi dua cara frontend menangani request yang lambat atau gagal:'),
         template: 'Tetapkan batas tunggu ___ (misalnya 10 detik), lalu retry gangguan sementara dengan ___ + jitter.',
         bank: ['timeout', 'exponential backoff', 'CORS', 'Base64'],
         answer: ['timeout', 'exponential backoff'],
@@ -1264,7 +1264,7 @@ export const lessons: Lesson[] = [
             },
             {
               id: 'get',
-              label: t('Server selalu memproses setiap request POST dua kali secara otomatis'),
+              label: t('Server memproses setiap request POST dua kali'),
               explainWrong: t('POST hanya diproses satu kali per request. Masalah muncul kalau request itu terkirim ulang.'),
             },
           ],

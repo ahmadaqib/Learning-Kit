@@ -591,7 +591,7 @@ export const lessons: Lesson[] = [
           type: 'limit',
           modes: ['pro'],
           analogy: t('Library sebagai perabot, framework sebagai rumah jadi'),
-          prompt: t('Apa yang bisa terjadi di proyek web sungguhan, padahal rumah dan perabot terasa terpisah?'),
+          prompt: t('Rumah dan perabot terasa terpisah. Apa yang bisa terjadi di proyek web sungguhan?'),
           choices: [
             { id: 'mix', label: t('Framework tetap bisa memakai beberapa library tambahan') },
             {
@@ -615,7 +615,7 @@ export const lessons: Lesson[] = [
         makeTf({
           id: 'a11-l01-q6',
           prompt: t(
-            'Seperti sepeda, bisa satu framework membuat framework lain lebih mudah dipelajari.',
+            'Seperti naik sepeda, belajar satu framework membuat framework lain lebih mudah.',
             'Konsep dasar seperti komponen dan state mirip di berbagai framework. Menguasai satu framework membuat framework lain lebih mudah dipelajari.',
           ),
           answer: true,
@@ -733,7 +733,7 @@ export const lessons: Lesson[] = [
         answer: true,
         explainCorrect: t(
           'Bagian kecil bisa dipakai ulang, jadi kode tidak kusut. Seperti balok susun yang disusun lagi.',
-          'Komponen membuat kode tampilan modular dan mudah dirawat.',
+          'Komponen memecah kode tampilan jadi bagian kecil yang mudah dirawat.',
         ),
         explainWrong: t(
           'Bagian kecil yang dipakai ulang justru alasan utama memakai framework.',
@@ -2096,7 +2096,7 @@ export const lessons: Lesson[] = [
         ),
         explainWrong: t(
           'Catatan yang rinci sangat membantu. Teman tahu apa yang berubah.',
-          'Pesan commit deskriptif penting untuk melacak riwayat proyek.',
+          'Pesan commit yang menjelaskan perubahan memudahkan melacak riwayat proyek.',
         ),
         hints: [t('Bayangkan membaca daftar titik simpan.')],
         tags: ['git'],
@@ -2316,7 +2316,7 @@ export const lessons: Lesson[] = [
           analogy: t('Menayangkan web seperti pentas drama di panggung'),
           prompt: t(
             'Web sudah tayang di internet. Apa yang terjadi sesudah hari pertama?',
-            'Apa perbedaan terpenting setelah hari pertama website di-deploy?',
+            'Apa yang terjadi pada website setelah hari pertama di-deploy?',
           ),
           choices: [
             {
@@ -2351,8 +2351,8 @@ export const lessons: Lesson[] = [
           ],
           answer: 'cont',
           explainCorrect: t(
-            'Tayang pertama bukan garis akhir. Seperti drama yang dipentaskan lagi dan makin bagus.',
-            'Peluncuran pertama bukan garis akhir. Produk web terus dirawat dan diperbarui.',
+            'Web yang sudah tayang tetap dirawat. Seperti drama yang dipentaskan lagi dan makin bagus.',
+            'Setelah rilis pertama, produk web terus dirawat dan diperbarui.',
           ),
           hints: [t('Ingat: drama bisa dipentaskan berkali-kali.', 'Pikirkan apa yang terjadi pada produk setelah rilis pertama.')],
           tags: ['deploy'],

@@ -168,7 +168,7 @@ export const world: World = {
         id: 'b09-anc-j4',
         prompt: t(
           'Mengapa keadaan kosong perlu pesan ajakan?',
-          'Mengapa pesan ajakan di keadaan kosong penting untuk kenyamanan orang yang memakai aplikasi?',
+          'Mengapa keadaan kosong perlu pesan ajakan?',
         ),
         choices: [
           {
@@ -230,7 +230,7 @@ export const world: World = {
         answer: 'three',
         explainCorrect: t(
           'Orang perlu tahu saat menunggu, saat gagal, atau saat keranjang kosong.',
-          'Desainer dan programmer yang teliti merancang keempatnya: loading, error, kosong, dan berhasil.',
+          'Layar perlu empat keadaan: loading, error, kosong, dan berhasil.',
         ),
         tags: ['empat-keadaan'],
       }),
@@ -902,7 +902,7 @@ export const lessons: Lesson[] = [
         type: 'fill',
         modes: ['pro'],
         difficulty: 2,
-        prompt: t('Lengkapi pola state React untuk memanggil API secara asinkron.'),
+        prompt: t('Lengkapi pola state React untuk mengambil data dari API.'),
         template: 'const [status, setStatus] = useState("___"); // loading | error | sukses\nambilProduk(12).catch(() => setStatus("___"));',
         bank: ['loading', 'error', 'kosong-selamanya', '404'],
         answer: ['loading', 'error'],
@@ -1339,7 +1339,7 @@ export const lessons: Lesson[] = [
           analogy: t('Pelayan langsung mencatat "Siap!" sebelum cek dapur'),
           prompt: t('Mengapa analogi pelayan yang langsung menjawab "Siap!" berbahaya untuk fitur pembayaran?'),
           choices: [
-            { id: 'risk', label: t('Salah anggap sukses membuat orang mengira sudah lunas') },
+            { id: 'risk', label: t('Orang mengira pembayaran sudah lunas padahal belum') },
             {
               id: 'fast',
               label: t('Pelanggan terlalu senang kalau dilayani dengan sangat cepat'),
@@ -1694,7 +1694,7 @@ export const lessons: Lesson[] = [
       qStep({
         id: 'b09-l06-q2',
         type: 'match',
-        prompt: t('Pasangkan gejala di DevTools → Network dengan langkah cek yang tepat.'),
+        prompt: t('Pasangkan gejala di tab Network DevTools dengan langkah cek yang tepat.'),
         difficulty: 2,
         left: [
           { id: 'l1', label: t('Request tidak muncul sama sekali') },
@@ -1752,7 +1752,7 @@ export const lessons: Lesson[] = [
         id: 'b09-l06-q4',
         type: 'type',
         difficulty: 2,
-        prompt: t('Pada perintah curl, flag satu huruf apa yang menentukan HTTP method dan yang menambah header? Pisahkan dengan spasi, misalnya: -A -B.'),
+        prompt: t('Pada perintah curl, flag apa yang menentukan HTTP method, dan flag apa yang menambah header? Tulis berurutan, dipisah spasi, misalnya: -A -B.'),
         accept: ['-X -H', '-x -h'],
         explainCorrect: t('-X menentukan method (-X POST), -H menambah header, dan -d mengisi body data.'),
         hints: [t('Lihat contoh curl di kartu. Cari flag sebelum POST dan sebelum Content-Type.'), undefined],
@@ -1763,7 +1763,7 @@ export const lessons: Lesson[] = [
           id: 'b09-l06-q5',
           type: 'limit',
           analogy: t('Mock API sebagai dapur pura-pura'),
-          prompt: t('Apa yang TIDAK teruji kalau kita hanya memakai mock API seperti MSW?'),
+          prompt: t('Apa yang TIDAK teruji kalau kamu hanya memakai mock API seperti MSW?'),
           choices: [
             { id: 'real', label: t('Logika database, izin server asli, dan kecepatan produksi') },
             {
@@ -1810,7 +1810,7 @@ export const lessons: Lesson[] = [
     reviewCards: [
       makeMcq({
         id: 'b09-l06-r1',
-        prompt: t('Fitur DevTools → Network apa yang menyalin request bermasalah supaya bisa diulang di terminal atau Postman?'),
+        prompt: t('Fitur apa di tab Network DevTools yang menyalin request bermasalah supaya bisa diulang di terminal atau Postman?'),
         choices: [
           { id: 'curl', label: t('Copy as cURL') },
           { id: 'del', label: t('Clear Browser Cache'), explainWrong: t('Menghapus cache tidak menyalin rincian request ke terminal.') },
@@ -1821,7 +1821,7 @@ export const lessons: Lesson[] = [
       }),
       makeTf({
         id: 'b09-l06-r2',
-        prompt: t('MSW memungkinkan tim frontend memakai data tiruan tanpa mengubah kode fetch.'),
+        prompt: t('Dengan MSW, tim frontend bisa memakai data tiruan tanpa mengubah kode fetch.'),
         answer: true,
         explainCorrect: t('MSW mencegat request langsung di browser. Pindah ke backend asli berjalan mulus.'),
         explainWrong: t('Keunggulan utama MSW adalah memisahkan logika mock dari kode komponen frontend.'),
