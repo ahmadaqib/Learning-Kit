@@ -1,13 +1,17 @@
 # Handoff: Petualang Web playful redesign, copydeck and Pro lessons
 
 **For:** the coding agent (Codex) taking over from Claude Code. **Date:** 2026-11-23.
-**Branch:** `redesign/playful-ui-copydeck`. Local, uncommitted working tree.
+**Branch:** `redesign/playful-ui-copydeck`. See the current Git tracking note below.
 
 ## Current handoff after WF3
 
 All ten copy decision records under `pending-copy/` are applied. The 22 worlds contain 124 lessons and side quests, including seven optional Pro workshops in Pabrik JavaScript, Menara Alat and Dapur Frontend. The main paths keep their existing completion requirements. Lesson practice, reflection, focus and interleaved reviews are integrated. See the [WF3 design and reference checks](../specs/2026-11-23-pro-lessons-learning-science-design.md).
 
-The production build passes the content validator (zero errors, 18 advisories), contrast and color checks, TypeScript and Vite. Vitest passes 180 tests. The per-world report prints separate error and warning counts. Use `scripts/shoot.mjs` for browser captures and layout checks. The [layout QA record](layout-qa-2026-11-23.md) contains the capture matrix and screenshots. The remaining owner decision concerns Git tracking of `docs/superpowers/` before a commit.
+All seven Pro workshops now include a worked diagram or an interactive example. The two JavaScript examples let learners trace actual inputs and outputs. Catalog titles, taglines and time estimates have been reconciled with the lesson bundles.
+
+The production build passes the content validator (zero errors, seven editorial advisories), contrast and color checks, TypeScript and Vite. Vitest passes 204 tests including workshop visuals, help cues, audio and the companion endpoint. The per-world report prints separate error and warning counts. Use `scripts/shoot.mjs` for browser captures and layout checks. The [layout QA record](layout-qa-2026-11-23.md) contains the capture matrix and screenshots. At local revision `5cc742ea`, Git already tracks this handoff and files under `docs/superpowers/shots/after-r1/.chrome-profile/`. The root `prd.md` is ignored and untracked. The owner decision now concerns existing tracked files as well as future additions. An ignore rule only applies to untracked files.
+
+The companion offers local help on demand, with five pets, five selectable personalities, and an optional Pro-only strategy selector. The provider key and ordered model list are server environment settings. Local studio speech and device narration, click/back effects and optional instrumental music are available in Settings. The latest Chromium checks covered 85 route/viewport combinations and targeted short-viewport review sessions with enlarged text. [Pet selection](../shots/layout-qa/pet-settings.png)
 
 Sections 2 and 3 below preserve the original stopping point and work order.
 
