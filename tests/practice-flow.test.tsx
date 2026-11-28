@@ -128,3 +128,14 @@ it('sends Junior back to the world map from a locked lesson, but lets Pro open i
     expect(Boolean(screen.queryByText('peta dunia')), mode).toBe(mode === 'junior');
   }
 });
+
+it('offers the AI tutor on reading cards in Pro only', async () => {
+  for (const mode of ['junior', 'pro'] as const) {
+    cleanup();
+    useAppStore.setState({ activeProfileId: '', profiles: {} });
+    useAppStore.getState().createProfile({ nickname: 'Ari', avatar: 'star', mode });
+    mountPlayer();
+    await screen.findByText('Situs web itu seperti restoran');
+    expect(Boolean(screen.queryByRole('button', { name: 'Tanya AI' })), mode).toBe(mode === 'pro');
+  }
+});
