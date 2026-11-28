@@ -568,7 +568,10 @@ export const WORLD_METAS: WorldMeta[] = [
     requires: ['b09'],
     guardianName: 'Penjaga Puncak Petualang',
     lessons: [lm('b10-l01', 'b10', 'Memilih jenis API', ['junior', 'pro'], 7)],
-    sideQuests: [lm('b10-sq1', 'b10', 'Bekerja dengan kontrak API', ['junior', 'pro'], 7, undefined, true)],
+    sideQuests: [
+      lm('b10-sq1', 'b10', 'Bekerja dengan kontrak API', ['junior', 'pro'], 7, undefined, true),
+      lm('b10-sq2', 'b10', 'Dua tim, satu kontrak', ['pro'], 7, undefined, true),
+    ],
   },
 ];
 

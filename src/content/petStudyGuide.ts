@@ -133,6 +133,7 @@ const LESSON_EXERCISES: Partial<Record<string, string>> = {
   'b09-l06': 'Bayangkan tampilan menunggu angka tetapi balasan berisi teks. Bandingkan kontrak dengan data nyata sebelum memutuskan bagian yang perlu diperbaiki.',
   'b09-sq1': 'Sketsakan kartu buku dengan judul yang datang dari induknya dan tombol Suka yang bisa berubah. Tandai siapa pemilik setiap nilai.',
   'b10-sq1': 'Tulis janji kecil untuk pesanan: apa yang dikirim dan apa jawabannya. Lalu ganti satu nama isi dan tebak aplikasi mana yang rusak.',
+  'b10-sq2': 'Bagi kertas jadi dua kolom: tim tampilan dan tim server. Tulis tugas masing-masing untuk fitur keranjang, lalu lingkari yang harus disepakati di kontrak.',
   'b10-l01': 'Rancang papan skor dan tombol obrolan untuk pertandingan. Gambar arah kabar bagi tiap fitur sebelum menentukan cara menghubungkannya.',
 };
 

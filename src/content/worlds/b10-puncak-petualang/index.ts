@@ -14,6 +14,7 @@ import {
 } from '@/content/lessonHelpers';
 import type { Lesson, World } from '@/content/schema';
 import { contractWorkflow } from './workshop-kontrak';
+import { twoTeamsOneContract } from './workshop-dua-tim';
 
 export const world: World = {
   id: 'b10',
@@ -29,7 +30,7 @@ export const world: World = {
   sourceChapters: ['J2-16'],
   requires: ['b09'],
   lessons: ['b10-l01'],
-  sideQuests: [contractWorkflow.id],
+  sideQuests: [contractWorkflow.id, twoTeamsOneContract.id],
   boss: {
     title: 'Tantangan Penjaga Puncak Petualang',
     greeting: t(
@@ -837,4 +838,5 @@ export const lessons: Lesson[] = [
         'Gambar peta mini Kerajaan Petualang Web. Tandai tempat yang sudah kamu kunjungi: restoran, gudang, menara radio, gerbang, dan puncak.',
     },
   }),  contractWorkflow,
+  twoTeamsOneContract,
 ];
