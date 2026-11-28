@@ -35,6 +35,8 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
   let recent: number[] = [];
   let inFlight = 0;
   let retryGatewayAt = 0;
+  // First questions repeat (the three starter buttons on the same card), so their answers are reused.
+  const firstTurn = new Map<string, string>();
 
   return async (request: Request, clientId = 'unknown'): Promise<Response> => {
     if (request.method !== 'POST') return json(405, { error: 'method' });
@@ -56,11 +58,17 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
       console.warn('tutor.configuration_missing');
       return json(503, { error: 'unavailable' });
     }
+    const firstKey = parsed.data.messages.length === 1 ? [lesson.id, parsed.data.card, parsed.data.messages[0].content].join('\n') : '';
+    const reused = firstKey && firstTurn.get(firstKey);
+    if (reused) return json(200, { reply: reused });
+
     const t = now();
     if (t < retryGatewayAt) return json(503, { error: 'unavailable' });
     recent = recent.filter(at => t - at < 60_000);
-    const mine = (perClient.get(clientId) ?? []).filter(at => t - at < 60_000);
-    if (mine.length >= 8 || recent.length >= 40 || inFlight >= 4) return json(429, { error: 'busy' });
+    const mine = (perClient.get(clientId) ?? []).filter(at => t - at < 3_600_000);
+    const lastMinute = mine.filter(at => t - at < 60_000).length;
+    // Per learner: 12 a minute, 60 an hour. Per instance: 60 a minute, 6 at once. The WAF rule caps each IP across instances.
+    if (lastMinute >= 12 || mine.length >= 60 || recent.length >= 60 || inFlight >= 6) return json(429, { error: 'busy' });
     mine.push(t);
     perClient.set(clientId, mine);
     recent.push(t);
@@ -75,10 +83,11 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
         body: JSON.stringify({
           model: model?.trim() || TUTOR_DEFAULT_MODEL,
           reasoning_effort: 'none',
-          max_tokens: 1500,
+          // A tutor turn is about 150 words; 700 leaves room without paying for runaway output.
+          max_tokens: 700,
           messages: [
             { role: 'system', content: TUTOR_SYSTEM_PROMPT + '\n\n' + context },
-            ...parsed.data.messages.slice(-10),
+            ...parsed.data.messages.slice(-6),
           ],
         }),
       });
@@ -94,7 +103,12 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
         console.warn('tutor.provider_unusable_response');
         return json(503, { error: 'unavailable' });
       }
-      return json(200, { reply: reply.trim().slice(0, 4000) });
+      const answer = reply.trim().slice(0, 4000);
+      if (firstKey) {
+        if (firstTurn.size >= 300) firstTurn.delete(firstTurn.keys().next().value!);
+        firstTurn.set(firstKey, answer);
+      }
+      return json(200, { reply: answer });
     } catch (error) {
       console.warn('tutor.provider_fetch', error instanceof Error ? error.name : 'failed');
       return json(503, { error: 'unavailable' });
