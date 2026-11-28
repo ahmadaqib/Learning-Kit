@@ -102,3 +102,14 @@ describe('answer buttons', () => {
     expect(body).toEqual({ reply: 'Backend atau frontend?', options: ['Backend', 'Frontend'], sig: signReply(KEY, 'Backend atau frontend?') });
   });
 });
+
+describe('no long dashes', () => {
+  it('turns pause dashes into commas but keeps ranges and code', async () => {
+    const { noLongDashes } = await import('../server/aiGuard');
+    expect(noLongDashes('Browser memblokir request itu—kecuali server memberi izin.')).toBe('Browser memblokir request itu, kecuali server memberi izin.');
+    expect(noLongDashes('Frontend – bagian yang terlihat – dibuat dulu.')).toBe('Frontend, bagian yang terlihat, dibuat dulu.');
+    expect(noLongDashes('Ruang sentuh 44–48px sudah cukup.')).toBe('Ruang sentuh 44–48px sudah cukup.');
+    expect(noLongDashes('Selesai —.')).toBe('Selesai.');
+    expect(noLongDashes('Pakai `a—b` lalu:\n```js\nconst s = "x — y";\n```\nItu saja — jelas.')).toBe('Pakai `a—b` lalu:\n```js\nconst s = "x — y";\n```\nItu saja, jelas.');
+  });
+});

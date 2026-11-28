@@ -65,3 +65,17 @@ export function splitOptions(text: string): { reply: string; options: string[] }
     .slice(0, 3);
   return { reply: text.slice(0, match.index).trim(), options };
 }
+
+/**
+ * The house style has no long dashes, but models use them as pauses anyway. Outside code, "—" becomes a comma
+ * and a spaced "–" does too; an unspaced "–" is a range ("44–48px") and stays.
+ */
+export function noLongDashes(text: string): string {
+  return text
+    .split(/(```[\s\S]*?(?:```|$)|`[^`\n]*`)/)
+    .map((part, i) => (i % 2 ? part : part
+      .replace(/\s*—\s*/g, ', ')
+      .replace(/\s+–\s+/g, ', ')
+      .replace(/,\s*([.,;:!?])/g, '$1')))
+    .join('');
+}
