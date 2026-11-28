@@ -36,12 +36,18 @@ export const TutorChat: React.FC<{ lessonId: string; card: string }> = ({ lesson
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const endRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const lastRef = useRef<HTMLDivElement>(null);
 
   const update = (next: Message[]) => {
     threads.set(lessonId, next);
     setMessages(next);
-    requestAnimationFrame(() => endRef.current?.scrollIntoView({ block: 'end' }));
+    // Show the start of the newest message: long tutor answers are read from the top.
+    // Scroll the transcript only; scrollIntoView would also scroll the dialog and hide the notice and form.
+    requestAnimationFrame(() => {
+      const list = listRef.current, last = lastRef.current;
+      if (list && last) list.scrollTo({ top: last.offsetTop - 12, behavior: 'smooth' });
+    });
   };
 
   const ask = async (text: string) => {
@@ -100,35 +106,47 @@ export const TutorChat: React.FC<{ lessonId: string; card: string }> = ({ lesson
               Jawaban AI bisa keliru.
             </p>
 
-            <div className="max-h-[28dvh] space-y-2 overflow-y-auto" aria-live="polite">
-              {messages.length === 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {STARTERS.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => ask(s)}
-                      className="pw-pressable min-h-[var(--touch-min)] cursor-pointer rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--paper)] px-3 text-left text-sm font-bold text-[var(--ink)]"
+            {messages.length === 0 ? (
+              <div className="flex flex-col gap-2">
+                {STARTERS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => ask(s)}
+                    className="pw-pressable min-h-[var(--touch-min)] cursor-pointer rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-left text-sm font-bold text-[var(--ink)]"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div
+                ref={listRef}
+                // Height left in the dialog body (70dvh - header) after the notice and the form.
+                className="relative max-h-[max(9rem,calc(70dvh-76px-17rem))] space-y-3 overflow-y-auto overscroll-contain rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-well)] p-3"
+                aria-live="polite"
+              >
+                {messages.map((m, i) => (
+                  <div
+                    key={i}
+                    ref={i === messages.length - 1 ? lastRef : undefined}
+                    className={`${m.role === 'user' ? 'ml-10' : ''}`}
+                  >
+                    <p className={`pw-small m-0 mb-1 font-bold text-[var(--ink-2)] ${m.role === 'user' ? 'text-right' : ''}`}>
+                      {m.role === 'user' ? 'Kamu' : 'Tutor'}
+                    </p>
+                    <div
+                      className={`whitespace-pre-wrap break-words rounded-[var(--radius-md)] px-3 py-2 text-[15px] leading-relaxed text-[var(--ink)] ${
+                        m.role === 'user' ? 'bg-[var(--world-50)]' : 'border border-[var(--line)] bg-[var(--paper)]'
+                      }`}
                     >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`pw-body whitespace-pre-wrap break-words rounded-[var(--radius-md)] px-3 py-2 ${
-                    m.role === 'user' ? 'ml-8 bg-[var(--world-50)]' : 'mr-8 border border-[var(--line)] bg-[var(--paper)]'
-                  }`}
-                >
-                  <span className="sr-only">{m.role === 'user' ? 'Kamu: ' : 'Tutor: '}</span>
-                  {m.content}
-                </div>
-              ))}
-              {loading && <p className="pw-small m-0 text-[var(--ink-2)]">Tutor sedang menyiapkan jawaban…</p>}
-              <div ref={endRef} />
-            </div>
+                      {m.content}
+                    </div>
+                  </div>
+                ))}
+                {loading && <p className="pw-small m-0 text-[var(--ink-2)]">Tutor sedang menyiapkan jawaban…</p>}
+              </div>
+            )}
 
             {error && <p role="alert" className="pw-small m-0 font-bold text-[var(--err-600)]">{error}</p>}
 
