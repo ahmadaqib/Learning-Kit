@@ -24,6 +24,9 @@ describe('curriculum chat', () => {
     expect(sent.model).toBe(CHAT_DEFAULT_MODEL);
     expect(sent.messages[0].content).toContain('PROGRES PESERTA');
     expect(sent.messages[0].content).toContain('Pelajaran Pro selesai: 2 dari');
+    // Every Pro lesson title is in the data, so curriculum questions are recognised as in scope.
+    expect(sent.messages[0].content).toContain('Dua tim, satu kontrak');
+    expect(sent.messages[0].content).toContain('Bekerja dengan kontrak API');
     expect(new Headers(send.mock.calls[0][1]?.headers).get('authorization')).toBe('Bearer ' + KEY);
   });
 
