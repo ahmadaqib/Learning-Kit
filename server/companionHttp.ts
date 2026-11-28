@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createCompanionService, type CompanionConfig } from './companion.js';
 import { createTutorService, TUTOR_MAX_BYTES, type TutorConfig } from './tutor.js';
+import { createChatService, CHAT_MAX_BYTES, type ChatConfig } from './chat.js';
 
 type Serve = (request: Request, clientId: string) => Promise<Response>;
 
@@ -55,4 +56,8 @@ export function companionHttp(getConfig: () => CompanionConfig) {
 
 export function tutorHttp(getConfig: () => TutorConfig) {
   return nodeHandler(createTutorService(getConfig), '/api/tutor', TUTOR_MAX_BYTES);
+}
+
+export function chatHttp(getConfig: () => ChatConfig) {
+  return nodeHandler(createChatService(getConfig), '/api/chat', CHAT_MAX_BYTES);
 }
