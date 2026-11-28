@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { readReply } from './readReply';
 import { describe, expect, it, vi } from 'vitest';
 import { createTutorService, TUTOR_DEFAULT_MODEL } from '../server/tutor';
 
@@ -13,7 +14,7 @@ describe('Pro tutor chat', () => {
   it('answers through the default model, grounded in the lesson, with the key only in the header', async () => {
     const send = vi.fn<typeof fetch>().mockResolvedValue(answer('  Karena kontrak janji dua pihak. Apa akibatnya kalau satu tim mengubahnya sendiri?  '));
     const reply = await createTutorService(config, send)(request(chat));
-    expect(await reply.json()).toMatchObject({ reply: 'Karena kontrak janji dua pihak. Apa akibatnya kalau satu tim mengubahnya sendiri?', sig: expect.any(String) });
+    expect(await readReply(reply)).toMatchObject({ reply: 'Karena kontrak janji dua pihak. Apa akibatnya kalau satu tim mengubahnya sendiri?', sig: expect.any(String) });
     const [url, init] = send.mock.calls[0];
     const sent = JSON.parse(String(init?.body));
     expect(url).toBe('https://api.1inference.com/v1/chat/completions');
@@ -61,14 +62,14 @@ describe('Pro tutor chat', () => {
 
     expect((await createTutorService(() => ({}), send)(request(chat))).status).toBe(503);
     const failing = vi.fn<typeof fetch>().mockResolvedValue(new Response('', { status: 500 }));
-    expect(await (await createTutorService(config, failing)(request(chat))).json()).toEqual({ error: 'unavailable' });
+    expect(await readReply(await createTutorService(config, failing)(request(chat)))).toEqual({ error: 'unavailable' });
   });
 
   it('reuses the answer to a repeated first question on the same card, and caps output tokens and history', async () => {
     const send = vi.fn<typeof fetch>().mockResolvedValue(answer('Jawaban.'));
     const serve = createTutorService(config, send);
-    expect(await (await serve(request(chat), 'a')).json()).toMatchObject({ reply: 'Jawaban.' });
-    expect(await (await serve(request(chat), 'b')).json()).toMatchObject({ reply: 'Jawaban.' });
+    expect(await readReply(await serve(request(chat), 'a'))).toMatchObject({ reply: 'Jawaban.' });
+    expect(await readReply(await serve(request(chat), 'b'))).toMatchObject({ reply: 'Jawaban.' });
     expect(send).toHaveBeenCalledTimes(1);
     const long = Array.from({ length: 15 }, (_, i) => ({ role: i % 2 ? 'assistant' : 'user', content: 'Pesan ' + i }));
     await serve(request({ ...chat, messages: long }), 'c');

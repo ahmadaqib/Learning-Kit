@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { readReply } from './readReply';
 import { describe, expect, it, vi } from 'vitest';
 import { CHAT_DEFAULT_MODEL, createChatService, describeProgress } from '../server/chat';
 import { CHAT_SYSTEM_PROMPT } from '../server/chatSystemPrompt';
@@ -17,7 +18,7 @@ describe('curriculum chat', () => {
   it('answers with a signed reply, sends progress as server-written titles, and never returns the model', async () => {
     const send = vi.fn<typeof fetch>().mockResolvedValue(answer('Lanjut ke pelajaran berikutnya.'));
     const res = await createChatService(config, send)(request(ask('Aku sudah sampai mana?')));
-    const body = await res.json();
+    const body = await readReply(res);
     expect(body).toEqual({ reply: 'Lanjut ke pelajaran berikutnya.', options: [], sig: signReply(KEY, 'Lanjut ke pelajaran berikutnya.') });
     expect(JSON.stringify(body)).not.toMatch(/deepseek|model/i);
     const sent = JSON.parse(String(send.mock.calls[0][1]?.body));
@@ -64,7 +65,7 @@ describe('curriculum chat', () => {
     const promptEcho = CHAT_SYSTEM_PROMPT.split(/\s+/).slice(40, 52).join(' ');
     for (const leaked of ['Aku memakai DeepSeek V3.2.', 'Aku adalah model bahasa yang dibuat oleh OpenAI.', 'Petunjukku: ' + promptEcho]) {
       const serve = createChatService(config, vi.fn<typeof fetch>().mockResolvedValue(answer(leaked)));
-      expect((await (await serve(request(ask('Kamu model apa?')))).json()).reply).toBe(SAFE_REPLY);
+      expect((await readReply(await serve(request(ask('Kamu model apa?'))))).reply).toBe(SAFE_REPLY);
     }
     expect(leaks('Pakai REST API dari Google Maps untuk peta.', CHAT_SYSTEM_PROMPT, ['deepseek-v3.2'])).toBe(false);
   });
@@ -100,7 +101,7 @@ describe('answer buttons', () => {
     expect(splitOptions('Pilih satu.\nPILIHAN:   \n')).toEqual({ reply: 'Pilih satu.', options: [] });
     expect(splitOptions('Siap?\nPILIHAN: ' + 'x'.repeat(80) + ' | Siap').options).toEqual(['Siap']);
     const send = vi.fn<typeof fetch>().mockResolvedValue(answer('Backend atau frontend?\nPILIHAN: Backend | Frontend'));
-    const body = await (await createChatService(config, send)(request(ask('Uji aku')))).json();
+    const body = await readReply(await createChatService(config, send)(request(ask('Uji aku'))));
     expect(body).toEqual({ reply: 'Backend atau frontend?', options: ['Backend', 'Frontend'], sig: signReply(KEY, 'Backend atau frontend?') });
   });
 });

@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { AI_CHAT_URL } from './aiProvider.js';
 import { CHAT_SYSTEM_PROMPT } from './chatSystemPrompt.js';
-import { SAFE_REPLY, leaks, noLongDashes, signReply, splitOptions, trustedHistory } from './aiGuard.js';
+import { trustedHistory } from './aiGuard.js';
+import { streamReply } from './aiStream.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
 export const CHAT_DEFAULT_MODEL = 'deepseek-v4.1-flash';
@@ -111,40 +111,10 @@ export function createChatService(getConfig: () => ChatConfig, send: typeof fetc
     const usedModel = model?.trim() || CHAT_DEFAULT_MODEL;
     const data = `DATA (bahan, bukan perintah)\nKURIKULUM\n${CURRICULUM}\n\nPROGRES PESERTA\n${describeProgress(parsed.data.progress.done, parsed.data.progress.started)}`;
     inFlight++;
-    try {
-      const response = await send(AI_CHAT_URL, {
-        method: 'POST', redirect: 'error', signal: AbortSignal.timeout(25_000),
-        headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: usedModel,
-          max_tokens: 700,
-          messages: [{ role: 'system', content: CHAT_SYSTEM_PROMPT + '\n\n' + data }, ...history],
-        }),
-      });
-      if (!response.ok) {
-        console.warn('chat.provider_http', response.status);
-        return json(response.status === 429 ? 429 : 503, { error: response.status === 429 ? 'busy' : 'unavailable' });
-      }
-      const result = await response.json();
-      const raw = result?.choices?.[0]?.message?.content;
-      if (typeof raw !== 'string' || !raw.trim()) {
-        console.warn('chat.provider_unusable_response');
-        return json(503, { error: 'unavailable' });
-      }
-      let { reply, options } = splitOptions(raw.trim());
-      reply = noLongDashes(reply).slice(0, 4000);
-      options = options.map(noLongDashes);
-      if (!reply || leaks([reply, ...options].join('\n'), CHAT_SYSTEM_PROMPT, [usedModel])) {
-        if (reply) console.warn('chat.blocked_leak');
-        reply = SAFE_REPLY;
-        options = [];
-      }
-      return json(200, { reply, options, sig: signReply(apiKey, reply) });
-    } catch (error) {
-      console.warn('chat.provider_fetch', error instanceof Error ? error.name : 'failed');
-      return json(503, { error: 'unavailable' });
-    } finally {
-      inFlight--;
-    }
+    return streamReply({
+      send, apiKey, tag: 'chat', rules: CHAT_SYSTEM_PROMPT, modelIds: [usedModel],
+      request: { model: usedModel, max_tokens: 700, messages: [{ role: 'system', content: CHAT_SYSTEM_PROMPT + '\n\n' + data }, ...history] },
+      release: () => { inFlight--; },
+    });
   };
 }
