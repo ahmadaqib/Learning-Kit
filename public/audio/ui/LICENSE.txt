@@ -1,0 +1,6 @@
+UI sound effects in this folder: "rubber" pack from uisfx 0.4.0 by Romain Simon
+https://github.com/romainsimon/uisfx (https://uisfx.com)
+
+Dedicated to the public domain under Creative Commons CC0 1.0 Universal.
+https://creativecommons.org/publicdomain/zero/1.0/
+Attribution is not required; it is given here with thanks.
