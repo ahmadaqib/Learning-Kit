@@ -38,6 +38,8 @@ async function selectTip(input: PetHintRequest, key: string, models: string[], s
             { role: 'system', content: PET_SYSTEM_PROMPT },
             { role: 'user', content: JSON.stringify({ pelajaran: lesson.title, kartu: input.stepKind, gaya: input.personality, isyarat: input.cue ?? 'requested' }) },
           ], max_tokens: 4096,
+          // The answer is one word; without this the model reasons past the 5.2 s budget.
+          reasoning_effort: 'none',
         }),
       });
       if (!response.ok) {
