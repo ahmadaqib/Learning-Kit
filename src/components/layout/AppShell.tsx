@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef } from 'react';
-import { BookOpen, Heart, Home, Layers, Map as MapIcon, User } from 'lucide-react';
+import { BookOpen, Heart, Home, Layers, Map as MapIcon, MessageCircle, User } from 'lucide-react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { COLLECTION_LABEL } from '@/app/modeConfig';
 import { BrandLogo } from '@/components/mascot/BrandLogo';
@@ -95,6 +95,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children, hideNav = false })
     { to: '/peta/A', label: 'Peta', icon: MapIcon, badge: 0 },
     { to: '/ulang', label: 'Ulang', icon: Layers, badge: dueCount },
     { to: '/stiker', label: collection.nav, icon: BookOpen, badge: 0 },
+    // The curriculum chat is a Pro feature, like the lesson tutor.
+    ...(profile?.mode === 'pro' ? [{ to: '/tanya', label: 'Tanya', icon: MessageCircle, badge: 0 }] : []),
     { to: '/profil', label: 'Profil', icon: User, badge: 0 },
   ];
 
