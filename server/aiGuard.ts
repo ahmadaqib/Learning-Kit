@@ -52,3 +52,16 @@ export function leaks(reply: string, systemPrompt: string, modelIds: string[]): 
 export const plainText = (text: string) => text
   .replace(/\*\*(.+?)\*\*/g, '$1')
   .replace(/^#{1,6}\s+/gm, '');
+
+/**
+ * Splits the optional last line "PILIHAN: a | b | c" off a reply. The options become tap-to-send buttons,
+ * so they are capped at 3 (Hick's law) and kept short; anything malformed is dropped, never shown.
+ */
+export function splitOptions(text: string): { reply: string; options: string[] } {
+  const match = text.match(/\n*\s*PILIHAN\s*:\s*(.+?)\s*$/i);
+  if (!match || match.index === undefined) return { reply: text, options: [] };
+  const options = [...new Set(match[1].split('|').map((o) => clean(plainText(o)).replace(/^["'“”]+|["'“”.]+$/g, '').trim()))]
+    .filter((o) => o.length > 0 && o.length <= 60)
+    .slice(0, 3);
+  return { reply: text.slice(0, match.index).trim(), options };
+}

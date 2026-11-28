@@ -43,16 +43,18 @@ export const TutorChat: React.FC<{ lessonId: string; card: string }> = ({ lesson
 
       <DialogModal open={open} onClose={() => setOpen(false)} title="Tanya Tutor AI">
         {open && (
-          <ChatBox
-            threadKey={'lesson:' + lessonId}
-            endpoint="/api/tutor"
-            buildBody={(messages) => ({ lessonId, card, messages })}
-            starters={STARTERS}
-            notice="Pesanmu dan isi kartu ini dikirim ke AI 1Inference dan tidak disimpan di aplikasi. Jangan tulis data pribadi. Jawaban AI bisa keliru."
-            // Height left in the dialog body (70dvh - header) after the notice and the form.
-            listHeight="max-h-[max(9rem,calc(70dvh-76px-17rem))]"
-            inputId={`tutor-${lessonId}`}
-          />
+          // Exactly the dialog body's height, cancelling its padding, so only the transcript scrolls.
+          <div className="-mx-5 -my-5 h-[calc(70dvh-76px)] sm:-mx-6">
+            <ChatBox
+              threadKey={'lesson:' + lessonId}
+              endpoint="/api/tutor"
+              buildBody={(messages) => ({ lessonId, card, messages })}
+              starters={STARTERS}
+              greeting="Bagian mana dari kartu ini yang ingin kamu pahami?"
+              notice="Pesanmu dan isi kartu ini dikirim ke AI 1Inference dan tidak disimpan. Jangan tulis data pribadi. Jawaban AI bisa keliru."
+              inputId={`tutor-${lessonId}`}
+            />
+          </div>
         )}
       </DialogModal>
     </>

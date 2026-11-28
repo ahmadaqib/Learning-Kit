@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
-import { ChatBox, type ChatMessage } from '@/components/chat/ChatBox';
+import { ChatBox } from '@/components/chat/ChatBox';
 import { useAppStore } from '@/store/useAppStore';
 
 const STARTERS = [
-  'Aku sudah sampai mana, dan sebaiknya belajar apa berikutnya?',
-  'Jelaskan materi terakhir yang aku selesaikan dengan contoh nyata.',
-  'Uji pemahamanku tentang pelajaran yang baru selesai.',
+  'Aku sudah sampai mana? Apa langkah berikutnya?',
+  'Jelaskan materi terakhirku dengan contoh nyata',
+  'Uji pemahamanku',
 ];
 
 /** Pro curriculum chat. Only lesson ids leave the device as progress; the server turns them into titles. */
@@ -25,22 +25,15 @@ export const ChatPage: React.FC = () => {
   if (profile.mode !== 'pro') return <Navigate to="/beranda" replace />;
 
   return (
-    <div className="mx-auto w-full max-w-[840px] space-y-5 px-4 py-6 sm:px-6">
-      <header>
-        <span className="pw-kicker">Tanya Tutor</span>
-        <h1 className="pw-h1">Tanya soal pelajaran</h1>
-        <p className="pw-small text-[var(--ink-2)]">
-          Tanyakan isi pelajaran, posisimu di kurikulum, atau langkah belajar berikutnya.
-        </p>
-      </header>
+    <div className="pw-chat-page">
       <ChatBox
+        title="Tanya Tutor"
         threadKey={'curriculum:' + profile.id}
         endpoint="/api/chat"
-        buildBody={(messages: ChatMessage[]) => ({ messages, progress })}
+        buildBody={(messages) => ({ messages, progress })}
         starters={STARTERS}
-        notice="Pesanmu dan daftar pelajaran yang sudah kamu kerjakan dikirim ke AI 1Inference dan tidak disimpan di aplikasi. Jangan tulis data pribadi. Jawaban AI bisa keliru."
-        // Page height minus the header, the notice, the form and the bottom navigation.
-        listHeight="max-h-[max(12rem,calc(100dvh-31rem))]"
+        greeting="Mau belajar apa hari ini?"
+        notice="Pesanmu dan daftar pelajaran yang sudah kamu kerjakan dikirim ke AI 1Inference dan tidak disimpan. Jangan tulis data pribadi. Jawaban AI bisa keliru."
         inputId="curriculum-chat"
       />
     </div>

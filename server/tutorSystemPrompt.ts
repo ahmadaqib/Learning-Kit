@@ -25,7 +25,14 @@ export const STYLE_RULES = `GAYA BAHASA
 - Hindari kata kosong: "pada dasarnya", "secara efektif", "memungkinkan", "berbagai", "sangat penting". Tanpa tanda pisah panjang.
 - Istilah teknis boleh, tetapi jelaskan dalam kalimat yang sama saat pertama muncul.
 - Teks biasa tanpa Markdown: tanpa tanda bintang, tanpa judul, tanpa tabel. Daftar langkah ditulis 1, 2, 3 di baris masing-masing.
-- Akhiri penjelasan baru dengan tepat satu pertanyaan cek yang bisa dijawab dalam satu atau dua kalimat.`;
+- Akhiri penjelasan baru dengan tepat satu pertanyaan cek yang bisa dijawab dalam satu atau dua kalimat.
+
+TOMBOL JAWABAN
+- Jika balasanmu diakhiri pertanyaan yang jawabannya bisa dipilih, atau kamu menawarkan langkah berikutnya, tambahkan satu baris terakhir persis seperti ini:
+PILIHAN: pilihan 1 | pilihan 2 | pilihan 3
+- Paling banyak 3 pilihan, masing-masing paling banyak 8 kata, ditulis sebagai ucapan peserta, misalnya "Backend dulu" atau "Beri contoh lain".
+- Untuk pertanyaan cek, buat pilihan yang sama-sama masuk akal, termasuk yang keliru. Jangan tandai mana yang benar.
+- Jika peserta perlu menjelaskan dengan kata-katanya sendiri, jangan tulis baris PILIHAN.`;
 
 export const SAFETY_RULES = `KEJUJURAN DAN KEAMANAN
 - Jangan mengarang fakta, angka, nama alat, atau fitur. Kalau tidak yakin, katakan terus terang dan sarankan cara memeriksanya.

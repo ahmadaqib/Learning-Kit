@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AI_CHAT_URL } from './aiProvider.js';
 import { TUTOR_SYSTEM_PROMPT } from './tutorSystemPrompt.js';
-import { SAFE_REPLY, leaks, plainText, signReply, trustedHistory } from './aiGuard.js';
+import { SAFE_REPLY, leaks, plainText, signReply, splitOptions, trustedHistory } from './aiGuard.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
 export const TUTOR_DEFAULT_MODEL = 'deepseek-v4.1-flash';
@@ -37,7 +37,7 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
   let inFlight = 0;
   let retryGatewayAt = 0;
   // First questions repeat (the three starter buttons on the same card), so their answers are reused.
-  const firstTurn = new Map<string, string>();
+  const firstTurn = new Map<string, { reply: string; options: string[] }>();
 
   return async (request: Request, clientId = 'unknown'): Promise<Response> => {
     if (request.method !== 'POST') return json(405, { error: 'method' });
@@ -63,7 +63,7 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
     if (history.at(-1)?.role !== 'user' || history.at(-1)!.content.length > 1200) return json(400, { error: 'context' });
     const firstKey = parsed.data.messages.length === 1 ? [lesson.id, parsed.data.card, parsed.data.messages[0].content].join('\n') : '';
     const reused = firstKey && firstTurn.get(firstKey);
-    if (reused) return json(200, { reply: reused, sig: signReply(apiKey, reused) });
+    if (reused) return json(200, { ...reused, sig: signReply(apiKey, reused.reply) });
 
     const t = now();
     if (t < retryGatewayAt) return json(503, { error: 'unavailable' });
@@ -107,16 +107,18 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
         console.warn('tutor.provider_unusable_response');
         return json(503, { error: 'unavailable' });
       }
-      let answer = plainText(reply.trim()).slice(0, 4000);
-      if (leaks(answer, TUTOR_SYSTEM_PROMPT, [usedModel])) {
-        console.warn('tutor.blocked_leak');
+      let { reply: answer, options } = splitOptions(plainText(reply.trim()));
+      answer = answer.slice(0, 4000);
+      if (!answer || leaks([answer, ...options].join('\n'), TUTOR_SYSTEM_PROMPT, [usedModel])) {
+        if (answer) console.warn('tutor.blocked_leak');
         answer = SAFE_REPLY;
+        options = [];
       }
       if (firstKey) {
         if (firstTurn.size >= 300) firstTurn.delete(firstTurn.keys().next().value!);
-        firstTurn.set(firstKey, answer);
+        firstTurn.set(firstKey, { reply: answer, options });
       }
-      return json(200, { reply: answer, sig: signReply(apiKey, answer) });
+      return json(200, { reply: answer, options, sig: signReply(apiKey, answer) });
     } catch (error) {
       console.warn('tutor.provider_fetch', error instanceof Error ? error.name : 'failed');
       return json(503, { error: 'unavailable' });
