@@ -236,7 +236,7 @@ export const world: World = {
           {
             id: 'eye',
             label: t('Mata manusia bisa langsung membacanya'),
-            explainWrong: t('Untuk membaca pesan Protobuf sebagai data terstruktur, gunakan skema .proto dan alat pembaca.'),
+            explainWrong: t('Mata manusia tidak bisa langsung membaca biner. Pembacaannya butuh skema .proto dan alat pembaca.'),
           },
           {
             id: 'html',
@@ -742,7 +742,7 @@ export const lessons: Lesson[] = [
         id: 'b03-l02-q1',
         type: 'spotbug',
         modes: ['pro'],
-        prompt: t('Ketuk DUA baris yang melanggar aturan JSON.'),
+        prompt: t('Ketuk 2 baris yang melanggar aturan JSON.'),
         difficulty: 2,
         lines: [
           '{',
@@ -1310,7 +1310,7 @@ export const lessons: Lesson[] = [
           id: 'b03-l03-q6',
           type: 'scenario',
           story: t(
-            'Bito menerima papan-papan lemari dalam kardus. Ia langsung mencari pintu lemari, tetapi tidak ketemu.',
+            'Bito menerima papan-papan lemari dalam kardus. Ia langsung mencari pintu lemari, tetapi tidak menemukannya.',
             'Bito menerima teks JSON \'{"nama":"Topi","harga":45000}\' dari server dan langsung menulis teks.nama. Hasilnya undefined.',
           ),
           prompt: t('Langkah apa yang Bito lewatkan?', 'Langkah apa yang terlewat oleh Bito?'),
@@ -1558,7 +1558,7 @@ export const lessons: Lesson[] = [
           { id: 'r_mp', label: t('Mengunggah foto atau PDF per bagian') },
         ],
         answer: { xml: 'r_xml', mp: 'r_mp', pb: 'r_pb', yml: 'r_yml' },
-        explainCorrect: t('XML bertag, multipart untuk file, Protobuf biner, dan YAML memakai indentasi. Setiap format punya tempat pakainya.'),
+        explainCorrect: t('XML bertag, multipart untuk file, Protobuf biner, dan YAML memakai indentasi.'),
         hints: [t('Cocokkan ciri paling khas: tag, file, biner, indentasi.'), undefined],
         tags: ['protobuf', 'json'],
       }),

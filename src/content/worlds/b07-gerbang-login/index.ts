@@ -101,7 +101,7 @@ export const world: World = {
           {
             id: 'long',
             label: t('Tulisan di gelang cepat memudar'),
-            explainWrong: t('Masalahnya bukan tulisan yang pudar. Masalahnya semua orang bisa membacanya.'),
+            explainWrong: t('Tulisan pudar bukan alasannya. Yang berbahaya, semua orang bisa membacanya.'),
           },
           {
             id: 'del',
@@ -126,7 +126,7 @@ export const world: World = {
           {
             id: 'url',
             label: t('Bentuk huruf tulisannya'),
-            explainWrong: t('Bentuk huruf mudah ditiru. Cap hologram yang sulit dipalsukan.'),
+            explainWrong: t('Bentuk huruf mudah ditiru. Cap hologramlah yang sulit dipalsukan.'),
           },
         ],
         answer: 'sig',
@@ -259,13 +259,13 @@ export const world: World = {
         id: 'b07-anc-p6',
         type: 'limit',
         analogy: t('JWT seperti gelang konser berhologram'),
-        prompt: t('Apa batas penting analogi gelang konser berhologram saat dipakai pada JWT sungguhan?'),
+        prompt: t('Apa batas analogi gelang konser berhologram saat dipakai pada JWT sungguhan?'),
         choices: [
           { id: 'rev', label: t('Gelang bisa digunting petugas, JWT tetap berlaku sampai exp habis') },
           {
             id: 'dec',
             label: t('Tulisan di gelang bisa dibaca siapa saja'),
-            explainWrong: t('Tulisan gelang dan isi JWT bertanda tangan pada contoh ini sama-sama dapat dibaca oleh pemegangnya.'),
+            explainWrong: t('Itu kesamaan, bukan batas. Isi JWT bertanda tangan juga bisa dibaca pemegangnya.'),
           },
           {
             id: 'holo',
@@ -826,7 +826,7 @@ export const lessons: Lesson[] = [
           id: 'b07-l02-q6',
           type: 'scenario',
           story: t('Sari membuat web toko, aplikasi Android, dan beberapa layanan di belakangnya.'),
-          prompt: t('Cara membawa identitas mana yang paling fleksibel untuk semuanya?'),
+          prompt: t('Cara membawa identitas mana yang paling cocok untuk semua bagian itu?'),
           difficulty: 2,
           choices: [
             { id: 'tok', label: t('Bearer Token di header Authorization') },
@@ -1053,7 +1053,7 @@ export const lessons: Lesson[] = [
             {
               id: 'ask',
               label: t('Server menanyakan keaslian token ke browser milik pembeli lebih dulu'),
-              explainWrong: t('Server memeriksa tanda tangan memakai kunci yang sesuai.'),
+              explainWrong: t('Server tidak perlu bertanya ke browser. Ia memeriksa tanda tangan memakai kunci yang sesuai.'),
             },
             {
               id: 'skip',
@@ -1407,7 +1407,7 @@ export const lessons: Lesson[] = [
             {
               id: 'json',
               label: t('Token berumur panjang ukurannya makin besar'),
-              explainWrong: t('Umur token tidak mengubah ukurannya. Masalahnya ada pada keamanan.'),
+              explainWrong: t('Umur token tidak mengubah ukurannya. Risikonya ada pada token yang dicuri.'),
             },
           ],
           answer: 'leak',
@@ -1638,7 +1638,7 @@ export const lessons: Lesson[] = [
             },
           ],
           answer: 'sec',
-          explainCorrect: t('Pakai layanan atau library teruji, karena alur login yang salah satu langkah saja bisa membuka celah.'),
+          explainCorrect: t('Satu langkah yang salah saja bisa membuka celah di alur login. Karena itu pakai layanan atau library yang teruji.'),
           hints: [t('Pikirkan risiko kalau satu langkah keamanan terlewat.')],
           tags: ['oauth', 'autentikasi'],
         }),

@@ -214,7 +214,7 @@ export const world: World = {
       }),
       makeAnchorMcq({
         id: 'a10-anc-p3',
-        prompt: t('Takarir (teks ucapan) pada video dan alt text pada gambar termasuk prinsip POUR yang mana?'),
+        prompt: t('Takarir adalah teks ucapan pada video. Takarir dan alt text pada gambar termasuk prinsip POUR yang mana?'),
         choices: [
           { id: 'p', label: t('Perceivable (dapat ditangkap indra)') },
           {
@@ -225,7 +225,7 @@ export const world: World = {
           {
             id: 'r',
             label: t('Robust (kode kokoh)'),
-            explainWrong: t('Robust membahas kode standar yang bekerja di berbagai browser dan alat bantu.'),
+            explainWrong: t('Robust membahas kode standar yang bekerja di banyak browser dan alat bantu.'),
           },
         ],
         answer: 'p',
@@ -737,7 +737,7 @@ export const lessons: Lesson[] = [
         ],
         answer: { p: 'r3', o: 'r1', u: 'r2', r: 'r4' },
         explainCorrect: t(
-          'Tiap huruf menjawab satu pertanyaan: bisa ditangkap, bisa dipakai, bisa dipahami, atau kokoh. Contoh tiap huruf ada di kolom kanan.',
+          'Perceivable berarti bisa ditangkap, Operable bisa dipakai, Understandable bisa dipahami, dan Robust kokoh di banyak browser.',
         ),
         hints: [t('Ingat arti tiap huruf: ditangkap, dipakai, dipahami, kokoh.'), undefined],
         tags: ['pour'],
@@ -1154,7 +1154,7 @@ export const lessons: Lesson[] = [
           ],
           answer: 'nomouse',
           explainCorrect: t(
-            'Coba berpindah tanpa mouse. Kamu bisa melihat tombol mana yang tidak terpilih.',
+            'Coba berpindah tanpa mouse. Kamu jadi tahu tombol mana yang tidak bisa dijangkau.',
             'Uji tanpa mouse memperlihatkan tombol yang terlupakan atau kehilangan indikator fokus.',
           ),
           hints: [t('Ingat: mouse rusak, tombol apa yang tersisa?')],

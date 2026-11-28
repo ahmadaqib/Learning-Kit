@@ -423,7 +423,7 @@ export const lessons: Lesson[] = [
           choices: [
             {
               id: 'poll',
-              label: t('Bertanya berulang tiap beberapa detik', 'Menanya server berulang dengan jeda tetap'),
+              label: t('Bertanya berulang tiap beberapa detik', 'Bertanya ke server berulang dengan jeda tetap'),
             },
             {
               id: 'sse',
@@ -616,7 +616,7 @@ export const lessons: Lesson[] = [
             },
           ],
           answer: 'wait',
-          explainCorrect: t('Kabar yang terjadi tepat setelah satu putaran baru terlihat di putaran berikutnya. Jeda terbesar sama dengan interval polling.'),
+          explainCorrect: t('Kabar yang terjadi tepat setelah browser bertanya baru terlihat saat browser bertanya lagi. Jeda terpanjang sama dengan interval polling.'),
           hints: [t('Hitung kapan browser bertanya lagi.')],
           tags: ['polling'],
         }),
@@ -1093,7 +1093,7 @@ export const lessons: Lesson[] = [
               label: t('Polling, bertanya berulang', 'Polling: request berulang berkala'),
               explainWrong: t(
                 'Polling bertanya berulang kali. Radio cukup dinyalakan sekali.',
-                'Polling menanya berulang kali, bukan membuka satu saluran terbuka.',
+                'Polling bertanya berulang kali, bukan membuka satu saluran terbuka.',
               ),
             },
             {
@@ -1601,7 +1601,7 @@ export const lessons: Lesson[] = [
           modes: ['pro'],
           prompt: t('WebSocket mentah di browser otomatis menyediakan ruang chat, sambung ulang, dan format pesan.'),
           answer: false,
-          explainCorrect: t('Pernyataan itu keliru. WebSocket hanya pipa pesan; room, reconnect, dan format dibuat sendiri atau memakai library seperti Socket.IO.'),
+          explainCorrect: t('WebSocket hanya pipa pesan. Room, reconnect, dan format dibuat sendiri atau lewat library seperti Socket.IO.'),
           explainWrong: t('WebSocket hanyalah pipa dua arah. Ia tidak mengatur bentuk pesan atau ruang chat.'),
           hints: [t('Apakah pipa mentah sudah punya fitur siap pakai?')],
           tags: ['websocket'],
@@ -1832,7 +1832,7 @@ export const lessons: Lesson[] = [
             },
             {
               id: 'poll',
-              label: t('Ia bertanya ulang ke server setiap 5 detik sekali'),
+              label: t('Ia bertanya ulang ke server setiap 5 detik'),
               explainWrong: t('Itu cara kerja polling.'),
             },
           ],
