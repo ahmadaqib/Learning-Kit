@@ -1,8 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUp, SquarePen } from 'lucide-react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { ArrowUp, Check, Copy, SquarePen } from 'lucide-react';
 import { Bito } from '@/components/mascot/Bito';
 
 export type ChatMessage = { role: 'user' | 'assistant'; content: string; sig?: string; options?: string[] };
+
+// Loaded on first reply, so lesson pages do not carry the Markdown parser.
+const ChatMarkdown = lazy(() => import('./ChatMarkdown'));
+
+/** Copies a reply's Markdown text, the way chat apps do. */
+const CopyReply: React.FC<{ text: string }> = ({ text }) => {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => navigator.clipboard?.writeText(text).then(() => {
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1800);
+      }, () => {})}
+      className="pw-pressable inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-[var(--radius-full)] px-2.5 text-xs font-bold text-[var(--ink-3)] hover:bg-[var(--paper-2)] hover:text-[var(--ink)]"
+    >
+      {copied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
+      {copied ? 'Disalin' : 'Salin'}
+    </button>
+  );
+};
 
 // Kept in memory only, per thread: a chat never reaches storage and is gone when the tab closes.
 const threads = new Map<string, ChatMessage[]>();
@@ -151,9 +172,11 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5 flex-shrink-0" aria-hidden="true"><Bito size={40} expression="idle" react={false} /></div>
                       <div className="min-w-0 flex-1">
-                        <p className="m-0 whitespace-pre-wrap break-words text-[15px] leading-7 text-[var(--ink)]">
-                          <span className="sr-only">Tutor: </span>{m.content}
-                        </p>
+                        <span className="sr-only">Tutor: </span>
+                        <Suspense fallback={<p className="m-0 whitespace-pre-wrap break-words text-[15px] leading-7 text-[var(--ink)]">{m.content}</p>}>
+                          <ChatMarkdown text={m.content} />
+                        </Suspense>
+                        <div className="-ml-2.5 mt-1"><CopyReply text={m.content} /></div>
                         {showOptions && i === messages.length - 1 && (
                           <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Pilihan jawaban">
                             {m.options!.map((o) => (

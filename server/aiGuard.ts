@@ -48,7 +48,7 @@ export function leaks(reply: string, systemPrompt: string, modelIds: string[]): 
   return false;
 }
 
-/** The UI shows plain text; some models add Markdown despite the prompt, so emphasis and heading marks are removed. */
+/** Button labels are plain text, so Markdown emphasis and heading marks are removed from them. */
 export const plainText = (text: string) => text
   .replace(/\*\*(.+?)\*\*/g, '$1')
   .replace(/^#{1,6}\s+/gm, '');
