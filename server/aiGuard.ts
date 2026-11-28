@@ -37,7 +37,7 @@ const words = (text: string) => text.toLowerCase().normalize('NFKC').split(/[^\p
 /** True when a reply repeats 8+ consecutive words of the system prompt or names the model behind the chat. */
 export function leaks(reply: string, systemPrompt: string, modelIds: string[]): boolean {
   const lower = reply.toLowerCase();
-  if (/deepseek/.test(lower) || modelIds.some((id) => id && lower.includes(id.toLowerCase()))) return true;
+  if (/deepseek|1inference|tokenportal/.test(lower) || modelIds.some((id) => id && lower.includes(id.toLowerCase()))) return true;
   // Models sometimes name their maker ("model bahasa yang dibuat oleh ..."), which reveals the vendor.
   if (/(model bahasa|language model|dibuat oleh|dikembangkan oleh|dilatih oleh|trained by|developed by|built by)\W+(\w+\W+){0,4}(openai|google|anthropic|meta|mistral|alibaba|qwen|deepseek)/.test(lower)) return true;
   const prompt = words(systemPrompt);

@@ -51,7 +51,7 @@ export const TutorChat: React.FC<{ lessonId: string; card: string }> = ({ lesson
               buildBody={(messages) => ({ lessonId, card, messages })}
               starters={STARTERS}
               greeting="Bagian mana dari kartu ini yang ingin kamu pahami?"
-              notice="Pesanmu dan isi kartu ini dikirim ke AI 1Inference dan tidak disimpan. Jangan tulis data pribadi. Jawaban AI bisa keliru."
+              notice="Pesanmu dan isi kartu ini dikirim ke layanan AI dan tidak disimpan. Jangan tulis data pribadi. Jawaban AI bisa keliru."
               inputId={`tutor-${lessonId}`}
             />
           </div>

@@ -33,7 +33,7 @@ export const ChatPage: React.FC = () => {
         buildBody={(messages) => ({ messages, progress })}
         starters={STARTERS}
         greeting="Mau belajar apa hari ini?"
-        notice="Pesanmu dan daftar pelajaran yang sudah kamu kerjakan dikirim ke AI 1Inference dan tidak disimpan. Jangan tulis data pribadi. Jawaban AI bisa keliru."
+        notice="Pesanmu dan daftar pelajaran yang sudah kamu kerjakan dikirim ke layanan AI dan tidak disimpan. Jangan tulis data pribadi. Jawaban AI bisa keliru."
         inputId="curriculum-chat"
       />
     </div>

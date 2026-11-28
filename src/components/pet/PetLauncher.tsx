@@ -228,7 +228,7 @@ function PetPanel({
             {canAskAi && (
               <div className="space-y-2 border-t border-[var(--line)] pt-3">
                 <p className="pw-small m-0 text-[var(--ink-2)]">
-                  Untuk memilih strategi, pet dapat mengirim judul pelajaran, jenis kartu, gaya pet, dan alasan bantuan ke 1Inference.
+                  Untuk memilih strategi, pet dapat mengirim judul pelajaran, jenis kartu, gaya pet, dan alasan bantuan ke layanan AI.
                 </p>
                 <Button
                   variant="secondary"
