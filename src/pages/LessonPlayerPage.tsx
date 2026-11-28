@@ -53,6 +53,7 @@ import { QuestionGuideOverlay } from '@/components/lesson/QuestionGuideOverlay';
 import { Bito } from '@/components/mascot/Bito';
 import { getPetStudyExercise, getPetStudyGuide } from '@/content/petStudyGuide';
 import { PetLauncher } from '@/components/pet/PetLauncher';
+import { TutorChat, tutorCardText } from '@/components/lesson/TutorChat';
 import { ALMOST_RATIO, QuestionIntro, QuestionRenderer, judgeParts } from '@/components/questions/QuestionRenderer';
 import { SimulatorHost } from '@/components/sims/SimulatorHost';
 import { Button } from '@/components/ui/Button';
@@ -1220,7 +1221,13 @@ function LessonPlayer({ pelajaranId, profileId }: { pelajaranId: string; profile
     mode,
     mascot: profile.mascot,
     reading,
-    readButton,
+    // Pro gets the AI tutor beside "Bacakan" on reading cards; questions keep only the read button.
+    readButton: mode === 'pro' && card ? (
+      <div className="flex items-center gap-2">
+        {readButton}
+        <TutorChat lessonId={lesson.id} card={tutorCardText(card)} />
+      </div>
+    ) : readButton,
   };
 
   const hintOffer =

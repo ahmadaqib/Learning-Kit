@@ -57,12 +57,13 @@ Peserta Junior dan Pro mendapat saran langsung dari kartu materi yang sedang dib
 
 Katalog tersimpan dapat diperbarui dengan `node --env-file=.env.local --import tsx scripts/prepare-pet-strategies.ts` dari akar proyek. Proses editorial ini mengirim judul kurikulum publik. Hasil baru ditulis setelah semua pilihan tervalidasi. Deployment memakai katalog yang sudah masuk git. Respons API menyebut sumber strategi melalui `source`. Nilai `live` menandai hasil permintaan peserta, termasuk pemakaian ulang untuk konteks yang sama. Nilai `prepared` menandai katalog editorial. Jika gateway menampilkan tantangan Cloudflare, log server mencatat Ray ID bila tersedia agar operator dapat menanyakannya kepada TokenPortal.
 
-Pada proyek Vercel, buka **Settings → Environment Variables**. Tetapkan kedua variabel server pada environment yang dituju. Pada mesin pengembangan, Vite dan Vite Preview membaca nama yang sama dari `.env.local`.
+Pada proyek Vercel, buka **Settings → Environment Variables**. Tetapkan variabel server ini pada environment yang dituju. Jangan beri awalan `VITE_`, karena awalan itu membuat nilainya ikut terkirim ke browser. Pada mesin pengembangan, Vite dan Vite Preview membaca nama yang sama dari `.env.local`.
 
 | Variabel server | Nilai |
 | --- | --- |
 | `TOKENPORTAL_API_KEY` | Kunci TokenPortal. Gunakan tipe Sensitive di Vercel. |
 | `TOKENPORTAL_MODELS` | ID model utama lalu cadangan, dipisahkan koma dalam urutan percobaan. Maksimal empat. |
+| `TOKENPORTAL_TUTOR_MODEL` | Opsional. Model untuk chat Tutor AI di Mode Pro (`/api/tutor`). Bawaan: `deepseek-v4.1-flash-fast`. |
 
 Perubahan environment Vercel berlaku pada deployment berikutnya. Proyek memakai fungsi Node untuk rute API dan pengalihan ke halaman utama untuk rute aplikasi. [Environment variables Vercel](https://vercel.com/docs/environment-variables) · [Panduan TokenPortal](https://tokenportal.id/docs)
 
