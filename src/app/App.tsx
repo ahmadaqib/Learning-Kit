@@ -11,6 +11,7 @@ import { Bito } from '@/components/mascot/Bito';
 import { Button } from '@/components/ui/Button';
 import { configureSound, listenForInterfaceSounds } from '@/engine/sound';
 import { configureSpeech, stopSpeaking } from '@/engine/speech';
+import { useAppUpdates } from '@/engine/appUpdate';
 
 // Lazy-load halaman berat agar initial bundle JS <= 180 KB gzip
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
@@ -77,6 +78,12 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { 
   }
 }
 
+/** Picks up new deploys at safe moments (see engine/appUpdate). Needs the router for the current path. */
+const AppUpdates: React.FC = () => {
+  useAppUpdates();
+  return null;
+};
+
 export const App: React.FC = () => {
   useEffect(() => {
     let activeProfileId: string | undefined;
@@ -105,6 +112,7 @@ export const App: React.FC = () => {
   return (
     <AppErrorBoundary>
     <BrowserRouter>
+      <AppUpdates />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<AppShell hideNav><ProfileSelectPage /></AppShell>} />

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ChatBox } from '@/components/chat/ChatBox';
 import { useAppStore } from '@/store/useAppStore';
+import { loadChat, saveChat } from '@/engine/chatHistory';
 
 const STARTERS = [
   'Aku sudah sampai mana? Apa langkah berikutnya?',
@@ -33,8 +34,9 @@ export const ChatPage: React.FC = () => {
         buildBody={(messages) => ({ messages, progress })}
         starters={STARTERS}
         greeting="Mau belajar apa hari ini?"
-        notice="Pesanmu dan daftar pelajaran yang sudah kamu kerjakan dikirim ke layanan AI dan tidak disimpan. Jangan tulis data pribadi. Jawaban AI bisa keliru."
+        notice="Pesanmu dan daftar pelajaran yang sudah kamu kerjakan dikirim ke layanan AI. Percakapan hanya disimpan di browser ini. Jangan tulis data pribadi. Jawaban AI bisa keliru."
         inputId="curriculum-chat"
+        persist={{ load: () => loadChat(profile.id), save: (m) => saveChat(profile.id, m) }}
       />
     </div>
   );

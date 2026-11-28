@@ -41,17 +41,25 @@ interface ChatBoxProps {
   inputId: string;
   /** Title shown in the toolbar; the dialog already has its own. */
   title?: string;
+  /** Keeps the conversation across reloads; without it the chat lives in memory for this tab only. */
+  persist?: { load: () => ChatMessage[]; save: (messages: ChatMessage[]) => void };
 }
 
 /** Messaging-app layout: scrolling transcript, composer pinned at the bottom. Fills its parent's height. */
-export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody, starters, greeting, notice, inputId, title }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => threads.get(threadKey) ?? []);
+export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody, starters, greeting, notice, inputId, title, persist }) => {
+  const [messages, setMessages] = useState<ChatMessage[]>(() => threads.get(threadKey) ?? persist?.load() ?? []);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
   const lastRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // A restored conversation opens at its latest message, like a chat app.
+  useEffect(() => {
+    const list = listRef.current;
+    if (list) list.scrollTop = list.scrollHeight;
+  }, []);
 
   // Grow the composer with its text, up to about six lines.
   useEffect(() => {
@@ -70,6 +78,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
 
   const update = (next: ChatMessage[]) => {
     threads.set(threadKey, next);
+    persist?.save(next);
     setMessages(next);
     scrollToLast();
   };
