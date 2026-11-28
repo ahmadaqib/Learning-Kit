@@ -125,5 +125,7 @@ export const preparedPetStrategies: Readonly<Record<string, Readonly<Record<PetA
   'b09-l05': { concept: 'recall', story: 'predict', sim: 'predict', limit: 'compare' },
   'b09-l06': { concept: 'recall', story: 'compare', sim: 'predict', limit: 'compare' },
   'b09-sq1': { concept: 'compare', story: 'predict', sim: 'predict', limit: 'compare' },
+  'b10-sq1': { concept: 'compare', story: 'predict', sim: 'predict', limit: 'compare' },
+  'b10-sq2': { concept: 'compare', story: 'predict', sim: 'predict', limit: 'compare' },
   'b10-l01': { concept: 'compare', story: 'compare', sim: 'predict', limit: 'compare' },
 };
