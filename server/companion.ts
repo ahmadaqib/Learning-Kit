@@ -65,10 +65,28 @@ async function selectTip(input: PetHintRequest, key: string, models: string[], s
   return null;
 }
 
-function json(status: number, value: object) {
+// Vercel's CDN keeps s-maxage responses and strips s-maxage before the browser sees it.
+// A live pick is paid for once per context per deploy; a prepared fallback is retried after 10 minutes.
+const LIVE_CACHE = 'public, max-age=0, s-maxage=2592000, stale-while-revalidate=86400';
+const PREPARED_CACHE = 'public, max-age=0, s-maxage=600';
+
+function json(status: number, value: object, cache = 'no-store') {
   return new Response(JSON.stringify(value), {
-    status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    status, headers: { 'Content-Type': 'application/json', 'Cache-Control': cache },
   });
+}
+
+/** GET carries the context in the query so the CDN can cache it; POST stays for tabs still running the old client. */
+async function readInput(request: Request): Promise<unknown | Response> {
+  const url = new URL(request.url);
+  if (request.method === 'GET') {
+    if (url.search.length > 512) return json(413, { error: 'size' });
+    return Object.fromEntries(url.searchParams);
+  }
+  if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return json(415, { error: 'format' });
+  const text = await request.text();
+  if (text.length > 512) return json(413, { error: 'size' });
+  try { return JSON.parse(text); } catch { return json(400, { error: 'context' }); }
 }
 
 /** Bounded editorial selector. A warm process shares decisions for identical lesson contexts. */
@@ -79,25 +97,22 @@ export function createCompanionService(getConfig: () => CompanionConfig, send: t
   let windowStart = 0;
   let calls = 0;
   return async (request: Request): Promise<Response> => {
-    if (request.method !== 'POST') return json(405, { error: 'method' });
+    if (request.method !== 'GET' && request.method !== 'POST') return json(405, { error: 'method' });
     const origin = request.headers.get('origin');
     if ((origin && origin !== new URL(request.url).origin) || request.headers.get('sec-fetch-site') === 'cross-site') {
       return json(403, { error: 'origin' });
     }
-    if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return json(415, { error: 'format' });
-    const text = await request.text();
-    if (text.length > 512) return json(413, { error: 'size' });
-    let body: unknown;
-    try { body = JSON.parse(text); } catch { return json(400, { error: 'context' }); }
+    const body = await readInput(request);
+    if (body instanceof Response) return body;
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success || lessons.get(parsed.data.topicId)?.worldId !== parsed.data.worldId) return json(400, { error: 'context' });
     const input = parsed.data;
     const context = [input.topicId, input.stepKind, input.personality, input.cue ?? 'requested'].join('/');
     const cached = choices.get(context);
-    if (cached) return json(200, { tipId: cached, source: 'live' });
+    if (cached) return json(200, { tipId: cached, source: 'live' }, LIVE_CACHE);
     const prepared = () => {
       const tipId = preparedPetStrategies[input.topicId]?.[input.stepKind];
-      return tipId ? json(200, { tipId, source: 'prepared' }) : json(503, { error: 'unavailable' });
+      return tipId ? json(200, { tipId, source: 'prepared' }, PREPARED_CACHE) : json(503, { error: 'unavailable' });
     };
     if (Date.now() < retryGatewayAt) return prepared();
     const { apiKey, models } = getConfig();
@@ -109,7 +124,8 @@ export function createCompanionService(getConfig: () => CompanionConfig, send: t
     let pending = inFlight.get(context);
     if (!pending) {
       if (Date.now() - windowStart >= 60000) { windowStart = Date.now(); calls = 0; }
-      if (calls >= 12 || inFlight.size >= 3) return prepared();
+      // The CDN answers repeat contexts, so only cache misses reach here.
+      if (calls >= 30 || inFlight.size >= 6) return prepared();
       calls++;
       pending = selectTip(input, apiKey, chain, send, () => {
         retryGatewayAt = Date.now() + 120_000;
@@ -120,6 +136,6 @@ export function createCompanionService(getConfig: () => CompanionConfig, send: t
       inFlight.set(context, pending);
     }
     const tip = await pending;
-    return tip ? json(200, { tipId: tip, source: 'live' }) : prepared();
+    return tip ? json(200, { tipId: tip, source: 'live' }, LIVE_CACHE) : prepared();
   };
 }

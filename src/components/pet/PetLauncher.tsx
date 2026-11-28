@@ -156,13 +156,12 @@ function PetPanel({
     };
 
     try {
-      const response = await fetch('/api/companion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      // GET so the CDN can answer repeat contexts without spending tokens.
+      const query = new URLSearchParams(Object.entries(body).filter((e): e is [string, string] => typeof e[1] === 'string'));
+      const response = await fetch('/api/companion?' + query, {
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         signal: controller.signal,
-        body: JSON.stringify(body),
       });
       const id = response.ok ? parseTip(await response.json()) : undefined;
       if (request.current === controller) setAi(id ?? 'unavailable');
