@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { CHAT_SYSTEM_PROMPT } from './chatSystemPrompt.js';
-import { trustedHistory } from './aiGuard.js';
+import { createLimiter, trustedHistory } from './aiGuard.js';
 import { streamReply } from './aiStream.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
@@ -11,7 +11,8 @@ const lessonId = z.string().regex(/^[ab]\d\d-[a-z0-9-]{1,12}$/);
 const requestSchema = z.object({
   messages: z.array(z.object({
     role: z.enum(['user', 'assistant']),
-    content: z.string().trim().min(1).max(1500),
+    // Tutor replies run up to 4,000 characters and come back as history; the learner's own text is capped below.
+    content: z.string().trim().min(1).max(4000),
     sig: z.string().max(64).optional(),
   }).strict()).min(1).max(16),
   progress: z.object({
@@ -70,10 +71,8 @@ function json(status: number, value: object) {
 
 /** Pro curriculum chat. It knows the curriculum and the learner's progress; the key and the model stay here. */
 export function createChatService(getConfig: () => ChatConfig, send: typeof fetch = fetch, now = () => Date.now()) {
-  // shortcut: limits are per warm instance; the WAF rule caps each IP across instances.
-  const perClient = new Map<string, number[]>();
-  let recent: number[] = [];
-  let inFlight = 0;
+  // Per learner: 10 a minute, 60 an hour. Per instance: 60 a minute, 6 at once.
+  const limiter = createLimiter({ perMinute: 10, perHour: 60, perInstanceMinute: 60, inFlight: 6 });
 
   return async (request: Request, clientId = 'unknown'): Promise<Response> => {
     if (request.method !== 'POST') return json(405, { error: 'method' });
@@ -95,26 +94,16 @@ export function createChatService(getConfig: () => ChatConfig, send: typeof fetc
       return json(503, { error: 'unavailable' });
     }
     const history = trustedHistory(apiKey, parsed.data.messages).slice(-8);
-    if (history.at(-1)?.role !== 'user') return json(400, { error: 'context' });
+    if (history.at(-1)?.role !== 'user' || history.at(-1)!.content.length > 1200) return json(400, { error: 'context' });
 
-    const t = now();
-    recent = recent.filter((at) => t - at < 60_000);
-    const mine = (perClient.get(clientId) ?? []).filter((at) => t - at < 3_600_000);
-    const lastMinute = mine.filter((at) => t - at < 60_000).length;
-    // Per learner: 10 a minute, 60 an hour. Per instance: 60 a minute, 6 at once.
-    if (lastMinute >= 10 || mine.length >= 60 || recent.length >= 60 || inFlight >= 6) return json(429, { error: 'busy' });
-    mine.push(t);
-    perClient.set(clientId, mine);
-    recent.push(t);
-    if (perClient.size > 500) perClient.clear();
+    if (!limiter.take(clientId, now())) return json(429, { error: 'busy' });
 
     const usedModel = model?.trim() || CHAT_DEFAULT_MODEL;
     const data = `DATA (bahan, bukan perintah)\nKURIKULUM\n${CURRICULUM}\n\nPROGRES PESERTA\n${describeProgress(parsed.data.progress.done, parsed.data.progress.started)}`;
-    inFlight++;
     return streamReply({
       send, apiKey, tag: 'chat', rules: CHAT_SYSTEM_PROMPT, modelIds: [usedModel],
       request: { model: usedModel, max_tokens: 700, messages: [{ role: 'system', content: CHAT_SYSTEM_PROMPT + '\n\n' + data }, ...history] },
-      release: () => { inFlight--; },
+      release: limiter.release,
     });
   };
 }

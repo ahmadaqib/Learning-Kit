@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
 import { createCompanionService } from '../server/companion';
+import { petHintQuery } from '../src/content/petContract';
 
 import { preparedPetStrategies } from '../server/preparedPetStrategies';
 import { WORLD_METAS } from '../src/content/worldMeta';
@@ -25,7 +26,7 @@ describe('server-side pet hints', () => {
     expect(send.mock.calls[0][1]?.body).not.toContain('fixture');
   });
   it('answers GET from the query with CDN cache headers: long for live picks, short for prepared, none for errors', async () => {
-    const get = (query: Record<string, string>, site = 'same-origin') => new Request('https://learn.example/api/companion?' + new URLSearchParams(query), {
+    const get = (query: Record<string, string>, site = 'same-origin') => new Request('https://learn.example/api/companion?' + petHintQuery(query) + ('extra' in query ? '&extra=' + query.extra : ''), {
       headers: { 'sec-fetch-site': site },
     });
     const serve = createCompanionService(config, vi.fn<typeof fetch>().mockResolvedValue(answer('predict')));
@@ -35,6 +36,9 @@ describe('server-side pet hints', () => {
     const prepared = await createCompanionService(() => ({}), vi.fn<typeof fetch>())(get(context));
     expect((await prepared.json()).source).toBe('prepared');
     expect(prepared.headers.get('cache-control')).toContain('s-maxage=600');
+    // The same context in another parameter order would be a new cache entry, so it is refused.
+    const reordered = new Request('https://learn.example/api/companion?topicId=a04-sq1&worldId=a04&stepKind=concept&personality=sinis&intent=study_hint&cue=stuck', { headers: { 'sec-fetch-site': 'same-origin' } });
+    expect((await serve(reordered)).status).toBe(400);
     for (const bad of [await serve(get({ ...context, extra: 'x' })), await serve(get(context, 'cross-site'))]) {
       expect(bad.headers.get('cache-control')).toBe('no-store');
     }

@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { ArrowUp, Check, Copy, SquarePen } from 'lucide-react';
 import { Bito } from '@/components/mascot/Bito';
+import { deviceId } from '@/engine/deviceId';
 
 export type ChatMessage = { role: 'user' | 'assistant'; content: string; sig?: string; options?: string[] };
 
@@ -134,7 +135,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-PW-Device': deviceId() },
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         signal: controller.signal,

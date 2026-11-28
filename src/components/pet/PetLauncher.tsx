@@ -3,7 +3,7 @@ import { CircleHelp, Square, Volume2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { DialogModal } from '@/components/ui/DialogModal';
-import { PET_AI_TIP_IDS, type PetHintCue, type PetHintRequest, type PetHintResponse, type PetId, type PetPersonality } from '@/content/petContract';
+import { PET_AI_TIP_IDS, petHintQuery, type PetHintCue, type PetHintRequest, type PetHintResponse, type PetId, type PetPersonality } from '@/content/petContract';
 import { getExtraPetTip, getPetId, getPetPersonality, getPetTip, PET_DETAILS, type PetContext } from '@/content/petTips';
 import type { Mode } from '@/content/schema';
 import { canSpeakCompanion, isQueuePlaying, speakCompanion, stopCompanionSpeaking } from '@/engine/readAloud';
@@ -157,8 +157,7 @@ function PetPanel({
 
     try {
       // GET so the CDN can answer repeat contexts without spending tokens.
-      const query = new URLSearchParams(Object.entries(body).filter((e): e is [string, string] => typeof e[1] === 'string'));
-      const response = await fetch('/api/companion?' + query, {
+      const response = await fetch('/api/companion?' + petHintQuery({ ...body }), {
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         signal: controller.signal,
