@@ -50,6 +50,8 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
   const [messages, setMessages] = useState<ChatMessage[]>(() => threads.get(threadKey) ?? persist?.load() ?? []);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
+  /** The reply as it streams in; replaced by the final cleaned reply when the stream ends. */
+  const [live, setLive] = useState<string | null>(null);
   const [error, setError] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
   const lastRef = useRef<HTMLDivElement>(null);
@@ -76,6 +78,42 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
     if (list && last) list.scrollTo({ top: last.offsetTop - 16, behavior: 'smooth' });
   });
 
+  // While text streams in, keep following it, unless the learner has scrolled up to read.
+  const followStream = () => requestAnimationFrame(() => {
+    const list = listRef.current;
+    if (list && list.scrollHeight - list.scrollTop - list.clientHeight < 120) list.scrollTop = list.scrollHeight;
+  });
+
+  /** Reads the server's NDJSON events, showing text as it arrives; returns the final event. */
+  const readStream = async (body: ReadableStream<Uint8Array>) => {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let pending = '';
+    let text = '';
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      pending += decoder.decode(value, { stream: true });
+      let newline: number;
+      while ((newline = pending.indexOf('\n')) >= 0) {
+        const line = pending.slice(0, newline).trim();
+        pending = pending.slice(newline + 1);
+        if (!line) continue;
+        const event = JSON.parse(line);
+        if (event.t === 'd' && typeof event.v === 'string') {
+          text += event.v;
+          setLive(text);
+          followStream();
+        } else if (event.t === 'done') {
+          return event as { reply?: unknown; options?: unknown; sig?: unknown };
+        } else if (event.t === 'error') {
+          throw new Error(event.error === 'busy' ? 'busy' : 'unavailable');
+        }
+      }
+    }
+    throw new Error('unavailable');
+  };
+
   const update = (next: ChatMessage[]) => {
     threads.set(threadKey, next);
     persist?.save(next);
@@ -92,7 +130,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
     setError('');
     setLoading(true);
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 30_000);
+    const timeout = window.setTimeout(() => controller.abort(), 60_000);
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -102,7 +140,8 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
         signal: controller.signal,
         body: JSON.stringify(buildBody(next.slice(-10).map(({ role, content, sig }) => ({ role, content, sig })))),
       });
-      const data = response.ok ? await response.json() : null;
+      const streamed = response.ok && response.body && (response.headers.get('content-type') ?? '').includes('ndjson');
+      const data = streamed ? await readStream(response.body!) : response.ok ? await response.json() : null;
       if (typeof data?.reply !== 'string') throw new Error(response.status === 429 ? 'busy' : 'unavailable');
       const options = Array.isArray(data.options) ? data.options.filter((o: unknown): o is string => typeof o === 'string').slice(0, 3) : [];
       update([...next, { role: 'assistant', content: data.reply, sig: typeof data.sig === 'string' ? data.sig : undefined, options }]);
@@ -115,6 +154,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
         : 'Tutor belum bisa dihubungi. Coba kirim lagi sebentar lagi.');
     } finally {
       window.clearTimeout(timeout);
+      setLive(null);
       setLoading(false);
       inputRef.current?.focus();
     }
@@ -148,7 +188,8 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
         </div>
       )}
 
-      <div ref={listRef} className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain" aria-live="polite">
+      {/* aria-busy holds screen-reader announcements until the streamed reply is complete. */}
+      <div ref={listRef} className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain" aria-live="polite" aria-busy={loading}>
         <div className="mx-auto flex min-h-full w-full max-w-[720px] flex-col px-4 py-5">
           {messages.length === 0 ? (
             <div className="my-auto flex flex-col items-center gap-5 py-6 text-center">
@@ -205,7 +246,18 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
                   )}
                 </div>
               ))}
-              {loading && (
+              {loading && live && (
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex-shrink-0" aria-hidden="true"><Bito size={40} expression="idle" react={false} /></div>
+                  <div className="min-w-0 flex-1">
+                    <Suspense fallback={<p className="m-0 whitespace-pre-wrap break-words text-[15px] leading-7 text-[var(--ink)]">{live}</p>}>
+                      <ChatMarkdown text={live} />
+                    </Suspense>
+                    <span className="ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-[var(--ink-3)] motion-safe:animate-pulse" aria-hidden="true" />
+                  </div>
+                </div>
+              )}
+              {loading && !live && (
                 <div className="flex items-center gap-3" role="status">
                   <div className="flex-shrink-0" aria-hidden="true"><Bito size={40} expression="think" react={false} /></div>
                   <span className="flex gap-1" aria-hidden="true">

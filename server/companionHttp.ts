@@ -43,7 +43,21 @@ export function nodeHandler(serve: Serve, path: string, maxBytes: number, method
       if (method === 'GET') url.search = new URL(req.url ?? '', 'http://local').search;
       const reply = await serve(new Request(url, method === 'GET' ? { method, headers } : { method, headers, body }), clientId);
       res.writeHead(reply.status, Object.fromEntries(reply.headers));
-      res.end(await reply.text());
+      if (!reply.body || !(reply.headers.get('content-type') ?? '').includes('ndjson')) {
+        res.end(await reply.text());
+        return;
+      }
+      // Pass each streamed piece on as it arrives; if the learner leaves, stop the upstream call.
+      const reader = reply.body.getReader();
+      res.on('close', () => {
+        if (!res.writableEnded) void reader.cancel();
+      });
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+      res.end();
     } catch {
       reject(503);
     }
