@@ -1,10 +1,11 @@
 import { rename, writeFile } from 'node:fs/promises';
+import { AI_CHAT_URL } from '../server/aiProvider';
 import { WORLD_METAS } from '../src/content/worldMeta';
 import { PET_AI_STEP_KINDS, PET_AI_TIP_IDS } from '../src/content/petContract';
 
-const models = [...new Set((process.env.TOKENPORTAL_MODELS ?? '').split(',').map(id => id.trim()).filter(Boolean))].slice(0, 4);
-const key = process.env.TOKENPORTAL_API_KEY;
-if (!key || !models.length) throw new Error('Configure TOKENPORTAL_API_KEY and TOKENPORTAL_MODELS before preparing the catalog.');
+const models = [...new Set((process.env.ONEINFERENCE_MODELS ?? '').split(',').map(id => id.trim()).filter(Boolean))].slice(0, 4);
+const key = process.env.ONEINFERENCE_API_KEY;
+if (!key || !models.length) throw new Error('Configure ONEINFERENCE_API_KEY and ONEINFERENCE_MODELS before preparing the catalog.');
 
 const lessons = WORLD_METAS.flatMap(world => [...world.lessons, ...world.sideQuests])
   .filter(lesson => lesson.modes.includes('pro'));
@@ -14,13 +15,13 @@ type LessonSummary = Pick<(typeof lessons)[number], 'id' | 'title'>;
 const unavailableModels = new Set<string>();
 async function prepare(batch: LessonSummary[]) {
   for (const model of models.filter(id => !unavailableModels.has(id))) {
-    const response = await fetch('https://tokenportal.id/v1/chat/completions', {
+    const response = await fetch(AI_CHAT_URL, {
       method: 'POST', redirect: 'error', signal: AbortSignal.timeout(90_000),
       headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model, messages: [{ role: 'system', content: prompt }, { role: 'user', content: JSON.stringify(batch) }], max_tokens: 4096 }),
     });
     if ([401, 402, 429].includes(response.status) || response.headers.get('cf-mitigated') === 'challenge') {
-      throw new Error('TokenPortal cannot serve the editorial request (HTTP ' + response.status + ').');
+      throw new Error('1Inference cannot serve the editorial request (HTTP ' + response.status + ').');
     }
     if (!response.ok) {
       if (response.status === 404) unavailableModels.add(model);
