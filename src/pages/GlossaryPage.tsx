@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { BookOpen, CheckCircle2, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { GLOSSARY_TERMS } from '@/content/glossary';
+import { GLOSSARY_TERMS, GLOSSARY_TOPICS } from '@/content/glossary';
 import { WORLD_META_BY_ID } from '@/content/worldMeta';
 import { resolveTxt } from '@/content/schema';
 import { useAppStore } from '@/store/useAppStore';
@@ -21,19 +21,14 @@ const SEARCH_ALIASES: Record<string, string[]> = {
   html: ['tag', 'semantik', 'dom'],
 };
 
-const QUICK_CHIPS = [
-  { id: 'all', label: 'Semua', query: '' },
-  { id: 'febe', label: 'FE & BE', query: 'fe' },
-  { id: 'htmlcss', label: 'HTML & CSS', query: 'html' },
-  { id: 'js', label: 'JavaScript', query: 'javascript' },
-  { id: 'api', label: 'API & HTTP', query: 'api' },
-  { id: 'sec', label: 'Keamanan', query: 'keamanan' },
-] as const;
+const TOPIC_CHIPS = [{ id: 'all', label: 'Semua', termIds: [] as string[] }, ...GLOSSARY_TOPICS];
 
 export const GlossaryPage: React.FC = () => {
   const profile = useAppStore((s) => s.profiles[s.activeProfileId]);
   const [query, setQuery] = useState('');
   const [scope, setScope] = useState<'all' | 'learned'>('all');
+  const [topicId, setTopicId] = useState('all');
+  const topicTerms = GLOSSARY_TOPICS.find((t) => t.id === topicId)?.termIds;
 
   const learnedLessonIds = useMemo(() => {
     const ids = new Set<string>(profile ? Object.keys(profile.lessons) : []);
@@ -45,6 +40,7 @@ export const GlossaryPage: React.FC = () => {
   const visibleTerms = GLOSSARY_TERMS.filter((term) => {
     const isLearned = learnedLessonIds.has(term.introducedIn);
     if (scope === 'learned' && !isLearned) return false;
+    if (topicTerms && !topicTerms.includes(term.id)) return false;
 
     const rawQ = query.trim().toLowerCase();
     if (!rawQ) return true;
@@ -126,14 +122,15 @@ export const GlossaryPage: React.FC = () => {
       </div>
 
       {/* Cip cepat kategori */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter cepat kategori istilah">
-        {QUICK_CHIPS.map((chip) => {
-          const active = query.toLowerCase() === chip.query;
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Pilih topik istilah">
+        {TOPIC_CHIPS.map((chip) => {
+          const active = topicId === chip.id;
           return (
             <button
               key={chip.id}
               type="button"
-              onClick={() => setQuery(chip.query)}
+              aria-pressed={active}
+              onClick={() => { setTopicId(chip.id); setQuery(''); }}
               className={`pw-pressable pw-t-colors min-h-[var(--touch-min)] cursor-pointer rounded-full border-2 px-3.5 text-xs font-extrabold ${
                 active
                   ? 'border-[var(--world-600)] bg-[var(--world-50)] text-[var(--world-700)]'
