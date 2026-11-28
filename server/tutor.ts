@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AI_CHAT_URL } from './aiProvider.js';
 import { TUTOR_SYSTEM_PROMPT } from './tutorSystemPrompt.js';
-import { SAFE_REPLY, leaks, plainText, signReply, splitOptions, trustedHistory } from './aiGuard.js';
+import { SAFE_REPLY, leaks, signReply, splitOptions, trustedHistory } from './aiGuard.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
 export const TUTOR_DEFAULT_MODEL = 'deepseek-v4.1-flash';
@@ -107,7 +107,7 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
         console.warn('tutor.provider_unusable_response');
         return json(503, { error: 'unavailable' });
       }
-      let { reply: answer, options } = splitOptions(plainText(reply.trim()));
+      let { reply: answer, options } = splitOptions(reply.trim());
       answer = answer.slice(0, 4000);
       if (!answer || leaks([answer, ...options].join('\n'), TUTOR_SYSTEM_PROMPT, [usedModel])) {
         if (answer) console.warn('tutor.blocked_leak');
