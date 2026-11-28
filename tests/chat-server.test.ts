@@ -18,7 +18,7 @@ describe('curriculum chat', () => {
     const send = vi.fn<typeof fetch>().mockResolvedValue(answer('Lanjut ke pelajaran berikutnya.'));
     const res = await createChatService(config, send)(request(ask('Aku sudah sampai mana?')));
     const body = await res.json();
-    expect(body).toEqual({ reply: 'Lanjut ke pelajaran berikutnya.', sig: signReply(KEY, 'Lanjut ke pelajaran berikutnya.') });
+    expect(body).toEqual({ reply: 'Lanjut ke pelajaran berikutnya.', options: [], sig: signReply(KEY, 'Lanjut ke pelajaran berikutnya.') });
     expect(JSON.stringify(body)).not.toMatch(/deepseek|model/i);
     const sent = JSON.parse(String(send.mock.calls[0][1]?.body));
     expect(sent.model).toBe(CHAT_DEFAULT_MODEL);
@@ -84,5 +84,18 @@ describe('plain text replies', () => {
     const { plainText } = await import('../server/aiGuard');
     expect(plainText('## Judul\nLanjutkan **"Perjalanan sebuah halaman"** dulu.\n1. a * b\nconst x = 2 * 3;'))
       .toBe('Judul\nLanjutkan "Perjalanan sebuah halaman" dulu.\n1. a * b\nconst x = 2 * 3;');
+  });
+});
+
+describe('answer buttons', () => {
+  it('splits up to three short options off the last line and returns them with the reply', async () => {
+    const { splitOptions } = await import('../server/aiGuard');
+    expect(splitOptions('Mana yang dibaca browser?\nPILIHAN: HTML | **CSS** | "JavaScript" | Python'))
+      .toEqual({ reply: 'Mana yang dibaca browser?', options: ['HTML', 'CSS', 'JavaScript'] });
+    expect(splitOptions('Jelaskan dengan kata-katamu.')).toEqual({ reply: 'Jelaskan dengan kata-katamu.', options: [] });
+    expect(splitOptions('Siap?\nPILIHAN: ' + 'x'.repeat(80) + ' | Siap').options).toEqual(['Siap']);
+    const send = vi.fn<typeof fetch>().mockResolvedValue(answer('Backend atau frontend?\nPILIHAN: Backend | Frontend'));
+    const body = await (await createChatService(config, send)(request(ask('Uji aku')))).json();
+    expect(body).toEqual({ reply: 'Backend atau frontend?', options: ['Backend', 'Frontend'], sig: signReply(KEY, 'Backend atau frontend?') });
   });
 });
