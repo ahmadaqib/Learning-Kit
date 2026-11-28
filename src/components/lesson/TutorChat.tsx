@@ -96,7 +96,7 @@ export const TutorChat: React.FC<{ lessonId: string; card: string }> = ({ lesson
         {open && (
           <div className="space-y-3">
             <p className="pw-small m-0 text-[var(--ink-2)]">
-              Pesanmu dan isi kartu ini dikirim ke AI TokenPortal dan tidak disimpan di aplikasi. Jangan tulis data pribadi.
+              Pesanmu dan isi kartu ini dikirim ke AI 1Inference dan tidak disimpan di aplikasi. Jangan tulis data pribadi.
               Jawaban AI bisa keliru.
             </p>
 
