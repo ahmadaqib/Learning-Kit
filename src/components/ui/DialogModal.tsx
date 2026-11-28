@@ -108,6 +108,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
         <button
           type="button"
           onClick={() => dialogRef.current?.close()}
+          data-sfx="close"
           aria-label="Tutup jendela"
           className="pw-pressable flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-[var(--line)] text-[var(--ink-2)] hover:bg-[var(--paper-2)] hover:text-[var(--ink)] cursor-pointer"
         >

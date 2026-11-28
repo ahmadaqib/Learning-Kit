@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { ArrowUp, Check, Copy, SquarePen } from 'lucide-react';
 import { Bito } from '@/components/mascot/Bito';
 import { deviceId } from '@/engine/deviceId';
+import { playSound } from '@/engine/sound';
 
 export type ChatMessage = { role: 'user' | 'assistant'; content: string; sig?: string; options?: string[] };
 
@@ -126,6 +127,8 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
     const question = text.trim().slice(0, 1200);
     if (!question || loading) return;
     const next: ChatMessage[] = [...messages, { role: 'user', content: question }];
+    // One place for every way of sending (Enter, button, starter, answer button); a click's own tap is skipped.
+    playSound('send', true);
     update(next);
     setDraft('');
     setError('');
@@ -146,6 +149,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ threadKey, endpoint, buildBody
       if (typeof data?.reply !== 'string') throw new Error(response.status === 429 ? 'busy' : 'unavailable');
       const options = Array.isArray(data.options) ? data.options.filter((o: unknown): o is string => typeof o === 'string').slice(0, 3) : [];
       update([...next, { role: 'assistant', content: data.reply, sig: typeof data.sig === 'string' ? data.sig : undefined, options }]);
+      playSound('receive', true);
     } catch (e) {
       // Give the question back so nothing the learner typed is lost.
       update(messages);

@@ -58,7 +58,7 @@ export const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ level, title, on
       {
         at: AT.impact,
         run: ({ skipped }) => {
-          if (!skipped) playSound('unlock', soundEnabled);
+          if (!skipped) playSound('levelup', soundEnabled);
           setFace('wow');
         },
       },

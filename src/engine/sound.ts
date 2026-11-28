@@ -1,6 +1,50 @@
 import { DEFAULT_AUDIO_SETTINGS, type Settings } from '@/content/schema';
 
-export type SoundEffect = 'tap' | 'back' | 'correct' | 'incorrect' | 'star' | 'unlock' | 'slap' | 'bip';
+export type SoundEffect = 'tap' | 'back' | 'correct' | 'incorrect' | 'star' | 'unlock' | 'slap' | 'bip'
+  | 'levelup' | 'toggle-on' | 'toggle-off' | 'open' | 'close' | 'send' | 'receive' | 'select';
+
+/**
+ * Recorded UI sounds ("rubber" pack from uisfx, CC0; see public/audio/ui/LICENSE.txt), about 60 KB in all.
+ * Effects without a file (slap, bip) and any file not loaded yet fall back to the synthesized tones below.
+ */
+const SAMPLES: Partial<Record<SoundEffect, string>> = {
+  tap: 'press', back: 'back', correct: 'success', incorrect: 'error', star: 'reward', unlock: 'unlock',
+  levelup: 'level-up', 'toggle-on': 'toggle-on', 'toggle-off': 'toggle-off', open: 'open', close: 'close',
+  send: 'send', receive: 'receive', select: 'select',
+};
+const SAMPLE_GAIN = 0.7;
+const buffers = new Map<string, AudioBuffer>();
+let samplesRequested = false;
+
+/** Fetches and decodes every sample once, after the first interaction (browsers block audio before it). */
+function loadSamples(ctx: AudioContext): void {
+  if (samplesRequested) return;
+  samplesRequested = true;
+  for (const name of new Set(Object.values(SAMPLES))) {
+    fetch(`/audio/ui/${name}.mp3`)
+      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+      .then((data) => ctx.decodeAudioData(data))
+      .then((buffer) => { buffers.set(name, buffer); })
+      .catch(() => { /* keep the synthesized fallback for this effect */ });
+  }
+}
+
+function playSample(ctx: AudioContext, effect: SoundEffect): boolean {
+  const name = SAMPLES[effect];
+  const buffer = name && buffers.get(name);
+  if (!buffer || !effectsGain) return false;
+  const source = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  source.buffer = buffer;
+  gain.gain.value = SAMPLE_GAIN;
+  source.connect(gain);
+  gain.connect(effectsGain);
+  source.start();
+  return true;
+}
+
+/** Effects a button can ask for with data-sfx="…". */
+const CUE_EFFECTS = new Set<SoundEffect>(['back', 'tap', 'select', 'send', 'open', 'close', 'star', 'unlock', 'levelup']);
 type SoundPreferences = Pick<Settings, 'soundEnabled' | 'soundVolume' | 'musicEnabled' | 'musicVolume'>;
 
 let audioCtx: AudioContext | null = null;
@@ -10,7 +54,7 @@ let preferences: SoundPreferences | undefined;
 let hasUserInteracted = false;
 let speechPlaying = false;
 let musicTimer: ReturnType<typeof setInterval> | null = null;
-let activeClick: { event: MouseEvent; played: boolean; effect: 'tap' | 'back' | null; beforeProfile: boolean } | null = null;
+let activeClick: { event: MouseEvent; played: boolean; effect: SoundEffect | null; beforeProfile: boolean } | null = null;
 
 export function configureSound(settings?: SoundPreferences): void {
   preferences = settings;
@@ -111,6 +155,8 @@ export function playSound(effect: SoundEffect, enabled: boolean): void {
   if (preferences?.soundVolume === 0) return;
   const ctx = getAudioContext();
   if (!ctx) return;
+  loadSamples(ctx);
+  if (playSample(ctx, effect)) return;
 
   switch (effect) {
     case 'tap':
@@ -134,6 +180,7 @@ export function playSound(effect: SoundEffect, enabled: boolean): void {
       playTone(ctx, 783.99, 0.18, 'triangle', 0.16, 0.08);
       break;
     case 'unlock':
+    case 'levelup':
       playTone(ctx, 523.25, 0.12, 'triangle', 0.14, 0);
       playTone(ctx, 659.25, 0.12, 'triangle', 0.15, 0.09);
       playTone(ctx, 783.99, 0.14, 'triangle', 0.16, 0.18);
@@ -147,6 +194,9 @@ export function playSound(effect: SoundEffect, enabled: boolean): void {
       playTone(ctx, 659.25, 0.065, 'square', 0.05, 0);
       playTone(ctx, 987.77, 0.07, 'square', 0.05, 0.07);
       break;
+    default:
+      // Newer cues have no synthesized version: a soft tap until the file has loaded.
+      playTone(ctx, 640, 0.046, 'sine', 0.08);
   }
 }
 
@@ -227,7 +277,7 @@ export function listenForInterfaceSounds(): () => void {
     activeClick = {
       event,
       played: false,
-      effect: interactive ? (cue === 'back' ? 'back' : 'tap') : null,
+      effect: interactive ? (cue && CUE_EFFECTS.has(cue as SoundEffect) ? cue as SoundEffect : 'tap') : null,
       beforeProfile: target?.getAttribute('data-sfx-enabled') === 'true',
     };
     markUserInteraction();
@@ -243,7 +293,13 @@ export function listenForInterfaceSounds(): () => void {
     if (click?.event !== event) return;
     clearTimeout(resetClick);
     if (click.effect) {
-      playSound(click.effect, preferences?.soundEnabled ?? click.beforeProfile);
+      // Switches and checkboxes say which way they moved. React has already updated the DOM here.
+      const control = event.target instanceof Element ? event.target.closest('input[type="checkbox"], [role="switch"], [aria-pressed]') : null;
+      const on = control instanceof HTMLInputElement ? control.checked
+        : control ? (control.getAttribute('aria-checked') ?? control.getAttribute('aria-pressed')) === 'true' : null;
+      const choice = event.target instanceof Element && event.target.closest('input[type="radio"], [role="radio"], [role="option"]');
+      const effect = click.effect !== 'tap' ? click.effect : choice ? 'select' : on === null ? 'tap' : on ? 'toggle-on' : 'toggle-off';
+      playSound(effect, preferences?.soundEnabled ?? click.beforeProfile);
     }
     activeClick = null;
     historyIndex = window.history.state?.idx ?? historyIndex;

@@ -34,6 +34,7 @@ export const TutorChat: React.FC<{ lessonId: string; card: string }> = ({ lesson
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}
+        data-sfx="open"
         onClick={() => setOpen(true)}
         className="pw-pressable inline-flex h-11 flex-shrink-0 cursor-pointer items-center gap-1.5 rounded-[var(--radius-full)] border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-bold text-[var(--ink)]"
       >
