@@ -113,3 +113,18 @@ it('keeps all seven workshops accessible as optional Pro work outside the main p
     }
   }
 });
+
+it('sends Junior back to the world map from a locked lesson, but lets Pro open it', () => {
+  for (const mode of ['junior', 'pro'] as const) {
+    cleanup();
+    useAppStore.setState({ activeProfileId: '', profiles: {} });
+    useAppStore.getState().createProfile({ nickname: 'Ari', avatar: 'star', mode });
+    render(<MemoryRouter initialEntries={['/belajar/a01-l04']}>
+      <Routes>
+        <Route path="/belajar/:pelajaranId" element={<LessonPlayerPage />} />
+        <Route path="/dunia/:id" element={<p>peta dunia</p>} />
+      </Routes>
+    </MemoryRouter>);
+    expect(Boolean(screen.queryByText('peta dunia')), mode).toBe(mode === 'junior');
+  }
+});

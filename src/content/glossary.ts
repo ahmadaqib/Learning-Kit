@@ -1337,3 +1337,16 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
 export const GLOSSARY_BY_ID: Record<string, GlossaryTerm> = Object.fromEntries(
   GLOSSARY_TERMS.map((t) => [t.id, t]),
 );
+
+/** Topic chips on the glossary page: a hand-picked catalog across worlds, so a learner can browse one theme. */
+export const GLOSSARY_TOPICS: { id: string; label: string; termIds: string[] }[] = [
+  { id: 'web', label: 'Cara kerja web', termIds: ['frontend', 'backend', 'browser', 'server', 'dns', 'request', 'response', 'url', 'domain', 'https'] },
+  { id: 'htmlcss', label: 'HTML & CSS', termIds: ['html', 'css', 'tag', 'atribut', 'elemen', 'doctype', 'semantik', 'alt-text', 'selector', 'class-css', 'box-model', 'padding', 'margin', 'rem-unit', 'flexbox', 'grid-css', 'z-index', 'responsif', 'viewport', 'breakpoint', 'media-query', 'mobile-first'] },
+  { id: 'js', label: 'JavaScript', termIds: ['javascript', 'variabel', 'tipe-data', 'kondisi', 'fungsi', 'dom', 'event', 'fetch'] },
+  { id: 'desain', label: 'Desain & UX', termIds: ['ui', 'ux', 'wireframe', 'design-thinking', 'persona', 'user-flow', 'prototype', 'usability-testing', 'hierarki', 'alignment', 'whitespace', 'gestalt', 'hick-law', 'fitts-law', 'miller-law', 'peak-end', 'roda-warna', 'hsl', 'skema-warna', 'aturan-60-30-10', 'warna-semantik', 'kontras', 'hex-rgb', 'tipografi', 'type-scale', 'grid-8pt', 'komponen-ui', 'state-ui', 'gaya-ui', 'design-token', 'atomic-design', 'aksesibilitas', 'pour'] },
+  { id: 'api', label: 'API & HTTP', termIds: ['api', 'endpoint', 'sdk', 'http-method', 'idempotent', 'status-code', 'header-body', 'cookie-cache', 'json', 'serialisasi', 'protobuf', 'rest', 'pagination', 'graphql', 'grpc', 'trpc-soap'] },
+  { id: 'kontrak', label: 'Kontrak API', termIds: ['kontrak-api', 'openapi', 'endpoint', 'json', 'status-code', 'pagination', 'rest', 'graphql', 'grpc', 'protobuf', 'trpc-soap'] },
+  { id: 'realtime', label: 'Realtime & event', termIds: ['polling', 'long-polling', 'sse', 'websocket', 'webrtc', 'webhook', 'signature-webhook', 'queue-pubsub'] },
+  { id: 'sec', label: 'Keamanan & login', termIds: ['https', 'sanitasi', 'xss', 'csrf', 'rahasia-frontend', 'autentikasi', 'api-key', 'jwt', 'refresh-token', 'oauth', 'cors', 'rate-limit', 'idempotency-key', 'bola-idor', 'signature-webhook', 'bff'] },
+  { id: 'workflow', label: 'Alat & workflow', termIds: ['library-framework', 'react-komponen', 'tailwind-css', 'core-web-vitals', 'seo', 'git', 'deploy', 'openapi', 'empat-keadaan', 'debounce', 'optimistic-ui', 'backoff'] },
+];
