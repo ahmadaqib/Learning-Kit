@@ -1,22 +1,26 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createCompanionService, type CompanionConfig } from './companion.js';
 import { createTutorService, TUTOR_MAX_BYTES, type TutorConfig } from './tutor.js';
+import { createChatService, CHAT_MAX_BYTES, type ChatConfig } from './chat.js';
 
 type Serve = (request: Request, clientId: string) => Promise<Response>;
 
 /** Adapts a fetch-style service to Vercel functions and the Vite dev server, keeping the body size limit. */
-export function nodeHandler(serve: Serve, path: string, maxBytes: number) {
+export function nodeHandler(serve: Serve, path: string, maxBytes: number, methods: readonly string[] = ['POST']) {
   return async (req: IncomingMessage & { body?: unknown }, res: ServerResponse) => {
     const reject = (status: number) => {
       res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
       res.end('{"error":"request"}');
     };
-    if (req.method !== 'POST') return reject(405);
+    const method = req.method ?? '';
+    if (!methods.includes(method)) return reject(405);
     if (Number(req.headers['content-length']) > maxBytes) return reject(413);
     try {
       let body = '';
       // Vercel may supply an already parsed body. Vite supplies a Node stream.
-      if (req.body !== undefined) {
+      if (method === 'GET') {
+        // no body; the context is in the query string
+      } else if (req.body !== undefined) {
         body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
       } else {
         let bytes = 0;
@@ -36,7 +40,8 @@ export function nodeHandler(serve: Serve, path: string, maxBytes: number) {
       const clientId = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : '') || req.socket.remoteAddress || 'unknown';
       const scheme = req.headers['x-forwarded-proto'] === 'https' || ('encrypted' in req.socket && req.socket.encrypted) ? 'https' : 'http';
       const url = new URL(path, scheme + '://' + req.headers.host);
-      const reply = await serve(new Request(url, { method: 'POST', headers, body }), clientId);
+      if (method === 'GET') url.search = new URL(req.url ?? '', 'http://local').search;
+      const reply = await serve(new Request(url, method === 'GET' ? { method, headers } : { method, headers, body }), clientId);
       res.writeHead(reply.status, Object.fromEntries(reply.headers));
       res.end(await reply.text());
     } catch {
@@ -46,9 +51,13 @@ export function nodeHandler(serve: Serve, path: string, maxBytes: number) {
 }
 
 export function companionHttp(getConfig: () => CompanionConfig) {
-  return nodeHandler(createCompanionService(getConfig), '/api/companion', 512);
+  return nodeHandler(createCompanionService(getConfig), '/api/companion', 512, ['GET', 'POST']);
 }
 
 export function tutorHttp(getConfig: () => TutorConfig) {
   return nodeHandler(createTutorService(getConfig), '/api/tutor', TUTOR_MAX_BYTES);
+}
+
+export function chatHttp(getConfig: () => ChatConfig) {
+  return nodeHandler(createChatService(getConfig), '/api/chat', CHAT_MAX_BYTES);
 }

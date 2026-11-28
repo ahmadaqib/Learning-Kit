@@ -1,5 +1,5 @@
 import { loadEnv, type Plugin, type ViteDevServer, type PreviewServer } from 'vite';
-import { companionHttp, tutorHttp } from './companionHttp';
+import { chatHttp, companionHttp, tutorHttp } from './companionHttp';
 
 export function companionPlugin(): Plugin {
   function mount(server: ViteDevServer | PreviewServer) {
@@ -12,6 +12,10 @@ export function companionPlugin(): Plugin {
     server.middlewares.use('/api/tutor', tutorHttp(() => ({
       apiKey: read('ONEINFERENCE_API_KEY'),
       model: read('ONEINFERENCE_TUTOR_MODEL'),
+    })));
+    server.middlewares.use('/api/chat', chatHttp(() => ({
+      apiKey: read('ONEINFERENCE_API_KEY'),
+      model: read('ONEINFERENCE_CHAT_MODEL'),
     })));
   }
   return { name: 'local-companion-api', configureServer: mount, configurePreviewServer: mount };

@@ -24,6 +24,21 @@ describe('server-side pet hints', () => {
     expect(send.mock.calls.map(([, args]) => JSON.parse(String(args?.body)).model)).toEqual(['test-primary', 'test-fallback']);
     expect(send.mock.calls[0][1]?.body).not.toContain('fixture');
   });
+  it('answers GET from the query with CDN cache headers: long for live picks, short for prepared, none for errors', async () => {
+    const get = (query: Record<string, string>, site = 'same-origin') => new Request('https://learn.example/api/companion?' + new URLSearchParams(query), {
+      headers: { 'sec-fetch-site': site },
+    });
+    const serve = createCompanionService(config, vi.fn<typeof fetch>().mockResolvedValue(answer('predict')));
+    const live = await serve(get(context));
+    expect(await live.json()).toEqual({ tipId: 'predict', source: 'live' });
+    expect(live.headers.get('cache-control')).toContain('s-maxage=2592000');
+    const prepared = await createCompanionService(() => ({}), vi.fn<typeof fetch>())(get(context));
+    expect((await prepared.json()).source).toBe('prepared');
+    expect(prepared.headers.get('cache-control')).toContain('s-maxage=600');
+    for (const bad of [await serve(get({ ...context, extra: 'x' })), await serve(get(context, 'cross-site'))]) {
+      expect(bad.headers.get('cache-control')).toBe('no-store');
+    }
+  });
   it('covers every Pro lesson and card kind with an allowed prepared strategy', () => {
     const ids = WORLD_METAS.flatMap(world => [...world.lessons, ...world.sideQuests]).filter(l => l.modes.includes('pro')).map(l => l.id);
     expect(Object.keys(preparedPetStrategies).sort()).toEqual(ids.sort());

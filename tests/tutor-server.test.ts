@@ -13,7 +13,7 @@ describe('Pro tutor chat', () => {
   it('answers through the default model, grounded in the lesson, with the key only in the header', async () => {
     const send = vi.fn<typeof fetch>().mockResolvedValue(answer('  Karena kontrak janji dua pihak. Apa akibatnya kalau satu tim mengubahnya sendiri?  '));
     const reply = await createTutorService(config, send)(request(chat));
-    expect(await reply.json()).toEqual({ reply: 'Karena kontrak janji dua pihak. Apa akibatnya kalau satu tim mengubahnya sendiri?' });
+    expect(await reply.json()).toMatchObject({ reply: 'Karena kontrak janji dua pihak. Apa akibatnya kalau satu tim mengubahnya sendiri?', sig: expect.any(String) });
     const [url, init] = send.mock.calls[0];
     const sent = JSON.parse(String(init?.body));
     expect(url).toBe('https://api.1inference.com/v1/chat/completions');
@@ -40,18 +40,40 @@ describe('Pro tutor chat', () => {
     expect(send).not.toHaveBeenCalled();
   });
 
-  it('limits each learner per minute and reports a missing key or a failing gateway as unavailable', async () => {
+  it('limits each learner per minute and per hour and reports a missing key or a failing gateway as unavailable', async () => {
     let t = 0;
+    let n = 0;
     const send = vi.fn<typeof fetch>().mockImplementation(async () => answer('Oke.'));
     const serve = createTutorService(config, send, () => t);
-    for (let i = 0; i < 8; i++) expect((await serve(request(chat), 'learner-a')).status).toBe(200);
-    expect((await serve(request(chat), 'learner-a')).status).toBe(429);
-    expect((await serve(request(chat), 'learner-b')).status).toBe(200);
-    t = 61_000;
-    expect((await serve(request(chat), 'learner-a')).status).toBe(200);
+    const ask = (learner: string) => serve(request({ ...chat, messages: [{ role: 'user', content: 'Pertanyaan ' + n++ }] }), learner);
+    for (let i = 0; i < 12; i++) expect((await ask('learner-a')).status).toBe(200);
+    expect((await ask('learner-a')).status).toBe(429);
+    expect((await ask('learner-b')).status).toBe(200);
+    // 12 more a minute later, then the hourly cap of 60 holds even in a fresh minute.
+    for (const minute of [1, 2, 3, 4]) {
+      t = minute * 61_000;
+      for (let i = 0; i < 12; i++) expect((await ask('learner-a')).status).toBe(200);
+    }
+    t = 5 * 61_000;
+    expect((await ask('learner-a')).status).toBe(429);
+    t = 3_700_000;
+    expect((await ask('learner-a')).status).toBe(200);
 
     expect((await createTutorService(() => ({}), send)(request(chat))).status).toBe(503);
     const failing = vi.fn<typeof fetch>().mockResolvedValue(new Response('', { status: 500 }));
     expect(await (await createTutorService(config, failing)(request(chat))).json()).toEqual({ error: 'unavailable' });
+  });
+
+  it('reuses the answer to a repeated first question on the same card, and caps output tokens and history', async () => {
+    const send = vi.fn<typeof fetch>().mockResolvedValue(answer('Jawaban.'));
+    const serve = createTutorService(config, send);
+    expect(await (await serve(request(chat), 'a')).json()).toMatchObject({ reply: 'Jawaban.' });
+    expect(await (await serve(request(chat), 'b')).json()).toMatchObject({ reply: 'Jawaban.' });
+    expect(send).toHaveBeenCalledTimes(1);
+    const long = Array.from({ length: 15 }, (_, i) => ({ role: i % 2 ? 'assistant' : 'user', content: 'Pesan ' + i }));
+    await serve(request({ ...chat, messages: long }), 'c');
+    const sent = JSON.parse(String(send.mock.calls[1][1]?.body));
+    expect(sent.max_tokens).toBe(700);
+    expect(sent.messages).toHaveLength(7);
   });
 });
