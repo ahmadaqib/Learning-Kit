@@ -58,7 +58,8 @@ export const plainText = (text: string) => text
  * so they are capped at 3 (Hick's law) and kept short; anything malformed is dropped, never shown.
  */
 export function splitOptions(text: string): { reply: string; options: string[] } {
-  const match = text.match(/\n*\s*PILIHAN\s*:\s*(.+?)\s*$/i);
+  // The model sometimes writes the label with nothing after it; the line is removed either way.
+  const match = text.match(/\n*[ \t]*PILIHAN[ \t]*:[ \t]*(.*?)\s*$/i);
   if (!match || match.index === undefined) return { reply: text, options: [] };
   const options = [...new Set(match[1].split('|').map((o) => clean(plainText(o)).replace(/^["'“”]+|["'“”.]+$/g, '').trim()))]
     .filter((o) => o.length > 0 && o.length <= 60)

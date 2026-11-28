@@ -4,7 +4,7 @@ import { CHAT_SYSTEM_PROMPT } from './chatSystemPrompt.js';
 import { SAFE_REPLY, leaks, noLongDashes, signReply, splitOptions, trustedHistory } from './aiGuard.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
-export const CHAT_DEFAULT_MODEL = 'deepseek-v3.2';
+export const CHAT_DEFAULT_MODEL = 'deepseek-v4.1-flash';
 export const CHAT_MAX_BYTES = 40_000;
 
 const lessonId = z.string().regex(/^[ab]\d\d-[a-z0-9-]{1,12}$/);

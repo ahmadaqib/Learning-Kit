@@ -64,7 +64,7 @@ Pada proyek Vercel, buka **Settings → Environment Variables**. Tetapkan variab
 | `ONEINFERENCE_API_KEY` | Kunci 1Inference (`sk_...`). Gunakan tipe Sensitive di Vercel. |
 | `ONEINFERENCE_MODELS` | ID model utama lalu cadangan, dipisahkan koma dalam urutan percobaan. Maksimal empat. |
 | `ONEINFERENCE_TUTOR_MODEL` | Opsional. Model untuk chat Tutor AI di Mode Pro (`/api/tutor`). Bawaan: `deepseek-v4.1-flash`. |
-| `ONEINFERENCE_CHAT_MODEL` | Opsional. Model untuk menu Tanya di Mode Pro (`/api/chat`). Bawaan: `deepseek-v3.2`. |
+| `ONEINFERENCE_CHAT_MODEL` | Opsional. Model untuk menu Tanya di Mode Pro (`/api/chat`). Bawaan: `deepseek-v4.1-flash`. |
 
 Perubahan environment Vercel berlaku pada deployment berikutnya. Proyek memakai fungsi Node untuk rute API dan pengalihan ke halaman utama untuk rute aplikasi. [Environment variables Vercel](https://vercel.com/docs/environment-variables) · [Dokumentasi 1Inference](https://1inference.com/docs)
 
