@@ -16,7 +16,7 @@ describe('Pro tutor chat', () => {
     expect(await reply.json()).toEqual({ reply: 'Karena kontrak janji dua pihak. Apa akibatnya kalau satu tim mengubahnya sendiri?' });
     const [url, init] = send.mock.calls[0];
     const sent = JSON.parse(String(init?.body));
-    expect(url).toBe('https://tokenportal.id/v1/chat/completions');
+    expect(url).toBe('https://api.1inference.com/v1/chat/completions');
     expect(sent.model).toBe(TUTOR_DEFAULT_MODEL);
     expect(sent.messages[0].role).toBe('system');
     expect(sent.messages[0].content).toContain('Dua tim, satu kontrak');

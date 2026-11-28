@@ -53,19 +53,19 @@ Ilustrasi Piko (tarsius dengan buku) berasal dari OpenArt. Mobi (kucing dengan p
 
 ### Petunjuk AI Pro di Vercel
 
-Peserta Junior dan Pro mendapat saran langsung dari kartu materi yang sedang dibaca. Di mode Pro, tombol **Petunjuk AI** juga dapat meminta TokenPortal memilih strategi dari tiga pilihan. Server hanya mengirim judul pelajaran, jenis kartu, gaya pet dan kategori bantuan. Jika panggilan gagal, server menyajikan strategi yang sebelumnya dipilih TokenPortal untuk pelajaran dan jenis kartu itu. Panel menandai pilihan tersimpan. Kuis menggunakan petunjuk yang disiapkan penulis soal.
+Peserta Junior dan Pro mendapat saran langsung dari kartu materi yang sedang dibaca. Di mode Pro, tombol **Petunjuk AI** juga dapat meminta 1Inference memilih strategi dari tiga pilihan. Server hanya mengirim judul pelajaran, jenis kartu, gaya pet dan kategori bantuan. Jika panggilan gagal, server menyajikan strategi yang sebelumnya dipilih model AI untuk pelajaran dan jenis kartu itu. Panel menandai pilihan tersimpan. Kuis menggunakan petunjuk yang disiapkan penulis soal.
 
-Katalog tersimpan dapat diperbarui dengan `node --env-file=.env.local --import tsx scripts/prepare-pet-strategies.ts` dari akar proyek. Proses editorial ini mengirim judul kurikulum publik. Hasil baru ditulis setelah semua pilihan tervalidasi. Deployment memakai katalog yang sudah masuk git. Respons API menyebut sumber strategi melalui `source`. Nilai `live` menandai hasil permintaan peserta, termasuk pemakaian ulang untuk konteks yang sama. Nilai `prepared` menandai katalog editorial. Jika gateway menampilkan tantangan Cloudflare, log server mencatat Ray ID bila tersedia agar operator dapat menanyakannya kepada TokenPortal.
+Katalog tersimpan dapat diperbarui dengan `node --env-file=.env.local --import tsx scripts/prepare-pet-strategies.ts` dari akar proyek. Proses editorial ini mengirim judul kurikulum publik. Hasil baru ditulis setelah semua pilihan tervalidasi. Deployment memakai katalog yang sudah masuk git. Respons API menyebut sumber strategi melalui `source`. Nilai `live` menandai hasil permintaan peserta, termasuk pemakaian ulang untuk konteks yang sama. Nilai `prepared` menandai katalog editorial. Jika gateway menampilkan tantangan Cloudflare, log server mencatat Ray ID bila tersedia agar operator dapat menanyakannya kepada penyedia gateway.
 
 Pada proyek Vercel, buka **Settings → Environment Variables**. Tetapkan variabel server ini pada environment yang dituju. Jangan beri awalan `VITE_`, karena awalan itu membuat nilainya ikut terkirim ke browser. Pada mesin pengembangan, Vite dan Vite Preview membaca nama yang sama dari `.env.local`.
 
 | Variabel server | Nilai |
 | --- | --- |
-| `TOKENPORTAL_API_KEY` | Kunci TokenPortal. Gunakan tipe Sensitive di Vercel. |
-| `TOKENPORTAL_MODELS` | ID model utama lalu cadangan, dipisahkan koma dalam urutan percobaan. Maksimal empat. |
-| `TOKENPORTAL_TUTOR_MODEL` | Opsional. Model untuk chat Tutor AI di Mode Pro (`/api/tutor`). Bawaan: `deepseek-v4.1-flash-fast`. |
+| `ONEINFERENCE_API_KEY` | Kunci 1Inference (`sk_...`). Gunakan tipe Sensitive di Vercel. |
+| `ONEINFERENCE_MODELS` | ID model utama lalu cadangan, dipisahkan koma dalam urutan percobaan. Maksimal empat. |
+| `ONEINFERENCE_TUTOR_MODEL` | Opsional. Model untuk chat Tutor AI di Mode Pro (`/api/tutor`). Bawaan: `deepseek-v4.1-flash`. |
 
-Perubahan environment Vercel berlaku pada deployment berikutnya. Proyek memakai fungsi Node untuk rute API dan pengalihan ke halaman utama untuk rute aplikasi. [Environment variables Vercel](https://vercel.com/docs/environment-variables) · [Panduan TokenPortal](https://tokenportal.id/docs)
+Perubahan environment Vercel berlaku pada deployment berikutnya. Proyek memakai fungsi Node untuk rute API dan pengalihan ke halaman utama untuk rute aplikasi. [Environment variables Vercel](https://vercel.com/docs/environment-variables) · [Dokumentasi 1Inference](https://1inference.com/docs)
 
 ### Skrip Pengembangan & Verifikasi
 

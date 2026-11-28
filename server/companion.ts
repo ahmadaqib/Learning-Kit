@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AI_CHAT_URL } from './aiProvider.js';
 import { preparedPetStrategies } from './preparedPetStrategies.js';
 import { PET_SYSTEM_PROMPT } from './petSystemPrompt.js';
 import { PET_HINT_CUES, PET_AI_STEP_KINDS, PET_PERSONALITIES, type PetAiTipId, type PetHintRequest } from '../src/content/petContract.js';
@@ -29,7 +30,7 @@ async function selectTip(input: PetHintRequest, key: string, models: string[], s
   const lesson = lessons.get(input.topicId)!;
   for (const model of models) {
     try {
-      const response = await send('https://tokenportal.id/v1/chat/completions', {
+      const response = await send(AI_CHAT_URL, {
         method: 'POST', redirect: 'error', signal: AbortSignal.timeout(5200),
         headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
         body: JSON.stringify({
