@@ -96,6 +96,8 @@ describe('answer buttons', () => {
     expect(splitOptions('Mana yang dibaca browser?\nPILIHAN: HTML | **CSS** | "JavaScript" | Python'))
       .toEqual({ reply: 'Mana yang dibaca browser?', options: ['HTML', 'CSS', 'JavaScript'] });
     expect(splitOptions('Jelaskan dengan kata-katamu.')).toEqual({ reply: 'Jelaskan dengan kata-katamu.', options: [] });
+    expect(splitOptions('Bagian mana yang diperbaiki?\n\nPILIHAN:')).toEqual({ reply: 'Bagian mana yang diperbaiki?', options: [] });
+    expect(splitOptions('Pilih satu.\nPILIHAN:   \n')).toEqual({ reply: 'Pilih satu.', options: [] });
     expect(splitOptions('Siap?\nPILIHAN: ' + 'x'.repeat(80) + ' | Siap').options).toEqual(['Siap']);
     const send = vi.fn<typeof fetch>().mockResolvedValue(answer('Backend atau frontend?\nPILIHAN: Backend | Frontend'));
     const body = await (await createChatService(config, send)(request(ask('Uji aku')))).json();
