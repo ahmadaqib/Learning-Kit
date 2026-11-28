@@ -47,3 +47,8 @@ export function leaks(reply: string, systemPrompt: string, modelIds: string[]): 
   for (let i = 0; i + 8 <= out.length; i++) if (grams.has(out.slice(i, i + 8).join(' '))) return true;
   return false;
 }
+
+/** The UI shows plain text; some models add Markdown despite the prompt, so emphasis and heading marks are removed. */
+export const plainText = (text: string) => text
+  .replace(/\*\*(.+?)\*\*/g, '$1')
+  .replace(/^#{1,6}\s+/gm, '');

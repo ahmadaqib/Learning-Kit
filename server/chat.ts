@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AI_CHAT_URL } from './aiProvider.js';
 import { CHAT_SYSTEM_PROMPT } from './chatSystemPrompt.js';
-import { SAFE_REPLY, leaks, signReply, trustedHistory } from './aiGuard.js';
+import { SAFE_REPLY, leaks, plainText, signReply, trustedHistory } from './aiGuard.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
 export const CHAT_DEFAULT_MODEL = 'deepseek-v3.2';
@@ -127,7 +127,7 @@ export function createChatService(getConfig: () => ChatConfig, send: typeof fetc
         console.warn('chat.provider_unusable_response');
         return json(503, { error: 'unavailable' });
       }
-      let reply = raw.trim().slice(0, 4000);
+      let reply = plainText(raw.trim()).slice(0, 4000);
       if (leaks(reply, CHAT_SYSTEM_PROMPT, [usedModel])) {
         console.warn('chat.blocked_leak');
         reply = SAFE_REPLY;
