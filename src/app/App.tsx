@@ -20,6 +20,7 @@ const StickerBookPage = lazy(() => import('@/pages/StickerBookPage').then((m) =>
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const GlossaryPage = lazy(() => import('@/pages/GlossaryPage').then((m) => ({ default: m.GlossaryPage })));
+const ChatPage = lazy(() => import('@/pages/ChatPage').then((m) => ({ default: m.ChatPage })));
 const LessonPlayerPage = lazy(() =>
   import('@/pages/LessonPlayerPage').then((m) => ({ default: m.LessonPlayerPage })),
 );
@@ -194,6 +195,14 @@ export const App: React.FC = () => {
             element={
               <RequireProfile>
                 <AppShell><SettingsPage /></AppShell>
+              </RequireProfile>
+            }
+          />
+          <Route
+            path="/tanya"
+            element={
+              <RequireProfile>
+                <AppShell><ChatPage /></AppShell>
               </RequireProfile>
             }
           />
