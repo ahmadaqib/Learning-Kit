@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { AI_CHAT_URL } from './aiProvider.js';
 import { TUTOR_SYSTEM_PROMPT } from './tutorSystemPrompt.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
-export const TUTOR_DEFAULT_MODEL = 'deepseek-v4.1-flash-fast';
+export const TUTOR_DEFAULT_MODEL = 'deepseek-v4.1-flash';
 export const TUTOR_MAX_BYTES = 24_000;
 
 const messageSchema = z.object({ role: z.enum(['user', 'assistant']), content: z.string().trim().min(1).max(1200) }).strict();
@@ -68,7 +69,7 @@ export function createTutorService(getConfig: () => TutorConfig, send: typeof fe
     const context = `Pelajaran: ${lesson.title}\nIsi kartu yang sedang dibaca:\n"""\n${parsed.data.card}\n"""`;
     inFlight++;
     try {
-      const response = await send('https://tokenportal.id/v1/chat/completions', {
+      const response = await send(AI_CHAT_URL, {
         method: 'POST', redirect: 'error', signal: AbortSignal.timeout(25_000),
         headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
