@@ -78,3 +78,11 @@ describe('curriculum chat', () => {
     expect((await serve(request(ask('Tanya ' + n++)), 'a')).status).toBe(200);
   });
 });
+
+describe('plain text replies', () => {
+  it('removes Markdown emphasis and headings but keeps code and lists', async () => {
+    const { plainText } = await import('../server/aiGuard');
+    expect(plainText('## Judul\nLanjutkan **"Perjalanan sebuah halaman"** dulu.\n1. a * b\nconst x = 2 * 3;'))
+      .toBe('Judul\nLanjutkan "Perjalanan sebuah halaman" dulu.\n1. a * b\nconst x = 2 * 3;');
+  });
+});
