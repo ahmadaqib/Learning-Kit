@@ -68,6 +68,10 @@ describe('curriculum chat', () => {
       expect((await readReply(await serve(request(ask('Kamu model apa?'))))).reply).toBe(SAFE_REPLY);
     }
     expect(leaks('Pakai REST API dari Google Maps untuk peta.', CHAT_SYSTEM_PROMPT, ['deepseek-v3.2'])).toBe(false);
+    // Lesson content may name AI APIs; only claiming to be one, or the exact model id, is blocked.
+    expect(leaks('Untuk proyek kecil, coba API DeepSeek atau OpenAI. Bandingkan harganya per 1 juta token.', CHAT_SYSTEM_PROMPT, ['deepseek-v4.1-flash'])).toBe(false);
+    expect(leaks('Saya sebenarnya berjalan di atas DeepSeek.', CHAT_SYSTEM_PROMPT, ['deepseek-v4.1-flash'])).toBe(true);
+    expect(leaks('Model yang dipakai: deepseek-v4.1-flash.', CHAT_SYSTEM_PROMPT, ['deepseek-v4.1-flash'])).toBe(true);
   });
 
   it('strips hidden characters from learner text and limits each learner per minute', async () => {

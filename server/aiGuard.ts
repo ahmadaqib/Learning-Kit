@@ -34,10 +34,13 @@ export const SAFE_REPLY = 'Aku Tutor Petualang Web. Aku tidak membahas cara kerj
 
 const words = (text: string) => text.toLowerCase().normalize('NFKC').split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 
-/** True when a reply repeats 8+ consecutive words of the system prompt or names the model behind the chat. */
+/** True when a reply repeats 8+ consecutive words of the system prompt, or names the model as itself or its maker. */
 export function leaks(reply: string, systemPrompt: string, modelIds: string[]): boolean {
   const lower = reply.toLowerCase();
-  if (/deepseek|1inference|tokenportal/.test(lower) || modelIds.some((id) => id && lower.includes(id.toLowerCase()))) return true;
+  // The exact model id and the gateway never belong in a lesson answer.
+  if (/1inference|tokenportal/.test(lower) || modelIds.some((id) => id && lower.includes(id.toLowerCase()))) return true;
+  // Naming a model is fine as lesson content ("coba API DeepSeek atau OpenAI"); claiming to be one is not.
+  if (/\b(aku|saya|tutor ini|model ini|ai ini|kamu sedang (?:berbicara|bicara|chat) dengan)\b[^.\n]{0,40}\b(deepseek|gpt|chatgpt|gemini|claude|llama|qwen|mistral|grok|kimi|glm)/.test(lower)) return true;
   // Models sometimes name their maker ("model bahasa yang dibuat oleh ..."), which reveals the vendor.
   if (/(model bahasa|language model|dibuat oleh|dikembangkan oleh|dilatih oleh|trained by|developed by|built by)\W+(\w+\W+){0,4}(openai|google|anthropic|meta|mistral|alibaba|qwen|deepseek)/.test(lower)) return true;
   const prompt = words(systemPrompt);
@@ -79,4 +82,33 @@ export function noLongDashes(text: string): string {
       .replace(/\s+–\s+/g, ', ')
       .replace(/,\s*([.,;:!?])/g, '$1')))
     .join('');
+}
+
+/**
+ * Per-learner and per-instance request limits for one endpoint. `take` claims a slot or returns false;
+ * the caller must call `release` when the request finishes.
+ * shortcut: counts live in one warm instance, not across instances; the WAF rule caps each IP globally.
+ */
+export function createLimiter(limits: { perMinute: number; perHour: number; perInstanceMinute: number; inFlight: number }) {
+  const perClient = new Map<string, number[]>();
+  let recent: number[] = [];
+  let inFlight = 0;
+  return {
+    take(clientId: string, t: number): boolean {
+      recent = recent.filter((at) => t - at < 60_000);
+      const mine = (perClient.get(clientId) ?? []).filter((at) => t - at < 3_600_000);
+      const lastMinute = mine.filter((at) => t - at < 60_000).length;
+      if (lastMinute >= limits.perMinute || mine.length >= limits.perHour
+        || recent.length >= limits.perInstanceMinute || inFlight >= limits.inFlight) return false;
+      mine.push(t);
+      perClient.set(clientId, mine);
+      recent.push(t);
+      if (perClient.size > 2000) perClient.delete(perClient.keys().next().value!);
+      inFlight++;
+      return true;
+    },
+    release() {
+      inFlight = Math.max(0, inFlight - 1);
+    },
+  };
 }

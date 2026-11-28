@@ -37,7 +37,10 @@ export function nodeHandler(serve: Serve, path: string, maxBytes: number, method
         if (typeof value === 'string') headers.set(header, value);
       }
       const forwarded = req.headers['x-forwarded-for'];
-      const clientId = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : '') || req.socket.remoteAddress || 'unknown';
+      const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : '') || req.socket.remoteAddress || 'unknown';
+      // Learners behind one school IP get separate limits per browser; the WAF rule still caps the IP.
+      const device = req.headers['x-pw-device'];
+      const clientId = typeof device === 'string' && /^[a-z0-9-]{16,64}$/.test(device) ? ip + '|' + device : ip;
       const scheme = req.headers['x-forwarded-proto'] === 'https' || ('encrypted' in req.socket && req.socket.encrypted) ? 'https' : 'http';
       const url = new URL(path, scheme + '://' + req.headers.host);
       if (method === 'GET') url.search = new URL(req.url ?? '', 'http://local').search;

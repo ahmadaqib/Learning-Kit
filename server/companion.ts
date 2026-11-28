@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { AI_CHAT_URL } from './aiProvider.js';
 import { preparedPetStrategies } from './preparedPetStrategies.js';
 import { PET_SYSTEM_PROMPT } from './petSystemPrompt.js';
-import { PET_HINT_CUES, PET_AI_STEP_KINDS, PET_PERSONALITIES, type PetAiTipId, type PetHintRequest } from '../src/content/petContract.js';
+import { PET_HINT_CUES, PET_AI_STEP_KINDS, PET_PERSONALITIES, petHintQuery, type PetAiTipId, type PetHintRequest } from '../src/content/petContract.js';
 import { WORLD_METAS } from '../src/content/worldMeta.js';
 
 const requestSchema = z.object({
@@ -81,7 +81,10 @@ async function readInput(request: Request): Promise<unknown | Response> {
   const url = new URL(request.url);
   if (request.method === 'GET') {
     if (url.search.length > 512) return json(413, { error: 'size' });
-    return Object.fromEntries(url.searchParams);
+    const input = Object.fromEntries(url.searchParams);
+    // Only the canonical order is accepted, so each context has exactly one cache entry (and one paid call).
+    if (url.search.slice(1) !== petHintQuery(input)) return json(400, { error: 'context' });
+    return input;
   }
   if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return json(415, { error: 'format' });
   const text = await request.text();

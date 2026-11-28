@@ -22,6 +22,21 @@ export interface PetHintRequest {
   cue?: PetHintCue;
 }
 
+/**
+ * The one query order for a pet hint. The CDN caches by exact URL, so the server accepts only this order;
+ * otherwise reordered parameters would each be a new cache entry and a new paid AI call.
+ */
+const PET_HINT_QUERY_KEYS = ['worldId', 'topicId', 'stepKind', 'personality', 'intent', 'cue'] as const;
+
+export function petHintQuery(request: Record<string, unknown>): string {
+  const query = new URLSearchParams();
+  for (const key of PET_HINT_QUERY_KEYS) {
+    const value = request[key];
+    if (typeof value === 'string') query.append(key, value);
+  }
+  return query.toString();
+}
+
 export interface PetHintResponse {
   tipId: PetAiTipId;
   source: 'live' | 'prepared';
