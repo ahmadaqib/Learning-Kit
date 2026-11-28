@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { BookOpen, CheckCircle2, Search } from 'lucide-react';
+import { BookOpen, CheckCircle2, Lock, Search } from 'lucide-react';
+import { LESSON_STUBS, WORLD_STUBS } from '@/components/map/MapPath';
+import { isLessonUnlocked } from '@/engine/unlock';
 import { Link } from 'react-router-dom';
 import { GLOSSARY_TERMS, GLOSSARY_TOPICS } from '@/content/glossary';
 import { WORLD_META_BY_ID } from '@/content/worldMeta';
@@ -36,6 +38,15 @@ export const GlossaryPage: React.FC = () => {
   }, [profile]);
 
   if (!profile) return null;
+
+  // Mirrors the lesson route guard: a lesson outside this mode gets no link, and Junior follows the map.
+  const lessonLink = (lessonId: string): 'open' | 'locked' | 'none' => {
+    const meta = LESSON_STUBS[lessonId];
+    if (meta && !meta.modes.includes(profile.mode)) return 'none';
+    if (profile.mode !== 'junior' || profile.lessons[lessonId]?.completedAt) return 'open';
+    const world = meta && WORLD_STUBS.find((w) => w.id === meta.worldId);
+    return world && isLessonUnlocked(lessonId, world, LESSON_STUBS, profile, WORLD_STUBS) ? 'open' : 'locked';
+  };
 
   const visibleTerms = GLOSSARY_TERMS.filter((term) => {
     const isLearned = learnedLessonIds.has(term.introducedIn);
@@ -163,6 +174,7 @@ export const GlossaryPage: React.FC = () => {
             const worldId = item.introducedIn.split('-')[0];
             const worldMeta = WORLD_META_BY_ID[worldId];
             const learned = learnedLessonIds.has(item.introducedIn);
+            const link = lessonLink(item.introducedIn);
             return (
               <article key={item.id} className="pw-card space-y-2 p-[var(--space-card)]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -189,12 +201,19 @@ export const GlossaryPage: React.FC = () => {
                 <p className="pw-body text-[var(--ink-2)]">
                   {resolveTxt(item.shortDef, profile.mode)}
                 </p>
-                <Link
-                  to={`/belajar/${item.introducedIn}`}
-                  className="pw-pressable inline-flex min-h-[var(--touch-min)] items-center gap-1 pt-1 text-xs font-extrabold text-[var(--world-700)] underline underline-offset-4"
-                >
-                  Buka pelajaran terkait →
-                </Link>
+                {link === 'none' ? null : link === 'locked' ? (
+                  <p className="inline-flex min-h-[var(--touch-min)] items-center gap-1 pt-1 text-xs font-extrabold text-[var(--ink-3)]">
+                    <Lock className="h-3 w-3" aria-hidden="true" />
+                    Pelajarannya terbuka nanti di petamu
+                  </p>
+                ) : (
+                  <Link
+                    to={`/belajar/${item.introducedIn}`}
+                    className="pw-pressable inline-flex min-h-[var(--touch-min)] items-center gap-1 pt-1 text-xs font-extrabold text-[var(--world-700)] underline underline-offset-4"
+                  >
+                    Buka pelajaran terkait →
+                  </Link>
+                )}
               </article>
             );
           })}
