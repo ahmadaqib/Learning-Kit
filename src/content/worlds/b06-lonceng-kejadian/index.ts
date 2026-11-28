@@ -838,7 +838,7 @@ export const lessons: Lesson[] = [
           { id: 'r4', label: t('Periksa signature HMAC') },
         ],
         answer: { l1: 'r1', l2: 'r2', l3: 'r3', l4: 'r4' },
-        explainCorrect: t('Empat penangkal ini saling melengkapi. Misalnya, ID tersimpan mencegah kejadian yang sama diproses dua kali.'),
+        explainCorrect: t('ID kejadian mencegah proses ganda, dan balasan 200 cepat mencegah pengiriman ulang. Cek API sumber memulihkan urutan, dan signature menolak request palsu.'),
         hints: [t('Mulai dari pasangan yang paling jelas dulu.'), undefined],
         tags: ['signature-webhook', 'idempotent', 'https'],
       }),

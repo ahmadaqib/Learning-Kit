@@ -241,7 +241,7 @@ export const world: World = {
         ],
         answer: 'ok',
         explainCorrect: t(
-          'REST adalah gaya rancangan, HTTP protokol pengiriman, dan JSON format datanya. Membedakan ketiganya membantu membaca dokumentasi API.',
+          'REST adalah gaya rancangan, HTTP protokol pengiriman, dan JSON format datanya.',
         ),
         tags: ['rest', 'json'],
       }),
@@ -337,7 +337,7 @@ export const world: World = {
         id: 'b04-anc-p6',
         type: 'limit',
         analogy: t('REST seperti restoran paket tetap dan GraphQL seperti pelayan pribadi sesuai daftar'),
-        prompt: t('Apa kelebihan REST yang justru menjadi kerumitan baru di GraphQL?'),
+        prompt: t('Kelebihan REST apa yang menjadi sulit di GraphQL?'),
         choices: [
           { id: 'cache', label: t('Caching HTTP lebih mudah di URL GET milik REST') },
           {
@@ -608,7 +608,7 @@ export const lessons: Lesson[] = [
             'Rani membangun aplikasi belanja dengan katalog barang, chat pembeli dan penjual, dan kabar otomatis saat pembayaran lunas.',
           ),
           prompt: t(
-            'Urut dari daftar barang, chat, lalu kabar lunas. Jalur mana yang cocok?',
+            'Jalur mana untuk daftar barang, chat, dan kabar lunas, berurutan?',
             'Kombinasi keluarga API mana yang paling tepat untuk aplikasi Rani?',
           ),
           difficulty: 3,
@@ -698,7 +698,7 @@ export const lessons: Lesson[] = [
         answer: true,
         explainCorrect: t(
           'Tiap jalur punya tugas yang paling cocok. Radio bagus untuk kabar, restoran untuk bertanya.',
-          'Pilihan bergantung pada arah dan waktu komunikasi fitur itu. Cocokkan kebutuhan dengan jenis API yang tepat.',
+          'Pilihan bergantung pada arah dan waktu komunikasi fitur itu. Katalog cocok dengan REST, chat dengan WebSocket.',
         ),
         explainWrong: t(
           'Tiap jalur punya kelebihan dan batas. Tidak ada yang cocok untuk semua tugas.',
@@ -1040,7 +1040,7 @@ export const lessons: Lesson[] = [
           ],
           answer: 'act',
           explainCorrect: t(
-            'REST adalah pedoman agar konsisten, bukan penjara kaku. Proses bisnis yang lebih cocok sebagai aksi boleh memakai alamat aksi.',
+            'REST adalah pedoman agar konsisten. Proses bisnis yang lebih cocok sebagai aksi boleh memakai alamat aksi.',
           ),
           hints: [t('Pikirkan proses yang sulit dijadikan satu benda.')],
           tags: ['rest', 'endpoint'],
@@ -1428,7 +1428,7 @@ export const lessons: Lesson[] = [
           },
         ],
         answer: 'lnk',
-        explainCorrect: t('Seperti kolom links yang berisi alamat halaman berikutnya pada response pagination.'),
+        explainCorrect: t('HATEOAS berarti response menyertakan tautan ke langkah berikutnya, seperti kolom links berisi alamat halaman berikutnya.'),
         tags: ['rest', 'pagination'],
       }),
     ],
@@ -1489,7 +1489,7 @@ export const lessons: Lesson[] = [
               id: 'under',
               label: t('Data datang terlambat', 'Latensi tinggi karena jaringan lambat'),
               explainWrong: t(
-                'Cepat atau lambat tidak ditanyakan. Masalahnya ada pada isi paket yang kebanyakan.',
+                'Datanya tidak terlambat. Masalahnya ada pada isi paket yang kebanyakan.',
                 'Kecepatan jaringan tidak disebut di cerita. Masalahnya ada pada kolom berlebih yang ikut terkirim.',
               ),
             },

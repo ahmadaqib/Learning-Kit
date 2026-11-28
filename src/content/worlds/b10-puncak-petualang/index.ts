@@ -195,7 +195,7 @@ export const world: World = {
           },
         ],
         answer: 'gql',
-        explainCorrect: t('GraphQL memungkinkan tiap tampilan meminta tepat kolom yang dibutuhkan dalam satu query.'),
+        explainCorrect: t('Di GraphQL, tiap tampilan bisa meminta tepat kolom yang dibutuhkan dalam satu query.'),
         tags: ['graphql'],
       }),
       makeAnchorMcq({
@@ -810,7 +810,7 @@ export const lessons: Lesson[] = [
         id: 'b10-l01-r3',
         prompt: t(
           'Server tetap harus memeriksa sandi dan izin, walau aplikasi sudah memeriksa.',
-          'Jangan percaya client: validasi, login, dan izin tetap ditegakkan di server.',
+          'Jangan percaya client: validasi, login, dan izin tetap diperiksa di server.',
         ),
         answer: true,
         explainCorrect: t(

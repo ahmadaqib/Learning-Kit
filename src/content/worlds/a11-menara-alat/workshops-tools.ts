@@ -272,7 +272,7 @@ export const browserDevTools = makeLesson({
         { id: 'latency', label: t('Ukur durasi animasi saat tombol ditekan'), explainWrong: t('Kode status tetap menunjukkan tujuan yang tidak ditemukan. Periksa alamat dan nomor produknya dahulu.') },
       ],
       answer: 'address',
-      explainCorrect: t('Satu alamat berhasil dan yang lain gagal. Periksa pembentukan alamat serta apakah nomor produk itu ada.'),
+      explainCorrect: t('Satu alamat berhasil dan yang lain gagal. Periksa cara alamat dibuat dan apakah produk bernomor itu ada.'),
       hints: [t('Cari perbedaan yang langsung terlihat pada kedua panggilan.')],
       tags: ['deploy'],
     })),

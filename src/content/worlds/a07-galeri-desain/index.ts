@@ -246,7 +246,7 @@ export const world: World = {
       }),
       makeAnchorMcq({
         id: 'a07-anc-p5',
-        prompt: t('Tombol "Beranda" di ujung kiri dan "Profil" di ujung kanan bilah bawah memanfaatkan efek apa?'),
+        prompt: t('Tombol "Beranda" di ujung kiri dan "Profil" di ujung kanan bilah bawah memakai efek apa?'),
         choices: [
           { id: 'sp', label: t('Serial Position Effect') },
           {
@@ -849,7 +849,7 @@ export const lessons: Lesson[] = [
           '.kotak-input { padding: 10px; }',
         ],
         answer: [2],
-        explainCorrect: t('Baris 2 memberi margin-bottom 32 px antara label dan kotaknya, jauh di atas jarak antargrup 12 px.'),
+        explainCorrect: t('Baris 2 memberi margin-bottom 32 px antara label dan kotaknya, jauh di atas jarak antarkelompok 12 px.'),
         hints: [t('Cari angka margin yang paling besar.'), undefined],
         tags: ['alignment', 'margin'],
       }),
@@ -1179,8 +1179,8 @@ export const lessons: Lesson[] = [
               id: 'alt',
               label: t('Tulisan terlalu panjang', 'Teks alt pada gambar'),
               explainWrong: t(
-                'Tulisan tidak jadi masalah. Tombol Simpan yang berganti-ganti gaya.',
-                'Masalahnya adalah ketidakkonsistenan visual antartombol utama.',
+                'Tulisan tidak jadi masalah. Gaya tombol Simpan yang berubah-ubah itulah masalahnya.',
+                'Teks alt tidak disebut di cerita. Masalahnya ada pada gaya tombol utama yang berganti-ganti.',
               ),
             },
           ],
@@ -1520,7 +1520,7 @@ export const lessons: Lesson[] = [
             'Di toko kue Sari, harga kue A dekat foto kue B. Orang jadi salah paham.',
             'Di toko kue Sari, foto dan harga kue berderet tanpa bingkai, dan harga kue A lebih dekat ke foto B.',
           ),
-          prompt: t('Apa cara terbaik memperbaikinya?', 'Apa cara terbersih memperbaiki masalah pengelompokan pada daftar kue Sari?'),
+          prompt: t('Apa cara terbaik memperbaikinya?', 'Apa cara terbaik memperbaiki masalah pengelompokan pada daftar kue Sari?'),
           difficulty: 2,
           choices: [
             { id: 'card', label: t('Beri tiap kue satu kartu', 'Beri tiap kue satu kartu (Common Region)') },
@@ -2272,7 +2272,7 @@ export const lessons: Lesson[] = [
         id: 'a07-l06-q7',
         type: 'type',
         modes: ['pro'],
-        prompt: t('Berapa detik batas tanggapan agar terasa instan dalam Doherty Threshold? Tulis angkanya saja, misalnya 0,4.'),
+        prompt: t('Berapa detik batas tanggapan agar terasa instan dalam Doherty Threshold? Tulis angkanya saja, misalnya 2,5.'),
         difficulty: 2,
         accept: ['0.4', '0,4', '0.4 detik', '0,4 detik'],
         explainCorrect: t('Sekitar 0,4 detik (400 ms) menjadi patokan tanggapan yang terasa seketika.'),
@@ -2557,7 +2557,7 @@ export const lessons: Lesson[] = [
           type: 'limit',
           modes: ['pro'],
           analogy: t('Mengelompokkan nomor telepon agar mudah dihafal'),
-          prompt: t('Apa yang sebaiknya TIDAK disuruh dilakukan orang saat proses bayar?'),
+          prompt: t('Apa yang sebaiknya TIDAK diminta dari orang saat proses bayar?'),
           difficulty: 2,
           choices: [
             { id: 'mem', label: t('Menghafal kode barang dari halaman 1') },
@@ -2628,7 +2628,7 @@ export const lessons: Lesson[] = [
         template: 'Teknik memenggal informasi menjadi beberapa kelompok kecil agar mudah diingat disebut ___.',
         bank: ['chunking', 'hovering', 'debugging'],
         answer: ['chunking'],
-        explainCorrect: t("Chunking adalah inti Miller's Law di berbagai form dan tampilan data."),
+        explainCorrect: t("Chunking memecah deretan panjang menjadi potongan pendek. Itulah inti Miller's Law."),
         hints: [t('Cari istilah yang berarti memecah menjadi potongan.'), undefined],
         tags: ['miller-law'],
       }),
@@ -2730,9 +2730,9 @@ export const lessons: Lesson[] = [
           id: 'a07-l08-q5',
           type: 'scenario',
           story: t(
-            'Checkout toko online Nadia lancar. Setelah transaksi, hanya muncul "OK_200_DONE" di halaman putih, dan kartu gagal memunculkan "FATAL ERR #99".',
+            'Checkout toko online Nadia lancar. Setelah transaksi, hanya muncul "OK_200_DONE" di halaman putih, dan kalau kartu gagal yang muncul "FATAL ERR #99".',
           ),
-          prompt: t('Hukum UX mana yang paling dirugikan oleh penutup seperti ini?'),
+          prompt: t('Hukum UX mana yang paling menjelaskan kesan dari penutup seperti ini?'),
           difficulty: 2,
           choices: [
             { id: 'pe', label: t('Peak-End Rule: kesan akhir buruk') },
@@ -2890,17 +2890,17 @@ export const lessons: Lesson[] = [
     reviewCards: [
       makeMcq({
         id: 'a07-l08-r1',
-        prompt: t('Dalam Peak-End Rule, dua momen mana yang paling menentukan ingatan atas keseluruhan pengalaman?'),
+        prompt: t('Dalam Peak-End Rule, dua momen mana yang paling menentukan kesan seluruh pengalaman?'),
         choices: [
           { id: 'pe', label: t('Momen paling berkesan dan momen terakhir') },
           {
             id: 'mid',
             label: t('Rata-rata detik demi detik di bagian tengah'),
-            explainWrong: t('Orang tidak menilai pengalaman dengan rata-rata matematis, tetapi dari puncak dan akhirnya.'),
+            explainWrong: t('Orang menilai pengalaman dari puncak dan akhirnya. Mereka tidak menghitung rata-rata.'),
           },
         ],
         answer: 'pe',
-        explainCorrect: t('Puncak dan akhir adalah dua titik yang membentuk kesan akhir.'),
+        explainCorrect: t('Puncak dan akhir adalah dua momen yang paling diingat orang.'),
         tags: ['peak-end'],
       }),
       makeTf({
@@ -3053,7 +3053,7 @@ export const lessons: Lesson[] = [
             },
           ],
           answer: 'val',
-          explainCorrect: t('Longgar pada variasi format yang wajar, tetapi tetap ketat memvalidasi keamanan dan kerapian keluaran.'),
+          explainCorrect: t('Terima format yang wajar, seperti spasi atau tanda strip. Tetap periksa isinya agar aman dan rapi.'),
           hints: [t('Cari hal yang bukan sekadar variasi format.')],
           tags: ['ux'],
         }),

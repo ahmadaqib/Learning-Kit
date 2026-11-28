@@ -1018,7 +1018,7 @@ export const lessons: Lesson[] = [
           { id: 'min', label: t('24px'), explainWrong: t('24px adalah batas minimum WCAG, belum nyaman untuk ujung jari.') },
         ],
         answer: 'ok',
-        explainCorrect: t('Sekitar 44–48px memberi ruang sentuh yang aman dan nyaman.'),
+        explainCorrect: t('Sekitar 44–48px memberi ruang cukup untuk ujung jari.'),
         tags: ['responsif'],
       }),
       makeMcq({
