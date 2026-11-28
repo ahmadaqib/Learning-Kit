@@ -143,7 +143,7 @@ export const reactComponentState = makeLesson({
       choices: [
         { id: 'callback', label: t('Panggil fungsi dari induk untuk meminta perubahan') },
         { id: 'assign', label: t('Tulis langsung ke prop nama yang diterima'), explainWrong: t('Prop hanya dibaca oleh anak. Nilai baru perlu dikirim oleh induk.') },
-        { id: 'assignLocal', label: t('Ganti variabel lokal dan tunggu induk berubah'), explainWrong: t('Variabel lokal hanya ada di anak. Pembaruan di induk perlu dilaksanakan di induk.') },
+        { id: 'assignLocal', label: t('Ganti variabel lokal dan tunggu induk berubah'), explainWrong: t('Variabel lokal hanya ada di anak. Induk harus mengubah datanya sendiri.') },
       ],
       answer: 'callback',
       explainCorrect: t('Anak dapat memberi tahu induk lewat fungsi. Induk mengubah datanya, lalu mengirim prop baru saat tampilan diperbarui.'),
@@ -153,7 +153,7 @@ export const reactComponentState = makeLesson({
     qStep({
       id: 'b09-sq1-q6',
       type: 'spotbug',
-      prompt: t('Baris mana menjalankan pembaruan terlalu cepat, saat tampilan dibuat?'),
+      prompt: t('Baris mana yang menjalankan pembaruan terlalu cepat, saat tampilan dibuat?'),
       difficulty: 3,
       lines: [
         'const [jumlah, setJumlah] = useState(0);',
@@ -184,7 +184,7 @@ export const reactComponentState = makeLesson({
     }),
     makeMcq({
       id: 'b09-sq1-r2',
-      prompt: t('Jumlah barang berubah saat diklik. Bagian mana menjadwalkan pembaruan tampilan?'),
+      prompt: t('Jumlah barang berubah saat diklik. Bagian mana yang menjadwalkan pembaruan tampilan?'),
       choices: [
         { id: 'variable', label: t('Variabel lokal yang bertambah'), explainWrong: t('Mengubah variabel lokal tidak meminta React memperbarui tampilan. Gunakan fungsi pembaruan state.') },
         { id: 'setter', label: t('Fungsi setJumlah dari useState') },

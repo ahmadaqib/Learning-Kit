@@ -489,7 +489,7 @@ export const lessons: Lesson[] = [
           answer: true,
           explainCorrect: t(
             'Tulisan pendek pun bisa berisi tanda berbahaya. Periksa semua, seperti petugas bank memeriksa formulir.',
-            'Masukan dari luar bisa berisi kode berbahaya. Aturan ini menjadi dasar keamanan web.',
+            'Masukan dari luar bisa berisi kode berbahaya. Karena itu semua masukan harus diperiksa.',
           ),
           explainWrong: t(
             'Pendek tidak berarti aman. Petugas bank memeriksa setiap formulir.',
@@ -1156,7 +1156,7 @@ export const lessons: Lesson[] = [
       qStep({
         id: 'a12-l03-q3',
         type: 'spotbug',
-        prompt: t('Tautan mana yang perlu rel="noopener" untuk mendukung browser lama?'),
+        prompt: t('Ketuk baris tautan yang perlu rel="noopener" untuk browser lama.'),
         difficulty: 2,
         lines: [
           '<nav>',

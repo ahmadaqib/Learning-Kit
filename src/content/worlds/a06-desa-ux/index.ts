@@ -857,7 +857,7 @@ export const lessons: Lesson[] = [
           type: 'limit',
           analogy: t('Mirip dokter yang memeriksa pasien'),
           prompt: t(
-            'Dokter harus berhati-hati dengan obat. Mana yang hanya aman bagi pembuat aplikasi?',
+            'Dokter harus berhati-hati dengan obat. Apa yang boleh dicoba berkali-kali pembuat aplikasi, tetapi tidak oleh dokter?',
             'Apa yang aman dicoba berkali-kali oleh desainer UX, tetapi tidak oleh dokter?',
           ),
           difficulty: 2,
@@ -1251,7 +1251,7 @@ export const lessons: Lesson[] = [
           },
         ],
         answer: 'mvp',
-        explainCorrect: t('MVP memungkinkan tim menguji ide inti tanpa menunggu semua fitur selesai. Seperti mencoba satu resep dulu sebelum membuka restoran.'),
+        explainCorrect: t('Dengan MVP, tim bisa menguji ide inti tanpa menunggu semua fitur selesai. Seperti mencoba satu resep dulu sebelum membuka restoran.'),
         hints: [t('Cari versi yang paling sederhana, tetapi sudah bisa dipakai.')],
         tags: ['ux'],
       }),
@@ -1458,7 +1458,7 @@ export const lessons: Lesson[] = [
           type: 'scenario',
           story: t(
             'Tim Dimas ingin tahu apakah pembeli paham cara memilih sepatu sampai membayar. Programmer belum mulai bekerja.',
-            'Tim Dimas ingin memastikan pembeli paham urutan klik dari memilih sepatu sampai membayar, sebelum programmer menulis kode.',
+            'Tim Dimas ingin tahu apakah pembeli paham urutan klik dari memilih sepatu sampai membayar, sebelum programmer menulis kode.',
           ),
           prompt: t('Apa yang paling cocok dibuat tim Dimas sekarang?', 'Rancangan apa yang paling cocok dibuat sekarang?'),
           difficulty: 2,
@@ -1592,7 +1592,7 @@ export const lessons: Lesson[] = [
         answer: 'pr',
         explainCorrect: t(
           'Prototype bisa diklik dan dicoba. Seperti rumah contoh yang pintunya bisa dibuka.',
-          'Prototype memungkinkan pemakai mencoba alur klik sebelum coding.',
+          'Dengan prototype, pemakai bisa mencoba alur klik sebelum coding.',
         ),
         hints: [t('Ingat tahap terakhir yang dibuat arsitek.', 'Ingat rumah contoh yang pintunya bisa dibuka.')],
         tags: ['prototype'],

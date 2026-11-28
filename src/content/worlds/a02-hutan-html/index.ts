@@ -417,7 +417,7 @@ export const lessons: Lesson[] = [
             },
             {
               id: 'wrap',
-              label: t('Menempel di luar isinya', 'Membungkus isi supaya tetap rapi dan teratur'),
+              label: t('Menempel di luar isinya', 'Membungkus isi di dalamnya'),
               explainWrong: t(
                 'Label kardus juga menempel di luar isinya. Itu kemiripannya.',
                 'Itu kemiripannya: kardus kertas juga membungkus isi.',
@@ -1479,7 +1479,7 @@ export const lessons: Lesson[] = [
           answer: 'h2',
           explainCorrect: t(
             'Subjudul turun satu tingkat dari judul utama, jadi tingkat 2.',
-            'Urutan judul berjalan rapi: h1, lalu h2, lalu h3.',
+            'Subjudul turun satu tingkat dari <h1>, jadi memakai <h2>.',
           ),
           hints: [t('Ingat bab dan subbab di buku.', 'Turun satu tingkat dari judul utama.')],
           tags: ['tag'],
